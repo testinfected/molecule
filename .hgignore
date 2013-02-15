@@ -1,0 +1,9 @@
+syntax: glob
+
+*.iws
+*.ipr
+*.iml
+.DS_Store
+target
+reports
+.idea
