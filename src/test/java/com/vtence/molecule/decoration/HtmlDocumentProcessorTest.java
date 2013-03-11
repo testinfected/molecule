@@ -27,24 +27,24 @@ public class HtmlDocumentProcessorTest {
             "</html>\n";
 
     @Test public void
-    extractsHtmlHeadMinusTitle() {
+    omitsTitleWhenExtractingHtmlHead() {
         assertThat("html chunks", processor.process(page), hasChunk("head",
                         "  <meta name=\"description\" content=\"Description\"/>\n" +
                         "  <meta name=\"author\" content=\"Author\"/>"));
     }
 
     @Test public void
-    extractsHtmlBody() {
+    extractsBodyFromHtmlPage() {
         assertThat("html chunks", processor.process(page), hasChunk("body", "Content of the body"));
     }
 
     @Test public void
-    extractsHtmlTitle() {
+    extractsHtmlTitleFromHead() {
         assertThat("html chunks", processor.process(page), hasChunk("title", "Page Title"));
     }
 
     @Test public void
-    extractsHeadMetaData() {
+    extractsMetaDataFromHead() {
         assertThat("html chunks", processor.process(page), hasChunk("meta[description]", "Description"));
         assertThat("html chunks", processor.process(page), hasChunk("meta[author]", "Author"));
     }

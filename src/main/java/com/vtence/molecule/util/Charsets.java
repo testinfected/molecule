@@ -3,6 +3,8 @@ package com.vtence.molecule.util;
 import java.nio.charset.Charset;
 
 /**
+ * Inspired by Google Collections code.
+ *
  * These charsets are guaranteed to be supported on any JVM.
  */
 public final class Charsets {

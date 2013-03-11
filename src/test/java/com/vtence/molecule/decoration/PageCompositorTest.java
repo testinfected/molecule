@@ -1,6 +1,7 @@
 package com.vtence.molecule.decoration;
 
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.api.Action;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
 
 @RunWith(JMock.class)
 public class PageCompositorTest {
@@ -37,13 +39,18 @@ public class PageCompositorTest {
     processesContentAndRendersLayout() throws Exception {
         context.checking(new Expectations() {{
             oneOf(contentProcessor).process(with(originalPage)); will(returnValue(data));
-            oneOf(layout).render(with(any(Writer.class)), with(same(data))); will(write(decoratedPage));
+            oneOf(layout).render(with(anyOutput()), with(same(data))); will(writeToOutput(decoratedPage));
         }});
 
         assertThat("decorated page", decorate(originalPage), equalTo(decoratedPage));
     }
 
-    private Action write(String output) {
+
+    private Matcher<Writer> anyOutput() {
+        return any(Writer.class);
+    }
+
+    private Action writeToOutput(String output) {
         return new Write(output);
     }
 
@@ -54,7 +61,6 @@ public class PageCompositorTest {
     }
 
     public static class Write implements Action {
-
         private Object content;
 
         public Write(Object content) {

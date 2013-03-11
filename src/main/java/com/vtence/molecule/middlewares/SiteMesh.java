@@ -28,11 +28,11 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        BufferedResponse capture = captureResponse(request, response);
-        if (shouldDecorate(capture)) {
-            decorate(response, capture);
+        BufferedResponse capturedResponse = captureResponse(request, response);
+        if (shouldDecorate(capturedResponse)) {
+            decorate(response, capturedResponse);
         } else {
-            write(response, capture);
+            write(response, capturedResponse);
         }
     }
 

@@ -23,10 +23,10 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 public class FilterMapTest {
 
     Mockery context = new JUnit4Mockery();
+    FilterMap filters = new FilterMap();
+
     Application successor = context.mock(Application.class, "successor");
     Sequence filtering = context.sequence("filtering");
-
-    FilterMap filters = new FilterMap();
 
     MockRequest request = aRequest();
     MockResponse response = aResponse();

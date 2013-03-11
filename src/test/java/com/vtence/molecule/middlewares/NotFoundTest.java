@@ -28,7 +28,7 @@ public class NotFoundTest {
     }
 
     @Test public void
-    setStatusCodeToNotFound() {
+    setsStatusCodeToNotFound() {
         response.assertStatus(HttpStatus.NOT_FOUND);
     }
 

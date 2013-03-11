@@ -24,9 +24,9 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 @RunWith(JMock.class)
 public class HttpMethodOverrideTest {
     Mockery context = new JUnit4Mockery();
-    Application successor = context.mock(Application.class, "successor");
-
     HttpMethodOverride methodOverride = new HttpMethodOverride();
+
+    Application successor = context.mock(Application.class, "successor");
 
     MockRequest request = aRequest();
     MockResponse response = aResponse();

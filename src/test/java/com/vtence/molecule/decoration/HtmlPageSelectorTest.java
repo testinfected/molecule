@@ -15,7 +15,7 @@ public class HtmlPageSelectorTest {
     Selector selector = new HtmlPageSelector();
 
     @Test public void
-    selectsHtmlContent() throws IOException {
+    selectsContentOfTypeTextHtmlWhenResponseIsOk() throws IOException {
         Response response = aResponse().
                 withContentType("text/html; charset=iso-8859-1").
                 withStatus(HttpStatus.OK);

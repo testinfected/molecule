@@ -23,8 +23,8 @@ public class FailureMonitorTest {
 
     Mockery context = new JUnit4Mockery();
     FailureReporter failureReporter = context.mock(FailureReporter.class);
-    Application successor = context.mock(Application.class, "successor");
     FailureMonitor monitor = new FailureMonitor(failureReporter);
+    Application successor = context.mock(Application.class, "successor");
 
     Exception error = new Exception("An internal error occurred!");
 

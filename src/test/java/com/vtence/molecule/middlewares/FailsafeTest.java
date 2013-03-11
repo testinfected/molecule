@@ -21,9 +21,8 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 @RunWith(JMock.class)
 public class FailsafeTest {
     Mockery context = new JUnit4Mockery();
-
-    Application successor = context.mock(Application.class, "successor");
     Failsafe failsafe = new Failsafe();
+    Application successor = context.mock(Application.class, "successor");
 
     String errorMessage = "An internal error occurred!";
     Exception error = new Exception(errorMessage);
@@ -51,7 +50,7 @@ public class FailsafeTest {
     }
 
     @Test public void
-    setStatusToInternalServerError() {
+    setsStatusToInternalServerError() {
         response.assertStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -28,8 +28,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 public class SiteMeshTest {
     Mockery context = new JUnit4Mockery();
     Selector selector = context.mock(Selector.class);
-    Application successor = context.mock(Application.class, "successor");
     SiteMesh siteMesh = new SiteMesh(selector, new FakeDecorator());
+    Application successor = context.mock(Application.class, "successor");
 
     String originalPage = "<plain page>";
     String decoratedPage = "<decorated page>";

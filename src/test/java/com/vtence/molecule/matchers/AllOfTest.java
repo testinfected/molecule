@@ -12,14 +12,18 @@ public class AllOfTest {
     evaluatesToLogicalConjunctionOfMultipleMatchers() {
         Matcher<String> allOf = AllOf.allOf(startingWith("one"), startingWith("one two"), startingWith("one two three"));
 
-        assertThat("no match but all matchers match", allOf.matches("one two three"));
+        assertThat("no match even if all matchers match", allOf.matches("one two three"));
         assertThat("match but one matcher does not match", !allOf.matches("one two two"));
     }
 
     @SuppressWarnings("unchecked") @Test public void
     supportsMatchingOnSuperType() {
-        Matcher<String> allOf = AllOf.allOf(startingWith("good"), new Anything<Object>());
+        Matcher<String> allOf = AllOf.allOf(startingWith("good"), aMatcherOnType(Object.class));
 
         assertThat("match", allOf.matches("good"));
+    }
+
+    private <T> Anything<T> aMatcherOnType(Class<T> type) {
+        return new Anything<T>();
     }
 }

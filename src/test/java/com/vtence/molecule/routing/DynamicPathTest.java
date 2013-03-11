@@ -29,7 +29,7 @@ public class DynamicPathTest {
     }
 
     @Test public void
-    expectsPathWithSameNumberOfSegments() {
+    expectsPathsWithSameNumberOfSegments() {
         DynamicPath dynamicPath = new DynamicPath("/products/:number/items/:id");
         assertThat("match", !dynamicPath.matches("/products/LAB-1234"));
     }
