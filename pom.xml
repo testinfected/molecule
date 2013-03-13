@@ -12,7 +12,7 @@
     <artifactId>molecule</artifactId>
     <packaging>jar</packaging>
     <name>Molecule</name>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     <description>A Rack inspired web framework for Java</description>
     <url>https://github.com/testinfected/molecule</url>
     <licenses>
