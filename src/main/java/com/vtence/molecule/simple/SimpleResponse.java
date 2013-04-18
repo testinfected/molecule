@@ -1,6 +1,7 @@
 package com.vtence.molecule.simple;
 
 import com.vtence.molecule.HttpException;
+import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.HttpStatus;
 import org.simpleframework.http.ContentType;
 import org.simpleframework.http.Response;
@@ -41,11 +42,11 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public void contentType(String mediaType) {
-        header("Content-Type", mediaType);
+        header(HttpHeaders.CONTENT_TYPE, mediaType);
     }
 
     public String contentType() {
-        return header("Content-Type");
+        return header(HttpHeaders.CONTENT_TYPE);
     }
 
     public String header(String name) {

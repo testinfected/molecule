@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Clock;
@@ -13,7 +14,7 @@ public class DateHeader extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        response.headerDate("Date", clock.now().getTime());
+        response.headerDate(HttpHeaders.DATE, clock.now().getTime());
 
         forward(request, response);
     }

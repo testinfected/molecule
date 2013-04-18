@@ -4,6 +4,7 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Charsets;
+import com.vtence.molecule.util.MimeTypes;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,7 +37,7 @@ public class Failsafe extends AbstractMiddleware {
     }
 
     private void renderError(Exception error, Response response) throws IOException {
-        response.contentType("text/html; charset=" + Charsets.ISO_8859_1.name().toLowerCase());
+        response.contentType(MimeTypes.TEXT_HTML + "; charset=" + Charsets.ISO_8859_1.name().toLowerCase());
         response.body(formatAsHtml(error));
     }
 

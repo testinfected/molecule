@@ -1,4 +1,4 @@
-define 'molecule', :group => 'com.vtence.molecule', :version => '0.1-SNAPSHOT' do
+define 'molecule', :group => 'com.vtence.molecule', :version => '0.2-SNAPSHOT' do
   compile.options.source = '1.7'
   compile.options.target = '1.7'
 

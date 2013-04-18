@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
@@ -12,7 +13,7 @@ public class ServerHeader extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        response.header("Server", serverName);
+        response.header(HttpHeaders.SERVER, serverName);
 
         forward(request, response);
     }

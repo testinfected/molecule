@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.decoration.Decorator;
@@ -37,7 +38,7 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     private void decorate(Response response, BufferedResponse buffer) throws IOException {
-        response.removeHeader("Content-Length");
+        response.removeHeader(HttpHeaders.CONTENT_LENGTH);
         Writer out = response.writer();
         decorator.decorate(out, buffer.body());
         out.flush();

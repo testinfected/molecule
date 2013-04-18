@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -38,7 +39,7 @@ public class FileServer implements Application {
     private void renderFile(Request request, Response response) throws IOException {
         File file = new File(root, fileName(request));
         response.contentType(MimeTypes.guessFrom(file.getName()));
-        response.headerDate("Last-Modified", file.lastModified());
+        response.headerDate(HttpHeaders.LAST_MODIFIED, file.lastModified());
         response.contentLength((int) file.length());
 
         InputStream in = new FileInputStream(file);
