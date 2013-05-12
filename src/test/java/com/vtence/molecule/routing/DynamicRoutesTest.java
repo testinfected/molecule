@@ -4,57 +4,57 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.middlewares.Routes;
+import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
-import static com.vtence.molecule.routing.RouterTest.Echo.echo;
+import static com.vtence.molecule.routing.DynamicRoutesTest.Echo.echo;
 import static com.vtence.molecule.support.MockRequest.DELETE;
 import static com.vtence.molecule.support.MockRequest.GET;
 import static com.vtence.molecule.support.MockRequest.POST;
 import static com.vtence.molecule.support.MockRequest.PUT;
 
-public class RouterTest {
+public class DynamicRoutesTest {
 
     @Test public void
     opensRoutesMatchingSpecifiedPathsAndVerbs() throws Exception {
-        Routes routes = Routes.draw(new Router() {{
+        Router router = Router.draw(new DynamicRoutes() {{
             map("/uri").via(HttpMethod.POST).to(echo("post to /uri"));
             map("/other/uri").via(HttpMethod.GET).to(echo("get to /other/uri"));
         }}).defaultsTo(echo("not matched"));
 
-        dispatch(routes, GET("/other/uri")).assertBody("get to /other/uri");
-        dispatch(routes, POST("/uri")).assertBody("post to /uri");
+        dispatch(router, GET("/other/uri")).assertBody("get to /other/uri");
+        dispatch(router, POST("/uri")).assertBody("post to /uri");
     }
 
     @Test public void
     providesConvenientShortcutsForDrawingRoutesUsingStandardVerbs() throws Exception {
-        Routes routes = Routes.draw(new Router() {{
+        Router router = Router.draw(new DynamicRoutes() {{
             get("/").to(echo("get"));
             put("/").to(echo("put"));
             post("/").to(echo("post"));
             delete("/").to(echo("delete"));
         }}).defaultsTo(echo("not matched"));
 
-        dispatch(routes, GET("/")).assertBody("get");
-        dispatch(routes, POST("/")).assertBody("post");
-        dispatch(routes, PUT("/")).assertBody("put");
-        dispatch(routes, DELETE("/")).assertBody("delete");
+        dispatch(router, GET("/")).assertBody("get");
+        dispatch(router, POST("/")).assertBody("post");
+        dispatch(router, PUT("/")).assertBody("put");
+        dispatch(router, DELETE("/")).assertBody("delete");
     }
 
     @Test public void
     drawsRoutesInOrder() throws Exception {
-        Routes routes = Routes.draw(new Router() {{
+        Router router = Router.draw(new DynamicRoutes() {{
             map("/").via(HttpMethod.GET).to(echo("get /"));
             map("/").to(echo("any /"));
         }}).defaultsTo(echo("not matched"));
 
-        dispatch(routes, GET("/"));
+        dispatch(router, GET("/"));
     }
 
-    private MockResponse dispatch(Routes routes, Request request) throws Exception {
+    private MockResponse dispatch(Router router, Request request) throws Exception {
         MockResponse response = new MockResponse();
-        routes.handle(request, response);
+        router.handle(request, response);
         return response;
     }
 

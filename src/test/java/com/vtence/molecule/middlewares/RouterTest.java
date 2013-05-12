@@ -20,9 +20,9 @@ import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 
 @RunWith(JMock.class)
-public class RoutesTest {
+public class RouterTest {
 
-    Routes routes = new Routes(new NotFound());
+    Router router = new Router(new NotFound());
 
     MockRequest request = aRequest();
     MockResponse response = aResponse();
@@ -35,14 +35,14 @@ public class RoutesTest {
 
     @Test public void
     routesToDefaultApplicationWhenNoRouteMatches() throws Exception {
-        routes.defaultsTo(fallbackApp).add(new StaticRoute(noRequest(), wrongApp));
+        router.defaultsTo(fallbackApp).add(new StaticRoute(noRequest(), wrongApp));
 
         context.checking(new Expectations() {{
             never(wrongApp);
             oneOf(fallbackApp).handle(with(same(request)), with(same(response)));
         }});
 
-        routes.handle(request, response);
+        router.handle(request, response);
     }
 
     @Test public void
@@ -51,10 +51,10 @@ public class RoutesTest {
             oneOf(preferredApp).handle(with(same(request)), with(same(response)));
             never(alternateApp);
         }});
-        routes.add(new StaticRoute(anyRequest(), preferredApp));
-        routes.add(new StaticRoute(anyRequest(), alternateApp));
+        router.add(new StaticRoute(anyRequest(), preferredApp));
+        router.add(new StaticRoute(anyRequest(), alternateApp));
 
-        routes.handle(request, response);
+        router.handle(request, response);
     }
 
     private Matcher<Request> noRequest() {

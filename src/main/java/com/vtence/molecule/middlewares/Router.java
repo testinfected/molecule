@@ -10,25 +10,25 @@ import com.vtence.molecule.routing.RouteSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Routes extends AbstractMiddleware implements RouteSet {
+public class Router extends AbstractMiddleware implements RouteSet {
 
-    public static Routes draw(RouteBuilder routeBuilder) {
-        Routes routes = new Routes();
-        routeBuilder.build(routes);
-        return routes;
+    public static Router draw(RouteBuilder routeBuilder) {
+        Router router = new Router();
+        routeBuilder.build(router);
+        return router;
     }
 
     private final List<Route> routingTable = new ArrayList<Route>();
 
-    public Routes() {
+    public Router() {
         this(new NotFound());
     }
 
-    public Routes(final Application fallback) {
+    public Router(final Application fallback) {
         connectTo(fallback);
     }
 
-    public Routes defaultsTo(Application app) {
+    public Router defaultsTo(Application app) {
         connectTo(app);
         return this;
     }
