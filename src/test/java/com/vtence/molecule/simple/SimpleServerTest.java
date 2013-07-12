@@ -50,7 +50,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    usesSpecifiedCharsetAsDefaultForEncoding() throws IOException {
+    acceptsADefaultCharsetForEncoding() throws IOException {
         server.defaultCharset(Charsets.UTF_16);
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -66,7 +66,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    supportsInMemoryHttpSessions() throws IOException {
+    providesHttpSessions() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 if (request.method() == HttpMethod.POST)
@@ -78,7 +78,7 @@ public class SimpleServerTest {
 
         request.withParameter("username", "Vincent").post("/login");
 
-        response = request.get("/");
+        response = request.but().removeParameters().get("/");
         response.assertHasContent("Hello, Vincent");
     }
 

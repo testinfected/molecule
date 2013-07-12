@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class HttpRequest {
 
-    private final WebClient client = new WebClient();
+    private final WebClient client;
     private final Map<String, String> parameters = new HashMap<String, String>();
 
     private HttpMethod method = HttpMethod.GET;
@@ -28,8 +28,17 @@ public class HttpRequest {
         return new HttpRequest();
     }
 
+    public HttpRequest() {
+        this(new WebClient());
+    }
+
+    public HttpRequest(WebClient client) {
+        this.client = client;
+    }
+
     public HttpRequest but() {
-        HttpRequest other = aRequest().withTimeOut(timeoutInMillis).onPort(port).withMethod(method).withPath(path);
+        HttpRequest other = new HttpRequest(client);
+        other.withTimeOut(timeoutInMillis).onPort(port).withMethod(method).withPath(path);
         for (String name : parameters.keySet()) {
             other.withParameter(name, parameters.get(name));
         }
@@ -83,6 +92,11 @@ public class HttpRequest {
 
     public HttpRequest withMethod(HttpMethod method) {
         this.method = method;
+        return this;
+    }
+
+    public HttpRequest removeParameters() {
+        parameters.clear();
         return this;
     }
 
