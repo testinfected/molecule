@@ -22,7 +22,7 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 public class DateHeaderTest {
     Mockery context = new JUnit4Mockery();
 
-    Date now = calendarDate(2012, 6, 8).atMidnight().build();
+    Date now = calendarDate(2012, 6, 8).atMidnight().inZone("GMT-04:00").build();
     DateHeader dateHeader = new DateHeader(BrokenClock.stoppedAt(now));
     Application successor = context.mock(Application.class, "successor");
 
