@@ -1,6 +1,8 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import com.vtence.molecule.util.FailureReporter;
@@ -8,7 +10,6 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
 import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -24,22 +25,17 @@ public class FailureMonitorTest {
     Mockery context = new JUnit4Mockery();
     FailureReporter failureReporter = context.mock(FailureReporter.class);
     FailureMonitor monitor = new FailureMonitor(failureReporter);
-    Application successor = context.mock(Application.class, "successor");
 
     Exception error = new Exception("An internal error occurred!");
 
     MockRequest request = aRequest();
     MockResponse response = aResponse();
 
-    @Before public void
-    chainToSuccessor() {
-        monitor.connectTo(successor);
-    }
-
     @Test public void
     notifiesFailureReporterAndRethrowsExceptionInCaseOfError() throws Exception {
+        monitor.connectTo(crashWith(error));
+
         context.checking(new Expectations() {{
-            allowing(successor).handle(with(request), with(response)); will(throwException(error));
             oneOf(failureReporter).errorOccurred(with(same(error)));
         }});
 
@@ -49,5 +45,13 @@ public class FailureMonitorTest {
         } catch (Exception e) {
             assertThat("error", e, sameInstance(error));
         }
+    }
+
+    private Application crashWith(final Exception error) {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                throw error;
+            }
+        };
     }
 }

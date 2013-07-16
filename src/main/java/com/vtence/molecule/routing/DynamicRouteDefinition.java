@@ -9,7 +9,7 @@ import com.vtence.molecule.matchers.Matchers;
 public class DynamicRouteDefinition implements RouteDefinition {
 
     private String path;
-    private Matcher<? super String> method = Matchers.anyMethod();
+    private Matcher<? super String> method = Matchers.<String>anything();
     private Application app;
 
     public DynamicRouteDefinition map(String path) {

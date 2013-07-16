@@ -2,111 +2,87 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Matcher;
-import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.matchers.Matchers;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.Sequence;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 
-@RunWith(JMock.class)
 public class FilterMapTest {
 
-    Mockery context = new JUnit4Mockery();
     FilterMap filters = new FilterMap();
-
-    Application successor = context.mock(Application.class, "successor");
-    Sequence filtering = context.sequence("filtering");
 
     MockRequest request = aRequest();
     MockResponse response = aResponse();
 
     @Before public void
-    chainWithSuccessor() {
-        filters.connectTo(successor);
+    stubApplication() {
+        filters.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("content");
+            }
+        });
     }
 
     @Test public void
     immediatelyForwardsRequestWhenNoFilterIsRegistered() throws Exception {
-        expectForward();
         filters.handle(request, response);
+        response.assertBody("content");
     }
 
     @Test public void
-    runsRequestThroughFilterThatMatches() throws Exception {
-        final Middleware ignored = context.mock(Middleware.class, "ignored");
-        filters.map(noRequest(), ignored);
-        final Middleware applies = context.mock(Middleware.class, "applies");
-        filters.map(anyRequest(), applies);
-
-        context.checking(new Expectations() {{
-            oneOf(applies).connectTo(successor); inSequence(filtering);
-            oneOf(applies).handle(request, response); inSequence(filtering);
-        }});
+    runsRequestThroughMatchingFilter() throws Exception {
+        filters.map(none(), filter("wrong"));
+        filters.map(all(), filter("right"));
 
         filters.handle(request, response);
+        response.assertBody("right content");
     }
 
     @Test public void
     forwardsRequestIfNoFilterMatches() throws Exception {
-        final Middleware filter = context.mock(Middleware.class);
-        filters.map(noRequest(), filter);
-
-        expectForward();
+        filters.map(none(), filter("wrong"));
         filters.handle(request, response);
+        response.assertBody("content");
     }
 
     @Test public void
-    runsRequestThroughFilterMappedToPrefixOfRequestPath() throws Exception {
-        request.withPath("/filtered/path");
-
-        final Middleware filter = context.mock(Middleware.class);
-        filters.map("/filtered", filter);
-
-        context.checking(new Expectations() {{
-            allowing(filter).connectTo(successor);
-            oneOf(filter).handle(request, response);
-        }});
+    matchesOnPathPrefix() throws Exception {
+        request.setPath("/filtered/path");
+        filters.map("/filtered", filter("filtered"));
 
         filters.handle(request, response);
+        response.assertBody("filtered content");
     }
 
     @Test public void
     appliesLastRegisteredOfMatchingFilters() throws Exception {
-        final Middleware ignored = context.mock(Middleware.class, "ignored");
-        filters.map(anyRequest(), ignored);
-        final Middleware applies = context.mock(Middleware.class, "applies");
-        filters.map(anyRequest(), applies);
-
-        context.checking(new Expectations() {{
-            allowing(applies).connectTo(successor);
-            oneOf(applies).handle(request, response);
-        }});
+        filters.map(all(), filter("old"));
+        filters.map(all(), filter("new"));
 
         filters.handle(request, response);
+        response.assertBody("new content");
     }
 
-    private void expectForward() throws Exception {
-        context.checking(new Expectations() {{
-            oneOf(successor).handle(with(same(request)), with(same(response)));
-        }});
-    }
-
-    private Matcher<Request> anyRequest() {
+    private Matcher<Request> all() {
         return Matchers.anything();
     }
 
-    private Matcher<Request> noRequest() {
+    private Matcher<Request> none() {
         return Matchers.nothing();
+    }
+
+    private AbstractMiddleware filter(final String name) {
+        return new AbstractMiddleware() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body(name + " ");
+                forward(request, response);
+            }
+        };
     }
 }

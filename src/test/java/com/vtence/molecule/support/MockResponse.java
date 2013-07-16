@@ -139,6 +139,10 @@ public class MockResponse implements Response {
         writer.flush();
     }
 
+    public String body() {
+        return new String(content(), charset());
+    }
+
     public void assertBody(String body) {
         assertBody(equalTo(body));
     }

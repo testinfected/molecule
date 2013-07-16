@@ -1,51 +1,39 @@
 package com.vtence.molecule.middlewares;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.api.Invocation;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.action.CustomAction;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static org.hamcrest.CoreMatchers.containsString;
 
-@RunWith(JMock.class)
 public class FailsafeTest {
-    Mockery context = new JUnit4Mockery();
     Failsafe failsafe = new Failsafe();
-    Application successor = context.mock(Application.class, "successor");
 
     String errorMessage = "An internal error occurred!";
-    Exception error = new Exception(errorMessage);
+    Exception error = new Exception(errorMessage) {{
+        setStackTrace(new StackTraceElement[] {
+                      new StackTraceElement("stack", "trace", "line", 1),
+                      new StackTraceElement("stack", "trace", "line", 2)
+        });
+    }};
 
     MockRequest request = aRequest();
     MockResponse response = aResponse();
 
     @Before public void
     handleRequest() throws Exception {
-        error.setStackTrace(new StackTraceElement[] {
-                new StackTraceElement("stack", "trace", "line", 1),
-                new StackTraceElement("stack", "trace", "line", 2)
+        failsafe.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                throw error;
+            }
         });
-
-        context.checking(new Expectations() {{
-            allowing(successor).handle(with(request), with(response)); will(new CustomAction("throw exception") {
-                public Object invoke(Invocation invocation) throws Throwable {
-                    throw error;
-                }
-            });
-        }});
-
-        failsafe.connectTo(successor);
         failsafe.handle(request, response);
     }
 

@@ -46,6 +46,10 @@ public class MockRequest implements Request {
         return this;
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public MockRequest withMethod(HttpMethod method) {
         this.method = method;
         return this;

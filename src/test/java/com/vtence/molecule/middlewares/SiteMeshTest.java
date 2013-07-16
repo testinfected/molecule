@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
@@ -20,7 +21,6 @@ import java.io.Writer;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
-import static com.vtence.molecule.support.WriteBody.writeBody;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
 
@@ -29,7 +29,6 @@ public class SiteMeshTest {
     Mockery context = new JUnit4Mockery();
     Selector selector = context.mock(Selector.class);
     SiteMesh siteMesh = new SiteMesh(selector, new FakeDecorator());
-    Application successor = context.mock(Application.class, "successor");
 
     String originalPage = "<plain page>";
     String decoratedPage = "<decorated page>";
@@ -39,38 +38,35 @@ public class SiteMeshTest {
     MockResponse response = aResponse();
 
     @Before public void
-    chainWithSuccessor() throws Exception {
+    selectPage() throws Exception {
         context.checking(new Expectations() {{
             allowing(selector).select(with(any(Response.class))); will(returnValue(true)); when(page.is("selected"));
             allowing(selector).select(with(any(Response.class))); will(returnValue(false)); when(page.isNot("selected"));
-            allowing(successor).handle(with(request), with(any(Response.class))); will(writeBody(originalPage));
         }});
+    }
 
-        siteMesh.connectTo(successor);
+    @Before public void
+    stubApplication() {
+        siteMesh.connectTo(write(originalPage));
     }
 
     @Test public void
     runsContentThroughDecoratorWhenPageIsSelected() throws Exception {
         siteMesh.handle(request, response);
-
         response.assertBody(decoratedPage);
     }
-
 
     @Test public void
     removesContentLengthHeaderWhenPageIsSelected() throws Exception {
         response.header("Content-Length", String.valueOf(140));
         siteMesh.handle(request, response);
-
         response.assertHeader("Content-Length", nullValue());
     }
 
     @Test public void
-    doesNotDecorateContentWhenPageIsNotSelected() throws Exception {
+    leavesContentUntouchedWhenPageIsNotSelected() throws Exception {
         page.become("unselected");
-
         siteMesh.handle(request, response);
-
         response.assertBody(originalPage);
     }
 
@@ -83,6 +79,14 @@ public class SiteMeshTest {
 
         response.assertContentType(containsString("UTF-16"));
         response.assertContentEncodedAs("UTF-16");
+    }
+
+    private Application write(final String text) {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body(text);
+            }
+        };
     }
 
     private class FakeDecorator implements Decorator {

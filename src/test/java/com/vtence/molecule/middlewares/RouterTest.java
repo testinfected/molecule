@@ -4,60 +4,56 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.matchers.Anything;
 import com.vtence.molecule.matchers.Nothing;
 import com.vtence.molecule.routing.Route;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import static com.vtence.molecule.matchers.Matchers.anyRequest;
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(JMock.class)
 public class RouterTest {
 
     Router router = new Router(new NotFound());
-
     MockRequest request = aRequest();
     MockResponse response = aResponse();
 
-    Mockery context = new JUnit4Mockery();
-    Application wrongApp = context.mock(Application.class, "wrong app");
-    Application preferredApp = context.mock(Application.class, "preferred app");
-    Application alternateApp = context.mock(Application.class, "alternate app");
-    Application fallbackApp = context.mock(Application.class, "fallback app");
-
     @Test public void
-    routesToDefaultApplicationWhenNoRouteMatches() throws Exception {
-        router.defaultsTo(fallbackApp).add(new StaticRoute(noRequest(), wrongApp));
-
-        context.checking(new Expectations() {{
-            never(wrongApp);
-            oneOf(fallbackApp).handle(with(same(request)), with(same(response)));
-        }});
-
+    routesToDefaultWhenNoRouteMatches() throws Exception {
+        router.defaultsTo(route("default")).add(new StaticRoute(none(), route("other")));
         router.handle(request, response);
+        assertRoutedTo("default");
     }
 
     @Test public void
     dispatchesToFirstRouteThatMatches() throws Exception {
-        context.checking(new Expectations() {{
-            oneOf(preferredApp).handle(with(same(request)), with(same(response)));
-            never(alternateApp);
-        }});
-        router.add(new StaticRoute(anyRequest(), preferredApp));
-        router.add(new StaticRoute(anyRequest(), alternateApp));
-
+        router.add(new StaticRoute(all(), route("preferred")));
+        router.add(new StaticRoute(all(), route("alternate")));
         router.handle(request, response);
+        assertRoutedTo("preferred");
     }
 
-    private Matcher<Request> noRequest() {
+    private void assertRoutedTo(String route) {
+        assertThat("route", response.body(), equalTo(route));
+    }
+
+    private Application route(final String name) {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body(name);
+            }
+        };
+    }
+
+    public static Matcher<Request> all() {
+        return new Anything<Request>();
+    }
+
+    public static Matcher<Request> none() {
         return new Nothing<Request>();
     }
 

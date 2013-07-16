@@ -13,14 +13,6 @@ public final class Matchers {
         return Anything.anything();
     }
 
-    public static Matcher<Request> anyRequest() {
-        return anything();
-    }
-
-    public static Matcher<String> anyMethod() {
-        return anything();
-    }
-
     public static <T> Matcher<T> nothing() {
         return Nothing.nothing();
     }
@@ -33,11 +25,11 @@ public final class Matchers {
         return StartingWith.startingWith(prefix);
     }
 
-    public static Matcher<Request> withMethod(Matcher<? super String> method) {
+    public static Matcher<Request> withMethod(String method) {
         return RequestWithMethod.withMethod(method);
     }
 
-    public static Matcher<Request> withMethod(String method) {
+    public static Matcher<Request> withMethod(Matcher<? super String> method) {
         return RequestWithMethod.withMethod(method);
     }
 

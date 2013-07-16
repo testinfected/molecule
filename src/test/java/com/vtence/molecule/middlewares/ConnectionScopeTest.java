@@ -1,8 +1,11 @@
 package com.vtence.molecule.middlewares;
 
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
+import com.vtence.molecule.Application;
+import com.vtence.molecule.HttpException;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
+import com.vtence.molecule.support.MockRequest;
+import com.vtence.molecule.support.MockResponse;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.States;
@@ -11,19 +14,16 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpException;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
-import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-import static org.jmock.Expectations.same;
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.fail;
 
 @RunWith(JMock.class)
 public class ConnectionScopeTest {
@@ -32,7 +32,6 @@ public class ConnectionScopeTest {
     DataSource dataSource = context.mock(DataSource.class);
     ConnectionScope connectionScope = new ConnectionScope(dataSource);
 
-    Application successor = context.mock(Application.class, "successor");
     Connection connection = context.mock(Connection.class);
     States connectionStatus = context.states("connection").startsAs("closed");
 
@@ -40,50 +39,51 @@ public class ConnectionScopeTest {
     MockResponse response = aResponse();
 
     @Before public void
-    chainWithSuccessor() throws Exception {
+    expectConnectionToBeReleased() throws Exception {
         context.checking(new Expectations() {{
             allowing(dataSource).getConnection(); will(returnValue(connection)); when(connectionStatus.is("closed"));
                 then(connectionStatus.is("opened"));
-            oneOf(connection).close(); when(connectionStatus.is("opened"));
-                then(connectionStatus.is("closed"));
+            oneOf(connection).close(); when(connectionStatus.is("opened")); then(connectionStatus.is("closed"));
         }});
-
-        connectionScope.connectTo(successor);
     }
 
     @Test public void
-    makesConnectionAvailableToSuccessor() throws Exception {
-        context.checking(new Expectations() {{
-            oneOf(successor).handle(with(aRequestWithConnectionReference(sameConnection(connection))), with(any(Response.class))); when(connectionStatus.is("opened"));
-        }});
-
+    opensConnectionAndMakesAvailableAsRequestAttribute() throws Exception {
+        connectionScope.connectTo(reportPresenceOfAttribute(Connection.class, connection));
         connectionScope.handle(request, response);
+        assertScoping("on");
     }
 
     @Test public void
     gracefullyClosesConnectionAndRemovesFromScopeWhenAnErrorOccurs() throws Exception {
-        context.checking(new Expectations() {{
-            allowing(successor).handle(with(any(Request.class)), with(any(Response.class)));
-                will(throwException(new HttpException("error")));
-        }});
+        connectionScope.connectTo(crashWith(new HttpException("Boom!")));
 
         try {
             connectionScope.handle(request, response);
+            fail("HttpException did not bubble up");
         } catch (HttpException expected) {
         }
 
-        request.assertAttribute(Connection.class, Matchers.nullValue());
+        request.assertAttribute(Connection.class, nullValue());
     }
 
-    private Matcher<Object> sameConnection(final Connection connection) {
-        return same((Object) connection);
-    }
-
-    private Matcher<Request> aRequestWithConnectionReference(Matcher<Object> connection) {
-        return new FeatureMatcher<Request, Object>(connection, "a request with connection scope", "connection scope") {
-            protected Object featureValueOf(Request actual) {
-                return new ConnectionScope.Reference(request).get();
+    private Application crashWith(final HttpException error) {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                throw error;
             }
         };
+    }
+
+    private Application reportPresenceOfAttribute(final Object key, final Object value) {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body(request.attribute(key) == value ? "on" : "off");
+            }
+        };
+    }
+
+    private void assertScoping(String state) {
+        assertThat("scoping", response.body(), equalTo(state));
     }
 }
