@@ -38,7 +38,7 @@ import static org.junit.Assert.fail;
 public class SimpleServerTest {
 
     static final String SESSION_COOKIE = "JSESSIONID";
-    static final long SESSION_TIMEOUT = MINUTES.toSeconds(30);
+    static final long THIRTY_MINUTES = MINUTES.toSeconds(30);
 
     SimpleServer server = new SimpleServer(9999);
     HttpRequest request = aRequest().onPort(server.port());
@@ -54,11 +54,12 @@ public class SimpleServerTest {
                 SimpleServerTest.this.error  = error;
             }
         });
-        server.enableSessions(new CookieTracker(new SessionPool(delorean, SESSION_TIMEOUT)));
+        server.enableSessions(new CookieTracker(new SessionPool(delorean, THIRTY_MINUTES)));
     }
 
     @After public void
     stopServer() throws Exception {
+        delorean.back();
         server.shutdown();
     }
 
@@ -182,7 +183,7 @@ public class SimpleServerTest {
                     request.session().put("username", request.parameter("username"));
                 else {
                     Session session = request.session(false);
-                    String username = session != null ? (String) session.get("username") : "X";
+                    String username = session != null ? session.<String>get("username") : "X";
                     response.body("Hello, " + username);
                 }
             }
@@ -191,7 +192,7 @@ public class SimpleServerTest {
         response = request.withParameter("username", "Vincent").post("/login");
         assertNoError();
 
-        delorean.travel(SECONDS.toMillis(SESSION_TIMEOUT));
+        delorean.travel(SECONDS.toMillis(THIRTY_MINUTES));
         response = request.but().removeParameters().get("/");
         assertNoError();
 
@@ -202,14 +203,13 @@ public class SimpleServerTest {
         return Matchers.hasKey(equalTo(key));
     }
 
-    private Matcher<Map<? extends Object, ? extends Object>> containsEntry(Object key, Object value) {
+    private Matcher<Map<?, ?>> containsEntry(Object key, Object value) {
         return Matchers.hasEntry(equalTo(key), equalTo(value));
     }
 
     private void assertNoError() {
         if (error != null) fail(StackTrace.of(error));
     }
-
 
     private static class Delorean implements Clock {
 
