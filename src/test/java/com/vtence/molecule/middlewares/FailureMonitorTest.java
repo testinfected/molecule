@@ -7,11 +7,9 @@ import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import com.vtence.molecule.util.FailureReporter;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
@@ -19,10 +17,9 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-@RunWith(JMock.class)
 public class FailureMonitorTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
     FailureReporter failureReporter = context.mock(FailureReporter.class);
     FailureMonitor monitor = new FailureMonitor(failureReporter);
 

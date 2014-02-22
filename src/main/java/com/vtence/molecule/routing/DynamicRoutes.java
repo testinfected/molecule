@@ -10,8 +10,8 @@ public class DynamicRoutes implements RouteBuilder {
     private final Collection<DynamicRouteDefinition> routes = new ArrayList<DynamicRouteDefinition>();
 
     public void build(RouteSet routeSet) {
-        for (DynamicRouteDefinition route : this.routes) {
-            routeSet.add(route.toRoute());
+        for (DynamicRouteDefinition definition : this.routes) {
+            routeSet.add(definition.toRoute());
         }
     }
 

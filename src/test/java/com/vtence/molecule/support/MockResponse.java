@@ -4,6 +4,7 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Charsets;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -30,13 +31,11 @@ public class MockResponse implements Response {
 
     private final Map<String, String> headers = new HashMap<String, String>();
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    private final Map<String, String> cookies = new HashMap<String, String>();
     private HttpStatus status;
 
     public static MockResponse aResponse() {
         return new MockResponse();
-    }
-
-    public MockResponse() {
     }
 
     public void redirectTo(String location) {
@@ -63,12 +62,16 @@ public class MockResponse implements Response {
         headers.remove(name);
     }
 
+    public void cookie(String name, String value) {
+        cookies.put(name, value);
+    }
+
     public void assertHeader(String name, String value) {
         assertHeader(name, equalTo(value));
     }
 
     public void assertHeader(String name, Matcher<? super String> valueMatcher) {
-        assertThat("response header[" + name + "]", header(name), valueMatcher);
+        assertThat("header[" + name + "]", header(name), valueMatcher);
     }
 
     public void assertHeader(String name, long date) {
@@ -95,6 +98,11 @@ public class MockResponse implements Response {
         return status.code;
     }
 
+    public MockResponse withStatus(HttpStatus status) {
+        status(status);
+        return this;
+    }
+
     public void status(HttpStatus status) {
         this.status = status;
     }
@@ -107,11 +115,11 @@ public class MockResponse implements Response {
         assertThat("response status", status, equalTo(expected));
     }
 
-    public int contentLength() {
-        return header("Content-Length") != null ? parseInt(header("Content-Length")) : 0;
+    public long contentLength() {
+        return header("Content-Length") != null ? parseLong(header("Content-Length")) : 0;
     }
 
-    public void contentLength(int length) {
+    public void contentLength(long length) {
         header("Content-Length", valueOf(length));
     }
 
@@ -139,28 +147,32 @@ public class MockResponse implements Response {
         writer.flush();
     }
 
-    public String body() {
-        return new String(content(), charset());
-    }
-
     public void assertBody(String body) {
         assertBody(equalTo(body));
     }
 
     public void assertBody(Matcher<? super String> bodyMatcher) {
-        assertThat("response body", new String(content(), charset()), bodyMatcher);
+        assertThat("body", new String(content(), charset()), bodyMatcher);
+    }
+
+    public String body() {
+        return new String(content(), charset());
     }
 
     public void assertContent(byte[] content) {
-        assertArrayEquals("response content", content, content());
+        assertArrayEquals("content", content, content());
+    }
+
+    public byte[] content() {
+        return output.toByteArray();
     }
 
     public void assertContentSize(long size) {
-        assertThat("response size", output.toByteArray().length, is((int) size));
+        assertThat("content size", output.toByteArray().length, is((int) size));
     }
 
     public void assertContentEncodedAs(String encoding) throws IOException {
-        assertThat("response encoding", CharsetDetector.detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
+        assertThat("content encoding", CharsetDetector.detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
     }
 
     public void reset() throws IOException {
@@ -176,25 +188,19 @@ public class MockResponse implements Response {
         return this;
     }
 
-    public MockResponse withStatus(HttpStatus status) {
-        status(status);
-        return this;
+    public void assertCookie(String name, String value) {
+        assertThat("cookies", cookies, Matchers.hasEntry(name, value));
     }
 
     public String toString() {
-        return output.toString();
+        return "mock response (" + output + ")";
     }
-
     private static final String RFC_1123_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
     private static final String TYPE = "[^/]+";
     private static final String SUBTYPE = "[^;]+";
     private static final String CHARSET = "charset=([^;]+)";
     private static final Pattern CONTENT_TYPE_FORMAT = Pattern.compile(String.format("%s/%s(?:;\\s*%s)+", TYPE, SUBTYPE, CHARSET));
     private static final int ENCODING = 1;
-
-    private byte[] content() {
-        return output.toByteArray();
-    }
 
     private static Charset parseCharset(String contentType) {
         java.util.regex.Matcher matcher = CONTENT_TYPE_FORMAT.matcher(contentType);

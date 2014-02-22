@@ -20,7 +20,8 @@ public class DynamicPath implements Matcher<String> {
         if (!pattern.sameLengthAs(path)) return false;
 
         for (int i = 0; i < pattern.segmentCount(); i++) {
-            if (!isDynamic(pattern.segment(i)) && !pattern.segment(i).equals(path.segment(i))) return false;
+            if (!isDynamic(pattern.segment(i)) && !pattern.segment(i).equals(path.segment(i)))
+                return false;
         }
         return true;
     }
@@ -47,7 +48,6 @@ public class DynamicPath implements Matcher<String> {
     }
 
     public static class Path {
-
         private final String path;
 
         public Path(String path) {

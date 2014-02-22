@@ -24,7 +24,11 @@ public interface Request {
 
     Map<Object, Object> attributes();
 
+    String cookie(String name);
+
     Session session();
+
+    Session session(boolean create);
 
     <T> T unwrap(Class<T> type);
 }

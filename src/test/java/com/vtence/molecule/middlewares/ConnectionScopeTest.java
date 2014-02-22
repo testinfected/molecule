@@ -7,13 +7,11 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.jmock.States;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -25,10 +23,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
 
-@RunWith(JMock.class)
 public class ConnectionScopeTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
     DataSource dataSource = context.mock(DataSource.class);
     ConnectionScope connectionScope = new ConnectionScope(dataSource);
 

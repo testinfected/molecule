@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HttpResponse {
@@ -86,5 +87,13 @@ public class HttpResponse {
 
     public void assertNotChunked() {
         assertHasNoHeader("Transfer-Encoding");
+    }
+
+    public void assertHasCookie(String name) {
+        assertHasHeader("Set-Cookie", containsString(name + "="));
+    }
+
+    public void assertHasNoCookie(String name) {
+        assertHasHeader("Set-Cookie", not(containsString(name)));
     }
 }

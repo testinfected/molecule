@@ -1,20 +1,20 @@
 package com.vtence.molecule.simple;
 
-import com.vtence.molecule.HttpException;
 import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
-import org.simpleframework.util.lease.LeaseException;
+import com.vtence.molecule.simple.session.SessionTracking;
+import org.simpleframework.http.Cookie;
 
-import java.io.IOException;
 import java.util.Map;
 
-public class SimpleRequest implements Request {
+public class SimpleRequest implements com.vtence.molecule.Request {
 
     private final org.simpleframework.http.Request request;
+    private final SessionTracking sessionTracking;
 
-    public SimpleRequest(org.simpleframework.http.Request request) {
+    public SimpleRequest(org.simpleframework.http.Request request, SessionTracking sessionTracking) {
         this.request = request;
+        this.sessionTracking = sessionTracking;
     }
 
     public String protocol() {
@@ -34,11 +34,7 @@ public class SimpleRequest implements Request {
     }
 
     public String parameter(String name) {
-        try {
-            return request.getParameter(name);
-        } catch (IOException e) {
-            throw new HttpException("Cannot read request parameter", e);
-        }
+        return request.getParameter(name);
     }
 
     public String ip() {
@@ -58,21 +54,26 @@ public class SimpleRequest implements Request {
         request.getAttributes().remove(key);
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<Object, Object> attributes() {
+        return request.getAttributes();
+    }
+
+    public String cookie(String name) {
+        Cookie cookie = request.getCookie(name);
+        return cookie != null ? cookie.getValue() : null;
+    }
+
     public Session session() {
-        try {
-            return new SimpleSession(request.getSession());
-        } catch (LeaseException e) {
-            throw new HttpException("Cannot acquire session", e);
-        }
+        return session(true);
+    }
+
+    public Session session(boolean create) {
+        return sessionTracking.openSession(this, create);
     }
 
     public <T> T unwrap(Class<T> type) {
         if (!type.isAssignableFrom(request.getClass())) throw new IllegalArgumentException("Unsupported type: " + type.getName());
         return type.cast(request);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Map<Object, Object> attributes() {
-        return request.getAttributes();
     }
 }

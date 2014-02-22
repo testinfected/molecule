@@ -8,13 +8,11 @@ import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.jmock.States;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -24,9 +22,8 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-@RunWith(JMock.class)
 public class SiteMeshTest {
-    Mockery context = new JUnit4Mockery();
+    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
     Selector selector = context.mock(Selector.class);
     SiteMesh siteMesh = new SiteMesh(selector, new FakeDecorator());
 

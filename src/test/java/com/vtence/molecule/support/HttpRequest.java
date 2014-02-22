@@ -4,7 +4,6 @@ import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
-import com.vtence.molecule.Server;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -16,13 +15,15 @@ import java.util.Map;
 
 public class HttpRequest {
 
-    private final WebClient client;
     private final Map<String, String> parameters = new HashMap<String, String>();
 
+    private final WebClient client;
     private HttpMethod method = HttpMethod.GET;
     private String path = "/";
     private int port;
     private int timeoutInMillis = 5000;
+    private boolean followRedirects = true;
+    private boolean applyCookies = true;
 
     public static HttpRequest aRequest() {
         return new HttpRequest();
@@ -38,11 +39,17 @@ public class HttpRequest {
 
     public HttpRequest but() {
         HttpRequest other = new HttpRequest(client);
-        other.withTimeOut(timeoutInMillis).onPort(port).withMethod(method).withPath(path);
+        other.withTimeOut(timeoutInMillis).onPort(port).usingMethod(method).on(path).
+                applyCookies(applyCookies).followRedirects(followRedirects);
         for (String name : parameters.keySet()) {
             other.withParameter(name, parameters.get(name));
         }
         return other;
+    }
+
+    public HttpRequest applyCookies(boolean apply) {
+        this.applyCookies = apply;
+        return this;
     }
 
     public HttpRequest onPort(int port) {
@@ -50,13 +57,13 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest withPath(String path) {
+    public HttpRequest on(String path) {
         this.path = path;
         return this;
     }
 
-    public HttpRequest to(Server server) {
-        onPort(server.port());
+    public HttpRequest followRedirects(boolean follow) {
+        this.followRedirects = follow;
         return this;
     }
 
@@ -66,7 +73,9 @@ public class HttpRequest {
     }
 
     public HttpResponse send() throws IOException {
-        client.setTimeout(timeoutInMillis);
+        client.getOptions().setTimeout(timeoutInMillis);
+        if (!applyCookies) client.getCookieManager().clearCookies();
+        client.getOptions().setRedirectEnabled(followRedirects);
         WebRequest request = new WebRequest(requestUrl(), method);
         request.setRequestParameters(requestParameters());
 
@@ -74,15 +83,15 @@ public class HttpRequest {
     }
 
     public HttpResponse get(String path) throws IOException {
-        return withMethod(HttpMethod.GET).withPath(path).send();
+        return usingMethod(HttpMethod.GET).on(path).send();
     }
 
     public HttpResponse post(String path) throws IOException {
-        return withMethod(HttpMethod.POST).withPath(path).send();
+        return usingMethod(HttpMethod.POST).on(path).send();
     }
 
     public HttpResponse delete(String path) throws IOException {
-        return withMethod(HttpMethod.DELETE).withPath(path).send();
+        return usingMethod(HttpMethod.DELETE).on(path).send();
     }
 
     public HttpRequest withTimeOut(int timeoutInMillis) {
@@ -90,7 +99,7 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest withMethod(HttpMethod method) {
+    public HttpRequest usingMethod(HttpMethod method) {
         this.method = method;
         return this;
     }

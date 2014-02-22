@@ -14,10 +14,12 @@ public class MockRequest implements Request {
 
     private final Map<String, String> params = new HashMap<String, String>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
+    private final Map<String, String> cookies = new HashMap<String, String>();
     private HttpMethod method = HttpMethod.GET;
     private String path = "/";
     private String ip = "127.0.0.1";
     private String protocol = "HTTP/1.1";
+    private Session session;
 
     public static MockRequest aRequest() {
         return new MockRequest();
@@ -41,13 +43,13 @@ public class MockRequest implements Request {
 
     public MockRequest() {}
 
+    public void setPath(String path) {
+        withPath(path);
+    }
+
     public MockRequest withPath(String path) {
         this.path = path;
         return this;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 
     public MockRequest withMethod(HttpMethod method) {
@@ -119,11 +121,26 @@ public class MockRequest implements Request {
     }
 
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {
-        assertThat("attribute["  + key.toString() + "]", attribute(key), attributeMatcher);
+        assertThat("attribute[" + key.toString() + "]", attribute(key), attributeMatcher);
+    }
+
+    public void withCookie(String name, String value) {
+        cookies.put(name, value);
+    }
+
+    public String cookie(String name) {
+        return cookies.get(name);
     }
 
     public Session session() {
-        return null;
+        return session(true);
+    }
+
+    public Session session(boolean create) {
+        if (session == null && create) {
+            session = new MockSession();
+        }
+        return session;
     }
 
     public String toString() {

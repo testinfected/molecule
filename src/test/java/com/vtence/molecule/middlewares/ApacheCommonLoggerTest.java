@@ -6,12 +6,10 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -24,13 +22,14 @@ import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.containsString;
 
-@RunWith(JMock.class)
 public class ApacheCommonLoggerTest {
-
-    Mockery context = new JUnit4Mockery() {{ setImposteriser(ClassImposteriser.INSTANCE); }};
+    @Rule public JUnitRuleMockery context = new JUnitRuleMockery() {{
+        setImposteriser(ClassImposteriser.INSTANCE);
+    }};
     Logger logger = context.mock(Logger.class);
     Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").build();
-    ApacheCommonLogger apacheCommonLogger = new ApacheCommonLogger(logger, BrokenClock.stoppedAt(currentTime), TimeZone.getTimeZone("GMT+01:00"));
+    ApacheCommonLogger apacheCommonLogger =
+            new ApacheCommonLogger(logger, BrokenClock.stoppedAt(currentTime), TimeZone.getTimeZone("GMT+01:00"));
 
     @Test public void
     logsRequestsServedInApacheCommonLogFormat() throws Exception {

@@ -33,10 +33,6 @@ public class RequestWrapper implements Request {
         return request.parameter(name);
     }
 
-    public <T> T unwrap(Class<T> type) {
-        return request.unwrap(type);
-    }
-
     public String ip() {
         return request.ip();
     }
@@ -57,7 +53,19 @@ public class RequestWrapper implements Request {
         return request.attributes();
     }
 
+    public String cookie(String name) {
+        return request.cookie(name);
+    }
+
     public Session session() {
         return request.session();
+    }
+
+    public Session session(boolean create) {
+        return request.session(create);
+    }
+
+    public <T> T unwrap(Class<T> type) {
+        return request.unwrap(type);
     }
 }

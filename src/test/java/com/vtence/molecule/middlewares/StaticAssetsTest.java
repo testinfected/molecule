@@ -7,20 +7,17 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JMock;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static com.vtence.molecule.HttpStatus.OK;
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 
-@RunWith(JMock.class)
 public class StaticAssetsTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
     Application fileServer = context.mock(Application.class, "file server");
     StaticAssets assets = new StaticAssets(fileServer, "/favicon.ico");
 

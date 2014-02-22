@@ -2,11 +2,15 @@ package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.simple.session.DisableSessions;
+import com.vtence.molecule.simple.session.SessionTracker;
+import com.vtence.molecule.simple.session.SessionTracking;
 import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.FailureReporter;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
@@ -17,12 +21,18 @@ import java.nio.charset.Charset;
 
 public class SimpleServer implements Server {
 
-    private final int port;
+    private static final int PORT_80 = 80;
 
+    private int port;
     private FailureReporter failureReporter = FailureReporter.IGNORE;
     private Charset defaultCharset = Charsets.ISO_8859_1;
+    private SessionTracker tracker = new DisableSessions();
 
     private Connection connection;
+
+    public SimpleServer() {
+        this(PORT_80);
+    }
 
     public SimpleServer(int port) {
         this.port = port;
@@ -36,12 +46,20 @@ public class SimpleServer implements Server {
         defaultCharset = charset;
     }
 
+    public void enableSessions(SessionTracker tracker) {
+        this.tracker = tracker;
+    }
+
+    public void port(int port) {
+        this.port = port;
+    }
+
     public int port() {
         return port;
     }
 
     public void run(final Application app) throws IOException {
-        connection = new SocketConnection(new ApplicationContainer(app));
+        connection = new SocketConnection(new ContainerServer(new ApplicationContainer(app)));
         SocketAddress address = new InetSocketAddress(port);
         connection.connect(address);
     }
@@ -59,7 +77,10 @@ public class SimpleServer implements Server {
 
         public void handle(Request request, Response response) {
             try {
-                app.handle(new SimpleRequest(request), new SimpleResponse(response, defaultCharset));
+                SimpleResponse responseAdapter = new SimpleResponse(response, defaultCharset);
+                SimpleRequest requestAdapter = new SimpleRequest(request, new SessionTracking(tracker, responseAdapter));
+
+                app.handle(requestAdapter, responseAdapter);
             } catch (Exception failure) {
                 failureReporter.errorOccurred(failure);
             } finally {

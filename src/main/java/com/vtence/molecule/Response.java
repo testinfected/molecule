@@ -7,11 +7,7 @@ import java.nio.charset.Charset;
 
 public interface Response {
 
-    int statusCode();
-
-    void statusCode(int code);
-
-    void status(HttpStatus status);
+    void redirectTo(String location);
 
     String header(String name);
 
@@ -21,17 +17,23 @@ public interface Response {
 
     void removeHeader(String name);
 
+    void cookie(String name, String value);
+
     void contentType(String contentType);
 
     String contentType();
 
-    int contentLength();
+    int statusCode();
 
-    void contentLength(int length);
+    void status(HttpStatus status);
+
+    void statusCode(int code);
+
+    long contentLength();
+
+    void contentLength(long length);
 
     Charset charset();
-
-    void redirectTo(String location);
 
     OutputStream outputStream() throws IOException;
 
