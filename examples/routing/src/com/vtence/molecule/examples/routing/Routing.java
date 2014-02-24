@@ -5,18 +5,19 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
+
+import static com.vtence.molecule.middlewares.Router.draw;
 
 public class Routing {
 
     public static void main(String[] args) throws IOException {
         Server server = new SimpleServer(8080);
 
-        server.run(Router.draw(new DynamicRoutes() {{
+        server.run(draw(new DynamicRoutes() {{
 
             map("/").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
@@ -45,7 +46,7 @@ public class Routing {
                                     "<body>" +
                                     "<h3>Hello, " + request.parameter("username") + "</h3>" +
                                     "</body>" +
-                            "</html>"
+                                    "</html>"
 
                     );
                 }

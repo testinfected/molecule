@@ -4,13 +4,14 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Session;
-import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.simple.session.CookieTracker;
 import com.vtence.molecule.simple.session.SessionPool;
 
 import java.io.IOException;
+
+import static com.vtence.molecule.middlewares.Router.draw;
 
 public class EnablingSessions {
 
@@ -20,7 +21,7 @@ public class EnablingSessions {
         // Enable sessions, using a cookie tracking strategy with an in-memory session pool
         server.enableSessions(new CookieTracker(new SessionPool()));
 
-        server.run(Router.draw(new DynamicRoutes() {{
+        server.run(draw(new DynamicRoutes() {{
 
             map("/").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {

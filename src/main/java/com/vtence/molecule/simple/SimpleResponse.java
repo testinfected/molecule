@@ -118,7 +118,8 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         }
 
         public <T> T unwrap(Class<T> type) {
-            if (!type.isAssignableFrom(response.getClass())) throw new IllegalArgumentException("Unsupported type: " + type.getName());
+            if (!type.isAssignableFrom(response.getClass()))
+                throw new IllegalArgumentException("Unsupported type: " + type.getName());
             return type.cast(response);
         }
     }

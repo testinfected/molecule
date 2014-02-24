@@ -73,7 +73,8 @@ public class SimpleRequest implements com.vtence.molecule.Request {
     }
 
     public <T> T unwrap(Class<T> type) {
-        if (!type.isAssignableFrom(request.getClass())) throw new IllegalArgumentException("Unsupported type: " + type.getName());
+        if (!type.isAssignableFrom(request.getClass()))
+            throw new IllegalArgumentException("Unsupported type: " + type.getName());
         return type.cast(request);
     }
 }
