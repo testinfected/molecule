@@ -5,6 +5,7 @@ import com.vtence.molecule.Session;
 import com.vtence.molecule.simple.session.SessionTracking;
 import org.simpleframework.http.Cookie;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class SimpleRequest implements com.vtence.molecule.Request {
@@ -27,6 +28,10 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     public String pathInfo() {
         return request.getPath().getPath();
+    }
+
+    public String body() throws IOException {
+        return request.getContent();
     }
 
     public HttpMethod method() {

@@ -1,10 +1,13 @@
 package com.vtence.molecule;
 
+import java.io.IOException;
 import java.util.Map;
 
 public interface Request {
 
     String protocol();
+
+    String body() throws IOException;
 
     HttpMethod method();
 

@@ -5,6 +5,7 @@ import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,6 +95,10 @@ public class MockRequest implements Request {
 
     public String uri() {
         return pathInfo();
+    }
+
+    public String body() throws IOException {
+        return null;
     }
 
     public <T> T unwrap(Class<T> type) {

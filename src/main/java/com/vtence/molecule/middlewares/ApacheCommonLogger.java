@@ -3,6 +3,7 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Clock;
+import com.vtence.molecule.util.SystemClock;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -18,6 +19,10 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     private final Logger logger;
     private final Clock clock;
     private final TimeZone timeZone;
+
+    public ApacheCommonLogger(Logger logger) {
+        this(logger, new SystemClock());
+    }
 
     public ApacheCommonLogger(Logger logger, Clock clock) {
         this(logger, clock, TimeZone.getDefault());

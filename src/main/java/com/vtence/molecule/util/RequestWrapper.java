@@ -4,6 +4,7 @@ import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class RequestWrapper implements Request {
@@ -27,6 +28,10 @@ public class RequestWrapper implements Request {
 
     public String pathInfo() {
         return request.pathInfo();
+    }
+
+    public String body() throws IOException {
+        return request.body();
     }
 
     public String parameter(String name) {
