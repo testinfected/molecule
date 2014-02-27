@@ -63,6 +63,14 @@ public class RequestWrapper implements Request {
         return request.protocol();
     }
 
+    public String cookie(String name) {
+        return request.cookie(name);
+    }
+
+    public Map<String, String> cookies() {
+        return request.cookies();
+    }
+
     public Object attribute(Object key) {
         return request.attribute(key);
     }
@@ -77,10 +85,6 @@ public class RequestWrapper implements Request {
 
     public void removeAttribute(Object key) {
         request.removeAttribute(key);
-    }
-
-    public String cookie(String name) {
-        return request.cookie(name);
     }
 
     public Session session() {

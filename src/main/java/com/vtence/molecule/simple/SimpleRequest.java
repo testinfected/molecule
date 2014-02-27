@@ -6,6 +6,7 @@ import com.vtence.molecule.simple.session.SessionTracking;
 import org.simpleframework.http.Cookie;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,14 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     public String protocol() {
         return String.format("HTTP/%s.%s", request.getMajor(), request.getMinor());
+    }
+
+    public Map<String, String> cookies() {
+        Map<String, String> cookies = new HashMap<String, String>();
+        for (Cookie cookie: request.getCookies()) {
+            cookies.put(cookie.getName(), cookie.getValue());
+        }
+        return cookies;
     }
 
     public String cookie(String name) {

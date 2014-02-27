@@ -4,6 +4,7 @@ import com.gargoylesoftware.htmlunit.FormEncodingType;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 import java.io.IOException;
@@ -17,9 +18,11 @@ import java.util.Map;
 public class HttpRequest {
 
     private final WebClient client;
+    private final String domain = "localhost";
 
     private final Map<String, String> parameters = new HashMap<String, String>();
     private final Map<String, String> headers = new HashMap<String, String>();
+    private final Map<String, String> cookies = new HashMap<String, String>();
 
     private HttpMethod method = HttpMethod.GET;
     private String path = "/";
@@ -47,12 +50,16 @@ public class HttpRequest {
         other.withTimeout(timeoutInMillis).onPort(port).usingMethod(method).on(path).
                 applyCookies(applyCookies).followRedirects(followRedirects).
                 withEncodingType(encodingType).withBody(body);
-        for (String header : headers.keySet()) {
+        for (String header: headers.keySet()) {
             other.withHeader(header, headers.get(header));
         }
-        for (String name : parameters.keySet()) {
+        for (String cookie: cookies.keySet()) {
+            other.withCookie(cookie, cookies.get(cookie));
+        }
+        for (String name: parameters.keySet()) {
             other.withParameter(name, parameters.get(name));
         }
+
         return other;
     }
 
@@ -96,9 +103,17 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest withCookie(String name, String value) {
+        this.cookies.put(name, value);
+        return this;
+    }
+
     public HttpResponse send() throws IOException {
         client.getOptions().setTimeout(timeoutInMillis);
-        if (!applyCookies) client.getCookieManager().clearCookies();
+        for (String cookie: cookies.keySet()) {
+            client.getCookieManager().addCookie(new Cookie(domain, cookie, cookies.get(cookie)));
+        }
+        client.getCookieManager().setCookiesEnabled(applyCookies);
         client.getOptions().setRedirectEnabled(followRedirects);
         WebRequest request = new WebRequest(requestUrl(), method);
         request.setRequestParameters(requestParameters());
@@ -145,6 +160,6 @@ public class HttpRequest {
     }
 
     private URL requestUrl() throws MalformedURLException {
-        return new URL("http://localhost:" + port + path);
+        return new URL("http://" + domain + ":" + port + path);
     }
 }

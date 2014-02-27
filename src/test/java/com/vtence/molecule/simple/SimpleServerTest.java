@@ -165,6 +165,27 @@ public class SimpleServerTest {
 
     @SuppressWarnings("unchecked")
     @Test public void
+    detailsRequestCookies() throws IOException {
+        final Map<String, String> cookies = new HashMap<String, String>();
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                cookies.put("all", request.cookies().toString());
+                cookies.put("sessionId", request.cookie("sessionId"));
+            }
+        });
+
+        request.withCookie("sessionId", "id")
+                .withCookie("name", "value")
+                .send();
+        assertNoError();
+
+        assertThat("request cookies", cookies, allOf(
+                hasEntry(equalTo("all"), containsString("name=value")),
+                hasEntry("sessionId", "id")));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test public void
     supportsRequestAttributes() throws IOException {
         final Map<Object, Object> attributes = new HashMap<Object, Object>();
         server.run(new Application() {

@@ -30,6 +30,8 @@ public interface Request {
 
     String protocol();
 
+    Map<String, String> cookies();
+
     String cookie(String name);
 
     Object attribute(Object key);

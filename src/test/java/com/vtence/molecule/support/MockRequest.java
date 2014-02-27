@@ -122,6 +122,18 @@ public class MockRequest implements Request {
         return null;
     }
 
+    public void withCookie(String name, String value) {
+        cookies.put(name, value);
+    }
+
+    public Map<String, String> cookies() {
+        return cookies;
+    }
+
+    public String cookie(String name) {
+        return cookies.get(name);
+    }
+
     public <T> T unwrap(Class<T> type) {
         throw new UnsupportedOperationException();
     }
@@ -148,14 +160,6 @@ public class MockRequest implements Request {
 
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {
         assertThat("attribute[" + key.toString() + "]", attribute(key), attributeMatcher);
-    }
-
-    public void withCookie(String name, String value) {
-        cookies.put(name, value);
-    }
-
-    public String cookie(String name) {
-        return cookies.get(name);
     }
 
     public Session session() {
