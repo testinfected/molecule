@@ -5,6 +5,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class RequestWrapper implements Request {
@@ -14,12 +15,36 @@ public class RequestWrapper implements Request {
         this.request = request;
     }
 
-    public String protocol() {
-        return request.protocol();
+    public String body() throws IOException {
+        return request.body();
+    }
+
+    public long contentLength() {
+        return request.contentLength();
+    }
+
+    public String contentType() {
+        return request.contentType();
+    }
+
+    public List<String> headers() {
+        return request.headers();
+    }
+
+    public List<String> headers(String name) {
+        return request.headers(name);
+    }
+
+    public String header(String name) {
+        return request.header(name);
     }
 
     public HttpMethod method() {
         return request.method();
+    }
+
+    public String parameter(String name) {
+        return request.parameter(name);
     }
 
     public String uri() {
@@ -30,20 +55,20 @@ public class RequestWrapper implements Request {
         return request.pathInfo();
     }
 
-    public String body() throws IOException {
-        return request.body();
-    }
-
-    public String parameter(String name) {
-        return request.parameter(name);
-    }
-
     public String ip() {
         return request.ip();
     }
 
+    public String protocol() {
+        return request.protocol();
+    }
+
     public Object attribute(Object key) {
         return request.attribute(key);
+    }
+
+    public Map<Object, Object> attributes() {
+        return request.attributes();
     }
 
     public void attribute(Object key, Object value) {
@@ -52,10 +77,6 @@ public class RequestWrapper implements Request {
 
     public void removeAttribute(Object key) {
         request.removeAttribute(key);
-    }
-
-    public Map<Object, Object> attributes() {
-        return request.attributes();
     }
 
     public String cookie(String name) {

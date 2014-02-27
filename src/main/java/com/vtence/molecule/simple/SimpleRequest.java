@@ -6,6 +6,7 @@ import com.vtence.molecule.simple.session.SessionTracking;
 import org.simpleframework.http.Cookie;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class SimpleRequest implements com.vtence.molecule.Request {
@@ -18,20 +19,28 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         this.sessionTracking = sessionTracking;
     }
 
-    public String protocol() {
-        return String.format("HTTP/%s.%s", request.getMajor(), request.getMinor());
-    }
-
-    public String uri() {
-        return request.getTarget();
-    }
-
-    public String pathInfo() {
-        return request.getPath().getPath();
-    }
-
     public String body() throws IOException {
         return request.getContent();
+    }
+
+    public long contentLength() {
+        return request.getContentLength();
+    }
+
+    public String contentType() {
+        return request.getContentType().getType();
+    }
+
+    public List<String> headers() {
+        return request.getNames();
+    }
+
+    public List<String> headers(String name) {
+        return request.getValues(name);
+    }
+
+    public String header(String name) {
+        return request.getValue(name);
     }
 
     public HttpMethod method() {
@@ -42,12 +51,34 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return request.getParameter(name);
     }
 
+    public String uri() {
+        return request.getTarget();
+    }
+
+    public String pathInfo() {
+        return request.getPath().getPath();
+    }
+
     public String ip() {
         return request.getClientAddress().getAddress().getHostAddress();
     }
 
+    public String protocol() {
+        return String.format("HTTP/%s.%s", request.getMajor(), request.getMinor());
+    }
+
+    public String cookie(String name) {
+        Cookie cookie = request.getCookie(name);
+        return cookie != null ? cookie.getValue() : null;
+    }
+
     public Object attribute(Object key) {
         return request.getAttribute(key);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<Object, Object> attributes() {
+        return request.getAttributes();
     }
 
     @SuppressWarnings("unchecked")
@@ -57,16 +88,6 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     public void removeAttribute(Object key) {
         request.getAttributes().remove(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Map<Object, Object> attributes() {
-        return request.getAttributes();
-    }
-
-    public String cookie(String name) {
-        Cookie cookie = request.getCookie(name);
-        return cookie != null ? cookie.getValue() : null;
     }
 
     public Session session() {

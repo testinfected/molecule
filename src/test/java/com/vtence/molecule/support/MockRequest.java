@@ -7,6 +7,7 @@ import com.vtence.molecule.Session;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertThat;
@@ -66,6 +67,26 @@ public class MockRequest implements Request {
     public MockRequest withProtocol(String protocol) {
         this.protocol = protocol;
         return this;
+    }
+
+    public long contentLength() {
+        return -1;
+    }
+
+    public String contentType() {
+        return null;
+    }
+
+    public List<String> headers() {
+        return null;
+    }
+
+    public List<String> headers(String name) {
+        return null;
+    }
+
+    public String header(String name) {
+        return null;
     }
 
     public HttpMethod method() {

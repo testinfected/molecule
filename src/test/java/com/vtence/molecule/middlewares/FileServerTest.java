@@ -21,7 +21,7 @@ public class FileServerTest {
     static final String TEST_IMAGE = "assets/image.png";
 
     File base = locateBase();
-    FileServer fileServer = new FileServer(base, new NotFound());
+    FileServer fileServer = new FileServer(base);
     File file = new File(base, TEST_IMAGE);
 
     MockRequest request = GET(TEST_IMAGE);

@@ -30,6 +30,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -93,11 +94,12 @@ public class SimpleServerTest {
         assertNoError();
         response.assertOK();
         response.assertContentIsEncodedAs("UTF-16");
-        response.assertHasContentType(Matchers.containsString("UTF-16"));
+        response.assertHasContentType(containsString("UTF-16"));
     }
 
+    @SuppressWarnings("unchecked")
     @Test public void
-    providesInformationAboutRequest() throws IOException {
+    providesGeneralRequestInformation() throws IOException {
         final Map<String, String> info = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -108,7 +110,7 @@ public class SimpleServerTest {
             }
         });
 
-        request.get("/uri");
+        request.post("/uri");
         assertNoError();
 
         assertThat("request information", info, allOf(
@@ -116,6 +118,49 @@ public class SimpleServerTest {
                 hasEntry("pathInfo", "/uri"),
                 hasEntry("uri", "/uri"),
                 hasEntry("protocol", "HTTP/1.1")));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test public void
+    detailsRequestHeaders() throws IOException {
+        final Map<String, String> headers = new HashMap<String, String>();
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                headers.put("all", request.headers().toString());
+                headers.put("accept", request.header("Accept"));
+            }
+        });
+
+        request.withHeader("Accept", "text/html").send();
+        assertNoError();
+
+        assertThat("request headers", headers, allOf(
+                hasEntry(equalTo("all"), containsString("Accept")),
+                hasEntry("accept", "text/html")));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test public void
+    detailsRequestContent() throws IOException {
+        final Map<String, String> content = new HashMap<String, String>();
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                content.put("contentType", String.valueOf(request.contentType()));
+                content.put("contentLength", String.valueOf(request.contentLength()));
+                content.put("body", request.body());
+            }
+        });
+
+        request.withHeader("Accept", "text/html")
+                .withEncodingType("application/x-www-form-urlencoded")
+                .withBody("name=value")
+                .post("/uri");
+        assertNoError();
+
+        assertThat("request content", content, allOf(
+                hasEntry("contentType", "application/x-www-form-urlencoded"),
+                hasEntry("contentLength", "10"),
+                hasEntry("body", "name=value")));
     }
 
     @SuppressWarnings("unchecked")
