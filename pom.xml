@@ -25,7 +25,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/testinfected/molecule.git</connection>
-        <developerConnection>scm:git:git@github.com:testinfected/molecule.git</developerConnection>
+        <developerConnection>ssh://hg@bitbucket.org/testinfected/molecule</developerConnection>
         <url>https://github.com/testinfected/molecule</url>
     </scm>
     <developers>
