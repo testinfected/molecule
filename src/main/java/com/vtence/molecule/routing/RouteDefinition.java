@@ -1,14 +1,10 @@
 package com.vtence.molecule.routing;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpMethod;
+import com.vtence.molecule.Matcher;
 
-// todo consider having separate clauses
 public interface RouteDefinition {
 
-    RouteDefinition map(String path);
+    ViaClause map(String path);
 
-    RouteDefinition via(HttpMethod method);
-
-    RouteDefinition to(Application application);
+    ViaClause map(Matcher<? super String> path);
 }

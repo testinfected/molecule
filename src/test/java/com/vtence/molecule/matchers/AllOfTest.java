@@ -4,26 +4,28 @@ import com.vtence.molecule.Matcher;
 import org.junit.Test;
 
 import static com.vtence.molecule.matchers.StartingWith.startingWith;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AllOfTest {
 
     @SuppressWarnings("unchecked") @Test public void
     evaluatesToLogicalConjunctionOfMultipleMatchers() {
-        Matcher<String> allOf = AllOf.allOf(startingWith("one"), startingWith("one two"), startingWith("one two three"));
+        Matcher<String> allOf = AllOf.allOf(startingWith("one"),
+                startingWith("one two"), startingWith("one two three"));
 
-        assertThat("no match even if all matchers match", allOf.matches("one two three"));
-        assertThat("match but one matcher does not match", !allOf.matches("one two two"));
+        assertThat("all match", allOf.matches("one two three"), is(true));
+        assertThat("one miss", !allOf.matches("one two two"), is(true));
     }
 
     @SuppressWarnings("unchecked") @Test public void
-    supportsMatchingOnSuperType() {
+    matchesDescendantType() {
         Matcher<String> allOf = AllOf.allOf(startingWith("good"), aMatcherOnType(Object.class));
 
-        assertThat("match", allOf.matches("good"));
+        assertThat("matches", allOf.matches("good"), is(true));
     }
 
-    private <T> Anything<T> aMatcherOnType(Class<T> type) {
+    private <T> Anything<T> aMatcherOnType(Class<T> _) {
         return new Anything<T>();
     }
 }

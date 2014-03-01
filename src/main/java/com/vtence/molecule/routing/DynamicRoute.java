@@ -1,6 +1,7 @@
 package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -12,12 +13,13 @@ import java.util.Map;
 
 public class DynamicRoute implements Route {
 
-    private final DynamicPath path;
-    private final Matcher<? super String> method;
+    private final Matcher<? super String> path;
+    private final Matcher<? super HttpMethod> method;
     private final Application app;
 
-    public DynamicRoute(String pathPattern, Matcher<? super String> method, Application app) {
-        this.path = new DynamicPath(pathPattern);
+    public DynamicRoute(Matcher<? super String> path, Matcher<? super HttpMethod> method,
+                        Application app) {
+        this.path = path;
         this.method = method;
         this.app = app;
     }
@@ -31,13 +33,15 @@ public class DynamicRoute implements Route {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        app.handle(new BoundParameters(request), response);
+        Request wrapper = path instanceof WithBoundParameters ?
+                new RequestWithPathBoundParameters(request, (WithBoundParameters) path) : request;
+        app.handle(wrapper, response);
     }
 
-    public class BoundParameters extends RequestWrapper {
+    public class RequestWithPathBoundParameters extends RequestWrapper {
         private final Map<String, String> boundParameters;
 
-        public BoundParameters(Request request) {
+        public RequestWithPathBoundParameters(Request request, WithBoundParameters path) {
             super(request);
             boundParameters = path.boundParameters(request.pathInfo());
         }

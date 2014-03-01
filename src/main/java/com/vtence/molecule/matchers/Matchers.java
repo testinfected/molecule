@@ -1,5 +1,6 @@
 package com.vtence.molecule.matchers;
 
+import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Matcher;
 import com.vtence.molecule.Request;
 
@@ -25,17 +26,31 @@ public final class Matchers {
         return StartingWith.startingWith(prefix);
     }
 
-    public static Matcher<Request> withMethod(String method) {
+    public static Matcher<Request> withMethod(String name) {
+        return RequestWithMethod.withMethod(name);
+    }
+
+    public static Matcher<Request> withMethod(HttpMethod method) {
         return RequestWithMethod.withMethod(method);
     }
 
-    public static Matcher<Request> withMethod(Matcher<? super String> method) {
+    public static Matcher<Request> withMethod(Matcher<? super HttpMethod> method) {
         return RequestWithMethod.withMethod(method);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Matcher<T> allOf(Matcher<? super T>... matchers) {
         return AllOf.allOf(matchers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Matcher<T> anyOf(Iterable<Matcher<? super T>> matchers) {
+        return AnyOf.anyOf(matchers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Matcher<T> anyOf(Matcher<? super T>... matchers) {
+        return AnyOf.anyOf(matchers);
     }
 
     private Matchers() {}

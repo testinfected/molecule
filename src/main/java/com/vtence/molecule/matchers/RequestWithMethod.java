@@ -6,25 +6,25 @@ import com.vtence.molecule.Request;
 
 public class RequestWithMethod implements Matcher<Request> {
 
-    private final Matcher<? super String> nameMatcher;
+    private final Matcher<? super HttpMethod> methodMatcher;
 
-    public RequestWithMethod(Matcher<? super String> nameMatcher) {
-        this.nameMatcher = nameMatcher;
+    public RequestWithMethod(Matcher<? super HttpMethod> methodMatcher) {
+        this.methodMatcher = methodMatcher;
     }
 
     public boolean matches(Request actual) {
-        return nameMatcher.matches(actual.method().name());
+        return methodMatcher.matches(actual.method());
+    }
+
+    public static RequestWithMethod withMethod(String name) {
+        return withMethod(HttpMethod.valueOf(name));
     }
 
     public static RequestWithMethod withMethod(HttpMethod method) {
-        return withMethod(method.name());
+        return withMethod(Matchers.equalTo(method));
     }
 
-    public static RequestWithMethod withMethod(String methodName) {
-        return withMethod(IsEqual.equalTo(methodName));
-    }
-
-    public static RequestWithMethod withMethod(Matcher<? super String> nameMatcher) {
-        return new RequestWithMethod(nameMatcher);
+    public static RequestWithMethod withMethod(Matcher<? super HttpMethod> method) {
+        return new RequestWithMethod(method);
     }
 }

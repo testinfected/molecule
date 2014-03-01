@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static com.vtence.molecule.support.MockRequest.*;
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static org.hamcrest.Matchers.is;
 
 public class DynamicRouteDefinitionTest {
 
@@ -33,17 +34,18 @@ public class DynamicRouteDefinitionTest {
     }
 
     @Test public void
-    routesRequestOnlyWhenPathMatchesGivenPattern() throws Exception {
+    routesRequestWhenPathMatchesGivenPattern() throws Exception {
         Route route = definition.map("/resource/:id").toRoute();
         assertThat("no match", route.matches(GET("/resource/1")));
         assertThat("match", !route.matches(GET("/other/1")));
     }
 
     @Test public void
-    routesRequestOnlyWhenHttpMethodsMatch() throws Exception {
-        Route route = definition.map("/resource").via(HttpMethod.POST).toRoute();
-        assertThat("no match", route.matches(POST("/resource")));
-        assertThat("match", !route.matches(GET("/resource")));
+    routesRequestWhenHttpMethodMatchesAny() throws Exception {
+        Route route = definition.map("/resource").via(HttpMethod.POST, HttpMethod.PUT).toRoute();
+        assertThat("1st matches", route.matches(POST("/resource")), is(true));
+        assertThat("2nd matches", !route.matches(GET("/resource")), is(true));
+        assertThat("none matches", !route.matches(GET("/resource")), is(true));
     }
 
     @Test public void
@@ -56,7 +58,7 @@ public class DynamicRouteDefinitionTest {
     }
 
     @Test public void
-    pathParametersWillShadowOriginalRequestParametersWithSameName() throws Exception {
+    pathParametersShadowRequestParametersWithSameName() throws Exception {
         Route route = definition.map("/resource/:id").to(app).toRoute();
         context.checking(new Expectations() {{
             oneOf(app).handle(with(hasParameter("id", "1")), with(any(Response.class)));

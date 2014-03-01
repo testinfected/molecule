@@ -3,25 +3,43 @@ package com.vtence.molecule.routing;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Matcher;
-import com.vtence.molecule.matchers.IsEqual;
 import com.vtence.molecule.matchers.Matchers;
 
-public class DynamicRouteDefinition implements RouteDefinition {
+import java.util.ArrayList;
+import java.util.List;
 
-    private String path;
-    private Matcher<? super String> method = Matchers.<String>anything();
+import static com.vtence.molecule.matchers.Matchers.anyOf;
+import static com.vtence.molecule.matchers.Matchers.equalTo;
+
+public class DynamicRouteDefinition implements RouteDefinition, ViaClause {
+
+    private Matcher<? super String> path;
+    private Matcher<? super HttpMethod> method = Matchers.<HttpMethod>anything();
     private Application app;
 
     public DynamicRouteDefinition map(String path) {
+        return map(new DynamicPath(path));
+    }
+
+    public DynamicRouteDefinition map(Matcher<? super String> path) {
         this.path = path;
         return this;
     }
 
-    public DynamicRouteDefinition via(HttpMethod method) {
-        return via(IsEqual.equalTo(method.name()));
+    public DynamicRouteDefinition via(HttpMethod... methods) {
+        return via(anyOf(equallyMatching(methods)));
     }
 
-    public DynamicRouteDefinition via(Matcher<? super String> method) {
+    private List<Matcher<? super HttpMethod>> equallyMatching(HttpMethod... methods) {
+        List<Matcher<? super HttpMethod>> matchMethods =
+                new ArrayList<Matcher<? super HttpMethod>>();
+        for (HttpMethod httpMethod : methods) {
+            matchMethods.add(equalTo(httpMethod));
+        }
+        return matchMethods;
+    }
+
+    public DynamicRouteDefinition via(Matcher<? super HttpMethod> method) {
         this.method = method;
         return this;
     }
@@ -32,11 +50,11 @@ public class DynamicRouteDefinition implements RouteDefinition {
     }
 
     public DynamicRoute toRoute() {
-        checkValidity();
+        ensureValid();
         return new DynamicRoute(path, method, app);
     }
 
-    public void checkValidity() {
+    public void ensureValid() {
         if (path == null) throw new IllegalStateException("No path was specified");
     }
 }

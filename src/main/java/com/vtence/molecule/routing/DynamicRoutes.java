@@ -1,6 +1,7 @@
 package com.vtence.molecule.routing;
 
 import com.vtence.molecule.HttpMethod;
+import com.vtence.molecule.Matcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,23 +16,43 @@ public class DynamicRoutes implements RouteBuilder {
         }
     }
 
-    public RouteDefinition map(String path) {
+    public ViaClause map(String path) {
         return openRoute().map(path);
     }
 
-    public RouteDefinition get(String path) {
+    public ViaClause map(Matcher<? super String> path) {
+        return openRoute().map(path);
+    }
+
+    public ToClause get(String path) {
         return map(path).via(HttpMethod.GET);
     }
 
-    public RouteDefinition post(String path) {
+    public ToClause get(Matcher<? super String> path) {
+        return map(path).via(HttpMethod.GET);
+    }
+
+    public ToClause post(String path) {
         return map(path).via(HttpMethod.POST);
     }
 
-    public RouteDefinition put(String path) {
+    public ToClause post(Matcher<? super String> path) {
+        return map(path).via(HttpMethod.POST);
+    }
+
+    public ToClause put(String path) {
         return map(path).via(HttpMethod.PUT);
     }
 
-    public RouteDefinition delete(String path) {
+    public ToClause put(Matcher<? super String> path) {
+        return map(path).via(HttpMethod.PUT);
+    }
+
+    public ToClause delete(String path) {
+        return map(path).via(HttpMethod.DELETE);
+    }
+
+    public ToClause delete(Matcher<? super String> path) {
         return map(path).via(HttpMethod.DELETE);
     }
 
