@@ -8,7 +8,7 @@ Build yourself using Buildr or Maven (for latest and greatest version), or simpl
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.1</version>
+      <version>0.2-SNAPSHOT</version>
 </dependency>
 ```
 
