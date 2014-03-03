@@ -5,7 +5,7 @@ repositories:
     - http://repo1.maven.org/maven2
 
 artifacts:
-  simpleweb: org.simpleframework:simple:jar:5.1.6
+  simple: org.simpleframework:simple:jar:5.1.6
 
   # -- test dependencies
   jmock: org.jmock:jmock:jar:2.6.0

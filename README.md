@@ -2,7 +2,9 @@
 
 ## Getting started
 
-Build yourself using Buildr or Maven (for latest and greatest version), or simply download from Maven Central:
+Build yourself using Buildr (for latest and greatest version), or simply download using Maven
+(you might have to add https://oss.sonatype.org/content/repositories/snapshots/ to your snapshots
+ repositories):
 
 ```xml
 <dependency>
