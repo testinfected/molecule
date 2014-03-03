@@ -1,4 +1,4 @@
-VERSION_NUMBER = "0.3-SNAPSHOT"
+VERSION_NUMBER = "0.2-SNAPSHOT"
 
 define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER do
   compile.options.source = '1.7'
