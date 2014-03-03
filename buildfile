@@ -16,7 +16,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   test.with transitive(artifacts(:htmlunit))
 
   package :jar
-  package(:test_jar)
-  package(:javadocs)
   package(:sources)
+  package(:javadoc)
+  package(:test_jar)
 end
