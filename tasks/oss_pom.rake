@@ -32,13 +32,12 @@ module Enhancements
     attr_accessor :issues_system
 
     # Add a project hosted on github
-    def add_github_project(project_spec)
-      git_url = "git@github.com:#{project_spec}.git"
-      self.scm_connection = self.scm_developer_connection = "scm:git:#{git_url}"
-      self.scm_url = git_url
-      web_url = "https://github.com/#{project_spec}"
-      self.url = web_url
-      self.issues_url = "#{web_url}/issues"
+    def add_github_project(username, project)
+      self.scm_connection = "https://github.com/#{username}/#{project}.git"
+      self.scm_developer_connection = "scm:git:git@github.com:#{username}/#{project}.git"
+      self.scm_url = "https://github.com/#{username}/#{project}
+      self.url = self.scm_url
+      self.issues_url = "#{self.url}/issues"
       self.issues_system = "GitHub Issues"
     end
 

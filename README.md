@@ -2,15 +2,13 @@
 
 ## Getting started
 
-Build yourself using Buildr (for latest and greatest version), or simply download using Maven
-(you might have to add https://oss.sonatype.org/content/repositories/snapshots/ to your snapshots
- repositories):
+Build yourself using Buildr (for latest and greatest version), or simply download using Maven:
 
 ```xml
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.2-SNAPSHOT</version>
+      <version>0.2</version>
 </dependency>
 ```
 
