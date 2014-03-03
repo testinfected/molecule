@@ -7,4 +7,3 @@ syntax: glob
 target
 reports
 .idea
-buildr.rb
