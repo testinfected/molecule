@@ -1,4 +1,4 @@
-VERSION_NUMBER = "0.3-SNAPSHOT"
+VERSION_NUMBER = "0.2-SNAPSHOT"
 
 define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER do
   compile.options.source = '1.7'
@@ -15,8 +15,8 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   test.with :hamcrest, :jmock, :cglib, :objenesis, :jmock_legacy, :juniversalchardet
   test.with transitive(artifacts(:htmlunit))
 
-  package_with_javadoc
-  package_with_sources
   package :jar
   package(:test_jar)
+  package(:javadocs)
+  package(:sources)
 end
