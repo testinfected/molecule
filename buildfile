@@ -21,15 +21,4 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   pom.add_github_project(:testinfected, :molecule)
   pom.add_developer('testinfected', 'Vincent Tence', 'vtence@gmail.com', ['Developer'])
   pom.optional_dependencies.concat [:simple]
-
-  repositories.release_to = {
-    :url => 'https://oss.sonatype.org/service/local/staging/deploy/maven2/',
-    :username => Buildr.settings.user['sonatype']['username'],
-    :password => Buildr.settings.user['sonatype']['password']
-  }
-  repositories.snapshot_to = {
-    :url => 'https://oss.sonatype.org/content/repositories/snapshots/',
-    :username => Buildr.settings.user['sonatype']['username'],
-    :password => Buildr.settings.user['sonatype']['password']
-  }
 end
