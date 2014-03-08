@@ -18,6 +18,7 @@ public class FileServer implements Application {
 
     private final File root;
     private final Application notFound;
+    private final MimeTypes mediaTypes = MimeTypes.defaults();
 
     public FileServer(File root) {
         this(root, new NotFound());
@@ -26,6 +27,10 @@ public class FileServer implements Application {
     public FileServer(File root, Application notFound) {
         this.root = root;
         this.notFound = notFound;
+    }
+
+    public void registerMediaType(String extension, String mediaType) {
+        mediaTypes.map(extension, mediaType);
     }
 
     public void handle(Request request, Response response) throws Exception {
@@ -38,9 +43,9 @@ public class FileServer implements Application {
 
     private void renderFile(Request request, Response response) throws IOException {
         File file = new File(root, fileName(request));
-        response.contentType(MimeTypes.guessFrom(file.getName()));
+        response.contentType(mediaTypes.guessFrom(file.getName()));
         response.headerDate(HttpHeaders.LAST_MODIFIED, file.lastModified());
-        response.contentLength((int) file.length());
+        response.contentLength(file.length());
 
         InputStream in = new FileInputStream(file);
         try {

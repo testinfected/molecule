@@ -56,6 +56,14 @@ public class FileServerTest {
     }
 
     @Test public void
+    learnsNewMediaTypes() throws Exception {
+        fileServer.registerMediaType("png", "image/custom-png");
+        fileServer.handle(request, response);
+
+        response.assertContentType("image/custom-png");
+    }
+
+    @Test public void
     setsFileResponseHeaders() throws Exception {
         fileServer.handle(request, response);
 

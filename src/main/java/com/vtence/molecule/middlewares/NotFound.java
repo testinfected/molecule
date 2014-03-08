@@ -13,7 +13,7 @@ public class NotFound implements Application {
         response.status(HttpStatus.NOT_FOUND);
         String body = "Not found: " + request.pathInfo();
         byte[] bytes = body.getBytes(Charsets.ISO_8859_1);
-        response.contentType(MimeTypes.TEXT_PLAIN);
+        response.contentType(MimeTypes.TEXT);
         response.contentLength(bytes.length);
         response.outputStream(bytes.length).write(bytes);
     }

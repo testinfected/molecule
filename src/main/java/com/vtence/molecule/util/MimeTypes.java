@@ -3,31 +3,43 @@ package com.vtence.molecule.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MimeTypes {
+public final class MimeTypes {
 
-    public static final String TEXT_HTML = "text/html";
-    public static final String TEXT_PLAIN = "text/plain";
-    public static final String TEXT_CSS = "text/css";
-    public static final String IMAGE_PNG = "image/png";
-    public static final String IMAGE_X_ICON = "image/x-icon";
+    public static final String HTML = "text/html";
+    public static final String TEXT = "text/plain";
+    public static final String CSS = "text/css";
+    public static final String JAVASCRIPT = "application/javascript";
+    public static final String JSON = "application/json";
+    public static final String PNG = "image/png";
+    public static final String GIF = "image/gif";
+    public static final String JPEG = "image/jpeg";
+    public static final String ICON = "image/x-icon";
+    private static final String BINARY_DATA = "application/octet-stream";
 
-    private static final String FALLBACK = "application/octet-stream";
-    private static final Map<String, String> knownTypes = new HashMap<String, String>();
+    private final Map<String, String> knownTypes = new HashMap<String, String>();
 
-    static {
-        knownTypes.put(".txt", TEXT_PLAIN);
-        knownTypes.put(".html", TEXT_HTML);
-        knownTypes.put(".css", TEXT_CSS);
-        knownTypes.put(".png", IMAGE_PNG);
-        knownTypes.put(".ico", IMAGE_X_ICON);
+    public static MimeTypes defaults() {
+        MimeTypes mimeTypes = new MimeTypes();
+        mimeTypes.map("txt", TEXT);
+        mimeTypes.map("html", HTML);
+        mimeTypes.map("css", CSS);
+        mimeTypes.map("js", JAVASCRIPT);
+        mimeTypes.map("png", PNG);
+        mimeTypes.map("gif", GIF);
+        mimeTypes.map("jpg", JPEG);
+        mimeTypes.map("jpeg", JPEG);
+        mimeTypes.map("ico", ICON);
+        return mimeTypes;
     }
 
-    public static String guessFrom(String filename) {
+    public void map(String extension, String mimeType) {
+        knownTypes.put(extension, mimeType);
+    }
+
+    public String guessFrom(String filename) {
         for (String ext : knownTypes.keySet()) {
-            if (filename.endsWith(ext)) return knownTypes.get(ext);
+            if (filename.endsWith("." + ext)) return knownTypes.get(ext);
         }
-        return FALLBACK;
+        return BINARY_DATA;
     }
-
-    private MimeTypes() {}
 }
