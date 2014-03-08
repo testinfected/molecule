@@ -1,7 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
-
 public class StartingWith implements Matcher<String> {
     private final String prefix;
 

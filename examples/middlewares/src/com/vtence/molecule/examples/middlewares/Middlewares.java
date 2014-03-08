@@ -2,7 +2,7 @@ package com.vtence.molecule.examples.middlewares;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.MiddlewareStack;
+import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.middlewares.AbstractMiddleware;

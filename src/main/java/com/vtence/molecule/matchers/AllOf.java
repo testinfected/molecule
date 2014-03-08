@@ -1,7 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
-
 import java.util.Arrays;
 
 public class AllOf<T> implements Matcher<T> {

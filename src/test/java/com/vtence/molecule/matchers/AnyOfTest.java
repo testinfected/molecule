@@ -1,6 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
 import org.junit.Test;
 
 import static com.vtence.molecule.matchers.Matchers.equalTo;

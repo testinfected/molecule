@@ -1,10 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
-
-import java.util.Arrays;
-import java.util.List;
-
 public class Combination<T> implements Matcher<T> {
 
     private final Matcher<? super T> matcher;

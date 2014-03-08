@@ -1,7 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
-
 public class IsEqual<T> implements Matcher<T> {
     private final T other;
 

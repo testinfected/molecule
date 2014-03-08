@@ -1,7 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
-
 public class Nothing<T> implements Matcher<T> {
     public boolean matches(T actual) {
         return false;

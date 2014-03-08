@@ -1,7 +1,6 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Matcher;
-import com.vtence.molecule.Middleware;
+import com.vtence.molecule.matchers.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.matchers.Matchers;

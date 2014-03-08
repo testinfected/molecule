@@ -1,4 +1,4 @@
-package com.vtence.molecule;
+package com.vtence.molecule.matchers;
 
 public interface Matcher<T> {
 

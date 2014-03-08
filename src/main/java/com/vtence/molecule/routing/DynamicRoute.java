@@ -2,7 +2,7 @@ package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.Matcher;
+import com.vtence.molecule.matchers.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.matchers.Combination;

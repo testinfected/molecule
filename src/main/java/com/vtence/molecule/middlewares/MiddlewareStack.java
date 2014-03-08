@@ -1,4 +1,8 @@
-package com.vtence.molecule;
+package com.vtence.molecule.middlewares;
+
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

@@ -1,6 +1,5 @@
 package com.vtence.molecule.matchers;
 
-import com.vtence.molecule.Matcher;
 import com.vtence.molecule.Request;
 
 public class RequestWithPath implements Matcher<Request> {
