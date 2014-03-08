@@ -27,17 +27,15 @@ public class PageCompositorTest {
     }
 
     private class StubProcessor implements ContentProcessor {
-
-        public Map<String, Object> process(String content) {
-            Map<String, Object> fragments = new HashMap<String, Object>();
+        public Map<String, String> process(String content) {
+            Map<String, String> fragments = new HashMap<String, String>();
             fragments.put("content", "content");
             return fragments;
         }
     }
 
     private class StubLayout implements Layout {
-
-        public void render(Writer out, Map<String, Object> fragments) throws IOException {
+        public void render(Writer out, Map<String, String> fragments) throws IOException {
             out.write("<decorated>" + fragments.get("content") + "</decorated>");
         }
     }

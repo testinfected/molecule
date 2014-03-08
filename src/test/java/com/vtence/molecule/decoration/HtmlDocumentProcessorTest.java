@@ -45,11 +45,12 @@ public class HtmlDocumentProcessorTest {
 
     @Test public void
     extractsMetaDataFromHead() {
-        assertThat("html chunks", processor.process(page), hasChunk("meta[description]", "Description"));
-        assertThat("html chunks", processor.process(page), hasChunk("meta[author]", "Author"));
+        assertThat("html chunks", processor.process(page), hasChunk("description", "Description"));
+        assertThat("html chunks", processor.process(page), hasChunk("author", "Author"));
     }
 
-    private Matcher<Map<? extends String, ? extends Object>> hasChunk(final String key, final String value) {
-        return Matchers.<String, Object>hasEntry(key, value);
+    private Matcher<Map<? extends String, ? extends String>> hasChunk(final String key,
+                                                                      final String value) {
+        return Matchers.hasEntry(key, value);
     }
 }
