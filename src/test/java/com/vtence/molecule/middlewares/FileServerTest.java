@@ -9,35 +9,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import static com.vtence.molecule.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.HttpStatus.OK;
 import static com.vtence.molecule.support.MockRequest.GET;
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static com.vtence.molecule.support.ResourceLocator.onClasspath;
 
 public class FileServerTest {
 
-    static final String TEST_IMAGE = "assets/image.png";
+    static final String SAMPLE_IMAGE = "images/sample.png";
 
-    File base = locateBase();
+    File base = onClasspath().locate("assets");
     FileServer fileServer = new FileServer(base);
-    File file = new File(base, TEST_IMAGE);
+    File file = new File(base, SAMPLE_IMAGE);
 
-    MockRequest request = GET(TEST_IMAGE);
+    MockRequest request = GET(SAMPLE_IMAGE);
     MockResponse response = aResponse();
-
-    private static File locateBase() {
-        URL fileLocation = FileServerTest.class.getClassLoader().getResource(TEST_IMAGE);
-        if (fileLocation == null) throw new AssertionError("Image not found: " + TEST_IMAGE);
-        File asset;
-        try {
-            asset = new File(fileLocation.toURI());
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-        return asset.getParentFile().getParentFile();
-    }
 
     @Test public void
     rendersFile() throws Exception {

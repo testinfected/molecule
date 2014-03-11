@@ -2,13 +2,14 @@ VERSION_NUMBER = "0.3-SNAPSHOT"
 Release.commit_message = lambda { |version| "Bump version number to #{version}" }
 Release.tag_name = lambda { |version| "v#{version}" }
 
+JMOCK = [:jmock, :cglib, :objenesis, :jmock_legacy]
+
 define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER do
   compile.options.source = '1.7'
   compile.options.target = '1.7'
 
-  compile.with :simple
-  test.with :hamcrest, :jmock, :cglib, :objenesis, :jmock_legacy, :juniversalchardet
-  test.with transitive(artifacts(:htmlunit))
+  compile.with :simple, :mustache
+  test.with :hamcrest, JMOCK, :juniversalchardet, transitive(artifacts(:htmlunit))
 
   package :jar
   package :sources
@@ -20,5 +21,5 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   pom.add_mit_license
   pom.add_github_project(:testinfected, :molecule)
   pom.add_developer('testinfected', 'Vincent Tence', 'vtence@gmail.com', ['Developer'])
-  pom.optional_dependencies.concat [:simple]
+  pom.optional_dependencies.concat [:simple, :mustache]
 end

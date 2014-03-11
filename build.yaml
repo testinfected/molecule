@@ -6,6 +6,7 @@ repositories:
 
 artifacts:
   simple: org.simpleframework:simple:jar:5.1.6
+  mustache: com.samskivert:jmustache:jar:1.9
 
   # -- test dependencies
   jmock: org.jmock:jmock:jar:2.6.0
