@@ -5,14 +5,14 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.support.Template.render;
-import static com.vtence.molecule.support.ResourceLocator.onClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class JMustacheRendererTest {
 
-    JMustacheRenderer mustache = JMustacheRenderer.templatesIn(onClasspath().locate("views"));
+    JMustacheRenderer mustache = JMustacheRenderer.lookIn(locateOnClasspath(("views")));
 
     @Test public void
     rendersFromTemplatesFolder() throws IOException, SAXException {

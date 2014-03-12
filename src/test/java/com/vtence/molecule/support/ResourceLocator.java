@@ -5,11 +5,15 @@ import java.net.URL;
 
 public class ResourceLocator {
 
-    private final ClassLoader classLoader;
+    public static File locateOnClasspath(String resource) {
+        return onClasspath().locate(resource);
+    }
 
     public static ResourceLocator onClasspath() {
         return new ResourceLocator(Thread.currentThread().getContextClassLoader());
     }
+
+    private final ClassLoader classLoader;
 
     public ResourceLocator(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -17,7 +21,7 @@ public class ResourceLocator {
 
     public File locate(String resource) {
         URL fileLocation = classLoader.getResource(resource);
-        if (fileLocation == null) throw new IllegalArgumentException("Cannot find "+ resource);
+        if (fileLocation == null) throw new IllegalArgumentException("Cannot find " + resource);
         File target;
         try {
             target = new File(fileLocation.toURI());

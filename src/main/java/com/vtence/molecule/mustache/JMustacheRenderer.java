@@ -21,7 +21,7 @@ public class JMustacheRenderer implements RenderingEngine {
     private Charset encoding = Charsets.UTF_8;
     private String extension = "mustache";
 
-    public static JMustacheRenderer templatesIn(File folder) {
+    public static JMustacheRenderer lookIn(File folder) {
         return new JMustacheRenderer().templateDir(folder);
     }
 
