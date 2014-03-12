@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 
 public class SimpleServer implements Server {
 
-    private static final int PORT_80 = 80;
+    private static final int RANDOM_PORT = 0;
 
     private int port;
     private FailureReporter failureReporter = FailureReporter.IGNORE;
@@ -31,7 +31,7 @@ public class SimpleServer implements Server {
     private Connection connection;
 
     public SimpleServer() {
-        this(PORT_80);
+        this(RANDOM_PORT);
     }
 
     public SimpleServer(int port) {
@@ -61,7 +61,8 @@ public class SimpleServer implements Server {
     public void run(final Application app) throws IOException {
         connection = new SocketConnection(new ContainerServer(new ApplicationContainer(app)));
         SocketAddress address = new InetSocketAddress(port);
-        connection.connect(address);
+        // The actual port the server is running on, in case we're using any random available port
+        port = ((InetSocketAddress) connection.connect(address)).getPort();
     }
 
     public void shutdown() throws IOException {

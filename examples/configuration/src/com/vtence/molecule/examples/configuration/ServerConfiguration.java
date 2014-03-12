@@ -16,8 +16,9 @@ import static com.vtence.molecule.middlewares.Router.draw;
 public class ServerConfiguration {
 
     public static void main(String[] args) throws IOException {
+        // By default, server will run on a random available port...
         SimpleServer server = new SimpleServer();
-        // Use port 8080, the default being 80
+        // ... but we can specify any port
         server.port(8080);
         // Fallback to UTF-8 when no charset is specified in the content type of the response
         server.defaultCharset(Charsets.UTF_8);
