@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class HttpRequest {
     private final WebClient client;
     private final String domain = "localhost";
 
-    private final Map<String, String> parameters = new HashMap<String, String>();
+    private final Map<String, List<String>> parameters = new HashMap<String, List<String>>();
     private final Map<String, String> headers = new HashMap<String, String>();
     private final Map<String, String> cookies = new HashMap<String, String>();
 
@@ -46,10 +47,16 @@ public class HttpRequest {
     }
 
     public HttpRequest but() {
-        HttpRequest other = new HttpRequest(client);
-        other.withTimeout(timeoutInMillis).onPort(port).usingMethod(method).on(path).
-                applyCookies(applyCookies).followRedirects(followRedirects).
-                withEncodingType(encodingType).withBody(body);
+        HttpRequest other = new HttpRequest(client).
+                withTimeout(timeoutInMillis).
+                onPort(port).
+                usingMethod(method).
+                on(path).
+                applyCookies(applyCookies).
+                followRedirects(followRedirects).
+                withEncodingType(encodingType).
+                withBody(body);
+
         for (String header: headers.keySet()) {
             other.withHeader(header, headers.get(header));
         }
@@ -57,10 +64,15 @@ public class HttpRequest {
             other.withCookie(cookie, cookies.get(cookie));
         }
         for (String name: parameters.keySet()) {
-            other.withParameter(name, parameters.get(name));
+            other.withParameter(name, parameters(name));
         }
 
         return other;
+    }
+
+    private String[] parameters(String name) {
+        List<String> values = parameters.get(name);
+        return values.toArray(new String[values.size()]);
     }
 
     public HttpRequest applyCookies(boolean apply) {
@@ -88,8 +100,8 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest withParameter(String name, String value) {
-        parameters.put(name, value);
+    public HttpRequest withParameter(String name, String... value) {
+        parameters.put(name, Arrays.asList(value));
         return this;
     }
 
@@ -153,8 +165,10 @@ public class HttpRequest {
 
     private List<NameValuePair> requestParameters() {
         List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-        for (String name : parameters.keySet()) {
-            pairs.add(new NameValuePair(name, parameters.get(name)));
+        for (String name: parameters.keySet()) {
+            for (String value : parameters(name)) {
+                pairs.add(new NameValuePair(name, value));
+            }
         }
         return pairs;
     }

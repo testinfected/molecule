@@ -47,6 +47,10 @@ public class RequestWrapper implements Request {
         return request.parameter(name);
     }
 
+    public String[] parameters(String name) {
+        return request.parameters(name);
+    }
+
     public String uri() {
         return request.uri();
     }

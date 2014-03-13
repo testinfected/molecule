@@ -1,11 +1,12 @@
 package com.vtence.molecule.support;
 
-import org.hamcrest.Matcher;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
+import org.hamcrest.Matcher;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 public class MockRequest implements Request {
 
-    private final Map<String, String> params = new HashMap<String, String>();
+    private final Map<String, List<String>> params = new HashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
     private final Map<String, String> cookies = new HashMap<String, String>();
     private HttpMethod method = HttpMethod.GET;
@@ -22,6 +23,8 @@ public class MockRequest implements Request {
     private String ip = "127.0.0.1";
     private String protocol = "HTTP/1.1";
     private Session session;
+
+    public MockRequest() {}
 
     public static MockRequest aRequest() {
         return new MockRequest();
@@ -42,8 +45,6 @@ public class MockRequest implements Request {
     public static MockRequest DELETE(String path) {
         return aRequest().withPath(path).withMethod(HttpMethod.DELETE);
     }
-
-    public MockRequest() {}
 
     public void setPath(String path) {
         withPath(path);
@@ -98,7 +99,8 @@ public class MockRequest implements Request {
     }
 
     public void addParameter(String name, String value) {
-        params.put(name, value);
+        if (!params.containsKey(name)) params.put(name, new ArrayList<String>());
+        params.get(name).add(value);
     }
 
     public MockRequest withParameter(String name, String value) {
@@ -107,7 +109,15 @@ public class MockRequest implements Request {
     }
 
     public String parameter(String name) {
-        return params.get(name);
+        String[] values = parameters(name);
+        if (values.length == 0) return null;
+        return values[0];
+    }
+
+    public String[] parameters(String name) {
+        List<String> values = params.get(name);
+        if (values == null) return new String[0];
+        return values.toArray(new String[values.size()]);
     }
 
     public String protocol() {

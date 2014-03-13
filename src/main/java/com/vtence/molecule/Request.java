@@ -12,15 +12,13 @@ public interface Request {
 
     String contentType();
 
-    List<String> headers();
+    String header(String name);
 
     List<String> headers(String name);
 
-    String header(String name);
+    List<String> headers();
 
     HttpMethod method();
-
-    String parameter(String name);
 
     String uri();
 
@@ -30,9 +28,13 @@ public interface Request {
 
     String protocol();
 
-    Map<String, String> cookies();
+    String parameter(String name);
+
+    String[] parameters(String name);
 
     String cookie(String name);
+
+    Map<String, String> cookies();
 
     Object attribute(Object key);
 

@@ -52,6 +52,11 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return request.getParameter(name);
     }
 
+    public String[] parameters(String name) {
+        List<String> values = request.getQuery().getAll(name);
+        return values.toArray(new String[values.size()]);
+    }
+
     public String uri() {
         return request.getTarget();
     }

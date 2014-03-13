@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,6 +98,19 @@ public class SimpleServerTest {
         response.assertHasContentType(containsString("UTF-16"));
     }
 
+    @Test public void
+    supportsArrayParameters() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body(Arrays.toString(request.parameters("names")));
+            }
+        });
+
+        response = request.withParameter("names", "Alice", "Bob", "Charles").send();
+        assertNoError();
+        response.assertHasContent("[Alice, Bob, Charles]");
+    }
+
     @SuppressWarnings("unchecked")
     @Test public void
     providesGeneralRequestInformation() throws IOException {
@@ -122,7 +136,7 @@ public class SimpleServerTest {
 
     @SuppressWarnings("unchecked")
     @Test public void
-    detailsRequestHeaders() throws IOException {
+    supportsRequestHeaders() throws IOException {
         final Map<String, String> headers = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -165,7 +179,7 @@ public class SimpleServerTest {
 
     @SuppressWarnings("unchecked")
     @Test public void
-    detailsRequestCookies() throws IOException {
+    supportsCookies() throws IOException {
         final Map<String, String> cookies = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -208,7 +222,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    onlyCreatesSessionOnDemand() throws IOException {
+    onlyCreatesSessionsOnDemand() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("Hello, World");
@@ -242,7 +256,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    sessionsExpireAfterTimeout() throws Exception {
+    expiresSessionsAfterTimeout() throws Exception {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 if (request.method() == HttpMethod.POST)
