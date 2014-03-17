@@ -6,8 +6,11 @@ import com.vtence.molecule.util.Charsets;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -29,9 +32,11 @@ import static org.junit.Assert.assertThat;
 
 public class MockResponse implements Response {
 
-    private final Map<String, String> headers = new HashMap<String, String>();
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+    private final Map<String, String> headers = new HashMap<String, String>();
     private final Map<String, String> cookies = new HashMap<String, String>();
+
     private HttpStatus status;
 
     public static MockResponse aResponse() {
@@ -134,11 +139,11 @@ public class MockResponse implements Response {
     }
 
     public OutputStream outputStream(int bufferSize) throws IOException {
-        return output;
+        return new BufferedOutputStream(outputStream(), bufferSize);
     }
 
     public Writer writer() throws IOException {
-        return new OutputStreamWriter(output, charset());
+        return new OutputStreamWriter(outputStream(), charset());
     }
 
     public void body(String body) throws IOException {
@@ -167,8 +172,16 @@ public class MockResponse implements Response {
         return output.toByteArray();
     }
 
+    public boolean empty() {
+        return output.size() == 0;
+    }
+
+    public InputStream stream() {
+        return new ByteArrayInputStream(content());
+    }
+
     public void assertContentSize(long size) {
-        assertThat("content size", output.toByteArray().length, is((int) size));
+        assertThat("content size", content().length, is((int) size));
     }
 
     public void assertContentEncodedAs(String encoding) throws IOException {
