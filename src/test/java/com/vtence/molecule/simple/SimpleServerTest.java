@@ -55,7 +55,7 @@ public class SimpleServerTest {
     configureServer() {
         server.reportErrorsTo(new FailureReporter() {
             public void errorOccurred(Exception error) {
-                SimpleServerTest.this.error  = error;
+                SimpleServerTest.this.error = error;
             }
         });
         server.enableSessions(new CookieTracker(new SessionPool(delorean, THIRTY_MINUTES)));
@@ -71,7 +71,6 @@ public class SimpleServerTest {
     respondsToRequests() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body("<html>...</html>");
                 response.status(HttpStatus.OK);
             }
         });
@@ -79,7 +78,52 @@ public class SimpleServerTest {
         response = request.send();
         assertNoError();
         response.assertOK();
+    }
+
+    @Test public void
+    chunksResponseStreamWhenContentLengthUnknown() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                byte[] content = "<html>...</html>".getBytes(response.charset());
+                response.outputStream().write(content);
+            }
+        });
+
+        response = request.send();
+        assertNoError();
         response.assertHasContent("<html>...</html>");
+        response.assertChunked();
+    }
+
+    @Test public void
+    doesNoChunkResponseWithContentLengthHeader() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                byte[] content = "<html>...</html>".getBytes(response.charset());
+                response.contentLength(content.length);
+                response.outputStream().write(content);
+            }
+        });
+
+        response = request.send();
+        assertNoError();
+        response.assertHasContent("<html>...</html>");
+        response.assertNotChunked();
+    }
+
+    @Test public void
+    doesNotChunkResponseStreamWhenBuffered() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                byte[] content = "<html>...</html>".getBytes(response.charset());
+                response.outputStream(content.length).write(content);
+            }
+        });
+
+        response = request.send();
+        assertNoError();
+        response.assertHasContent("<html>...</html>");
+        response.assertNotChunked();
     }
 
     @Test public void
