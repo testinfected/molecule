@@ -25,6 +25,6 @@ public class ViewTemplate implements View {
     }
 
     private String withCharsetOf(Response response) {
-        return mediaType + "; charset=" + response.charset().displayName().toLowerCase();
+        return mediaType + "; charset=" + response.charsetName();
     }
 }

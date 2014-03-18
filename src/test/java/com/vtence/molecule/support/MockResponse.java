@@ -145,6 +145,10 @@ public class MockResponse implements Response {
         return charset != null ? charset : defaultEncoding;
     }
 
+    public String charsetName() {
+        return charset().name().toLowerCase();
+    }
+
     public OutputStream outputStream() throws IOException {
         bufferSize = 0;
         return output;
@@ -191,6 +195,10 @@ public class MockResponse implements Response {
 
     public InputStream stream() {
         return new ByteArrayInputStream(content());
+    }
+
+    public void assertBufferSize(int size) {
+        assertBufferSize(equalTo(size));
     }
 
     public void assertBufferSize(Matcher<Integer> sizeMatcher) {
