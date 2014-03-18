@@ -12,6 +12,7 @@ import org.junit.Test;
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class FailsafeTest {
     Failsafe failsafe = new Failsafe();
@@ -25,7 +26,7 @@ public class FailsafeTest {
     }};
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = aResponse().withDefaultCharset("utf-8");
 
     @Before public void
     handleRequest() throws Exception {
@@ -50,7 +51,7 @@ public class FailsafeTest {
     }
 
     @Test public void
-    setsResponseContentTypeToHtml() {
-        response.assertHeader("Content-Type", containsString("text/html"));
+    respondsWithHtmlContent() {
+        response.assertHeader("Content-Type", equalTo("text/html; charset=utf-8"));
     }
 }
