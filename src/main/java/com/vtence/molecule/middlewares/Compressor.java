@@ -18,6 +18,7 @@ public class Compressor extends AbstractMiddleware {
         BufferedResponse buffer = new BufferedResponse(response);
         forward(request, buffer);
         if (acceptableEncodingsFor(request).contains(DEFLATE)) {
+            response.removeHeader(HttpHeaders.CONTENT_LENGTH);
             response.header(HttpHeaders.CONTENT_ENCODING, DEFLATE);
             deflate(response, buffer);
         } else {
