@@ -35,9 +35,9 @@ public class Compressor extends AbstractMiddleware {
         deflater.setInput(buffer.content());
         deflater.finish();
         byte[] buf = new byte[CHUNKS_SIZE];
-        while (!deflater.needsInput()) {
+        while (!deflater.finished()) {
             int written = deflater.deflate(buf);
-            response.outputStream(written).write(buf);
+            response.outputStream(written).write(buf, 0, written);
         }
     }
 
