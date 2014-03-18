@@ -57,7 +57,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    deflatesBufferedResponseBodies() throws Exception {
+    deflatesResponseBodies() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("uncompressed body");
