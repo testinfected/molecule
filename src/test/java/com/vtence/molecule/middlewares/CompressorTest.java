@@ -14,6 +14,7 @@ import java.util.zip.InflaterInputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 public class CompressorTest {
 
@@ -33,7 +34,9 @@ public class CompressorTest {
             }
         });
 
+        request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
+        response.assertHeader("Content-Encoding", "deflate");
         assertThat("inflated content", inflate(response), equalTo("uncompressed content"));
     }
 
@@ -47,7 +50,9 @@ public class CompressorTest {
             }
         });
 
+        request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
+        response.assertHeader("Content-Encoding", "deflate");
         assertThat("inflated content", inflate(response), equalTo("uncompressed content"));
     }
 
@@ -59,7 +64,9 @@ public class CompressorTest {
             }
         });
 
+        request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
+        response.assertHeader("Content-Encoding", "deflate");
         assertThat("inflated body", inflate(response), equalTo("uncompressed body"));
     }
 
@@ -70,7 +77,23 @@ public class CompressorTest {
             }
         });
 
+        request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
+        response.assertHeader("Content-Encoding", "deflate");
+    }
+
+    @Test public void
+    fallsBackToNoCompression() throws Exception {
+        compressor.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("uncompressed body");
+            }
+        });
+
+        request.withHeader("Accept-Encoding", "compress");
+        compressor.handle(request, response);
+        response.assertHeader("Content-Encoding", nullValue());
+        response.assertBody("uncompressed body");
     }
 
     private String inflate(MockResponse response) throws IOException {

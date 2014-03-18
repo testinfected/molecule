@@ -30,7 +30,9 @@ import static com.vtence.molecule.support.HttpRequest.aRequest;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
@@ -137,20 +139,24 @@ public class SimpleServerTest {
     @SuppressWarnings("unchecked")
     @Test public void
     supportsRequestHeaders() throws IOException {
-        final Map<String, String> headers = new HashMap<String, String>();
+        final Map<String, Iterable<String>> headers = new HashMap<String, Iterable<String>>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                headers.put("all", request.headers().toString());
-                headers.put("accept", request.header("Accept"));
+                headers.put("names", request.headerNames());
+                headers.put("accept", Arrays.asList(request.header("Accept")));
+                headers.put("encoding", request.headers("Accept-Encoding"));
             }
         });
 
-        request.withHeader("Accept", "text/html").send();
+        request.withHeader("Accept", "text/html").
+                withHeader("Accept-Encoding", "gzip, identity; q=0.5, deflate;q=1.0, *;q=0").
+                send();
         assertNoError();
 
-        assertThat("request headers", headers, allOf(
-                hasEntry(equalTo("all"), containsString("Accept")),
-                hasEntry("accept", "text/html")));
+        assertThat("Header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
+        assertThat("Accept header", headers.get("accept"), contains("text/html"));
+        assertThat("Accept-Encoding header", headers.get("encoding"), contains("gzip", "deflate",
+                "identity"));
     }
 
     @SuppressWarnings("unchecked")

@@ -7,6 +7,7 @@ import com.vtence.molecule.Session;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RequestWrapper implements Request {
     protected final Request request;
@@ -27,8 +28,8 @@ public class RequestWrapper implements Request {
         return request.contentType();
     }
 
-    public List<String> headers() {
-        return request.headers();
+    public Set<String> headerNames() {
+        return request.headerNames();
     }
 
     public List<String> headers(String name) {

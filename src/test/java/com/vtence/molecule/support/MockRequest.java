@@ -10,14 +10,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertThat;
 
 public class MockRequest implements Request {
 
+    private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
     private final Map<String, List<String>> params = new HashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
     private final Map<String, String> cookies = new HashMap<String, String>();
+
     private HttpMethod method = HttpMethod.GET;
     private String path = "/";
     private String ip = "127.0.0.1";
@@ -44,10 +48,6 @@ public class MockRequest implements Request {
 
     public static MockRequest DELETE(String path) {
         return aRequest().withPath(path).withMethod(HttpMethod.DELETE);
-    }
-
-    public void setPath(String path) {
-        withPath(path);
     }
 
     public MockRequest withPath(String path) {
@@ -78,16 +78,22 @@ public class MockRequest implements Request {
         return null;
     }
 
-    public List<String> headers() {
-        return null;
+    public void withHeader(String header, String... values) {
+        headers.put(header, asList(values));
+    }
+
+    public Set<String> headerNames() {
+        return headers.keySet();
     }
 
     public List<String> headers(String name) {
-        return null;
+        List<String> values = headers.get(name);
+        return values != null ? values : new ArrayList<String>();
     }
 
     public String header(String name) {
-        return null;
+        List<String> values = headers.get(name);
+        return values.isEmpty() ? null : values.get(0);
     }
 
     public HttpMethod method() {
