@@ -7,6 +7,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 public class ApacheCommonLoggerTest {
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
+        setThreadingPolicy(new Synchroniser());
     }};
     Logger logger = context.mock(Logger.class);
     Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").build();
@@ -48,8 +50,7 @@ public class ApacheCommonLoggerTest {
         apacheCommonLogger.handle(request, aResponse());
     }
 
-    @Test
-    public void
+    @Test public void
     hyphenReplacesContentSizeForEmptyResponses() throws Exception {
         Request request = aRequest().withIp("192.168.0.1").withMethod(DELETE).withPath("/logout");
         apacheCommonLogger.connectTo(new Application() {
