@@ -127,6 +127,20 @@ public class SimpleServerTest {
     }
 
     @Test public void
+    doesNotChunkResponseBodies() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("<html>...</html>");
+            }
+        });
+
+        response = request.send();
+        assertNoError();
+        response.assertHasContent("<html>...</html>");
+        response.assertNotChunked();
+    }
+
+    @Test public void
     acceptsADefaultCharsetForEncoding() throws IOException {
         server.defaultCharset(Charsets.UTF_16);
         server.run(new Application() {
