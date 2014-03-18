@@ -6,7 +6,7 @@ import com.vtence.molecule.util.MimeTypes;
 
 public class HtmlPageSelector implements Selector {
 
-    public boolean select(Response response) {
+    public boolean selected(Response response) {
         return isOk(response.statusCode()) && isHtml(response.contentType());
     }
 

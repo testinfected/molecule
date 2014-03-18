@@ -39,8 +39,8 @@ public class SiteMeshTest {
     @Before public void
     selectPage() throws Exception {
         context.checking(new Expectations() {{
-            allowing(selector).select(with(any(Response.class))); will(returnValue(true)); when(page.is("selected"));
-            allowing(selector).select(with(any(Response.class))); will(returnValue(false)); when(page.isNot("selected"));
+            allowing(selector).selected(with(any(Response.class))); will(returnValue(true)); when(page.is("selected"));
+            allowing(selector).selected(with(any(Response.class))); will(returnValue(false)); when(page.isNot("selected"));
         }});
     }
 

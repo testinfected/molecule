@@ -19,7 +19,7 @@ public class HtmlPageSelectorTest {
         Response response = aResponse().
                 withContentType("text/html; charset=iso-8859-1").
                 withStatus(HttpStatus.OK);
-        assertThat("content selection", selector.select(response), equalTo(true));
+        assertThat("content selection", selector.selected(response), equalTo(true));
     }
 
     @Test public void
@@ -27,18 +27,18 @@ public class HtmlPageSelectorTest {
         Response response = aResponse().
                 withContentType("text/plain").
                 withStatus(HttpStatus.OK);
-        assertThat("content selection", selector.select(response), equalTo(false));
+        assertThat("content selection", selector.selected(response), equalTo(false));
     }
 
     @Test public void
     doesNotSelectContentWhenStatusNotOK() throws IOException {
         Response response = aResponse().withStatus(HttpStatus.SEE_OTHER);
-        assertThat("content selection", selector.select(response), equalTo(false));
+        assertThat("content selection", selector.selected(response), equalTo(false));
     }
 
     @Test public void
     doesNotSelectResponseWithoutContentType() throws IOException {
         Response response = aResponse().withStatus(HttpStatus.OK);
-        assertThat("content selection", selector.select(response), equalTo(false));
+        assertThat("content selection", selector.selected(response), equalTo(false));
     }
 }

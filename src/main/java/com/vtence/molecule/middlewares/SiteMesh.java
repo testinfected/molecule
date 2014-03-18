@@ -50,6 +50,6 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     private boolean shouldDecorate(Response response) {
-        return selector.select(response);
+        return selector.selected(response);
     }
 }
