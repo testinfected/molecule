@@ -56,7 +56,7 @@ public class FileServerTest {
         fileServer.handle(request, response);
 
         response.assertHeader("Content-Length", String.valueOf(file.length()));
-        response.assertHeader("Last-Modified", file.lastModified());
+        response.assertHeaderDate("Last-Modified", file.lastModified());
     }
 
     @Test public void

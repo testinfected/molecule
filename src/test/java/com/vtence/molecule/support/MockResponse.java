@@ -90,7 +90,7 @@ public class MockResponse implements Response {
         assertThat("header[" + name + "]", header(name), valueMatcher);
     }
 
-    public void assertHeader(String name, long date) {
+    public void assertHeaderDate(String name, long date) {
         assertHeader(name, formatDate(date));
     }
 
