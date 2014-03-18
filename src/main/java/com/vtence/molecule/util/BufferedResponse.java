@@ -47,4 +47,8 @@ public class BufferedResponse extends ResponseWrapper {
     public byte[] content() {
         return buffer.toByteArray();
     }
+
+    public int size() {
+        return buffer.size();
+    }
 }

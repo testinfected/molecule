@@ -29,11 +29,12 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        BufferedResponse capturedResponse = captureResponse(request, response);
-        if (shouldDecorate(capturedResponse)) {
-            decorate(response, capturedResponse);
+        BufferedResponse buffer = new BufferedResponse(response);
+        forward(request, buffer);
+        if (shouldDecorate(buffer)) {
+            decorate(response, buffer);
         } else {
-            write(response, capturedResponse);
+            write(response, buffer);
         }
     }
 
@@ -45,13 +46,7 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     private void write(Response response, BufferedResponse buffer) throws IOException {
-        response.body(buffer.body());
-    }
-
-    private BufferedResponse captureResponse(Request request, Response response) throws Exception {
-        BufferedResponse capture = new BufferedResponse(response);
-        forward(request, capture);
-        return capture;
+        response.outputStream(buffer.size()).write(buffer.content());
     }
 
     private boolean shouldDecorate(Response response) {
