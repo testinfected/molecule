@@ -7,6 +7,7 @@ import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
+import com.vtence.molecule.util.Charsets;
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -21,6 +22,7 @@ import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.equalTo;
 
 public class SiteMeshTest {
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
@@ -32,7 +34,7 @@ public class SiteMeshTest {
     States page = context.states("page").startsAs("selected");
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = aResponse().withDefaultCharset("utf-8");
 
     @Before public void
     selectPage() throws Exception {
@@ -54,21 +56,23 @@ public class SiteMeshTest {
     }
 
     @Test public void
-    removesContentLengthHeaderWhenPageIsSelected() throws Exception {
+    removesContentLengthHeaderDecorating() throws Exception {
         response.header("Content-Length", String.valueOf(140));
         siteMesh.handle(request, response);
         response.assertHeader("Content-Length", nullValue());
     }
 
     @Test public void
-    leavesContentUntouchedWhenPageIsNotSelected() throws Exception {
+    leavesContentUntouchedWhenNotDecorating() throws Exception {
         page.become("unselected");
         siteMesh.handle(request, response);
         response.assertBody(originalPage);
+        int contentSize = originalPage.getBytes(Charsets.UTF_8).length;
+        response.assertBufferSize(equalTo(contentSize));
     }
 
     @Test public void
-    preservesOriginalPageEncodingWhenDecorating() throws Exception {
+    preservesOriginalResponseEncodingWhenDecorating() throws Exception {
         response.withContentType("text/html; charset=UTF-16");
         decoratedPage = "<The following characters require encoding: éçë>";
 

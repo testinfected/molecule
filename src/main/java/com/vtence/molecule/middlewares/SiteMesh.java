@@ -45,7 +45,7 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     private void write(Response response, BufferedResponse buffer) throws IOException {
-        response.outputStream().write(buffer.content());
+        response.body(buffer.body());
     }
 
     private BufferedResponse captureResponse(Request request, Response response) throws Exception {
