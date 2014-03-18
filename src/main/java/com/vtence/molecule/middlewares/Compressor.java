@@ -8,11 +8,11 @@ import com.vtence.molecule.util.BufferedResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 public class Compressor extends AbstractMiddleware {
 
     private static final String DEFLATE = "deflate";
-    private static final int CHUNKS_SIZE = 512;
 
     public void handle(Request request, final Response response) throws Exception {
         BufferedResponse buffer = new BufferedResponse(response);
@@ -31,14 +31,11 @@ public class Compressor extends AbstractMiddleware {
     }
 
     private void deflate(Response response, BufferedResponse buffer) throws IOException {
-        Deflater deflater = new Deflater();
-        deflater.setInput(buffer.content());
-        deflater.finish();
-        byte[] buf = new byte[CHUNKS_SIZE];
-        while (!deflater.finished()) {
-            int written = deflater.deflate(buf);
-            response.outputStream(written).write(buf, 0, written);
-        }
+        Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+        DeflaterOutputStream out = new DeflaterOutputStream(response.outputStream(), deflater);
+        out.write(buffer.content());
+        out.finish();
+        deflater.end();
     }
 
     private void identity(Response response, BufferedResponse buffer) throws IOException {

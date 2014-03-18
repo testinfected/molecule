@@ -9,6 +9,7 @@ import com.vtence.molecule.util.Streams;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -91,6 +92,7 @@ public class CompressorTest {
     }
 
     private String inflate(MockResponse response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new InflaterInputStream(response.stream()));
+        return response.empty() ? "" : Streams.toString(new InflaterInputStream(response.stream(),
+                new Inflater(true)));
     }
 }
