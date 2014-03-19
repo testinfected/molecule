@@ -4,13 +4,23 @@
 
 ## Getting started
 
-Build yourself using Buildr (for latest and greatest version), or simply download using Maven:
+Build yourself using [Buildr](http://buildr.apache.org), or simply download from Maven Central:
 
 ```xml
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.2</version>
+      <version>0.3-SNAPSHOT</version>
+</dependency>
+```
+
+To use the Simple server, you need to add [Simple](http://www.simpleframework.org) as a dependency:
+
+```xml
+<dependency>
+      <groupId>org.simpleframework</groupId>
+      <artifactId>simple</artifactId>
+      <version>5.1.6</version>
 </dependency>
 ```
 
