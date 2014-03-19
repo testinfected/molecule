@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertThat;
@@ -82,8 +81,8 @@ public class MockRequest implements Request {
         headers.put(header, asList(values));
     }
 
-    public Set<String> headerNames() {
-        return headers.keySet();
+    public List<String> headerNames() {
+        return new ArrayList<String>(headers.keySet());
     }
 
     public List<String> headers(String name) {

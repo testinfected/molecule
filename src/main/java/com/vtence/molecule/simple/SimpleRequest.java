@@ -7,10 +7,8 @@ import org.simpleframework.http.Cookie;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SimpleRequest implements com.vtence.molecule.Request {
 
@@ -34,8 +32,8 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return request.getContentType().getType();
     }
 
-    public Set<String> headerNames() {
-        return new LinkedHashSet<String>(request.getNames());
+    public List<String> headerNames() {
+        return request.getNames();
     }
 
     public List<String> headers(String name) {
