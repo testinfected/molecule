@@ -51,4 +51,5 @@ Check out the examples:
 * [Using Sessions](https://github.com/testinfected/molecule/blob/master/examples/sessions/src/com/vtence/molecule/examples/session/EnablingSessions.java)
 * [Available Middlewares - aka Filtering](https://github.com/testinfected/molecule/blob/master/examples/middlewares/src/com/vtence/molecule/examples/middlewares/Middlewares.java)
 * [Simply RESTful](https://github.com/testinfected/molecule/blob/master/examples/REST/src/com/vtence/molecule/examples/rest/REST.java)
+* [View Templating](https://github.com/testinfected/molecule/blob/master/examples/templates/src/com/vtence/molecule/examples/templates/ViewTemplating.java)
 * [PetStore](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
