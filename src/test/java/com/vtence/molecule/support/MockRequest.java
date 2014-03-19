@@ -88,7 +88,7 @@ public class MockRequest implements Request {
 
     public List<String> headers(String name) {
         List<String> values = headers.get(name);
-        return values != null ? values : new ArrayList<String>();
+        return values != null ? new ArrayList<String>(values) : new ArrayList<String>();
     }
 
     public String header(String name) {
