@@ -38,8 +38,8 @@ public class ApacheCommonLoggerTest {
         Request request = aRequest().withIp("192.168.0.1").withMethod(GET).withPath("/products?keyword=dogs");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body("a response with a size of 28");
                 response.contentLength(28);
+                response.body("a response with a size of 28");
                 response.status(HttpStatus.OK);
             }
         });
@@ -55,8 +55,8 @@ public class ApacheCommonLoggerTest {
         Request request = aRequest().withIp("192.168.0.1").withMethod(DELETE).withPath("/logout");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body("");
                 response.contentLength(0);
+                response.body("");
                 response.status(HttpStatus.NO_CONTENT);
             }
         });

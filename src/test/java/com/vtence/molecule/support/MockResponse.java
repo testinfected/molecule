@@ -63,6 +63,8 @@ public class MockResponse implements Response {
     }
 
     public void header(String name, String value) {
+        if (output.size() > 0)
+            throw new IllegalStateException("Cannot set header once response is committed");
         headers.put(name, value);
     }
 
