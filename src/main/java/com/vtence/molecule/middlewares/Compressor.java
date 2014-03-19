@@ -11,6 +11,8 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static com.vtence.molecule.HttpHeaders.CONTENT_ENCODING;
+
 public class Compressor extends AbstractMiddleware {
 
     private enum Coding {
@@ -28,7 +30,7 @@ public class Compressor extends AbstractMiddleware {
         gzip {
             public void encode(Response to, byte[] content) throws IOException {
                 to.removeHeader(HttpHeaders.CONTENT_LENGTH);
-                to.header(HttpHeaders.CONTENT_ENCODING, gzip.name());
+                to.header(CONTENT_ENCODING, gzip.name());
                 GZIPOutputStream out = new GZIPOutputStream(to.outputStream());
                 out.write(content);
                 out.finish();
@@ -46,6 +48,11 @@ public class Compressor extends AbstractMiddleware {
         BufferedResponse buffer = new BufferedResponse(response);
         forward(request, buffer);
 
+        if (alreadyEncoded(response) && !identityEncoded(response)) {
+            writeUncompressed(response, buffer);
+            return;
+        }
+
         for (String encoding: acceptableEncodingsFor(request)) {
             for (Coding coding : Coding.values()) {
                 if (coding.matches(encoding)) {
@@ -57,14 +64,24 @@ public class Compressor extends AbstractMiddleware {
             }
         }
 
-        write(response, buffer);
+        writeUncompressed(response, buffer);
     }
 
-    private void write(Response response, BufferedResponse buffer) throws IOException {
+    private boolean alreadyEncoded(Response response) {
+        return response.header(HttpHeaders.CONTENT_ENCODING) != null;
+    }
+
+    private boolean identityEncoded(Response response) {
+        return response.header(HttpHeaders.CONTENT_ENCODING).matches("\\bidentity\\b");
+    }
+
+    private void writeUncompressed(Response response, BufferedResponse buffer) throws IOException {
         response.outputStream(buffer.size()).write(buffer.content());
     }
 
     private List<String> acceptableEncodingsFor(Request client) {
+        // This works fine because Simple does the job of parsing the header for use
+        // and removes non acceptable codings
         return client.headers(HttpHeaders.ACCEPT_ENCODING);
     }
 }

@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
@@ -82,6 +83,10 @@ public class MockResponse implements Response {
 
     public void cookie(String name, String value) {
         cookies.put(name, value);
+    }
+
+    public void assertNoHeader(String name) {
+        assertHeader(name, nullValue());
     }
 
     public void assertHeader(String name, String value) {

@@ -17,7 +17,7 @@ import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.isEmptyString;
 
 public class CompressorTest {
 
@@ -37,7 +37,7 @@ public class CompressorTest {
         request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "deflate");
-        assertThat("inflated body", inflate(response), equalTo("uncompressed body"));
+        assertThat("body", inflate(response), equalTo("uncompressed body"));
     }
 
     @Test public void
@@ -51,7 +51,7 @@ public class CompressorTest {
         request.withHeader("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "gzip");
-        assertThat("inflated body", unzip(response), equalTo("uncompressed body"));
+        assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
     @Test public void
@@ -65,7 +65,7 @@ public class CompressorTest {
         request.withHeader("Accept-Encoding", "gzip", "deflate");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "gzip");
-        assertThat("inflated body", unzip(response), equalTo("uncompressed body"));
+        assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
     @Test public void
@@ -77,7 +77,7 @@ public class CompressorTest {
 
         request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        response.assertHeader("Content-Encoding", "deflate");
+        assertThat("body", inflate(response), isEmptyString());
     }
 
     @Test public void
@@ -91,12 +91,11 @@ public class CompressorTest {
 
         request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        response.assertHeader("Content-Length", nullValue());
+        response.assertNoHeader("Content-Length");
     }
 
     @Test public void
-    fallsBackToNoCompressionWhenClientDoesNotAcceptOurContentCodings() throws
-            Exception {
+    fallsBackToNoCompressionWhenClientDoesNotAcceptOurContentCodings() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("uncompressed body");
@@ -105,7 +104,7 @@ public class CompressorTest {
 
         request.withHeader("Accept-Encoding", "compress");
         compressor.handle(request, response);
-        response.assertHeader("Content-Encoding", nullValue());
+        response.assertNoHeader("Content-Encoding");
         response.assertBody("uncompressed body");
     }
 
@@ -121,6 +120,35 @@ public class CompressorTest {
         request.withHeader("Accept-Encoding", "identity");
         compressor.handle(request, response);
         response.assertHeader("Content-Length", "128");
+    }
+
+    @Test public void
+    skipsCompressionIfContentEncodingAlreadyPresent() throws Exception {
+        compressor.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.header("Content-Encoding", "deflate");
+                response.body("compressed body");
+            }
+        });
+
+        request.withHeader("Accept-Encoding", "gzip");
+        compressor.handle(request, response);
+        response.assertHeader("Content-Encoding", "deflate");
+        response.assertBody("compressed body");
+    }
+
+    @Test public void
+    compressesWhenContentEncodingIsIdentity() throws Exception {
+        compressor.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.header("Content-Encoding", "identity");
+                response.body("uncompressed body");
+            }
+        });
+
+        request.withHeader("Accept-Encoding", "gzip");
+        compressor.handle(request, response);
+        assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
     private String inflate(MockResponse response) throws IOException {
