@@ -30,7 +30,7 @@ public class AcceptEncodingTest {
 
     @Test public void
     considersIdentityEncodingAcceptableByDefault() {
-        assertSelected("", in("identity"), equalTo("identity"));
+        assertSelected("", in("gzip", "identity"), equalTo("identity"));
         assertSelected("deflate, gzip", in("identity"), equalTo("identity"));
         assertSelected("deflate; q=0, gzip; q=0", in("gzip", "deflate", "identity"),
                 equalTo("identity"));
