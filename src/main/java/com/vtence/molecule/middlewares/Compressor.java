@@ -48,7 +48,7 @@ public class Compressor extends AbstractMiddleware {
         BufferedResponse buffer = new BufferedResponse(response);
         forward(request, buffer);
 
-        if (alreadyEncoded(response) && !identityEncoded(response)) {
+        if (buffer.empty() || alreadyEncoded(response) && !identityEncoded(response)) {
             writeUncompressed(response, buffer);
             return;
         }

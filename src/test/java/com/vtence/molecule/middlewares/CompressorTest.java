@@ -17,7 +17,6 @@ import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.isEmptyString;
 
 public class CompressorTest {
 
@@ -69,7 +68,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    gracefullyHandlesLackOfContent() throws Exception {
+    doesNotCompressEmptyContent() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
             }
@@ -77,7 +76,7 @@ public class CompressorTest {
 
         request.withHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        assertThat("body", inflate(response), isEmptyString());
+        response.assertNoHeader("Content-Encoding");
     }
 
     @Test public void
@@ -95,7 +94,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    fallsBackToNoCompressionWhenClientDoesNotAcceptOurContentCodings() throws Exception {
+    fallsBackToNoCompressionWhenClientDoesNotAcceptOurEncodings() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("uncompressed body");
@@ -138,7 +137,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    compressesWhenContentEncodingIsIdentity() throws Exception {
+    compressesAnywayWhenContentEncodingIsIdentity() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.header("Content-Encoding", "identity");

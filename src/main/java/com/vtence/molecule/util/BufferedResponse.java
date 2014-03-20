@@ -51,4 +51,8 @@ public class BufferedResponse extends ResponseWrapper {
     public int size() {
         return buffer.size();
     }
+
+    public boolean empty() {
+        return size() == 0;
+    }
 }
