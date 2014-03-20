@@ -11,7 +11,6 @@ import com.vtence.molecule.simple.session.SessionPool;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.Clock;
 import com.vtence.molecule.util.FailureReporter;
 import org.hamcrest.Matcher;
@@ -141,11 +140,10 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    acceptsADefaultCharsetForEncoding() throws IOException {
-        server.defaultCharset(Charsets.UTF_16);
+    encodesResponsesAccordingToContentType() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.contentType("text/plain; charset=" + response.charset().displayName());
+                response.contentType("text/plain; charset=utf-16");
                 response.body("This content requires encoding &âçüè!");
                 response.status(HttpStatus.OK);
             }
@@ -155,7 +153,6 @@ public class SimpleServerTest {
         assertNoError();
         response.assertOK();
         response.assertContentIsEncodedAs("UTF-16");
-        response.assertHasContentType(containsString("UTF-16"));
     }
 
     @Test public void

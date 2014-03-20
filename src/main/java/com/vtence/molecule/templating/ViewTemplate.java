@@ -18,13 +18,9 @@ public class ViewTemplate implements View {
     }
 
     public void render(Response response, Object context) throws IOException {
-        response.contentType(withCharsetOf(response));
+        response.contentType(mediaType);
         Writer out = response.writer();
         renderer.render(out, name, context);
         out.flush();
-    }
-
-    private String withCharsetOf(Response response) {
-        return mediaType + "; charset=" + response.charsetName();
     }
 }

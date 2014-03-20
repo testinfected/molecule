@@ -7,7 +7,6 @@ import com.vtence.molecule.mustache.JMustacheRenderer;
 import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.templating.Templates;
 import com.vtence.molecule.templating.View;
-import com.vtence.molecule.util.Charsets;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +22,6 @@ public class ViewTemplating {
                 args[TEMPLATE_DIR] : "examples/templates/views");
 
         SimpleServer server = new SimpleServer(8080);
-        // Default to UTF-8 encoding for responses
-        server.defaultCharset(Charsets.UTF_8);
 
         // We use Mustache templates with an .html extension
         Templates templates = Templates.renderedWith(

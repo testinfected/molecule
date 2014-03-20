@@ -2,6 +2,7 @@ package com.vtence.molecule.simple;
 
 import com.vtence.molecule.HttpException;
 import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.util.Charsets;
 import org.simpleframework.http.ContentType;
 import org.simpleframework.http.Protocol;
 import org.simpleframework.http.Response;
@@ -15,11 +16,9 @@ import java.nio.charset.Charset;
 
 public class SimpleResponse implements com.vtence.molecule.Response {
     private final Response response;
-    private final Charset defaultCharset;
 
-    public SimpleResponse(Response response, Charset defaultCharset) {
+    public SimpleResponse(Response response) {
         this.response = response;
-        this.defaultCharset = defaultCharset;
     }
 
     public void redirectTo(String location) {
@@ -93,7 +92,7 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         ContentType type = contentType() != null ? new ContentTypeParser(contentType()) : null;
 
         if (type == null || type.getCharset() == null) {
-            return defaultCharset;
+            return Charsets.ISO_8859_1;
         }
 
         return Charset.forName(type.getCharset());

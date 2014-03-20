@@ -3,7 +3,6 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.util.MimeTypes;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,7 +35,7 @@ public class Failsafe extends AbstractMiddleware {
     }
 
     private void renderError(Exception error, Response response) throws IOException {
-        response.contentType(MimeTypes.HTML + "; charset=" + response.charsetName());
+        response.contentType("text/html; charset=utf-8");
         response.body(formatAsHtml(error));
     }
 

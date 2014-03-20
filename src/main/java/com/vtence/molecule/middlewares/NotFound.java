@@ -10,7 +10,7 @@ public class NotFound implements Application {
 
     public void handle(Request request, Response response) throws Exception {
         response.status(HttpStatus.NOT_FOUND);
-        response.contentType(MimeTypes.TEXT + "; charset=" + response.charsetName());
+        response.contentType(MimeTypes.TEXT);
         response.body("Not found: " + request.pathInfo());
     }
 }

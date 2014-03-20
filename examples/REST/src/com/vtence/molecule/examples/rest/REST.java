@@ -1,14 +1,13 @@
 package com.vtence.molecule.examples.rest;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
+import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
-import com.vtence.molecule.util.Charsets;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -43,8 +42,6 @@ public class REST {
 
     public static void main(String[] args) throws IOException {
         SimpleServer server = new SimpleServer(8080);
-        // Default to UTF-8 encoding for responses
-        server.defaultCharset(Charsets.UTF_8);
 
         server.run(new MiddlewareStack() {{
             // Capture internal server errors and display a 500 page

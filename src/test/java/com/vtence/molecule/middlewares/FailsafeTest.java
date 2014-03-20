@@ -26,7 +26,7 @@ public class FailsafeTest {
     }};
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse().withDefaultCharset("utf-8");
+    MockResponse response = aResponse();
 
     @Before public void
     handleRequest() throws Exception {
@@ -51,7 +51,7 @@ public class FailsafeTest {
     }
 
     @Test public void
-    respondsWithHtmlContent() {
+    respondsWithHtmlContentUtf8Encoded() {
         response.assertHeader("Content-Type", equalTo("text/html; charset=utf-8"));
     }
 }

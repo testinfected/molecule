@@ -34,7 +34,7 @@ public class SiteMeshTest {
     States page = context.states("page").startsAs("selected");
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse().withDefaultCharset("utf-8");
+    MockResponse response = aResponse();
 
     @Before public void
     selectPage() throws Exception {
@@ -73,13 +73,13 @@ public class SiteMeshTest {
 
     @Test public void
     preservesOriginalResponseEncodingWhenDecorating() throws Exception {
-        response.withContentType("text/html; charset=UTF-16");
+        response.withContentType("text/html; charset=utf-8");
         decoratedPage = "<The following characters require encoding: éçë>";
 
         siteMesh.handle(request, response);
 
-        response.assertContentType(containsString("UTF-16"));
-        response.assertContentEncodedAs("UTF-16");
+        response.assertContentType(containsString("utf-8"));
+        response.assertContentEncodedAs("utf-8");
     }
 
     private Application write(final String text) {

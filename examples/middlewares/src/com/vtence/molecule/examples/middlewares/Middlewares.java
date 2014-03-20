@@ -2,7 +2,6 @@ package com.vtence.molecule.examples.middlewares;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
@@ -12,10 +11,10 @@ import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.FailureMonitor;
 import com.vtence.molecule.middlewares.FilterMap;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
+import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.middlewares.ServerHeader;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
-import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.ConsoleErrorReporter;
 
 import java.io.IOException;
@@ -28,8 +27,6 @@ public class Middlewares {
 
     public static void main(String[] args) throws IOException {
         SimpleServer server = new SimpleServer(8080);
-        // Default to UTF-8 encoding for responses
-        server.defaultCharset(Charsets.UTF_8);
 
         server.run(new MiddlewareStack() {{
             // Add information about the server in the response header
