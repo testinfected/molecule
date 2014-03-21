@@ -95,7 +95,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    doesNoChunkResponseWithContentLengthHeader() throws IOException {
+    doesNoChunkResponsesWithContentLengthHeader() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 byte[] content = "<html>...</html>".getBytes(response.charset());
@@ -111,7 +111,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    doesNotChunkResponseStreamWhenBuffered() throws IOException {
+    doesNotChunkBufferedByteStreams() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 byte[] content = "<html>...</html>".getBytes(response.charset());

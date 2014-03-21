@@ -2,6 +2,7 @@ package com.vtence.molecule.templating;
 
 import com.vtence.molecule.Response;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -19,7 +20,7 @@ public class ViewTemplate implements View {
 
     public void render(Response response, Object context) throws IOException {
         response.contentType(mediaType);
-        Writer out = response.writer();
+        Writer out = new BufferedWriter(response.writer());
         renderer.render(out, name, context);
         out.flush();
     }

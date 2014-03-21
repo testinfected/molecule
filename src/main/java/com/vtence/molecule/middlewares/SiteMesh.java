@@ -11,6 +11,7 @@ import com.vtence.molecule.decoration.PageCompositor;
 import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.util.BufferedResponse;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -40,7 +41,7 @@ public class SiteMesh extends AbstractMiddleware {
 
     private void decorate(Response response, BufferedResponse buffer) throws IOException {
         response.removeHeader(HttpHeaders.CONTENT_LENGTH);
-        Writer out = response.writer();
+        Writer out = new BufferedWriter(response.writer());
         decorator.decorate(out, buffer.body());
         out.flush();
     }

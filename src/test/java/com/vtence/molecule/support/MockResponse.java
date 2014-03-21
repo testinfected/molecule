@@ -152,7 +152,7 @@ public class MockResponse implements Response {
     }
 
     public OutputStream outputStream(int bufferSize) throws IOException {
-        if (bufferSize <=0) return outputStream();
+        if (bufferSize <= 0) return outputStream();
         this.bufferSize = bufferSize;
         return new BufferedOutputStream(output, bufferSize);
     }
