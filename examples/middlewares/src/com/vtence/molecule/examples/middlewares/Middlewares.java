@@ -6,6 +6,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
 import com.vtence.molecule.middlewares.ApacheCommonLogger;
+import com.vtence.molecule.middlewares.Compressor;
 import com.vtence.molecule.middlewares.DateHeader;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.FailureMonitor;
@@ -29,7 +30,7 @@ public class Middlewares {
         SimpleServer server = new SimpleServer(8080);
 
         server.run(new MiddlewareStack() {{
-            // Add information about the server in the response header
+            // Add information about our server
             use(new ServerHeader("MyApp/1.0 molecule/0.2"));
             // Also include date and time of the response
             use(new DateHeader());
@@ -41,35 +42,41 @@ public class Middlewares {
             use(new FailureMonitor(ConsoleErrorReporter.toStandardError()));
             // Support HTTP method override via the _method request parameter
             use(new HttpMethodOverride());
+            // Compress response content using gzip or deflate when acceptable by the client
+            use(new Compressor());
 
+            // A filter map applies middleware depending on the request
             FilterMap filters = new FilterMap();
             // All requests to /private halt with 403
             filters.map("/private", new AbstractMiddleware() {
                 public void handle(Request request, Response response) throws Exception {
                     response.status(HttpStatus.FORBIDDEN);
                     response.body("This is a restricted area");
+                    // Stop the processing chain
                 }
             });
-            // All requests with /orders prefix go through this filter
-            filters.map("/orders", new AbstractMiddleware() {
+            // All requests with / prefix (i.e. all other requests) go through this dummy
+            // authentication filter
+            filters.map("/", new AbstractMiddleware() {
                 public void handle(Request request, Response response) throws Exception {
+                    // At this point we would perform proper authentication
                     String username = "...";
                     request.attribute("username", username);
-                    // Carry on with request processing
+                    // Carry on with the processing chain
                     forward(request, response);
                 }
             });
             use(filters);
 
-            // All requests go through the following filter
+            // You can add your own middleware to wrap request processing
             use(new AbstractMiddleware() {
                 public void handle(Request request, Response response) throws Exception {
                     // The 'before' part
                     response.contentType("text/plain");
-                    // Continue processing the request
+                    // Carry on with the processing chain
                     forward(request, response);
                     // The 'after' part
-                    System.out.println("User: " + request.attribute("username"));
+                    response.status(HttpStatus.OK);
                 }
             });
 
