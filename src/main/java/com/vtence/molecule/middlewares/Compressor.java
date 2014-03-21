@@ -1,87 +1,94 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.util.AcceptEncoding;
 import com.vtence.molecule.util.BufferedResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static com.vtence.molecule.HttpHeaders.CONTENT_ENCODING;
+import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
 
 public class Compressor extends AbstractMiddleware {
 
-    private enum Coding {
+    private enum Codings {
+
+        gzip {
+            public void encode(Response response, byte[] content) throws IOException {
+                response.removeHeader(CONTENT_LENGTH);
+                response.header(CONTENT_ENCODING, gzip.name());
+                GZIPOutputStream out = new GZIPOutputStream(response.outputStream());
+                out.write(content);
+                out.finish();
+            }
+        },
 
         deflate {
-            public void encode(Response to, byte[] content) throws IOException {
+            public void encode(Response response, byte[] content) throws IOException {
+                response.removeHeader(CONTENT_LENGTH);
+                response.header(CONTENT_ENCODING, name());
                 Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-                DeflaterOutputStream out = new DeflaterOutputStream(to.outputStream(), deflater);
+                DeflaterOutputStream out = new DeflaterOutputStream(response.outputStream(), deflater);
                 out.write(content);
                 out.finish();
                 deflater.end();
             }
         },
 
-        gzip {
-            public void encode(Response to, byte[] content) throws IOException {
-                to.removeHeader(HttpHeaders.CONTENT_LENGTH);
-                to.header(CONTENT_ENCODING, gzip.name());
-                GZIPOutputStream out = new GZIPOutputStream(to.outputStream());
-                out.write(content);
-                out.finish();
+        identity {
+            public void encode(Response response, byte[] content) throws IOException {
+                response.outputStream(content.length).write(content);
             }
         };
 
-        public boolean matches(String encoding) {
-            return name().equalsIgnoreCase(encoding);
-        }
+        public abstract void encode(Response to, byte[] content) throws IOException;
 
-        public abstract void encode(Response out, byte[] content) throws IOException;
+        public static String[] available() {
+            List<String> available = new ArrayList<String>();
+            for (Codings coding : values()) {
+                available.add(coding.name());
+            }
+            return available.toArray(new String[available.size()]);
+        }
     }
 
     public void handle(Request request, final Response response) throws Exception {
         BufferedResponse buffer = new BufferedResponse(response);
         forward(request, buffer);
 
-        if (buffer.empty() || alreadyEncoded(response) && !identityEncoded(response)) {
-            writeUncompressed(response, buffer);
+        if (buffer.empty() || alreadyEncoded(response)) {
+            buffer.flush();
             return;
         }
 
-        for (String encoding: acceptableEncodingsFor(request)) {
-            for (Coding coding : Coding.values()) {
-                if (coding.matches(encoding)) {
-                    response.removeHeader(HttpHeaders.CONTENT_LENGTH);
-                    response.header(HttpHeaders.CONTENT_ENCODING, coding.name());
-                    coding.encode(response, buffer.content());
-                    return;
-                }
-            }
+        String bestEncoding = selectBestAvailableEncodingFor(request);
+        if (bestEncoding != null) {
+            Codings coding = Codings.valueOf(bestEncoding);
+            coding.encode(response, buffer.content());
         }
+    }
 
-        writeUncompressed(response, buffer);
+    private String selectBestAvailableEncodingFor(Request request) {
+        AcceptEncoding acceptEncoding = AcceptEncoding.parse(request);
+        return acceptEncoding.selectBestEncoding(Codings.available());
     }
 
     private boolean alreadyEncoded(Response response) {
-        return response.header(HttpHeaders.CONTENT_ENCODING) != null;
+        String contentEncoding = response.header(CONTENT_ENCODING);
+        return contentEncoding != null && !isIdentity(contentEncoding);
     }
 
-    private boolean identityEncoded(Response response) {
-        return response.header(HttpHeaders.CONTENT_ENCODING).matches("\\bidentity\\b");
+    private boolean isIdentity(String contentEncoding) {
+        return contentEncoding.matches(atWordBoundaries(Codings.identity.name()));
     }
 
-    private void writeUncompressed(Response response, BufferedResponse buffer) throws IOException {
-        response.outputStream(buffer.size()).write(buffer.content());
-    }
-
-    private List<String> acceptableEncodingsFor(Request client) {
-        // This works fine because Simple does the job of parsing the header for use
-        // and removes non acceptable codings
-        return client.headers(HttpHeaders.ACCEPT_ENCODING);
+    private String atWordBoundaries(String text) {
+        return "\\b" + text + "\\b";
     }
 }

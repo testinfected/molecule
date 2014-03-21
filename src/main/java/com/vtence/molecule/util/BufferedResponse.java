@@ -55,4 +55,8 @@ public class BufferedResponse extends ResponseWrapper {
     public boolean empty() {
         return size() == 0;
     }
+
+    public void flush() throws IOException {
+        super.outputStream(size()).write(content());
+    }
 }

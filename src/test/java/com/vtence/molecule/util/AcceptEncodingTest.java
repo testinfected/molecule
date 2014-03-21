@@ -53,7 +53,7 @@ public class AcceptEncodingTest {
     private void assertSelected(String header,
                                 List<String> candidates,
                                 Matcher<? super String> matcher) {
-        AcceptEncoding acceptEncoding = AcceptEncoding.parse(header);
+        AcceptEncoding acceptEncoding = new AcceptEncoding(header);
         assertThat("selected encoding", acceptEncoding.selectBestEncoding(candidates), matcher);
     }
 

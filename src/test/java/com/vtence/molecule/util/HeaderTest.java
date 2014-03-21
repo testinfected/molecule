@@ -13,7 +13,7 @@ public class HeaderTest {
 
     @SuppressWarnings("unchecked") @Test public void
     parsesAndSortsEntriesInQualityOrder() {
-        Header header = Header.parse("foo; q=0.5, bar, baz; q=0.9, qux, *;q=0");
+        Header header = new Header("foo; q=0.5, bar, baz; q=0.9, qux, *;q=0");
         assertThat("sorted values", header.entries(), contains(
                 value("bar", 1),
                 value("qux", 1),
@@ -25,7 +25,7 @@ public class HeaderTest {
 
     @SuppressWarnings("unchecked") @Test public void
     handlesQuotedValues() {
-        Header header = Header.parse("\"foo, bar\"; q=0.8, baz");
+        Header header = new Header("\"foo, bar\"; q=0.8, baz");
         assertThat("all values", header.entries(), contains(
                 value("baz", 1),
                 value("\"foo, bar\"", 0.8)
@@ -34,7 +34,7 @@ public class HeaderTest {
 
     @SuppressWarnings("unchecked") @Test public void
     listAcceptableValues() {
-        Header header = Header.parse("foo, bar; q=0.8, baz, qux; q=0");
+        Header header = new Header("foo, bar; q=0.8, baz, qux; q=0");
         assertThat("acceptable values", header.values(), contains("foo", "baz", "bar"));
     }
 

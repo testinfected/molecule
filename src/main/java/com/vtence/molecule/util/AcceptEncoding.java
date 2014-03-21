@@ -1,18 +1,30 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.HttpHeaders;
+import com.vtence.molecule.Request;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public class AcceptEncoding {
     private final Header header;
 
-    public static AcceptEncoding parse(String header) {
-        return new AcceptEncoding(Header.parse(header));
+    public static AcceptEncoding parse(Request request) {
+        return new AcceptEncoding(request.header(HttpHeaders.ACCEPT_ENCODING));
+    }
+
+    public AcceptEncoding(String header) {
+        this(new Header(header));
     }
 
     public AcceptEncoding(Header header) {
         this.header = header;
+    }
+
+    public String selectBestEncoding(String... candidates) {
+        return selectBestEncoding(Arrays.asList(candidates));
     }
 
     public String selectBestEncoding(Collection<String> candidates) {

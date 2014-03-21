@@ -16,11 +16,7 @@ public class Header {
 
     private final List<Entry> entries;
 
-    public static Header parse(String header) {
-        return new Header(header);
-    }
-
-    protected Header(String header) {
+    public Header(String header) {
         this.entries = sortByQuality(parseEntries(header));
     }
 
