@@ -124,8 +124,12 @@ public class MockResponse implements Response {
         status(HttpStatus.forCode(code));
     }
 
+    public void assertStatus(int code) {
+        assertThat("status code", status.code, equalTo(code));
+    }
+
     public void assertStatus(HttpStatus expected) {
-        assertThat("response status", status, equalTo(expected));
+        assertThat("status", status, equalTo(expected));
     }
 
     public long contentLength() {

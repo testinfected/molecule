@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
@@ -148,6 +149,20 @@ public class CompressorTest {
         request.withHeader("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         assertThat("body", unzip(response), equalTo("uncompressed body"));
+    }
+
+    @Test public void
+    handlesLackOfAnAcceptableEncoding() throws Exception {
+        compressor.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("uncompressed body");
+            }
+        });
+        request.withHeader("Accept-Encoding", "identity;q=0");
+        compressor.handle(request, response);
+        response.assertStatus(HttpStatus.NOT_ACCEPTABLE);
+        response.assertContentType("text/plain");
+        response.assertBody("An acceptable encoding could not be found");
     }
 
     private String inflate(MockResponse response) throws IOException {

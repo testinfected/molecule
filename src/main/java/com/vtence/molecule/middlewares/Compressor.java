@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.AcceptEncoding;
@@ -67,10 +68,12 @@ public class Compressor extends AbstractMiddleware {
             return;
         }
 
-        String bestEncoding = selectBestAvailableEncodingFor(request);
-        if (bestEncoding != null) {
-            Codings coding = Codings.valueOf(bestEncoding);
+        String encoding = selectBestAvailableEncodingFor(request);
+        if (encoding != null) {
+            Codings coding = Codings.valueOf(encoding);
             coding.encode(response, buffer.content());
+        } else {
+            notAcceptable(response);
         }
     }
 
@@ -90,5 +93,11 @@ public class Compressor extends AbstractMiddleware {
 
     private String atWordBoundaries(String text) {
         return "\\b" + text + "\\b";
+    }
+
+    private void notAcceptable(Response response) throws IOException {
+        response.status(HttpStatus.NOT_ACCEPTABLE);
+        response.contentType("text/plain");
+        response.body("An acceptable encoding could not be found");
     }
 }
