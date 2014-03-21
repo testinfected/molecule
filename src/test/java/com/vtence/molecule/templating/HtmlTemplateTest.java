@@ -11,8 +11,8 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.Matchers.containsString;
 
 public class HtmlTemplateTest {
-    Templates templates = Templates.renderedWith(
-            JMustacheRenderer.lookIn(ResourceLocator.locateOnClasspath("views")));
+    Templates templates = new Templates(
+            new JMustacheRenderer().templateDir(ResourceLocator.locateOnClasspath("views")));
 
     ViewTemplate template = templates.html("hello");
     MockResponse response = aResponse();

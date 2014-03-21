@@ -4,7 +4,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class PeriodicSessionHouseKeeping{
+public class PeriodicSessionHouseKeeping {
 
     private static final long EVERY_HOUR = TimeUnit.HOURS.toSeconds(1);
 

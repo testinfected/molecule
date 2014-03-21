@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.containsString;
 
 public class JMustacheRendererTest {
 
-    JMustacheRenderer mustache = JMustacheRenderer.lookIn(locateOnClasspath(("views")));
+    JMustacheRenderer mustache = new JMustacheRenderer().templateDir(locateOnClasspath(("views")));
 
     @Test public void
     rendersFromTemplatesFolder() throws IOException, SAXException {

@@ -16,14 +16,10 @@ import java.nio.charset.Charset;
 
 public class JMustacheRenderer implements RenderingEngine {
 
-    private File path = new File(".");
     private Mustache.Compiler mustache;
+    private File path = new File(".");
     private Charset encoding = Charsets.UTF_8;
     private String extension = "mustache";
-
-    public static JMustacheRenderer lookIn(File folder) {
-        return new JMustacheRenderer().templateDir(folder);
-    }
 
     public JMustacheRenderer() {
         this(Mustache.compiler());

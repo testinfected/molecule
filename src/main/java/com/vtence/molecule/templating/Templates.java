@@ -8,10 +8,6 @@ public class Templates {
     private final RenderingEngine renderer;
     private Charset charset = Charsets.UTF_8;
 
-    public static Templates renderedWith(RenderingEngine engine) {
-        return new Templates(engine);
-    }
-
     public Templates(RenderingEngine renderer) {
         this.renderer = renderer;
     }

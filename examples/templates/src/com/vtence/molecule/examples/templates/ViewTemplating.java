@@ -24,8 +24,8 @@ public class ViewTemplating {
         SimpleServer server = new SimpleServer(8080);
 
         // We use Mustache templates with an .html extension
-        Templates templates = Templates.renderedWith(
-                JMustacheRenderer.lookIn(templateDir).extension("html"));
+        Templates templates = new Templates(
+                new JMustacheRenderer().templateDir(templateDir).extension("html"));
 
         // Typically, you would pass the view as a constructor parameter to the controller
         final View hello = templates.html("hello");
