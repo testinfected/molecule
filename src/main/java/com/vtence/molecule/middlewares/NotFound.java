@@ -8,6 +8,10 @@ import com.vtence.molecule.util.MimeTypes;
 
 public class NotFound implements Application {
 
+    public static void notFound(Request request, Response response) throws Exception {
+        new NotFound().handle(request, response);
+    }
+
     public void handle(Request request, Response response) throws Exception {
         response.status(HttpStatus.NOT_FOUND);
         response.contentType(MimeTypes.TEXT);

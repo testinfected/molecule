@@ -3,6 +3,7 @@ package com.vtence.molecule.support;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Charsets;
+import com.vtence.molecule.util.HttpDate;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -15,11 +16,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import static java.lang.Long.parseLong;
@@ -60,7 +58,7 @@ public class MockResponse implements Response {
     }
 
     public void headerDate(String name, long date) {
-        header(name, formatDate(date));
+        header(name, HttpDate.format(date));
     }
 
     public String header(String name) {
@@ -85,10 +83,6 @@ public class MockResponse implements Response {
 
     public void assertHeader(String name, Matcher<? super String> valueMatcher) {
         assertThat("header[" + name + "]", header(name), valueMatcher);
-    }
-
-    public void assertHeaderDate(String name, long date) {
-        assertHeader(name, formatDate(date));
     }
 
     public void contentType(String contentType) {
@@ -144,10 +138,6 @@ public class MockResponse implements Response {
         if (contentType() == null) return Charsets.ISO_8859_1;
         Charset charset = parseCharset(contentType());
         return charset != null ? charset : Charsets.ISO_8859_1;
-    }
-
-    public String charsetName() {
-        return charset().name().toLowerCase();
     }
 
     public OutputStream outputStream() throws IOException {
@@ -234,7 +224,7 @@ public class MockResponse implements Response {
     public String toString() {
         return "mock response (" + output + ")";
     }
-    private static final String RFC_1123_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
+
     private static final String TYPE = "[^/]+";
     private static final String SUBTYPE = "[^;]+";
     private static final String CHARSET = "charset=([^;]+)";
@@ -245,11 +235,5 @@ public class MockResponse implements Response {
         java.util.regex.Matcher matcher = CONTENT_TYPE_FORMAT.matcher(contentType);
         if (!matcher.matches()) return null;
         return Charset.forName(matcher.group(ENCODING));
-    }
-
-    private String formatDate(long date) {
-        SimpleDateFormat httpDate = new SimpleDateFormat(RFC_1123_DATE_FORMAT);
-        httpDate.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return httpDate.format(new Date(date));
     }
 }

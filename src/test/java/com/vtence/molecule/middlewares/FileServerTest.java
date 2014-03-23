@@ -2,6 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
+import com.vtence.molecule.util.HttpDate;
 import com.vtence.molecule.util.Streams;
 import org.junit.Test;
 
@@ -11,10 +12,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.vtence.molecule.HttpStatus.NOT_FOUND;
+import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.HttpStatus.OK;
 import static com.vtence.molecule.support.MockRequest.GET;
 import static com.vtence.molecule.support.MockResponse.aResponse;
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
+import static java.lang.String.valueOf;
+import static org.hamcrest.Matchers.equalTo;
 
 public class FileServerTest {
 
@@ -28,12 +32,13 @@ public class FileServerTest {
     MockResponse response = aResponse();
 
     @Test public void
-    rendersFile() throws Exception {
+    servesFiles() throws Exception {
         fileServer.handle(request, response);
 
         response.assertStatus(OK);
         response.assertContentSize(file.length());
         response.assertContent(contentOf(file));
+        response.assertHeader("Content-Length", valueOf(file.length()));
     }
 
     @Test public void
@@ -52,17 +57,23 @@ public class FileServerTest {
     }
 
     @Test public void
-    setsFileResponseHeaders() throws Exception {
+    setsLastModifiedHeader() throws Exception {
         fileServer.handle(request, response);
 
-        response.assertHeader("Content-Length", String.valueOf(file.length()));
-        response.assertHeaderDate("Last-Modified", file.lastModified());
+        response.assertHeader("Last-Modified", equalTo(HttpDate.format(file.lastModified())));
     }
 
     @Test public void
     rendersNotFoundWhenFileIsNotFound() throws Exception {
         fileServer.handle(request.withPath("/images/missing.png"), response);
         response.assertStatus(NOT_FOUND);
+    }
+
+    @Test public void
+    sendsNotModifiedIfFileHasNotBeenModifiedSinceLastServe() throws Exception {
+        request.withHeader("If-Modified-Since", HttpDate.format(file.lastModified()));
+        fileServer.handle(request, response);
+        response.assertStatus(NOT_MODIFIED);
     }
 
     private byte[] contentOf(final File file) throws IOException, URISyntaxException {
