@@ -15,15 +15,16 @@ import java.util.zip.GZIPOutputStream;
 
 import static com.vtence.molecule.HttpHeaders.CONTENT_ENCODING;
 import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
+import static com.vtence.molecule.middlewares.Compressor.Codings.identity;
 
 public class Compressor extends AbstractMiddleware {
 
-    private enum Codings {
+    static enum Codings {
 
         gzip {
             public void encode(Response response, byte[] content) throws IOException {
                 response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, gzip.name());
+                response.header(CONTENT_ENCODING, name());
                 GZIPOutputStream out = new GZIPOutputStream(response.outputStream());
                 out.write(content);
                 out.finish();
@@ -88,7 +89,7 @@ public class Compressor extends AbstractMiddleware {
     }
 
     private boolean isIdentity(String contentEncoding) {
-        return contentEncoding.matches(atWordBoundaries(Codings.identity.name()));
+        return contentEncoding.matches(atWordBoundaries(identity.name()));
     }
 
     private String atWordBoundaries(String text) {

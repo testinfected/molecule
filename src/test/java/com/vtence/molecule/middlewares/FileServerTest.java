@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import com.vtence.molecule.util.HttpDate;
@@ -11,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static com.vtence.molecule.HttpStatus.METHOD_NOT_ALLOWED;
 import static com.vtence.molecule.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.HttpStatus.OK;
@@ -85,6 +87,22 @@ public class FileServerTest {
         fileServer.handle(request, response);
         response.assertHeader("Cache-Control", "public, max-age=60");
         response.assertHeader("Access-Control-Allow-Origin", "*");
+    }
+
+    @Test public void
+    allowsHeadRequests() throws Exception {
+        fileServer.handle(request.withMethod(HttpMethod.HEAD), response);
+        response.assertStatus(OK);
+        response.assertContentSize(0);
+        response.assertHeader("Content-Length", valueOf(file.length()));
+    }
+
+    @Test public void
+    rejectsUnsupportedMethod() throws Exception {
+        fileServer.handle(request.withMethod(HttpMethod.POST), response);
+        response.assertStatus(METHOD_NOT_ALLOWED);
+        response.assertHeader("Allow", "GET, HEAD");
+        response.assertNoHeader("Last-Modified");
     }
 
     private byte[] contentOf(final File file) throws IOException, URISyntaxException {
