@@ -76,6 +76,17 @@ public class FileServerTest {
         response.assertStatus(NOT_MODIFIED);
     }
 
+    @Test public void
+    addsConfiguredCustomHeadersToResponse() throws Exception {
+        fileServer.
+                addHeader("Cache-Control", "public, max-age=60").
+                addHeader("Access-Control-Allow-Origin", "*");
+
+        fileServer.handle(request, response);
+        response.assertHeader("Cache-Control", "public, max-age=60");
+        response.assertHeader("Access-Control-Allow-Origin", "*");
+    }
+
     private byte[] contentOf(final File file) throws IOException, URISyntaxException {
         return Streams.toBytes(new FileInputStream(file));
     }

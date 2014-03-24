@@ -82,7 +82,7 @@ public class MockResponse implements Response {
     }
 
     public void assertHeader(String name, Matcher<? super String> valueMatcher) {
-        assertThat("header[" + name + "]", header(name), valueMatcher);
+        assertThat(name, header(name), valueMatcher);
     }
 
     public void contentType(String contentType) {
