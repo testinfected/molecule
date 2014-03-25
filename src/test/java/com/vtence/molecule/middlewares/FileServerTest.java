@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class FileServerTest {
 
-    static final String SAMPLE_IMAGE = "images/sample.png";
+    static final String SAMPLE_IMAGE = "/images/sample.png";
 
     File base = onClasspath().locate("assets");
     FileServer fileServer = new FileServer(base);
