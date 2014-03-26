@@ -11,7 +11,9 @@ import com.vtence.molecule.templating.View;
 import java.io.File;
 import java.io.IOException;
 
-// Access at http://localhost:8080/?name=Vincent
+/**
+ * Access at <a href="http://localhost:8080?name=Guest">http://localhost:8080?name=Guest</a>
+ */
 public class ViewTemplating {
 
     private static final int TEMPLATE_DIR = 0;

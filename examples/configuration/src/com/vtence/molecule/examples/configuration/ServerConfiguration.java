@@ -27,16 +27,11 @@ public class ServerConfiguration {
         server.run(draw(new DynamicRoutes() {{
             map("/hello").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
-                    String contentType = "text/html";
                     String encoding = request.parameter("encoding");
-                    if (encoding != null) {
-                        // The specified charset will be used automatically to encode the response
-                        contentType += "; charset=" + encoding;
-                    }
+                    // The specified charset will be used automatically to encode the response
+                    String contentType = "text/html; charset=" + encoding;
                     // An unsupported charset will cause an exception,
                     // which the failure reporter declared above will catch and log to the console.
-                    // If no encoding is given, it will fallback to the server default, in this
-                    // case utf-8.
                     response.contentType(contentType);
 
                     response.body(
