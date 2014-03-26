@@ -15,7 +15,7 @@ public class StaticFiles {
     public static void main(String[] args) throws IOException {
         SimpleServer server = new SimpleServer(8080);
 
-        // Serve files in the examples/files/blog directory, according to
+        // Serve files in the examples/files/site directory, according to
         // the path info of the request.
         FileServer files = new FileServer(new File("./examples/files/site"));
 
