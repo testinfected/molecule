@@ -1,11 +1,11 @@
 package com.vtence.molecule.support;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.HttpDate;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -23,8 +23,10 @@ import java.util.regex.Pattern;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
@@ -34,7 +36,7 @@ public class MockResponse implements Response {
     private final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
     private final Map<String, String> headers = new HashMap<String, String>();
-    private final Map<String, String> cookies = new HashMap<String, String>();
+    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     private HttpStatus status;
     int bufferSize = 0;
@@ -69,8 +71,8 @@ public class MockResponse implements Response {
         headers.remove(name);
     }
 
-    public void cookie(String name, String value) {
-        cookies.put(name, value);
+    public void cookie(Cookie cookie) {
+        cookies.put(cookie.name(), cookie);
     }
 
     public void assertNoHeader(String name) {
@@ -217,8 +219,17 @@ public class MockResponse implements Response {
         return this;
     }
 
-    public void assertCookie(String name, String value) {
-        assertThat("cookies", cookies, Matchers.hasEntry(name, value));
+    public Cookie cookie(String name) {
+        return cookies.get(name);
+    }
+
+    public void assertHasCookie(String name) {
+        assertCookie(name, notNullValue());
+    }
+
+    public void assertCookie(String name, Matcher<? super Cookie> matches) {
+        assertThat("cookies ", cookies, hasKey(name));
+        assertThat(name, cookie(name), matches);
     }
 
     public String toString() {

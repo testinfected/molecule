@@ -1,12 +1,12 @@
 package com.vtence.molecule.simple;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Session;
 import com.vtence.molecule.simple.session.SessionTracking;
-import org.simpleframework.http.Cookie;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,17 +73,18 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return String.format("HTTP/%s.%s", request.getMajor(), request.getMinor());
     }
 
-    public Map<String, String> cookies() {
-        Map<String, String> cookies = new HashMap<String, String>();
-        for (Cookie cookie: request.getCookies()) {
-            cookies.put(cookie.getName(), cookie.getValue());
+    public List<Cookie> cookies() {
+        List<Cookie> cookies = new ArrayList<Cookie>();
+        for (org.simpleframework.http.Cookie cookie: request.getCookies()) {
+            cookies.add(new Cookie(cookie.getName(), cookie.getValue()));
         }
         return cookies;
     }
 
-    public String cookie(String name) {
-        Cookie cookie = request.getCookie(name);
-        return cookie != null ? cookie.getValue() : null;
+    public Cookie cookie(String name) {
+        org.simpleframework.http.Cookie cooky = request.getCookie(name);
+        if (cooky == null) return null;
+        return new Cookie(cooky.getName(), cooky.getValue());
     }
 
     public Object attribute(Object key) {

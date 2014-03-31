@@ -9,6 +9,8 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static com.vtence.molecule.support.CookieMatchers.cookieWithValue;
+import static com.vtence.molecule.support.CookieMatchers.httpOnlyCookie;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -48,8 +50,7 @@ public class CookieTrackerTest {
     @Test public void
     generatesIdsForNewSessions() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(store).create("new-session");
-            will(returnValue(new MockSession("new-session")));
+            oneOf(store).create("new-session"); will(returnValue(new MockSession("new-session")));
         }});
 
         Session newSession = tracker.openSession(request, response);
@@ -58,14 +59,14 @@ public class CookieTrackerTest {
     }
 
     @Test public void
-    tracksClientAcrossRequestsWithASessionCookie() throws Exception {
+    tracksClientAcrossRequestsWithAnHttpOnlySessionCookie() throws Exception {
         context.checking(new Expectations() {{
-            allowing(store).create("new-session");
-            will(returnValue(new MockSession("new-session")));
+            allowing(store).create("new-session"); will(returnValue(new MockSession("new-session")));
         }});
 
         tracker.openSession(request, response);
-        response.assertCookie(SESSION_COOKIE, "new-session");
+        response.assertCookie(SESSION_COOKIE, cookieWithValue("new-session"));
+        response.assertCookie(SESSION_COOKIE, httpOnlyCookie(true));
     }
 
     private class StubPolicy implements SessionIdentifierPolicy {

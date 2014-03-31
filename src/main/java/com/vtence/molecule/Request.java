@@ -32,9 +32,9 @@ public interface Request {
 
     String[] parameters(String name);
 
-    String cookie(String name);
+    Cookie cookie(String name);
 
-    Map<String, String> cookies();
+    List<Cookie> cookies();
 
     Object attribute(Object key);
 

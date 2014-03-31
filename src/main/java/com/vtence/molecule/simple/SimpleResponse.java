@@ -1,5 +1,6 @@
 package com.vtence.molecule.simple;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpException;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.util.Charsets;
@@ -38,8 +39,11 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         response.setValue(name, null);
     }
 
-    public void cookie(String name, String value) {
-        response.setCookie(name, value);
+    public void cookie(Cookie cookie) {
+        org.simpleframework.http.Cookie cooky =
+                new org.simpleframework.http.Cookie(cookie.name(), cookie.value(), true);
+        cooky.setProtected(cookie.httpOnly());
+        response.setCookie(cooky);
     }
 
     public void contentType(String mediaType) {

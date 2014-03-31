@@ -1,5 +1,6 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
@@ -67,11 +68,11 @@ public class RequestWrapper implements Request {
         return request.protocol();
     }
 
-    public String cookie(String name) {
+    public Cookie cookie(String name) {
         return request.cookie(name);
     }
 
-    public Map<String, String> cookies() {
+    public List<Cookie> cookies() {
         return request.cookies();
     }
 

@@ -1,5 +1,6 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
 
@@ -36,8 +37,8 @@ public class ResponseWrapper implements Response {
         response.removeHeader(name);
     }
 
-    public void cookie(String name, String value) {
-        response.cookie(name, value);
+    public void cookie(Cookie cookie) {
+        response.cookie(cookie);
     }
 
     public void contentType(String contentType) {

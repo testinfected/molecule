@@ -1,5 +1,6 @@
 package com.vtence.molecule.support;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Session;
@@ -19,7 +20,7 @@ public class MockRequest implements Request {
     private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
     private final Map<String, List<String>> params = new HashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
-    private final Map<String, String> cookies = new HashMap<String, String>();
+    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     private HttpMethod method = HttpMethod.GET;
     private String path = "/";
@@ -138,14 +139,14 @@ public class MockRequest implements Request {
     }
 
     public void withCookie(String name, String value) {
-        cookies.put(name, value);
+        cookies.put(name, new Cookie(name, value));
     }
 
-    public Map<String, String> cookies() {
-        return cookies;
+    public List<Cookie> cookies() {
+        return new ArrayList<Cookie>(cookies.values());
     }
 
-    public String cookie(String name) {
+    public Cookie cookie(String name) {
         return cookies.get(name);
     }
 

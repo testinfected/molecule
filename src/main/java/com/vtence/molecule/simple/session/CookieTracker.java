@@ -1,5 +1,6 @@
 package com.vtence.molecule.simple.session;
 
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Session;
@@ -27,13 +28,15 @@ public class CookieTracker implements SessionTracker {
     }
 
     public Session acquireSession(Request request, Response response) {
-        String sessionId = request.cookie(cookieName);
-        return sessionId != null ? store.load(sessionId) : null;
+        Cookie sessionCookie = request.cookie(cookieName);
+        return sessionCookie != null ? store.load(sessionCookie.value()) : null;
     }
 
     public Session openSession(Request request, Response response) {
         Session session = store.create(policy.generateId());
-        response.cookie(cookieName, session.id());
+        Cookie cookie = new Cookie(cookieName, session.id());
+        cookie.httpOnly(true);
+        response.cookie(cookie);
         return session;
     }
 }

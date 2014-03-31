@@ -1,6 +1,7 @@
 package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
@@ -32,7 +33,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -238,28 +239,42 @@ public class SimpleServerTest {
                 hasEntry("body", "name=value")));
     }
 
-    @SuppressWarnings("unchecked")
     @Test public void
-    supportsCookies() throws IOException {
+    readsRequestCookies() throws IOException {
         final Map<String, String> cookies = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                cookies.put("all", request.cookies().toString());
-                cookies.put("sessionId", request.cookie("sessionId"));
+                for (Cookie cookie : request.cookies()) {
+                    cookies.put(cookie.name(), cookie.value());
+                }
             }
         });
 
-        request.withCookie("sessionId", "id")
-                .withCookie("name", "value")
+        request.withCookie("cookie1", "value1")
+                .withCookie("cookie2", "value2")
                 .send();
         assertNoError();
 
         assertThat("request cookies", cookies, allOf(
-                hasEntry(equalTo("all"), containsString("name=value")),
-                hasEntry("sessionId", "id")));
+                hasEntry("cookie1", "value1"),
+                hasEntry("cookie2", "value2")));
     }
 
-    @SuppressWarnings("unchecked")
+    @Test public void
+    setsResponseCookies() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                Cookie cookie = new Cookie("cookie", "value");
+                cookie.httpOnly(true);
+                response.cookie(cookie);
+            }
+        });
+
+        response = request.send();
+        assertNoError();
+        response.assertHasCookie(equalToIgnoringCase("cookie=value; Version=1; Path=/; HttpOnly"));
+    }
+
     @Test public void
     supportsRequestAttributes() throws IOException {
         final Map<Object, Object> attributes = new HashMap<Object, Object>();

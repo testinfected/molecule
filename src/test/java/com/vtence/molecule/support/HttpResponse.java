@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class HttpResponse {
@@ -90,10 +91,14 @@ public class HttpResponse {
     }
 
     public void assertHasCookie(String name) {
-        assertHasHeader("Set-Cookie", containsString(name + "="));
+        assertHasCookie(containsString(name + "="));
     }
 
     public void assertHasNoCookie(String name) {
-        assertHasHeader("Set-Cookie", not(containsString(name)));
+        assertHasCookie(not(startsWith(name)));
+    }
+
+    public void assertHasCookie(Matcher<? super String> matching) {
+        assertHasHeader("Set-Cookie", matching);
     }
 }
