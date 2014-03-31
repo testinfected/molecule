@@ -37,16 +37,16 @@ public class FilterMapTest {
 
     @Test public void
     runsRequestThroughMatchingFilter() throws Exception {
-        filters.map(none(), filter("wrong"));
-        filters.map(all(), filter("right"));
+        filters.map(none(), filter("none"));
+        filters.map(all(), filter("all"));
 
         filters.handle(request, response);
-        response.assertBody("right content");
+        response.assertBody("all content");
     }
 
     @Test public void
     forwardsRequestIfNoFilterMatches() throws Exception {
-        filters.map(none(), filter("wrong"));
+        filters.map(none(), filter("no"));
         filters.handle(request, response);
         response.assertBody("content");
     }

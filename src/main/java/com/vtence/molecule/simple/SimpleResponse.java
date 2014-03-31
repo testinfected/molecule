@@ -7,7 +7,6 @@ import com.vtence.molecule.util.Charsets;
 import org.simpleframework.http.ContentType;
 import org.simpleframework.http.Protocol;
 import org.simpleframework.http.Response;
-import org.simpleframework.http.parse.ContentTypeParser;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -93,17 +92,13 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public Charset charset() {
-        ContentType type = contentType() != null ? new ContentTypeParser(contentType()) : null;
+        ContentType type = response.getContentType();
 
         if (type == null || type.getCharset() == null) {
             return Charsets.ISO_8859_1;
         }
 
         return Charset.forName(type.getCharset());
-    }
-
-    public String charsetName() {
-        return charset().name().toLowerCase();
     }
 
     public OutputStream outputStream() throws IOException {

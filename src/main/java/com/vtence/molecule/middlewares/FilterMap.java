@@ -28,12 +28,13 @@ public class FilterMap extends AbstractMiddleware {
         return bestMatch;
     }
 
-    public void map(String pathPrefix, Middleware filter) {
-        filters.put(withPath(Matchers.startingWith(pathPrefix)), filter);
+    public FilterMap map(String pathPrefix, Middleware filter) {
+        return map(withPath(Matchers.startingWith(pathPrefix)), filter);
     }
 
-    public void map(Matcher<Request> requestMatcher, Middleware filter) {
+    public FilterMap map(Matcher<Request> requestMatcher, Middleware filter) {
         filters.put(requestMatcher, filter);
+        return this;
     }
 
     private static class PassThrough extends AbstractMiddleware {
