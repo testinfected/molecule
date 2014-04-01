@@ -1,4 +1,4 @@
-package com.vtence.molecule.mustache;
+package com.vtence.molecule.templating;
 
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -6,13 +6,13 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.support.Template.render;
+import static com.vtence.molecule.support.TemplateRenderer.render;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class JMustacheRendererTest {
 
-    JMustacheRenderer mustache = new JMustacheRenderer().templateDir(locateOnClasspath(("views")));
+    JMustacheRenderer mustache = new JMustacheRenderer().fromDir(locateOnClasspath(("views")));
 
     @Test public void
     rendersFromTemplatesFolder() throws IOException, SAXException {

@@ -6,7 +6,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.util.Streams;
+import com.vtence.molecule.support.Streams;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -4,7 +4,7 @@ import com.vtence.molecule.Response;
 
 import java.io.IOException;
 
-public interface View {
+public interface Template {
 
     void render(Response response, Object context) throws IOException;
 }

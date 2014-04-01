@@ -1,11 +1,10 @@
-package com.vtence.molecule.mustache;
+package com.vtence.molecule.templating;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
-import com.vtence.molecule.templating.RenderingEngine;
 import com.vtence.molecule.util.Charsets;
-import com.vtence.molecule.util.Streams;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class JMustacheRenderer implements RenderingEngine {
         });
     }
 
-    public JMustacheRenderer templateDir(File dir) {
+    public JMustacheRenderer fromDir(File dir) {
         this.path = dir;
         return this;
     }
@@ -70,7 +69,14 @@ public class JMustacheRenderer implements RenderingEngine {
             Template template = mustache.compile(source);
             template.execute(context, out);
         } finally {
-            Streams.close(source);
+            close(source);
+        }
+    }
+
+    private void close(Closeable closeable) {
+        try {
+            if (closeable != null) closeable.close();
+        } catch (IOException ignored) {
         }
     }
 

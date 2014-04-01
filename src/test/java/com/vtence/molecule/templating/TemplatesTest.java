@@ -1,20 +1,20 @@
 package com.vtence.molecule.templating;
 
-import com.vtence.molecule.mustache.JMustacheRenderer;
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.support.ResourceLocator;
+import com.vtence.molecule.util.MimeTypes;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 import static org.hamcrest.Matchers.containsString;
 
-public class HtmlTemplateTest {
-    Templates templates = new Templates(
-            new JMustacheRenderer().templateDir(ResourceLocator.locateOnClasspath("views")));
+public class TemplatesTest {
+    RenderingEngine renderer = new JMustacheRenderer().fromDir(locateOnClasspath("views"));
+    Templates templates = new Templates(renderer).ofType(MimeTypes.HTML);
 
-    ViewTemplate template = templates.html("hello");
+    Template template = templates.named("hello");
     MockResponse response = aResponse();
 
     @Test public void

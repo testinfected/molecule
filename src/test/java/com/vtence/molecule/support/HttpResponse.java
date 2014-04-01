@@ -1,7 +1,6 @@
 package com.vtence.molecule.support;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.vtence.molecule.util.Streams;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
