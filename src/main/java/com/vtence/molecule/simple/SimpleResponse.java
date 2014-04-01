@@ -1,8 +1,10 @@
 package com.vtence.molecule.simple;
 
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpException;
 import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.TextBody;
 import com.vtence.molecule.util.Charsets;
 import org.simpleframework.http.ContentType;
 import org.simpleframework.http.Protocol;
@@ -86,9 +88,10 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         return new OutputStreamWriter(outputStream(), charset());
     }
 
-    public void body(String body) throws IOException {
-        byte[] content = body.getBytes(charset());
-        outputStream(content.length).write(content);
+    public void body(String text) throws IOException {
+        Body body = TextBody.text(text, charset());
+        contentLength(body.size());
+        body.writeTo(response.getOutputStream());
     }
 
     public Charset charset() {
