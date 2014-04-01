@@ -41,7 +41,9 @@ public interface Response {
 
     Writer writer() throws IOException;
 
-    void body(String body) throws IOException;
+    void body(String text) throws IOException;
+
+    void body(Body body) throws IOException;
 
     void reset() throws IOException;
 

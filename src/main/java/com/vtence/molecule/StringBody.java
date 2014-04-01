@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-public class TextBody implements Body {
+public class StringBody implements Body {
 
     private final StringBuilder body = new StringBuilder();
     private final Charset charset;
 
-    public static TextBody text(String text, Charset charset) {
-        TextBody body = new TextBody(charset);
+    public static StringBody text(String text, Charset charset) {
+        StringBody body = new StringBody(charset);
         body.append(text);
         return body;
     }
 
-    public TextBody(Charset charset) {
+    public StringBody(Charset charset) {
         this.charset = charset;
     }
 
@@ -23,7 +23,7 @@ public class TextBody implements Body {
         body.append(text);
     }
 
-    public int size() {
+    public long size() {
         return content().length;
     }
 
@@ -31,7 +31,10 @@ public class TextBody implements Body {
         return body.toString().getBytes(charset);
     }
 
-    public void writeTo(OutputStream outputStream) throws IOException {
-        outputStream.write(content());
+    public void writeTo(OutputStream out) throws IOException {
+        out.write(content());
+    }
+
+    public void close() throws IOException {
     }
 }

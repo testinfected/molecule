@@ -1,8 +1,10 @@
 package com.vtence.molecule.support;
 
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.StringBody;
 import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.HttpDate;
 import org.hamcrest.Matcher;
@@ -157,9 +159,12 @@ public class MockResponse implements Response {
         return new OutputStreamWriter(outputStream(), charset());
     }
 
-    public void body(String body) throws IOException {
-        byte[] content = body.getBytes(charset());
-        outputStream(content.length).write(content);
+    public void body(String text) throws IOException {
+        body(StringBody.text(text, charset()));
+    }
+
+    public void body(Body body) throws IOException {
+        body.writeTo(outputStream());
     }
 
     public void assertBody(String body) {

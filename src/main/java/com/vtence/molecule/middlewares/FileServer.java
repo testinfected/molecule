@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Body;
 import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
@@ -9,13 +10,15 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.util.HttpDate;
 import com.vtence.molecule.util.Joiner;
 import com.vtence.molecule.util.MimeTypes;
-import com.vtence.molecule.util.Streams;
 
+import java.io.BufferedInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +68,9 @@ public class FileServer implements Application {
         }
 
         File file = new File(root, request.pathInfo());
+        // todo we won't be able to rely on catching FileNotFoundException to check if we
+        // can serve the file once we are done implementing deferred output
+        // So we need to check if the file exists and is readable
 
         if (notModifiedSince(request, file)) {
             response.status(HttpStatus.NOT_MODIFIED);
@@ -105,11 +111,49 @@ public class FileServer implements Application {
     }
 
     private void serve(Response response, File file) throws IOException {
-        InputStream in = new FileInputStream(file);
-        try {
-            Streams.copy(in, response.outputStream());
-        } finally {
-            Streams.close(in);
+        response.body(new FileBody(file));
+    }
+
+    public static class FileBody implements Body {
+        private static final int SIZE_8K = 8 * 1024;
+
+        private final File file;
+        private final int chunkSize;
+
+        public FileBody(File file) {
+            this(file, SIZE_8K);
+        }
+
+        public FileBody(File file, int chunkSize) {
+            this.file = file;
+            this.chunkSize = chunkSize;
+        }
+
+        public long size() {
+            return file.length();
+        }
+
+        public void writeTo(OutputStream out) throws IOException {
+            InputStream in = new BufferedInputStream(new FileInputStream(file));
+            try {
+                byte[] buffer = new byte[chunkSize];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+            } finally {
+                close(in);
+            }
+        }
+
+        public void close() throws IOException {
+        }
+
+        private void close(Closeable closeable) {
+            try {
+                closeable.close();
+            } catch (IOException ignored) {
+            }
         }
     }
 }

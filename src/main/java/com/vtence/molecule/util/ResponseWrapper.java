@@ -1,5 +1,6 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
@@ -85,7 +86,11 @@ public class ResponseWrapper implements Response {
         return response.writer();
     }
 
-    public void body(String body) throws IOException {
+    public void body(String text) throws IOException {
+        response.body(text);
+    }
+
+    public void body(Body body) throws IOException {
         response.body(body);
     }
 

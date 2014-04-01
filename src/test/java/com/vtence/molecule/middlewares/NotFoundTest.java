@@ -3,11 +3,8 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.util.Charsets;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
@@ -34,11 +31,6 @@ public class NotFoundTest {
     @Test public void
     rendersPageNotFound() {
         response.assertBody(content);
-    }
-
-    @Test public void
-    buffersResponse() throws IOException {
-        response.assertBufferSize(content.getBytes(Charsets.ISO_8859_1).length);
     }
 
     @Test public void

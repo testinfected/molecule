@@ -1,8 +1,9 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.StringBody;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,10 +35,12 @@ public class BufferedResponse extends ResponseWrapper {
         return new OutputStreamWriter(outputStream(), charset());
     }
 
-    public void body(String body) throws IOException {
-        Writer writer = new BufferedWriter(writer());
-        writer.write(body);
-        writer.flush();
+    public void body(String text) throws IOException {
+        body(StringBody.text(text, charset()));
+    }
+
+    public void body(Body body) throws IOException {
+        body.writeTo(outputStream());
     }
 
     public String body() throws UnsupportedEncodingException {
