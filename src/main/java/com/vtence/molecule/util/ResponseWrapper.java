@@ -73,10 +73,6 @@ public class ResponseWrapper implements Response {
         return response.charset();
     }
 
-    public OutputStream outputStream() throws IOException {
-        return response.outputStream();
-    }
-
     public OutputStream outputStream(int bufferSize) throws IOException {
         return response.outputStream(bufferSize);
     }

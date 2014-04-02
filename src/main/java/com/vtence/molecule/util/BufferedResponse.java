@@ -23,10 +23,6 @@ public class BufferedResponse extends ResponseWrapper {
         buffer.reset();
     }
 
-    public OutputStream outputStream() throws IOException {
-        return buffer;
-    }
-
     public OutputStream outputStream(int bufferSize) throws IOException {
         return buffer;
     }
@@ -37,7 +33,7 @@ public class BufferedResponse extends ResponseWrapper {
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(outputStream(body.size()));
+        body.writeTo(buffer);
     }
 
     public Body body() {

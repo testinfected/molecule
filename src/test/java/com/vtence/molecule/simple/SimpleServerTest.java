@@ -1,6 +1,7 @@
 package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.ChunkedBody;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
@@ -21,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -84,8 +86,15 @@ public class SimpleServerTest {
     chunksResponseStreamWhenContentLengthUnknown() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                byte[] content = "<html>...</html>".getBytes(response.charset());
-                response.outputStream().write(content);
+                final byte[] content = "<html>...</html>".getBytes(response.charset());
+                // todo once deferred output is in place, simplify with a text response
+                response.body(new ChunkedBody() {
+                    public void writeTo(OutputStream out) throws IOException {
+                        out.write(content);
+                    }
+
+                    public void close() throws IOException {}
+                });
             }
         });
 
@@ -99,24 +108,16 @@ public class SimpleServerTest {
     doesNoChunkResponsesWithContentLengthHeader() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                byte[] content = "<html>...</html>".getBytes(response.charset());
+                final byte[] content = "<html>...</html>".getBytes(response.charset());
                 response.contentLength(content.length);
-                response.outputStream().write(content);
-            }
-        });
+                // todo once deferred output is in place, simplify with a text response
+                response.body(new ChunkedBody() {
+                    public void writeTo(OutputStream out) throws IOException {
+                        out.write(content);
+                    }
 
-        response = request.send();
-        assertNoError();
-        response.assertHasContent("<html>...</html>");
-        response.assertNotChunked();
-    }
-
-    @Test public void
-    doesNotChunkBufferedByteStreams() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                byte[] content = "<html>...</html>".getBytes(response.charset());
-                response.outputStream(content.length).write(content);
+                    public void close() throws IOException {}
+                });
             }
         });
 

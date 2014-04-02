@@ -34,8 +34,6 @@ public interface Response {
 
     Charset charset();
 
-    OutputStream outputStream() throws IOException;
-
     OutputStream outputStream(int bufferSize) throws IOException;
 
     void body(String text) throws IOException;

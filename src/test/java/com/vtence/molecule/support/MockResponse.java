@@ -144,13 +144,11 @@ public class MockResponse implements Response {
         return charset != null ? charset : Charsets.ISO_8859_1;
     }
 
-    public OutputStream outputStream() throws IOException {
-        bufferSize = 0;
-        return output;
-    }
-
     public OutputStream outputStream(int bufferSize) throws IOException {
-        if (bufferSize <= 0) return outputStream();
+        if (bufferSize <= 0) {
+            this.bufferSize = 0;
+            return output;
+        }
         this.bufferSize = bufferSize;
         return new BufferedOutputStream(output, bufferSize);
     }

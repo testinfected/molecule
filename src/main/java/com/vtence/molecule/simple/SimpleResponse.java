@@ -107,10 +107,6 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         return Charset.forName(type.getCharset());
     }
 
-    public OutputStream outputStream() throws IOException {
-        return response.getOutputStream();
-    }
-
     public OutputStream outputStream(int bufferSize) throws IOException {
         return response.getOutputStream(bufferSize);
     }

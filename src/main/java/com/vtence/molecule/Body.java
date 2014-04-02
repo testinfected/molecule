@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
+// todo Consider letting implementations decide to implement Closeable
 public interface Body extends Closeable {
 
     // see comment below
