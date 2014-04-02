@@ -15,28 +15,13 @@ public class Failsafe extends AbstractMiddleware {
     public void handle(Request request, Response response) throws Exception {
         try {
             forward(request, response);
-        } catch (Exception internalError) {
-            failsafeResponse(internalError, response);
+        } catch (Exception error) {
+            failsafeResponse(error, response);
         }
     }
 
     private void failsafeResponse(Exception error, Response response) throws IOException {
-        setInternalErrorStatus(response);
-        // todo Remove. it will fail if response has already been committed and we won't need
-        // that once actual output is deferred to the end of the request cycle
-        resetContent(response);
-        renderError(error, response);
-    }
-
-    private void resetContent(Response response) throws IOException {
-        response.reset();
-    }
-
-    private void setInternalErrorStatus(Response response) {
         response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    private void renderError(Exception error, Response response) throws IOException {
         response.contentType("text/html; charset=utf-8");
         response.body(formatAsHtml(error));
     }

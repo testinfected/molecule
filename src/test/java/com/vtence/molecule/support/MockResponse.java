@@ -197,9 +197,6 @@ public class MockResponse implements Response {
         assertThat("content encoding", CharsetDetector.detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
     }
 
-    public void reset() throws IOException {
-    }
-
     public <T> T unwrap(Class<T> type) {
         throw new UnsupportedOperationException();
     }

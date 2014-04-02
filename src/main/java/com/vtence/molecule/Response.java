@@ -43,7 +43,5 @@ public interface Response {
 
     boolean empty();
 
-    void reset() throws IOException;
-
     <T> T unwrap(Class<T> type);
 }

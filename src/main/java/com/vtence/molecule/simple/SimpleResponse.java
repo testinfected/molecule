@@ -3,7 +3,6 @@ package com.vtence.molecule.simple;
 import com.vtence.molecule.BinaryBody;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
-import com.vtence.molecule.HttpException;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.TextBody;
 import com.vtence.molecule.util.Charsets;
@@ -112,14 +111,6 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         }
 
         return Charset.forName(type.getCharset());
-    }
-
-    public void reset() {
-        try {
-            response.reset();
-        } catch (IOException e) {
-            throw new HttpException("Response has already been committed", e);
-        }
     }
 
     public <T> T unwrap(Class<T> type) {
