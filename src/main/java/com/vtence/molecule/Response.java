@@ -2,7 +2,6 @@ package com.vtence.molecule;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 import java.nio.charset.Charset;
 
 public interface Response {
@@ -38,8 +37,6 @@ public interface Response {
     OutputStream outputStream() throws IOException;
 
     OutputStream outputStream(int bufferSize) throws IOException;
-
-    Writer writer() throws IOException;
 
     void body(String text) throws IOException;
 

@@ -7,9 +7,7 @@ import com.vtence.molecule.StringBody;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 
 public class BufferedResponse extends ResponseWrapper {
 
@@ -33,12 +31,8 @@ public class BufferedResponse extends ResponseWrapper {
         return buffer;
     }
 
-    public Writer writer() throws IOException {
-        return new OutputStreamWriter(outputStream(), charset());
-    }
-
     public void body(String text) throws IOException {
-        body(StringBody.text(text, charset()));
+        body(new StringBody(text, charset()));
     }
 
     public void body(Body body) throws IOException {

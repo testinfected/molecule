@@ -15,8 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -157,12 +155,8 @@ public class MockResponse implements Response {
         return new BufferedOutputStream(output, bufferSize);
     }
 
-    public Writer writer() throws IOException {
-        return new OutputStreamWriter(outputStream(), charset());
-    }
-
     public void body(String text) throws IOException {
-        body(StringBody.text(text, charset()));
+        body(new StringBody(text, charset()));
     }
 
     public void body(Body body) throws IOException {

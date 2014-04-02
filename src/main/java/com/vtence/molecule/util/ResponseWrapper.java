@@ -7,7 +7,6 @@ import com.vtence.molecule.Response;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 import java.nio.charset.Charset;
 
 public class ResponseWrapper implements Response {
@@ -80,10 +79,6 @@ public class ResponseWrapper implements Response {
 
     public OutputStream outputStream(int bufferSize) throws IOException {
         return response.outputStream(bufferSize);
-    }
-
-    public Writer writer() throws IOException {
-        return response.writer();
     }
 
     public void body(String text) throws IOException {

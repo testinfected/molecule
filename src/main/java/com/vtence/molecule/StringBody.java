@@ -6,21 +6,12 @@ import java.nio.charset.Charset;
 
 public class StringBody implements Body {
 
-    private final StringBuilder body = new StringBuilder();
+    private final String text;
     private final Charset charset;
 
-    public static StringBody text(String text, Charset charset) {
-        StringBody body = new StringBody(charset);
-        body.append(text);
-        return body;
-    }
-
-    public StringBody(Charset charset) {
+    public StringBody(String text, Charset charset) {
+        this.text = text;
         this.charset = charset;
-    }
-
-    public void append(String text) {
-        body.append(text);
     }
 
     public int size() {
@@ -28,7 +19,7 @@ public class StringBody implements Body {
     }
 
     private byte[] content() {
-        return body.toString().getBytes(charset);
+        return text.getBytes(charset);
     }
 
     public void writeTo(OutputStream out) throws IOException {
