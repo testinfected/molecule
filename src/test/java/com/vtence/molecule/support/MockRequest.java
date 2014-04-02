@@ -78,8 +78,9 @@ public class MockRequest implements Request {
         return null;
     }
 
-    public void withHeader(String header, String... values) {
+    public MockRequest withHeader(String header, String... values) {
         headers.put(header, asList(values));
+        return this;
     }
 
     public List<String> headerNames() {

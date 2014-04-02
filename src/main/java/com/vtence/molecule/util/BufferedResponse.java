@@ -1,9 +1,9 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.BinaryBody;
 import com.vtence.molecule.Body;
-import com.vtence.molecule.BytesBody;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.StringBody;
+import com.vtence.molecule.TextBody;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class BufferedResponse extends ResponseWrapper {
 
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-    private Body body = BytesBody.empty();
+    private Body body = BinaryBody.empty();
 
     public BufferedResponse(Response response) {
         super(response);
@@ -24,7 +24,7 @@ public class BufferedResponse extends ResponseWrapper {
     }
 
     public void body(String text) throws IOException {
-        body(new StringBody(text, charset()));
+        body(TextBody.text(text, charset()));
     }
 
     public void body(Body body) throws IOException {

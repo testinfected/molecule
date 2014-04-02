@@ -3,7 +3,7 @@ package com.vtence.molecule;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class BytesBody implements Body {
+public class BinaryBody implements Body {
 
     private static final Body EMPTY = bytes(new byte[0]);
 
@@ -14,10 +14,10 @@ public class BytesBody implements Body {
     }
 
     public static Body bytes(byte[] content) {
-        return new BytesBody(content);
+        return new BinaryBody(content);
     }
 
-    public BytesBody(byte[] content) {
+    public BinaryBody(byte[] content) {
         this.content = content;
     }
 

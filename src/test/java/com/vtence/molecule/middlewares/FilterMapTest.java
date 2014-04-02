@@ -1,9 +1,9 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.matchers.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.matchers.Matcher;
 import com.vtence.molecule.matchers.Matchers;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
 import static com.vtence.molecule.support.MockResponse.aResponse;
+import static java.lang.String.format;
 
 public class FilterMapTest {
 
@@ -24,7 +25,7 @@ public class FilterMapTest {
     stubApplication() {
         filters.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body("content");
+                response.header("content", "content");
             }
         });
     }
@@ -32,41 +33,45 @@ public class FilterMapTest {
     @Test public void
     immediatelyForwardsRequestWhenNoFilterIsRegistered() throws Exception {
         filters.handle(request, response);
-        response.assertBody("content");
+        assertFilteredContent("content");
     }
 
     @Test public void
     runsRequestThroughMatchingFilter() throws Exception {
         filters.map(none(), filter("none"));
-        filters.map(all(), filter("all"));
+        filters.map(all(), filter("filter"));
 
         filters.handle(request, response);
-        response.assertBody("all content");
+        assertFilteredContent("filter(content)");
     }
 
     @Test public void
     forwardsRequestIfNoFilterMatches() throws Exception {
         filters.map(none(), filter("no"));
         filters.handle(request, response);
-        response.assertBody("content");
+        assertFilteredContent("content");
     }
 
     @Test public void
     matchesOnPathPrefix() throws Exception {
         request.withPath("/filtered/path");
-        filters.map("/filtered", filter("filtered"));
+        filters.map("/filtered", filter("filter"));
 
         filters.handle(request, response);
-        response.assertBody("filtered content");
+        assertFilteredContent("filter(content)");
     }
 
     @Test public void
     appliesLastRegisteredOfMatchingFilters() throws Exception {
-        filters.map(all(), filter("old"));
-        filters.map(all(), filter("new"));
+        filters.map(all(), filter("filter"));
+        filters.map(all(), filter("replacement"));
 
         filters.handle(request, response);
-        response.assertBody("new content");
+        assertFilteredContent("replacement(content)");
+    }
+
+    private void assertFilteredContent(String content) {
+        response.assertHeader("content", content);
     }
 
     private Matcher<Request> all() {
@@ -80,8 +85,8 @@ public class FilterMapTest {
     private AbstractMiddleware filter(final String name) {
         return new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(name + " ");
                 forward(request, response);
+                response.header("content", format("%s(%s)", name, response.header("content")));
             }
         };
     }

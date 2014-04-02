@@ -21,6 +21,7 @@ import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ConnectionScopeTest {
@@ -59,6 +60,7 @@ public class ConnectionScopeTest {
             connectionScope.handle(request, response);
             fail("HttpException did not bubble up");
         } catch (HttpException expected) {
+            assertTrue(true);
         }
 
         request.assertAttribute(Connection.class, nullValue());

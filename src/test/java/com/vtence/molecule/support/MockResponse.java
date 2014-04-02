@@ -1,21 +1,19 @@
 package com.vtence.molecule.support;
 
+import com.vtence.molecule.BinaryBody;
 import com.vtence.molecule.Body;
-import com.vtence.molecule.BytesBody;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.StringBody;
+import com.vtence.molecule.TextBody;
 import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.HttpDate;
 import org.hamcrest.Matcher;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,15 +32,12 @@ import static org.junit.Assert.assertThat;
 
 public class MockResponse implements Response {
 
-    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
-
     private final Map<String, String> headers = new HashMap<String, String>();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     private HttpStatus status;
-    int bufferSize = 0;
 
-    private Body body = BytesBody.empty();
+    private Body body = BinaryBody.empty();
 
     public static MockResponse aResponse() {
         return new MockResponse();
@@ -57,7 +52,8 @@ public class MockResponse implements Response {
     }
 
     public void header(String name, String value) {
-        if (output.size() > 0)
+        // todo get rid of this check when we have fully implement deferred output
+        if (content().length > 0)
             throw new IllegalStateException("Cannot set header once response is committed");
         headers.put(name, value);
     }
@@ -132,6 +128,7 @@ public class MockResponse implements Response {
     }
 
     public long contentLength() {
+        // todo should return -1 if content length unknown
         return header("Content-Length") != null ? parseLong(header("Content-Length")) : 0;
     }
 
@@ -145,22 +142,12 @@ public class MockResponse implements Response {
         return charset != null ? charset : Charsets.ISO_8859_1;
     }
 
-    private OutputStream outputStream(int bufferSize) throws IOException {
-        if (bufferSize <= 0) {
-            this.bufferSize = 0;
-            return output;
-        }
-        this.bufferSize = bufferSize;
-        return new BufferedOutputStream(output, bufferSize);
-    }
-
     public void body(String text) throws IOException {
-        body(new StringBody(text, charset()));
+        body(TextBody.text(text, charset()));
     }
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(outputStream((int) body.size()));
     }
 
     public Body body() {
@@ -168,7 +155,15 @@ public class MockResponse implements Response {
     }
 
     public long size() {
-        return output.size();
+        return body.size();
+    }
+
+    public boolean empty() {
+        return size() == 0;
+    }
+
+    public String text() {
+        return new String(content(), charset());
     }
 
     public void assertBody(String body) {
@@ -176,35 +171,25 @@ public class MockResponse implements Response {
     }
 
     public void assertBody(Matcher<? super String> bodyMatcher) {
-        assertThat("body", new String(content(), charset()), bodyMatcher);
+        assertThat("body", text(), bodyMatcher);
     }
 
-    public String text() {
-        return new String(content(), charset());
+    public byte[] content() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            body.writeTo(out);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        return out.toByteArray();
     }
 
     public void assertContent(byte[] content) {
         assertArrayEquals("content", content, content());
     }
 
-    public byte[] content() {
-        return output.toByteArray();
-    }
-
-    public boolean empty() {
-        return size() == 0;
-    }
-
     public InputStream stream() {
         return new ByteArrayInputStream(content());
-    }
-
-    public void assertBufferSize(int size) {
-        assertBufferSize(equalTo(size));
-    }
-
-    public void assertBufferSize(Matcher<Integer> sizeMatcher) {
-        assertThat("buffer size", bufferSize, sizeMatcher);
     }
 
     public void assertContentSize(long size) {
@@ -216,7 +201,6 @@ public class MockResponse implements Response {
     }
 
     public void reset() throws IOException {
-        output.reset();
     }
 
     public <T> T unwrap(Class<T> type) {
@@ -242,13 +226,15 @@ public class MockResponse implements Response {
     }
 
     public String toString() {
-        return "mock response (" + output + ")";
+        // todo add headers and status as well
+        return text();
     }
 
     private static final String TYPE = "[^/]+";
     private static final String SUBTYPE = "[^;]+";
     private static final String CHARSET = "charset=([^;]+)";
     private static final Pattern CONTENT_TYPE_FORMAT = Pattern.compile(String.format("%s/%s(?:;\\s*%s)+", TYPE, SUBTYPE, CHARSET));
+
     private static final int ENCODING = 1;
 
     private static Charset parseCharset(String contentType) {

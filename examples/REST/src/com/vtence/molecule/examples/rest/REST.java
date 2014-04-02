@@ -3,7 +3,6 @@ package com.vtence.molecule.examples.rest;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.StringBody;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.middlewares.MiddlewareStack;
