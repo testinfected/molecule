@@ -2,7 +2,6 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.FileBody;
-import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
@@ -12,18 +11,18 @@ import com.vtence.molecule.util.Joiner;
 import com.vtence.molecule.util.MimeTypes;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.vtence.molecule.HttpHeaders.ALLOW;
 import static com.vtence.molecule.HttpHeaders.IF_MODIFIED_SINCE;
 import static com.vtence.molecule.HttpHeaders.LAST_MODIFIED;
 import static com.vtence.molecule.HttpMethod.GET;
 import static com.vtence.molecule.HttpMethod.HEAD;
-import static com.vtence.molecule.middlewares.NotFound.notFound;
+import static com.vtence.molecule.HttpStatus.METHOD_NOT_ALLOWED;
+import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
 
 public class FileServer implements Application {
 
@@ -48,27 +47,22 @@ public class FileServer implements Application {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        try {
-            renderFile(request, response);
-        } catch (FileNotFoundException e) {
-            notFound(request, response);
-        }
-    }
-
-    private void renderFile(Request request, Response response) throws IOException {
         if (!methodAllowed(request)) {
-            response.header(HttpHeaders.ALLOW, ALLOW_HEADER);
-            response.status(HttpStatus.METHOD_NOT_ALLOWED);
+            response.header(ALLOW, ALLOW_HEADER);
+            response.status(METHOD_NOT_ALLOWED);
             return;
         }
 
         File file = new File(root, request.pathInfo());
-        // todo we won't be able to rely on catching FileNotFoundException to check if we
-        // can serve the file once we are done implementing deferred output
-        // So we need to check if the file exists and is readable
+        if (!canServe(file)) {
+            response.status(HttpStatus.NOT_FOUND);
+            response.contentType(MimeTypes.TEXT);
+            response.body("File not found: " + request.pathInfo());
+            return;
+        }
 
         if (notModifiedSince(request, file)) {
-            response.status(HttpStatus.NOT_MODIFIED);
+            response.status(NOT_MODIFIED);
             return;
         }
 
@@ -79,6 +73,10 @@ public class FileServer implements Application {
         if (head(request)) return;
 
         response.body(new FileBody(file));
+    }
+
+    private boolean canServe(File file) {
+        return file.exists() && file.canRead() && !file.isDirectory();
     }
 
     private boolean methodAllowed(Request request) {
