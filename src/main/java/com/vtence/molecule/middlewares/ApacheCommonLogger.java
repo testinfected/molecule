@@ -5,7 +5,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Clock;
 import com.vtence.molecule.util.SystemClock;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -53,8 +52,7 @@ public class ApacheCommonLogger extends AbstractMiddleware {
         return DATE_FORMAT.format(clock.now());
     }
 
-    private Serializable contentLengthOrHyphen(Response response) {
-        // todo use actual body size and print size if >= 0
-        return response.contentLength() > 0 ? response.contentLength() : "-";
+    private Object contentLengthOrHyphen(Response response) {
+        return response.size() > 0 ? response.size() : "-";
     }
 }
