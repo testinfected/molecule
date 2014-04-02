@@ -56,14 +56,14 @@ public class SiteMeshTest {
     }
 
     @Test public void
-    removesContentLengthHeaderDecorating() throws Exception {
+    removesContentLengthHeaderIfDecorating() throws Exception {
         response.header("Content-Length", String.valueOf(140));
         siteMesh.handle(request, response);
         response.assertHeader("Content-Length", nullValue());
     }
 
     @Test public void
-    leavesContentUntouchedWhenNotDecorating() throws Exception {
+    leavesContentUntouchedIfNoDecorationOccurs() throws Exception {
         page.become("unselected");
         siteMesh.handle(request, response);
         response.assertBody(originalPage);
