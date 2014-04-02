@@ -35,6 +35,6 @@ public class DateHeaderTest {
     }
 
     private void assertDate(String date) {
-        assertThat("date header", response.body(), equalTo(date));
+        assertThat("date header", response.text(), equalTo(date));
     }
 }

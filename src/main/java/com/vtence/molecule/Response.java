@@ -45,6 +45,8 @@ public interface Response {
 
     void body(Body body) throws IOException;
 
+    Body body();
+
     void reset() throws IOException;
 
     <T> T unwrap(Class<T> type);

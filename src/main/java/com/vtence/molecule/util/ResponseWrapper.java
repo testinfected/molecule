@@ -94,6 +94,10 @@ public class ResponseWrapper implements Response {
         response.body(body);
     }
 
+    public Body body() {
+        return response.body();
+    }
+
     public void reset() throws IOException {
         response.reset();
     }

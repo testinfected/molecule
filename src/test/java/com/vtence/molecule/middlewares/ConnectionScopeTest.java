@@ -81,6 +81,6 @@ public class ConnectionScopeTest {
     }
 
     private void assertScoping(String state) {
-        assertThat("scoping", response.body(), equalTo(state));
+        assertThat("scoping", response.text(), equalTo(state));
     }
 }

@@ -43,6 +43,8 @@ public class MockResponse implements Response {
     private HttpStatus status;
     int bufferSize = 0;
 
+    private Body body;
+
     public static MockResponse aResponse() {
         return new MockResponse();
     }
@@ -164,7 +166,12 @@ public class MockResponse implements Response {
     }
 
     public void body(Body body) throws IOException {
+        this.body = body;
         body.writeTo(outputStream());
+    }
+
+    public Body body() {
+        return body;
     }
 
     public void assertBody(String body) {
@@ -175,7 +182,7 @@ public class MockResponse implements Response {
         assertThat("body", new String(content(), charset()), bodyMatcher);
     }
 
-    public String body() {
+    public String text() {
         return new String(content(), charset());
     }
 

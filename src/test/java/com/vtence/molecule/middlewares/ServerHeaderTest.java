@@ -36,6 +36,6 @@ public class ServerHeaderTest {
     }
 
     private void assertServer(String server) {
-        assertThat("server header", response.body(), equalTo(server));
+        assertThat("server header", response.text(), equalTo(server));
     }
 }

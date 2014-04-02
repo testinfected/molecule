@@ -38,7 +38,7 @@ public class RouterTest {
     }
 
     private void assertRoutedTo(String route) {
-        assertThat("route", response.body(), equalTo(route));
+        assertThat("route", response.text(), equalTo(route));
     }
 
     private Application route(final String name) {

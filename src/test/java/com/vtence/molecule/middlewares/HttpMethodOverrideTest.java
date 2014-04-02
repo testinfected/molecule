@@ -63,6 +63,6 @@ public class HttpMethodOverrideTest {
     }
 
     private void assertMethod(String method) {
-        assertThat("method", response.body(), equalTo(method));
+        assertThat("method", response.text(), equalTo(method));
     }
 }

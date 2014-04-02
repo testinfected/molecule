@@ -3,9 +3,6 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.middlewares.AbstractMiddleware;
-import com.vtence.molecule.middlewares.Middleware;
-import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
@@ -49,6 +46,6 @@ public class MiddlewareStackTest {
     }
 
     private void assertChain(String chaining) {
-        assertThat("chaining", response.body(), equalTo(chaining));
+        assertThat("chaining", response.text(), equalTo(chaining));
     }
 }

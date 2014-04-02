@@ -42,7 +42,7 @@ public class SiteMesh extends AbstractMiddleware {
     private void decorate(Response response, BufferedResponse buffer) throws IOException {
         response.removeHeader(HttpHeaders.CONTENT_LENGTH);
         Writer out = new BufferedWriter(response.writer());
-        decorator.decorate(out, buffer.body());
+        decorator.decorate(out, buffer.text());
         out.flush();
     }
 

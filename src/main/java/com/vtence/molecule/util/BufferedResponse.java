@@ -15,6 +15,8 @@ public class BufferedResponse extends ResponseWrapper {
 
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
+    private Body body;
+
     public BufferedResponse(Response response) {
         super(response);
     }
@@ -40,10 +42,15 @@ public class BufferedResponse extends ResponseWrapper {
     }
 
     public void body(Body body) throws IOException {
+        this.body = body;
         body.writeTo(outputStream());
     }
 
-    public String body() throws UnsupportedEncodingException {
+    public Body body() {
+        return body;
+    }
+
+    public String text() throws UnsupportedEncodingException {
         return new String(content(), charset());
     }
 

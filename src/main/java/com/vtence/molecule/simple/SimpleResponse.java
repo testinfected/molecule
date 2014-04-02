@@ -19,6 +19,8 @@ import java.nio.charset.Charset;
 public class SimpleResponse implements com.vtence.molecule.Response {
     private final Response response;
 
+    private Body body;
+
     public SimpleResponse(Response response) {
         this.response = response;
     }
@@ -93,7 +95,12 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public void body(Body body) throws IOException {
+        this.body = body;
         body.writeTo(response.getOutputStream());
+    }
+
+    public Body body() {
+        return body;
     }
 
     public Charset charset() {
