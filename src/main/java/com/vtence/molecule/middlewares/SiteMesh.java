@@ -10,7 +10,6 @@ import com.vtence.molecule.decoration.HtmlPageSelector;
 import com.vtence.molecule.decoration.Layout;
 import com.vtence.molecule.decoration.PageCompositor;
 import com.vtence.molecule.decoration.Selector;
-import com.vtence.molecule.util.BufferedResponse;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -37,13 +36,11 @@ public class SiteMesh extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        BufferedResponse buffer = new BufferedResponse(response);
-        forward(request, buffer);
-        if (shouldDecorate(buffer)) {
+        forward(request, response);
+
+        if (shouldDecorate(response)) {
             response.removeHeader(CONTENT_LENGTH);
-            response.body(new DecoratedBody(decorator, buffer.body(), buffer.charset()));
-        } else {
-            response.body(buffer.body());
+            response.body(new DecoratedBody(decorator, response.body(), response.charset()));
         }
     }
 

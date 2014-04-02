@@ -6,7 +6,6 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.AcceptEncoding;
-import com.vtence.molecule.util.BufferedResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,35 +24,34 @@ public class Compressor extends AbstractMiddleware {
     static enum Codings {
 
         gzip {
-            public void encode(Response response, Body body) throws IOException {
+            public void encode(Response response) throws IOException {
                 response.removeHeader(CONTENT_LENGTH);
                 response.header(CONTENT_ENCODING, name());
-                response.body(new GZipStream(body));
+                response.body(new GZipStream(response.body()));
             }
         },
 
         deflate {
-            public void encode(Response response, Body body) throws IOException {
+            public void encode(Response response) throws IOException {
                 response.removeHeader(CONTENT_LENGTH);
                 response.header(CONTENT_ENCODING, name());
-                response.body(new DeflateStream(body));
+                response.body(new DeflateStream(response.body()));
             }
         },
 
         identity {
-            public void encode(Response response, Body body) throws IOException {
-                response.body(body);
+            public void encode(Response response) throws IOException {
             }
         };
 
-        public abstract void encode(Response to, Body body) throws IOException;
+        public abstract void encode(Response response) throws IOException;
 
-        public static String[] available() {
-            List<String> available = new ArrayList<String>();
+        public static String[] all() {
+            List<String> all = new ArrayList<String>();
             for (Codings coding : values()) {
-                available.add(coding.name());
+                all.add(coding.name());
             }
-            return available.toArray(new String[available.size()]);
+            return all.toArray(new String[all.size()]);
         }
 
         private static class GZipStream extends ChunkedBody {
@@ -102,18 +100,16 @@ public class Compressor extends AbstractMiddleware {
     }
 
     public void handle(Request request, final Response response) throws Exception {
-        BufferedResponse buffer = new BufferedResponse(response);
-        forward(request, buffer);
+        forward(request, response);
 
-        if (buffer.empty() || alreadyEncoded(response)) {
-            response.body(buffer.body());
+        if (response.empty() || alreadyEncoded(response)) {
             return;
         }
 
         String encoding = selectBestAvailableEncodingFor(request);
         if (encoding != null) {
             Codings coding = Codings.valueOf(encoding);
-            coding.encode(response, buffer.body());
+            coding.encode(response);
         } else {
             notAcceptable(response);
         }
@@ -121,7 +117,7 @@ public class Compressor extends AbstractMiddleware {
 
     private String selectBestAvailableEncodingFor(Request request) {
         AcceptEncoding acceptEncoding = AcceptEncoding.parse(request);
-        return acceptEncoding.selectBestEncoding(Codings.available());
+        return acceptEncoding.selectBestEncoding(Codings.all());
     }
 
     private boolean alreadyEncoded(Response response) {

@@ -52,9 +52,6 @@ public class MockResponse implements Response {
     }
 
     public void header(String name, String value) {
-        // todo get rid of this check when we have fully implement deferred output
-        if (content().length > 0)
-            throw new IllegalStateException("Cannot set header once response is committed");
         headers.put(name, value);
     }
 
