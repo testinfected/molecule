@@ -43,7 +43,7 @@ public class BufferedResponse extends ResponseWrapper {
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(outputStream());
+        body.writeTo(outputStream(body.size()));
     }
 
     public Body body() {
@@ -51,7 +51,7 @@ public class BufferedResponse extends ResponseWrapper {
     }
 
     public String text() throws UnsupportedEncodingException {
-        return new String(content(), charset());
+        return buffer.toString(charset().name());
     }
 
     public byte[] content() {

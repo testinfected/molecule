@@ -1,7 +1,7 @@
 package com.vtence.molecule;
 
 public abstract class ChunkedBody implements Body {
-    public long size() {
+    public int size() {
         return -1;
     }
 }

@@ -6,7 +6,7 @@ import java.io.OutputStream;
 
 public interface Body extends Closeable {
 
-    long size();
+    int size();
 
     void writeTo(OutputStream out) throws IOException;
 }

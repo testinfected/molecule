@@ -23,7 +23,7 @@ public class StringBody implements Body {
         body.append(text);
     }
 
-    public long size() {
+    public int size() {
         return content().length;
     }
 

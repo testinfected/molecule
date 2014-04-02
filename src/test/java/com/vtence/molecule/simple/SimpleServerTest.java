@@ -126,15 +126,13 @@ public class SimpleServerTest {
         response.assertNotChunked();
     }
 
-    // todo Server no longer buffers output for string bodies. Let's make as little decision
-    // as possible in the response and use middlewares for customizing behavios.
     // Since we're going to defer response output to the end
     // of the request cycle, what we need is a middleware that sets the
     // content length header for responses that have a known size if content encoding was
     // not explicitly set to chunked.
-    // For the time being, describe current behavior with that test
+    // For the time being, we will buffer response output to mimic previous behavior
     @Test public void
-    chunksBodiesByDefault() throws IOException {
+    doesNotChunksTextBodies() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("<html>...</html>");
@@ -144,7 +142,7 @@ public class SimpleServerTest {
         response = request.send();
         assertNoError();
         response.assertHasContent("<html>...</html>");
-        response.assertChunked();
+        response.assertNotChunked();
     }
 
     @Test public void

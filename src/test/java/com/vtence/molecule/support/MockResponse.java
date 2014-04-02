@@ -167,7 +167,7 @@ public class MockResponse implements Response {
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(outputStream());
+        body.writeTo(outputStream(body.size()));
     }
 
     public Body body() {

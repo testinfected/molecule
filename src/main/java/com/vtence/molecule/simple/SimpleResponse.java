@@ -96,7 +96,7 @@ public class SimpleResponse implements com.vtence.molecule.Response {
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(response.getOutputStream());
+        body.writeTo(response.getOutputStream(body.size()));
     }
 
     public Body body() {

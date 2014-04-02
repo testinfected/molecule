@@ -23,8 +23,8 @@ public class FileBody implements Body {
         this.chunkSize = chunkSize;
     }
 
-    public long size() {
-        return file.length();
+    public int size() {
+        return (int) file.length();
     }
 
     public void writeTo(OutputStream out) throws IOException {
