@@ -1,6 +1,7 @@
 package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Server;
 import com.vtence.molecule.simple.session.DisableSessions;
 import com.vtence.molecule.simple.session.SessionTracker;
@@ -69,16 +70,25 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(Request request, Response response) {
+        public void handle(Request req, Response resp) {
             try {
-                SimpleResponse responseAdapter = new SimpleResponse(response);
-                SimpleRequest requestAdapter = new SimpleRequest(request, new SessionTracking(tracker, responseAdapter));
+                // todo progressively morph our request and response from adapters of their
+                // simpleweb counterparts to state containers. Once this is done, we will
+                // make our request and response concrete classes.
+                SimpleResponse response = new SimpleResponse(resp);
+                SimpleRequest request = new SimpleRequest(req, new SessionTracking(tracker, response));
 
-                app.handle(requestAdapter, responseAdapter);
+                app.handle(request, response);
+
+                // todo After processing is done, sets headers, status and body to the simple
+                // response
+                Body body = response.body();
+                body.writeTo(resp.getOutputStream((int) body.size()));
+                body.close();
             } catch (Exception failure) {
                 failureReporter.errorOccurred(failure);
             } finally {
-                close(response);
+                close(resp);
             }
         }
 
