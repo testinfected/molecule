@@ -1,6 +1,7 @@
 package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Body;
+import com.vtence.molecule.BytesBody;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpException;
 import com.vtence.molecule.HttpStatus;
@@ -11,13 +12,12 @@ import org.simpleframework.http.Protocol;
 import org.simpleframework.http.Response;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public class SimpleResponse implements com.vtence.molecule.Response {
     private final Response response;
 
-    private Body body;
+    private Body body = BytesBody.empty();
 
     public SimpleResponse(Response response) {
         this.response = response;
@@ -90,11 +90,19 @@ public class SimpleResponse implements com.vtence.molecule.Response {
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(response.getOutputStream(body.size()));
+        body.writeTo(response.getOutputStream((int) body.size()));
     }
 
     public Body body() {
         return body;
+    }
+
+    public long size() {
+        return body.size();
+    }
+
+    public boolean empty() {
+        return size() == 0;
     }
 
     public Charset charset() {
@@ -105,10 +113,6 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         }
 
         return Charset.forName(type.getCharset());
-    }
-
-    public OutputStream outputStream(int bufferSize) throws IOException {
-        return response.getOutputStream(bufferSize);
     }
 
     public void reset() {

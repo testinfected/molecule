@@ -6,7 +6,6 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public class ResponseWrapper implements Response {
@@ -73,10 +72,6 @@ public class ResponseWrapper implements Response {
         return response.charset();
     }
 
-    public OutputStream outputStream(int bufferSize) throws IOException {
-        return response.outputStream(bufferSize);
-    }
-
     public void body(String text) throws IOException {
         response.body(text);
     }
@@ -87,6 +82,14 @@ public class ResponseWrapper implements Response {
 
     public Body body() {
         return response.body();
+    }
+
+    public long size() {
+        return response.size();
+    }
+
+    public boolean empty() {
+        return response.empty();
     }
 
     public void reset() throws IOException {

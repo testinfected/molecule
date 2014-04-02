@@ -1,19 +1,19 @@
 package com.vtence.molecule.util;
 
 import com.vtence.molecule.Body;
+import com.vtence.molecule.BytesBody;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.StringBody;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 public class BufferedResponse extends ResponseWrapper {
 
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-    private Body body;
+    private Body body = BytesBody.empty();
 
     public BufferedResponse(Response response) {
         super(response);
@@ -21,10 +21,6 @@ public class BufferedResponse extends ResponseWrapper {
 
     public void reset() throws IOException {
         buffer.reset();
-    }
-
-    public OutputStream outputStream(int bufferSize) throws IOException {
-        return buffer;
     }
 
     public void body(String text) throws IOException {
@@ -48,15 +44,11 @@ public class BufferedResponse extends ResponseWrapper {
         return buffer.toByteArray();
     }
 
-    public int size() {
+    public long size() {
         return buffer.size();
     }
 
     public boolean empty() {
         return size() == 0;
-    }
-
-    public void flush() throws IOException {
-        super.outputStream(size()).write(content());
     }
 }

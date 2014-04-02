@@ -106,7 +106,7 @@ public class Compressor extends AbstractMiddleware {
         forward(request, buffer);
 
         if (buffer.empty() || alreadyEncoded(response)) {
-            buffer.flush();
+            response.body(buffer.body());
             return;
         }
 

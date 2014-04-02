@@ -1,7 +1,6 @@
 package com.vtence.molecule;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public interface Response {
@@ -34,13 +33,15 @@ public interface Response {
 
     Charset charset();
 
-    OutputStream outputStream(int bufferSize) throws IOException;
-
     void body(String text) throws IOException;
 
     void body(Body body) throws IOException;
 
     Body body();
+
+    long size();
+
+    boolean empty();
 
     void reset() throws IOException;
 

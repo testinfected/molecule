@@ -14,7 +14,7 @@ public class StringBody implements Body {
         this.charset = charset;
     }
 
-    public int size() {
+    public long size() {
         return content().length;
     }
 

@@ -1,6 +1,7 @@
 package com.vtence.molecule.support;
 
 import com.vtence.molecule.Body;
+import com.vtence.molecule.BytesBody;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Response;
@@ -41,7 +42,7 @@ public class MockResponse implements Response {
     private HttpStatus status;
     int bufferSize = 0;
 
-    private Body body;
+    private Body body = BytesBody.empty();
 
     public static MockResponse aResponse() {
         return new MockResponse();
@@ -144,7 +145,7 @@ public class MockResponse implements Response {
         return charset != null ? charset : Charsets.ISO_8859_1;
     }
 
-    public OutputStream outputStream(int bufferSize) throws IOException {
+    private OutputStream outputStream(int bufferSize) throws IOException {
         if (bufferSize <= 0) {
             this.bufferSize = 0;
             return output;
@@ -159,11 +160,15 @@ public class MockResponse implements Response {
 
     public void body(Body body) throws IOException {
         this.body = body;
-        body.writeTo(outputStream(body.size()));
+        body.writeTo(outputStream((int) body.size()));
     }
 
     public Body body() {
         return body;
+    }
+
+    public long size() {
+        return output.size();
     }
 
     public void assertBody(String body) {
@@ -187,7 +192,7 @@ public class MockResponse implements Response {
     }
 
     public boolean empty() {
-        return output.size() == 0;
+        return size() == 0;
     }
 
     public InputStream stream() {

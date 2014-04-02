@@ -22,6 +22,8 @@ public class Failsafe extends AbstractMiddleware {
 
     private void failsafeResponse(Exception error, Response response) throws IOException {
         setInternalErrorStatus(response);
+        // todo Remove. it will fail if response has already been committed and we won't need
+        // that once actual output is deferred to the end of the request cycle
         resetContent(response);
         renderError(error, response);
     }

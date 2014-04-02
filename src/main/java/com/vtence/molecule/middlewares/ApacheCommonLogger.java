@@ -54,6 +54,7 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     }
 
     private Serializable contentLengthOrHyphen(Response response) {
+        // todo use actual body size and print size if >= 0
         return response.contentLength() > 0 ? response.contentLength() : "-";
     }
 }

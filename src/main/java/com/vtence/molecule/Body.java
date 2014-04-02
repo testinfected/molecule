@@ -8,7 +8,7 @@ import java.io.OutputStream;
 public interface Body extends Closeable {
 
     // see comment below
-    int size();
+    long size();
 
     // todo Should we pass a charset as well? This would defer byte conversion of char responses
     // to the time the body is written to the response.
