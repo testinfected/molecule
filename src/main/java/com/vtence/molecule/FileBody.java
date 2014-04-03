@@ -24,6 +24,10 @@ public class FileBody implements Body {
         this.chunkSize = chunkSize;
     }
 
+    public File file() {
+        return file;
+    }
+
     public long size(Charset charset) {
         return file.length();
     }

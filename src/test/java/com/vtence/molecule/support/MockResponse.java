@@ -193,8 +193,12 @@ public class MockResponse implements Response {
         return new ByteArrayInputStream(content());
     }
 
+    public long contentSize() {
+        return content().length;
+    }
+
     public void assertContentSize(long size) {
-        assertThat("content size", content().length, is((int) size));
+        assertThat("content size", contentSize(), is(size));
     }
 
     public void assertContentEncodedAs(String encoding) throws IOException {
