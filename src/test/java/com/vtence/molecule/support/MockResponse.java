@@ -4,8 +4,8 @@ import com.vtence.molecule.BinaryBody;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.TextBody;
+import com.vtence.molecule.simple.SimpleResponse;
 import com.vtence.molecule.util.Charsets;
 import com.vtence.molecule.util.HttpDate;
 import org.hamcrest.Matcher;
@@ -30,17 +30,37 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
-public class MockResponse implements Response {
+public class MockResponse extends SimpleResponse {
 
     private final Map<String, String> headers = new HashMap<String, String>();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
-    private HttpStatus status;
-
     private Body body = BinaryBody.empty();
+
+    public MockResponse() {
+        super(null);
+    }
 
     public static MockResponse aResponse() {
         return new MockResponse();
+    }
+
+    public MockResponse withStatus(HttpStatus status) {
+        status(status);
+        return this;
+    }
+
+    public void assertStatusCode(int code) {
+        assertThat("status code", statusCode(), equalTo(code));
+    }
+
+    public void assertStatusText(String text) {
+        assertThat("status text", statusText(), equalTo(text));
+    }
+
+    public void assertStatus(HttpStatus expected) {
+        assertStatusCode(expected.code);
+        assertStatusText(expected.text);
     }
 
     public void redirectTo(String location) {
@@ -101,31 +121,6 @@ public class MockResponse implements Response {
 
     public void assertContentType(Matcher<? super String> contentTypeMatcher) {
         assertHeader("Content-Type", contentTypeMatcher);
-    }
-
-    public int statusCode() {
-        return status.code;
-    }
-
-    public MockResponse withStatus(HttpStatus status) {
-        status(status);
-        return this;
-    }
-
-    public void status(HttpStatus status) {
-        this.status = status;
-    }
-
-    public void statusCode(int code) {
-        status(HttpStatus.forCode(code));
-    }
-
-    public void assertStatus(int code) {
-        assertThat("status code", status.code, equalTo(code));
-    }
-
-    public void assertStatus(HttpStatus expected) {
-        assertThat("status", status, equalTo(expected));
     }
 
     public long contentLength() {

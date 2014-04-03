@@ -15,8 +15,10 @@ import java.nio.charset.Charset;
 import static com.vtence.molecule.TextBody.text;
 
 public class SimpleResponse implements com.vtence.molecule.Response {
-    private final Response response;
+    private int statusCode = HttpStatus.OK.code;
+    private String statusText = HttpStatus.OK.text;
 
+    private final Response response;
     private Body body = BinaryBody.empty();
 
     public SimpleResponse(Response response) {
@@ -72,20 +74,24 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public int statusCode() {
-        return response.getCode();
+        return statusCode;
+    }
+
+    public void statusCode(int code) {
+        statusCode = code;
+    }
+
+    public String statusText() {
+        return statusText;
+    }
+
+    public void statusText(String text) {
+        statusText = text;
     }
 
     public void status(HttpStatus status) {
         statusCode(status.code);
         statusText(status.text);
-    }
-
-    public void statusCode(int code) {
-        response.setCode(code);
-    }
-
-    public void statusText(String reason) {
-        response.setDescription(reason);
     }
 
     public void body(String text) throws IOException {

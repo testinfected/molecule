@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.vtence.molecule.HttpStatus.CREATED;
 import static com.vtence.molecule.support.HttpRequest.aRequest;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -71,13 +72,13 @@ public class SimpleServerTest {
     respondsToRequests() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.status(HttpStatus.OK);
+                response.status(CREATED);
             }
         });
 
         response = request.send();
         assertNoError();
-        response.assertOK();
+        response.assertHasStatus(CREATED);
     }
 
     @Test public void

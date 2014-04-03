@@ -82,6 +82,8 @@ public class SimpleServer implements Server {
 
                 // todo After processing is done, sets headers, status and body to the simple
                 // response
+                resp.setCode(response.statusCode());
+                resp.setDescription(response.statusText());
                 Body body = response.body();
                 body.writeTo(resp.getOutputStream(), response.charset());
                 body.close();

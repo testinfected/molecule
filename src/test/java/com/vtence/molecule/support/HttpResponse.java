@@ -1,6 +1,7 @@
 package com.vtence.molecule.support;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
+import com.vtence.molecule.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
@@ -31,6 +32,11 @@ public class HttpResponse {
 
     public void assertHasStatusMessage(String message) {
         assertThat("response", response, HasStatusMessage.hasStatusMessage(message));
+    }
+
+    public void assertHasStatus(HttpStatus status) {
+        assertHasStatusCode(status.code);
+        assertHasStatusMessage(status.text);
     }
 
     public void assertHasNoHeader(String name) {
