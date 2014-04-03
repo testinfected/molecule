@@ -7,7 +7,7 @@ import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
 import static com.vtence.molecule.HttpHeaders.TRANSFER_ENCODING;
 import static java.lang.String.valueOf;
 
-public class ContentLength extends AbstractMiddleware {
+public class ContentLengthHeader extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
         forward(request, response);

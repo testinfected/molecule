@@ -13,28 +13,28 @@ import java.io.OutputStream;
 
 import static com.vtence.molecule.HttpHeaders.TRANSFER_ENCODING;
 
-public class ContentLengthTest {
+public class ContentLengthHeaderTest {
 
-    ContentLength contentLength = new ContentLength();
+    ContentLengthHeader contentLengthHeader = new ContentLengthHeader();
 
     MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Test public void
     setsContentLengthOnFixedLengthBodiesIfNoneSet() throws Exception {
-        contentLength.connectTo(new Application() {
+        contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("This body has a size of 32 bytes");
             }
         });
 
-        contentLength.handle(request, response);
+        contentLengthHeader.handle(request, response);
         response.assertHeader("Content-Length", "32");
     }
 
     @Test public void
     doesNotSetContentLengthOnVariableLengthBodies() throws Exception {
-        contentLength.connectTo(new Application() {
+        contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body(new ChunkedBody() {
                     public void writeTo(OutputStream out) throws IOException {
@@ -46,44 +46,44 @@ public class ContentLengthTest {
             }
         });
 
-        contentLength.handle(request, response);
+        contentLengthHeader.handle(request, response);
         response.assertNoHeader("Content-Length");
     }
 
     @Test public void
     doesNotSetContentLengthOnEmptyBodies() throws Exception {
-        contentLength.connectTo(new Application() {
+        contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
             }
         });
 
-        contentLength.handle(request, response);
+        contentLengthHeader.handle(request, response);
         response.assertNoHeader("Content-Length");
     }
 
     @Test public void
     doesNotSetContentLengthIfAlreadySet() throws Exception {
-        contentLength.connectTo(new Application() {
+        contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.contentLength(1);
                 response.body("This body is definitely larger than 1 byte");
             }
         });
 
-        contentLength.handle(request, response);
+        contentLengthHeader.handle(request, response);
         response.assertHeader("Content-Length", "1");
     }
 
     @Test public void
     doesNotSetContentLengthForChunkedTransferEncoding() throws Exception {
-        contentLength.connectTo(new Application() {
+        contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.header(TRANSFER_ENCODING, "chunked");
                 response.body("This body is chunked encoded");
             }
         });
 
-        contentLength.handle(request, response);
+        contentLengthHeader.handle(request, response);
         response.assertNoHeader("Content-Length");
     }
 }
