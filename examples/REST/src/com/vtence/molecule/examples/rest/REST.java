@@ -3,6 +3,7 @@ package com.vtence.molecule.examples.rest;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.TextBody;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.middlewares.MiddlewareStack;
@@ -54,12 +55,12 @@ public class REST {
             run(draw(new DynamicRoutes() {{
                 get("/albums").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
-                        StringBuilder body = new StringBuilder();
+                        TextBody body = new TextBody();
                         for(int id: albums.keySet()) {
                             Album album = albums.get(id);
                             body.append(String.format("%d: %s\n", id, album.info()));
                         }
-                        response.body(body.toString());
+                        response.body(body);
                     }
                 });
 

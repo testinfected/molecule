@@ -9,6 +9,7 @@ import com.vtence.molecule.util.AcceptEncoding;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Deflater;
@@ -61,10 +62,10 @@ public class Compressor extends AbstractMiddleware {
                 this.body = body;
             }
 
-            public void writeTo(OutputStream out) throws IOException {
+            public void writeTo(OutputStream out, Charset charset) throws IOException {
                 GZIPOutputStream zip = new GZIPOutputStream(out);
                 try {
-                    body.writeTo(zip);
+                    body.writeTo(zip, charset);
                 } finally {
                     zip.finish();
                 }
@@ -82,11 +83,11 @@ public class Compressor extends AbstractMiddleware {
                 this.body = body;
             }
 
-            public void writeTo(OutputStream out) throws IOException {
+            public void writeTo(OutputStream out, Charset charset) throws IOException {
                 Deflater zlib = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
                 DeflaterOutputStream deflate = new DeflaterOutputStream(out, zlib);
                 try {
-                    body.writeTo(deflate);
+                    body.writeTo(deflate, charset);
                 } finally {
                     deflate.finish();
                     zlib.end();

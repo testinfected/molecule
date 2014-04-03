@@ -12,19 +12,17 @@ import java.nio.charset.Charset;
 public class TemplateBody extends ChunkedBody {
     private final RenderingEngine renderer;
     private final Object context;
-    private final Charset charset;
-    private final String name;
+    private final String template;
 
-    public TemplateBody(RenderingEngine renderer, String templateName, Object context, Charset charset) {
+    public TemplateBody(RenderingEngine renderer, String templateName, Object context) {
         this.renderer = renderer;
         this.context = context;
-        this.charset = charset;
-        this.name = templateName;
+        this.template = templateName;
     }
 
-    public void writeTo(OutputStream out) throws IOException {
+    public void writeTo(OutputStream out, Charset charset) throws IOException {
         Writer writer = new BufferedWriter(new OutputStreamWriter(out, charset));
-        renderer.render(writer, name, context);
+        renderer.render(writer, template, context);
         writer.flush();
     }
 

@@ -144,7 +144,7 @@ public class MockResponse implements Response {
     }
 
     public void body(String text) throws IOException {
-        body(TextBody.text(text, charset()));
+        body(TextBody.text(text));
     }
 
     public void body(Body body) throws IOException {
@@ -156,7 +156,7 @@ public class MockResponse implements Response {
     }
 
     public long size() {
-        return body.size();
+        return body.size(charset());
     }
 
     public boolean empty() {
@@ -178,7 +178,7 @@ public class MockResponse implements Response {
     public byte[] content() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            body.writeTo(out);
+            body.writeTo(out, charset());
         } catch (IOException e) {
             throw new AssertionError(e);
         }

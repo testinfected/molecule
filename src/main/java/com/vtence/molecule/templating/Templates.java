@@ -35,7 +35,7 @@ public class Templates {
         return new Template() {
             public void render(Response response, Object context) throws IOException {
                 response.contentType(mediaType + "; charset=" + charset.name().toLowerCase());
-                response.body(new TemplateBody(renderer, name, context, response.charset()));
+                response.body(new TemplateBody(renderer, name, context));
             }
         };
     }

@@ -40,7 +40,7 @@ public class SiteMesh extends AbstractMiddleware {
 
         if (shouldDecorate(response)) {
             response.removeHeader(CONTENT_LENGTH);
-            response.body(new DecoratedBody(decorator, response.body(), response.charset()));
+            response.body(new DecoratedBody(decorator, response.body()));
         }
     }
 
@@ -51,23 +51,21 @@ public class SiteMesh extends AbstractMiddleware {
     private static class DecoratedBody extends ChunkedBody {
         private final Decorator decorator;
         private final Body body;
-        private final Charset charset;
 
-        public DecoratedBody(Decorator decorator, Body body, Charset charset) {
+        public DecoratedBody(Decorator decorator, Body body) {
             this.decorator = decorator;
-            this.charset = charset;
             this.body = body;
         }
 
-        public void writeTo(OutputStream out) throws IOException {
+        public void writeTo(OutputStream out, Charset charset) throws IOException {
             Writer writer = new BufferedWriter(new OutputStreamWriter(out, charset));
-            decorator.decorate(writer, toString(body));
+            decorator.decorate(writer, toString(body, charset));
             writer.flush();
         }
 
-        private String toString(Body body) throws IOException {
+        private String toString(Body body, Charset charset) throws IOException {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            body.writeTo(buffer);
+            body.writeTo(buffer, charset);
             return buffer.toString(charset.name());
         }
 

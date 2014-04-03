@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import static com.vtence.molecule.HttpHeaders.TRANSFER_ENCODING;
 
@@ -37,8 +38,8 @@ public class ContentLengthHeaderTest {
         contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body(new ChunkedBody() {
-                    public void writeTo(OutputStream out) throws IOException {
-                        out.write("A variable length body".getBytes());
+                    public void writeTo(OutputStream out, Charset charset) throws IOException {
+                        out.write("A variable length body".getBytes(charset));
                     }
 
                     public void close() throws IOException {}

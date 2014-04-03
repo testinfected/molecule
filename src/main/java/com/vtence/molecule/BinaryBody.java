@@ -2,6 +2,7 @@ package com.vtence.molecule;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public class BinaryBody implements Body {
 
@@ -21,11 +22,11 @@ public class BinaryBody implements Body {
         this.content = content;
     }
 
-    public long size() {
+    public long size(Charset charset) {
         return content.length;
     }
 
-    public void writeTo(OutputStream out) throws IOException {
+    public void writeTo(OutputStream out, Charset charset) throws IOException {
         out.write(content);
     }
 

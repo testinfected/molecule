@@ -4,7 +4,6 @@ import com.vtence.molecule.BinaryBody;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.TextBody;
 import com.vtence.molecule.util.Charsets;
 import org.simpleframework.http.ContentType;
 import org.simpleframework.http.Protocol;
@@ -12,6 +11,8 @@ import org.simpleframework.http.Response;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import static com.vtence.molecule.TextBody.text;
 
 public class SimpleResponse implements com.vtence.molecule.Response {
     private final Response response;
@@ -88,7 +89,7 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public void body(String text) throws IOException {
-        body(TextBody.text(text, charset()));
+        body(text(text));
     }
 
     public void body(Body body) throws IOException {
@@ -100,7 +101,7 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public long size() {
-        return body.size();
+        return body.size(charset());
     }
 
     public boolean empty() {

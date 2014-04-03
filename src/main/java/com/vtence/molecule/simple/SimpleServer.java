@@ -83,7 +83,7 @@ public class SimpleServer implements Server {
                 // todo After processing is done, sets headers, status and body to the simple
                 // response
                 Body body = response.body();
-                body.writeTo(resp.getOutputStream());
+                body.writeTo(resp.getOutputStream(), response.charset());
                 body.close();
             } catch (Exception failure) {
                 failureReporter.errorOccurred(failure);

@@ -5,7 +5,6 @@ import com.vtence.molecule.Response;
 
 import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
 import static com.vtence.molecule.HttpHeaders.TRANSFER_ENCODING;
-import static java.lang.String.valueOf;
 
 public class ContentLengthHeader extends AbstractMiddleware {
 
@@ -14,7 +13,7 @@ public class ContentLengthHeader extends AbstractMiddleware {
         if (!hasContentLengthHeader(response)
                 && isFixedLengthSize(response)
                 && !isChunked(response)) {
-            response.header(CONTENT_LENGTH, valueOf(response.size()));
+            response.contentLength(response.size());
         }
     }
 

@@ -7,15 +7,12 @@ import java.nio.charset.Charset;
 public class TextBody implements Body {
 
     private final StringBuilder content = new StringBuilder();
-    private final Charset charset;
 
-    public static TextBody text(String text, Charset charset) {
-        return new TextBody(charset).append(text);
+    public static TextBody text(String text) {
+        return new TextBody().append(text);
     }
 
-    public TextBody(Charset charset) {
-        this.charset = charset;
-    }
+    public TextBody() {}
 
     public TextBody append(CharSequence text) {
         this.content.append(text);
@@ -26,16 +23,16 @@ public class TextBody implements Body {
         return content.toString();
     }
 
-    public long size() {
-        return content().length;
+    public long size(Charset charset) {
+        return content(charset).length;
     }
 
-    private byte[] content() {
+    private byte[] content(Charset charset) {
         return text().getBytes(charset);
     }
 
-    public void writeTo(OutputStream out) throws IOException {
-        out.write(content());
+    public void writeTo(OutputStream out, Charset charset) throws IOException {
+        out.write(content(charset));
     }
 
     public void close() throws IOException {

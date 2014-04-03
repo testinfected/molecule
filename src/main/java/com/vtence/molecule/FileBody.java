@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public class FileBody implements Body {
     private static final int SIZE_8K = 8 * 1024;
@@ -23,11 +24,11 @@ public class FileBody implements Body {
         this.chunkSize = chunkSize;
     }
 
-    public long size() {
+    public long size(Charset charset) {
         return file.length();
     }
 
-    public void writeTo(OutputStream out) throws IOException {
+    public void writeTo(OutputStream out, Charset charset) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         try {
             copy(out, in);
