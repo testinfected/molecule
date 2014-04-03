@@ -27,6 +27,14 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         header(Protocol.LOCATION, location);
     }
 
+    public boolean hasHeader(String name) {
+        return header(name) != null;
+    }
+
+    public String header(String name) {
+        return response.getValue(name);
+    }
+
     public void header(String name, String value) {
         response.setValue(name, value);
     }
@@ -52,10 +60,6 @@ public class SimpleResponse implements com.vtence.molecule.Response {
 
     public String contentType() {
         return header(Protocol.CONTENT_TYPE);
-    }
-
-    public String header(String name) {
-        return response.getValue(name);
     }
 
     public long contentLength() {

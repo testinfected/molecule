@@ -1,7 +1,6 @@
 package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.ChunkedBody;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
@@ -22,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,18 +81,10 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    chunksResponseStreamWhenContentLengthUnknown() throws IOException {
+    chunksResponseWhenContentLengthUnknown() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                final byte[] content = "<html>...</html>".getBytes(response.charset());
-                // todo once deferred output is in place, simplify with a text response
-                response.body(new ChunkedBody() {
-                    public void writeTo(OutputStream out) throws IOException {
-                        out.write(content);
-                    }
-
-                    public void close() throws IOException {}
-                });
+                response.body("<html>...</html>");
             }
         });
 
@@ -108,34 +98,7 @@ public class SimpleServerTest {
     doesNoChunkResponsesWithContentLengthHeader() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                final byte[] content = "<html>...</html>".getBytes(response.charset());
-                response.contentLength(content.length);
-                // todo once deferred output is in place, simplify with a text response
-                response.body(new ChunkedBody() {
-                    public void writeTo(OutputStream out) throws IOException {
-                        out.write(content);
-                    }
-
-                    public void close() throws IOException {}
-                });
-            }
-        });
-
-        response = request.send();
-        assertNoError();
-        response.assertHasContent("<html>...</html>");
-        response.assertNotChunked();
-    }
-
-    // Since we're going to defer response output to the end
-    // of the request cycle, what we need is a middleware that sets the
-    // content length header for responses that have a known size if content encoding was
-    // not explicitly set to chunked.
-    // For the time being, we will buffer response output to mimic previous behavior
-    @Test public void
-    doesNotChunksTextBodies() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
+                response.contentLength(16);
                 response.body("<html>...</html>");
             }
         });
@@ -143,6 +106,7 @@ public class SimpleServerTest {
         response = request.send();
         assertNoError();
         response.assertHasContent("<html>...</html>");
+        response.assertHasHeader("Content-Length", "16");
         response.assertNotChunked();
     }
 

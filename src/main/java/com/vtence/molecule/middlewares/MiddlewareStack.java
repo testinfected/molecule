@@ -31,7 +31,7 @@ public class MiddlewareStack implements Application {
     }
 
     public Application assemble() {
-        if (runner == null) throw new IllegalStateException("No runner specified");
+        if (runner == null) throw new IllegalStateException("Nothing to run");
 
         chain = runner;
         for (Iterator<Middleware> middlewares = stack.descendingIterator(); middlewares.hasNext(); ) {

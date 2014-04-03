@@ -7,6 +7,8 @@ public interface Response {
 
     void redirectTo(String location);
 
+    boolean hasHeader(String name);
+
     String header(String name);
 
     void header(String name, String value);

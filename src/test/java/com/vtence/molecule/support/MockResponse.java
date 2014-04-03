@@ -51,6 +51,10 @@ public class MockResponse implements Response {
         assertThat("redirection", header("Location"), equalTo(expectedLocation));
     }
 
+    public boolean hasHeader(String name) {
+        return header(name) != null;
+    }
+
     public void header(String name, String value) {
         headers.put(name, value);
     }
