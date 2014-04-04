@@ -126,7 +126,7 @@ public class CompressorTest {
     skipsCompressionIfContentEncodingAlreadyPresent() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.header("Content-Encoding", "deflate");
+                response.set("Content-Encoding", "deflate");
                 response.body("compressed body");
             }
         });
@@ -141,7 +141,7 @@ public class CompressorTest {
     compressesAnywayWhenContentEncodingIsIdentity() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.header("Content-Encoding", "identity");
+                response.set("Content-Encoding", "identity");
                 response.body("uncompressed body");
             }
         });

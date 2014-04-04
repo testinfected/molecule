@@ -7,7 +7,6 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.TextBody;
 import com.vtence.molecule.simple.SimpleResponse;
 import com.vtence.molecule.util.Charsets;
-import com.vtence.molecule.util.HttpDate;
 import org.hamcrest.Matcher;
 
 import java.io.ByteArrayInputStream;
@@ -19,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static java.lang.Long.parseLong;
-import static java.lang.String.valueOf;
+import static com.vtence.molecule.HttpHeaders.LOCATION;
+import static com.vtence.molecule.support.CharsetDetector.detectedCharset;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -32,7 +31,6 @@ import static org.junit.Assert.assertThat;
 
 public class MockResponse extends SimpleResponse {
 
-    private final Map<String, String> headers = new HashMap<String, String>();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     private Body body = BinaryBody.empty();
@@ -63,40 +61,8 @@ public class MockResponse extends SimpleResponse {
         assertStatusText(expected.text);
     }
 
-    public void redirectTo(String location) {
-        header("Location", location);
-    }
-
     public void assertRedirectedTo(String expectedLocation) {
-        assertThat("redirection", header("Location"), equalTo(expectedLocation));
-    }
-
-    public boolean hasHeader(String name) {
-        return header(name) != null;
-    }
-
-    public void header(String name, String value) {
-        headers.put(name, value);
-    }
-
-    public void headerDate(String name, long date) {
-        header(name, HttpDate.format(date));
-    }
-
-    public String header(String name) {
-        return headers.get(name);
-    }
-
-    public void removeHeader(String name) {
-        headers.remove(name);
-    }
-
-    public void cookie(Cookie cookie) {
-        cookies.put(cookie.name(), cookie);
-    }
-
-    public void assertNoHeader(String name) {
-        assertHeader(name, nullValue());
+        assertThat("redirection", get(LOCATION), equalTo(expectedLocation));
     }
 
     public void assertHeader(String name, String value) {
@@ -104,15 +70,11 @@ public class MockResponse extends SimpleResponse {
     }
 
     public void assertHeader(String name, Matcher<? super String> valueMatcher) {
-        assertThat(name, header(name), valueMatcher);
+        assertThat(name, get(name), valueMatcher);
     }
 
-    public void contentType(String contentType) {
-        header("Content-Type", contentType);
-    }
-
-    public String contentType() {
-        return header("Content-Type");
+    public void assertNoHeader(String name) {
+        assertHeader(name, nullValue());
     }
 
     public void assertContentType(String contentType) {
@@ -123,19 +85,18 @@ public class MockResponse extends SimpleResponse {
         assertHeader("Content-Type", contentTypeMatcher);
     }
 
-    public long contentLength() {
-        // todo should return -1 if content length unknown
-        return header("Content-Length") != null ? parseLong(header("Content-Length")) : 0;
-    }
-
-    public void contentLength(long length) {
-        header("Content-Length", valueOf(length));
+    public void cookie(Cookie cookie) {
+        cookies.put(cookie.name(), cookie);
     }
 
     public Charset charset() {
         if (contentType() == null) return Charsets.ISO_8859_1;
         Charset charset = parseCharset(contentType());
         return charset != null ? charset : Charsets.ISO_8859_1;
+    }
+
+    public void assertContentEncodedAs(String encoding) throws IOException {
+        assertThat("content encoding", detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
     }
 
     public void body(String text) throws IOException {
@@ -196,10 +157,6 @@ public class MockResponse extends SimpleResponse {
         assertThat("content size", contentSize(), is(size));
     }
 
-    public void assertContentEncodedAs(String encoding) throws IOException {
-        assertThat("content encoding", CharsetDetector.detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
-    }
-
     public <T> T unwrap(Class<T> type) {
         throw new UnsupportedOperationException();
     }
@@ -227,6 +184,7 @@ public class MockResponse extends SimpleResponse {
         return text();
     }
 
+    // todo Extract a MediaType class
     private static final String TYPE = "[^/]+";
     private static final String SUBTYPE = "[^;]+";
     private static final String CHARSET = "charset=([^;]+)";

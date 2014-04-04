@@ -70,27 +70,30 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(Request req, Response resp) {
+        public void handle(Request req, Response res) {
             try {
                 // todo progressively morph our request and response from adapters of their
                 // simpleweb counterparts to state containers. Once this is done, we will
                 // make our request and response concrete classes.
-                SimpleResponse response = new SimpleResponse(resp);
+                SimpleResponse response = new SimpleResponse(res);
                 SimpleRequest request = new SimpleRequest(req, new SessionTracking(tracker, response));
 
                 app.handle(request, response);
 
                 // todo After processing is done, sets headers, status and body to the simple
                 // response
-                resp.setCode(response.statusCode());
-                resp.setDescription(response.statusText());
+                res.setCode(response.statusCode());
+                res.setDescription(response.statusText());
+                for (String name : response.names()) {
+                    res.setValue(name, response.get(name));
+                }
                 Body body = response.body();
-                body.writeTo(resp.getOutputStream(), response.charset());
+                body.writeTo(res.getOutputStream(), response.charset());
                 body.close();
             } catch (Exception failure) {
                 failureReporter.errorOccurred(failure);
             } finally {
-                close(resp);
+                close(res);
             }
         }
 

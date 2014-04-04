@@ -25,7 +25,7 @@ public class FilterMapTest {
     stubApplication() {
         filters.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.header("content", "content");
+                response.set("content", "content");
             }
         });
     }
@@ -86,7 +86,7 @@ public class FilterMapTest {
         return new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
                 forward(request, response);
-                response.header("content", format("%s(%s)", name, response.header("content")));
+                response.set("content", format("%s(%s)", name, response.get("content")));
             }
         };
     }

@@ -39,7 +39,7 @@ public class SiteMesh extends AbstractMiddleware {
         forward(request, response);
 
         if (shouldDecorate(response)) {
-            response.removeHeader(CONTENT_LENGTH);
+            response.remove(CONTENT_LENGTH);
             response.body(new DecoratedBody(decorator, response.body()));
         }
     }

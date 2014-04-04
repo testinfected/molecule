@@ -55,7 +55,7 @@ public class SiteMeshTest {
 
     @Test public void
     removesContentLengthHeaderIfDecorating() throws Exception {
-        response.header("Content-Length", String.valueOf(140));
+        response.setLong("Content-Length", 140);
         siteMesh.handle(request, response);
         response.assertHeader("Content-Length", nullValue());
     }

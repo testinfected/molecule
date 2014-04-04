@@ -29,7 +29,7 @@ public class MiddlewareStackTest {
         return new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
                 forward(request, response);
-                response.header("chain", order + " -> " + response.header("chain"));
+                response.set("chain", order + " -> " + response.get("chain"));
             }
         };
     }
@@ -37,7 +37,7 @@ public class MiddlewareStackTest {
     private Application application(final String app) {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.header("chain", app);
+                response.set("chain", app);
             }
         };
     }

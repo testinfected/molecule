@@ -26,16 +26,16 @@ public class Compressor extends AbstractMiddleware {
 
         gzip {
             public void encode(Response response) throws IOException {
-                response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, name());
+                response.remove(CONTENT_LENGTH);
+                response.set(CONTENT_ENCODING, name());
                 response.body(new GZipStream(response.body()));
             }
         },
 
         deflate {
             public void encode(Response response) throws IOException {
-                response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, name());
+                response.remove(CONTENT_LENGTH);
+                response.set(CONTENT_ENCODING, name());
                 response.body(new DeflateStream(response.body()));
             }
         },
@@ -117,12 +117,12 @@ public class Compressor extends AbstractMiddleware {
     }
 
     private String selectBestAvailableEncodingFor(Request request) {
-        AcceptEncoding acceptEncoding = AcceptEncoding.parse(request);
+        AcceptEncoding acceptEncoding = AcceptEncoding.of(request);
         return acceptEncoding.selectBestEncoding(Codings.all());
     }
 
     private boolean alreadyEncoded(Response response) {
-        String contentEncoding = response.header(CONTENT_ENCODING);
+        String contentEncoding = response.get(CONTENT_ENCODING);
         return contentEncoding != null && !isIdentity(contentEncoding);
     }
 

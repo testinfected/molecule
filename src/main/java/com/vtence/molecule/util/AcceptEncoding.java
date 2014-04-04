@@ -11,7 +11,7 @@ import java.util.List;
 public class AcceptEncoding {
     private final Header header;
 
-    public static AcceptEncoding parse(Request request) {
+    public static AcceptEncoding of(Request request) {
         return new AcceptEncoding(request.header(HttpHeaders.ACCEPT_ENCODING));
     }
 
