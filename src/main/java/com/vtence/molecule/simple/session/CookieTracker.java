@@ -36,7 +36,7 @@ public class CookieTracker implements SessionTracker {
         Session session = store.create(policy.generateId());
         Cookie cookie = new Cookie(cookieName, session.id());
         cookie.httpOnly(true);
-        response.cookie(cookie);
+        response.add(cookie);
         return session;
     }
 }

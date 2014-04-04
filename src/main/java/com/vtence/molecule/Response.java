@@ -34,7 +34,7 @@ public interface Response {
 
     void contentLength(long length);
 
-    void cookie(Cookie cookie);
+    void add(Cookie cookie);
 
     Charset charset();
 

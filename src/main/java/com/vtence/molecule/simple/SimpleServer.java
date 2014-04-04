@@ -2,6 +2,7 @@ package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
+import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Server;
 import com.vtence.molecule.simple.session.DisableSessions;
 import com.vtence.molecule.simple.session.SessionTracker;
@@ -79,22 +80,28 @@ public class SimpleServer implements Server {
                 SimpleRequest request = new SimpleRequest(req, new SessionTracking(tracker, response));
 
                 app.handle(request, response);
-
-                // todo After processing is done, sets headers, status and body to the simple
-                // response
-                res.setCode(response.statusCode());
-                res.setDescription(response.statusText());
-                for (String name : response.names()) {
-                    res.setValue(name, response.get(name));
-                }
-                Body body = response.body();
-                body.writeTo(res.getOutputStream(), response.charset());
-                body.close();
+                commitResponse(res, response);
             } catch (Exception failure) {
                 failureReporter.errorOccurred(failure);
             } finally {
                 close(res);
             }
+        }
+
+        private void commitResponse(Response simple, SimpleResponse response) throws IOException {
+            simple.setCode(response.statusCode());
+            simple.setDescription(response.statusText());
+            for (String name : response.names()) {
+                simple.setValue(name, response.get(name));
+            }
+            for (Cookie cookie : response.cookies()) {
+                org.simpleframework.http.Cookie cooky = simple.setCookie(cookie.name(),
+                        cookie.value());
+                cooky.setProtected(cookie.httpOnly());
+            }
+            Body body = response.body();
+            body.writeTo(simple.getOutputStream(), response.charset());
+            body.close();
         }
 
         private void close(Response response) {

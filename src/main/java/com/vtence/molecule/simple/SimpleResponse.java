@@ -13,7 +13,9 @@ import org.simpleframework.http.Response;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
@@ -23,6 +25,7 @@ import static java.lang.Long.parseLong;
 
 public class SimpleResponse implements com.vtence.molecule.Response {
     private final Headers headers = new Headers();
+    private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
 
     private int statusCode = HttpStatus.OK.code;
     private String statusText = HttpStatus.OK.text;
@@ -117,11 +120,16 @@ public class SimpleResponse implements com.vtence.molecule.Response {
         setLong(CONTENT_LENGTH, length);
     }
 
-    public void cookie(Cookie cookie) {
-        org.simpleframework.http.Cookie cooky =
-                new org.simpleframework.http.Cookie(cookie.name(), cookie.value(), true);
-        cooky.setProtected(cookie.httpOnly());
-        response.setCookie(cooky);
+    public void add(Cookie cookie) {
+        cookies.put(cookie.name(), cookie);
+    }
+
+    public Cookie cookie(String name) {
+        return cookies.get(name);
+    }
+
+    public Iterable<Cookie> cookies() {
+        return new ArrayList<Cookie>(cookies.values());
     }
 
     public Charset charset() {

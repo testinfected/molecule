@@ -237,7 +237,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 Cookie cookie = new Cookie("cookie", "value");
                 cookie.httpOnly(true);
-                response.cookie(cookie);
+                response.add(cookie);
             }
         });
 

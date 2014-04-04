@@ -11,8 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.vtence.molecule.HttpHeaders.LOCATION;
@@ -21,14 +19,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
 public class MockResponse extends SimpleResponse {
-
-    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     public MockResponse() {
         super(null);
@@ -76,7 +71,6 @@ public class MockResponse extends SimpleResponse {
     }
 
     public void assertCookie(String name, Matcher<? super Cookie> matches) {
-        assertThat("cookies ", cookies, hasKey(name));
         assertThat(name, cookie(name), matches);
     }
 
@@ -98,14 +92,6 @@ public class MockResponse extends SimpleResponse {
 
     public void assertContentEncodedAs(String encoding) throws IOException {
         assertThat("content encoding", detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
-    }
-
-    public Cookie cookie(String name) {
-        return cookies.get(name);
-    }
-
-    public void cookie(Cookie cookie) {
-        cookies.put(cookie.name(), cookie);
     }
 
     public Charset charset() {
