@@ -11,7 +11,6 @@ import org.junit.Test;
 import static com.vtence.molecule.HttpMethod.GET;
 import static com.vtence.molecule.HttpMethod.POST;
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -20,7 +19,7 @@ public class HttpMethodOverrideTest {
     HttpMethodOverride methodOverride = new HttpMethodOverride();
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Before public void
     echoHttpMethod()  {

@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static java.lang.String.format;
 
 public class FilterMapTest {
@@ -19,7 +18,7 @@ public class FilterMapTest {
     FilterMap filters = new FilterMap();
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Before public void
     stubApplication() {

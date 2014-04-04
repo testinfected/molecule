@@ -12,7 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -26,7 +25,7 @@ public class FailureMonitorTest {
     Exception error = new Exception("An internal error occurred!");
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Test public void
     notifiesFailureReporterAndRethrowsExceptionInCaseOfError() throws Exception {

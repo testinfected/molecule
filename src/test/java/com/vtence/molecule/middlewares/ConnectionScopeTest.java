@@ -17,7 +17,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
@@ -34,7 +33,7 @@ public class ConnectionScopeTest {
     States connectionStatus = context.states("connection").startsAs("closed");
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Before public void
     expectConnectionToBeReleased() throws Exception {

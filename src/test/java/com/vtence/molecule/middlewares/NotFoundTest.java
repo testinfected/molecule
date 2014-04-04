@@ -7,14 +7,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 
 public class NotFoundTest {
 
     NotFound notFound = new NotFound();
 
     MockRequest request = aRequest().withPath("/resource");
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     String content = "Not found: /resource";
 

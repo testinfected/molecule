@@ -1,5 +1,7 @@
 package com.vtence.molecule.routing;
 
+import com.vtence.molecule.support.MockRequest;
+import com.vtence.molecule.support.MockResponse;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.jmock.Expectations;
@@ -14,7 +16,6 @@ import com.vtence.molecule.Response;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static com.vtence.molecule.support.MockRequest.*;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.Matchers.is;
 
 public class DynamicRouteDefinitionTest {
@@ -22,6 +23,8 @@ public class DynamicRouteDefinitionTest {
     DynamicRouteDefinition definition = new DynamicRouteDefinition();
     Mockery context = new JUnit4Mockery();
     Application app = context.mock(Application.class);
+    MockRequest request = aRequest();
+    MockResponse response = new MockResponse();
 
     @Test(expected = IllegalStateException.class) public void
     isInvalidIfNoPathWasSpecified() throws Exception {
@@ -54,7 +57,7 @@ public class DynamicRouteDefinitionTest {
         context.checking(new Expectations() {{
             oneOf(app).handle(with(hasParameter("number", "100")), with(any(Response.class)));
         }});
-        route.handle(aRequest().withPath("/resource").withParameter("number", "100"), aResponse());
+        route.handle(request.withPath("/resource").withParameter("number", "100"), response);
     }
 
     @Test public void
@@ -63,7 +66,7 @@ public class DynamicRouteDefinitionTest {
         context.checking(new Expectations() {{
             oneOf(app).handle(with(hasParameter("id", "1")), with(any(Response.class)));
         }});
-        route.handle(aRequest().withPath("/resource/1").withParameter("id", "not 1"), aResponse());
+        route.handle(request.withPath("/resource/1").withParameter("id", "not 1"), response);
     }
 
     private Matcher<Request> hasParameter(final String name, String value) {

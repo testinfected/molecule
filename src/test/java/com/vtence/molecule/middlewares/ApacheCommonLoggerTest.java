@@ -5,6 +5,8 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
+import com.vtence.molecule.support.MockRequest;
+import com.vtence.molecule.support.MockResponse;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.concurrent.Synchroniser;
@@ -19,8 +21,6 @@ import java.util.logging.Logger;
 import static com.vtence.molecule.HttpMethod.DELETE;
 import static com.vtence.molecule.HttpMethod.GET;
 import static com.vtence.molecule.support.DateBuilder.calendarDate;
-import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class ApacheCommonLoggerTest {
@@ -33,9 +33,12 @@ public class ApacheCommonLoggerTest {
     ApacheCommonLogger apacheCommonLogger =
             new ApacheCommonLogger(logger, BrokenClock.stoppedAt(currentTime), TimeZone.getTimeZone("GMT+01:00"));
 
+    MockRequest request = new MockRequest();
+    MockResponse response = new MockResponse();
+
     @Test public void
     logsRequestsServedInApacheCommonLogFormat() throws Exception {
-        Request request = aRequest().withIp("192.168.0.1").withMethod(GET).withPath("/products?keyword=dogs");
+        request.withIp("192.168.0.1").withMethod(GET).withPath("/products?keyword=dogs");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("a response with a size of 28");
@@ -46,12 +49,12 @@ public class ApacheCommonLoggerTest {
             oneOf(logger).info("192.168.0.1 - - [27/Jun/2012:18:04:00 +0100] \"GET /products?keyword=dogs HTTP/1.1\" 200 28");
         }});
 
-        apacheCommonLogger.handle(request, aResponse());
+        apacheCommonLogger.handle(request, response);
     }
 
     @Test public void
     hyphenReplacesContentSizeForEmptyResponses() throws Exception {
-        Request request = aRequest().withIp("192.168.0.1").withMethod(DELETE).withPath("/logout");
+        request.withIp("192.168.0.1").withMethod(DELETE).withPath("/logout");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.contentLength(0);
@@ -64,6 +67,6 @@ public class ApacheCommonLoggerTest {
             oneOf(logger).info(with(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));
         }});
 
-        apacheCommonLogger.handle(request, aResponse());
+        apacheCommonLogger.handle(request, response);
     }
 }

@@ -11,7 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 
 public class StaticAssetsTest {
 
@@ -24,7 +23,7 @@ public class StaticAssetsTest {
     StaticAssets assets = new StaticAssets(fileServer, "/favicon.ico");
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Before public void
     setUpResponseChain() {

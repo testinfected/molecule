@@ -15,7 +15,6 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -24,7 +23,7 @@ public class CompressorTest {
     Compressor compressor = new Compressor();
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Test public void
     deflatesResponseWhenClientAcceptsDeflate() throws Exception {

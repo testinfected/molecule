@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 import static org.hamcrest.Matchers.containsString;
 
@@ -15,7 +14,7 @@ public class TemplatesTest {
     Templates templates = new Templates(renderer).ofType(MimeTypes.HTML);
 
     Template template = templates.named("hello");
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Test public void
     rendersUsingProvidedContext() throws IOException {

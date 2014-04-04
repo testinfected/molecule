@@ -1,10 +1,7 @@
 package com.vtence.molecule.support;
 
-import com.vtence.molecule.BinaryBody;
-import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.TextBody;
 import com.vtence.molecule.simple.SimpleResponse;
 import com.vtence.molecule.util.Charsets;
 import org.hamcrest.Matcher;
@@ -33,19 +30,8 @@ public class MockResponse extends SimpleResponse {
 
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
-    private Body body = BinaryBody.empty();
-
     public MockResponse() {
         super(null);
-    }
-
-    public static MockResponse aResponse() {
-        return new MockResponse();
-    }
-
-    public MockResponse withStatus(HttpStatus status) {
-        status(status);
-        return this;
     }
 
     public void assertStatusCode(int code) {
@@ -85,42 +71,13 @@ public class MockResponse extends SimpleResponse {
         assertHeader("Content-Type", contentTypeMatcher);
     }
 
-    public void cookie(Cookie cookie) {
-        cookies.put(cookie.name(), cookie);
+    public void assertHasCookie(String name) {
+        assertCookie(name, notNullValue());
     }
 
-    public Charset charset() {
-        if (contentType() == null) return Charsets.ISO_8859_1;
-        Charset charset = parseCharset(contentType());
-        return charset != null ? charset : Charsets.ISO_8859_1;
-    }
-
-    public void assertContentEncodedAs(String encoding) throws IOException {
-        assertThat("content encoding", detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
-    }
-
-    public void body(String text) throws IOException {
-        body(TextBody.text(text));
-    }
-
-    public void body(Body body) throws IOException {
-        this.body = body;
-    }
-
-    public Body body() {
-        return body;
-    }
-
-    public long size() {
-        return body.size(charset());
-    }
-
-    public boolean empty() {
-        return size() == 0;
-    }
-
-    public String text() {
-        return new String(content(), charset());
+    public void assertCookie(String name, Matcher<? super Cookie> matches) {
+        assertThat("cookies ", cookies, hasKey(name));
+        assertThat(name, cookie(name), matches);
     }
 
     public void assertBody(String body) {
@@ -131,30 +88,52 @@ public class MockResponse extends SimpleResponse {
         assertThat("body", text(), bodyMatcher);
     }
 
+    public void assertContent(byte[] content) {
+        assertArrayEquals("content", content, content());
+    }
+
+    public void assertContentSize(long size) {
+        assertThat("content size", contentSize(), is(size));
+    }
+
+    public void assertContentEncodedAs(String encoding) throws IOException {
+        assertThat("content encoding", detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
+    }
+
+    public Cookie cookie(String name) {
+        return cookies.get(name);
+    }
+
+    public void cookie(Cookie cookie) {
+        cookies.put(cookie.name(), cookie);
+    }
+
+    public Charset charset() {
+        if (contentType() == null) return Charsets.ISO_8859_1;
+        Charset charset = parseCharset(contentType());
+        return charset != null ? charset : Charsets.ISO_8859_1;
+    }
+
     public byte[] content() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            body.writeTo(out, charset());
+            body().writeTo(out, charset());
         } catch (IOException e) {
             throw new AssertionError(e);
         }
         return out.toByteArray();
     }
 
-    public void assertContent(byte[] content) {
-        assertArrayEquals("content", content, content());
-    }
-
     public InputStream stream() {
         return new ByteArrayInputStream(content());
     }
 
-    public long contentSize() {
-        return content().length;
+    public String text() {
+        return new String(content(), charset());
     }
 
-    public void assertContentSize(long size) {
-        assertThat("content size", contentSize(), is(size));
+    public long contentSize() {
+        return content().length;
     }
 
     public <T> T unwrap(Class<T> type) {
@@ -166,17 +145,9 @@ public class MockResponse extends SimpleResponse {
         return this;
     }
 
-    public Cookie cookie(String name) {
-        return cookies.get(name);
-    }
-
-    public void assertHasCookie(String name) {
-        assertCookie(name, notNullValue());
-    }
-
-    public void assertCookie(String name, Matcher<? super Cookie> matches) {
-        assertThat("cookies ", cookies, hasKey(name));
-        assertThat(name, cookie(name), matches);
+    public MockResponse withStatus(HttpStatus status) {
+        status(status);
+        return this;
     }
 
     public String toString() {

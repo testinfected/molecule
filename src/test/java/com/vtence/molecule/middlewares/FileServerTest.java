@@ -17,7 +17,6 @@ import static com.vtence.molecule.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.HttpStatus.OK;
 import static com.vtence.molecule.support.MockRequest.GET;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
 import static java.lang.String.valueOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,7 +30,7 @@ public class FileServerTest {
     File file = new File(base, SAMPLE_IMAGE);
 
     MockRequest request = GET(SAMPLE_IMAGE);
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Test public void
     servesFiles() throws Exception {

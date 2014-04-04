@@ -12,7 +12,6 @@ import java.util.Date;
 
 import static com.vtence.molecule.support.DateBuilder.calendarDate;
 import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -21,7 +20,7 @@ public class DateHeaderTest {
     DateHeader dateHeader = new DateHeader(BrokenClock.stoppedAt(now));
 
     MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockResponse response = new MockResponse();
 
     @Test public void
     setsDateHeaderFromClockTime() throws Exception {
