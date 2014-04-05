@@ -1,6 +1,5 @@
 package com.vtence.molecule.util;
 
-import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.Request;
 
 import java.util.ArrayList;
@@ -8,11 +7,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static com.vtence.molecule.HttpHeaders.ACCEPT_ENCODING;
+
 public class AcceptEncoding {
     private final Header header;
 
     public static AcceptEncoding of(Request request) {
-        return new AcceptEncoding(request.header(HttpHeaders.ACCEPT_ENCODING));
+        String header = request.header(ACCEPT_ENCODING);
+        return header != null ? new AcceptEncoding(header) : new AcceptEncoding("");
     }
 
     public AcceptEncoding(String header) {
@@ -28,7 +30,7 @@ public class AcceptEncoding {
     }
 
     public String selectBestEncoding(Collection<String> candidates) {
-        List<Header.Entry> contentCodings = explicitContentCodings(candidates);
+        List<Header.Value> contentCodings = explicitContentCodings(candidates);
         List<String> acceptableEncodings = listAcceptable(contentCodings);
         for (String acceptable : acceptableEncodings) {
             if (candidates.contains(acceptable)) return acceptable;
@@ -36,15 +38,15 @@ public class AcceptEncoding {
         return null;
     }
 
-    private List<Header.Entry> explicitContentCodings(Collection<String> availableEncodings) {
-        List<Header.Entry> codings = new ArrayList<Header.Entry>();
+    private List<Header.Value> explicitContentCodings(Collection<String> availableEncodings) {
+        List<Header.Value> codings = new ArrayList<Header.Value>();
 
-        for (Header.Entry accept: header.entries()) {
+        for (Header.Value accept: header.all()) {
             if (accept.is("*")) {
                 List<String> others = new ArrayList<String>(availableEncodings);
-                others.removeAll(listValues(header.entries()));
+                others.removeAll(listValues(header.all()));
                 for (String other : others) {
-                    codings.add(new Header.Entry(other, accept.quality()));
+                    codings.add(new Header.Value(other, accept.parameters()));
                 }
             } else {
                 codings.add(accept);
@@ -54,19 +56,19 @@ public class AcceptEncoding {
         return codings;
     }
 
-    private List<String> listAcceptable(List<Header.Entry> encodings) {
+    private List<String> listAcceptable(List<Header.Value> encodings) {
         List<String> candidates = listValues(encodings);
         if (!candidates.contains("identity")) candidates.add("identity");
 
-        for (Header.Entry encoding : encodings) {
+        for (Header.Value encoding : encodings) {
             if (!encoding.acceptable()) candidates.remove(encoding.value());
         }
         return candidates;
     }
 
-    private List<String> listValues(List<Header.Entry> entries) {
+    private List<String> listValues(List<Header.Value> entries) {
         List<String> values = new ArrayList<String>();
-        for (Header.Entry entry: entries) {
+        for (Header.Value entry: entries) {
             values.add(entry.value());
         }
         return values;

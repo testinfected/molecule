@@ -1,5 +1,6 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.support.MockRequest;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ import static org.hamcrest.Matchers.nullValue;
 public class AcceptEncodingTest {
 
     @Test public void
-    selectsNoEncodingWhenThereAreNonCandidates() {
+    selectsNoEncodingWhenThereAreNoCandidates() {
         assertSelected("gzip", in(), nullValue());
     }
 
@@ -48,6 +49,13 @@ public class AcceptEncodingTest {
     selectsFirstOfHighestQualityEncodingsWhenAnyIsAcceptable() {
         assertSelected("*", in("gzip", "deflate", "identity"), equalTo("gzip"));
         assertSelected("gzip; q=0.9, *", in("gzip", "deflate", "compress"), equalTo("deflate"));
+    }
+
+    @Test public void
+    handlesAbsenceOfAcceptEncodingHeader() {
+        AcceptEncoding accept = AcceptEncoding.of(new MockRequest());
+        assertThat("selected encoding", accept.selectBestEncoding("gzip", "identity"),
+                equalTo("identity"));
     }
 
     private void assertSelected(String header,
