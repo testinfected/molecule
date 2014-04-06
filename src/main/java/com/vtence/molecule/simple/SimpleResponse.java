@@ -6,9 +6,9 @@ import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpHeaders;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.util.Charsets;
+import com.vtence.molecule.util.ContentType;
 import com.vtence.molecule.util.Headers;
 import com.vtence.molecule.util.HttpDate;
-import org.simpleframework.http.ContentType;
 import org.simpleframework.http.Response;
 
 import java.io.IOException;
@@ -133,13 +133,11 @@ public class SimpleResponse implements com.vtence.molecule.Response {
     }
 
     public Charset charset() {
-        ContentType type = response.getContentType();
-
-        if (type == null || type.getCharset() == null) {
+        ContentType contentType = ContentType.of(this);
+        if (contentType == null || contentType.charsetName() == null) {
             return Charsets.ISO_8859_1;
         }
-
-        return Charset.forName(type.getCharset());
+        return contentType.charset();
     }
 
     public void body(String text) throws IOException {

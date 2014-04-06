@@ -3,15 +3,12 @@ package com.vtence.molecule.support;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.simple.SimpleResponse;
-import com.vtence.molecule.util.Charsets;
 import org.hamcrest.Matcher;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.regex.Pattern;
 
 import static com.vtence.molecule.HttpHeaders.LOCATION;
 import static com.vtence.molecule.support.CharsetDetector.detectedCharset;
@@ -94,12 +91,6 @@ public class MockResponse extends SimpleResponse {
         assertThat("content encoding", detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
     }
 
-    public Charset charset() {
-        if (contentType() == null) return Charsets.ISO_8859_1;
-        Charset charset = parseCharset(contentType());
-        return charset != null ? charset : Charsets.ISO_8859_1;
-    }
-
     public byte[] content() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -139,19 +130,5 @@ public class MockResponse extends SimpleResponse {
     public String toString() {
         // todo add headers and status as well
         return text();
-    }
-
-    // todo Extract a MediaType class
-    private static final String TYPE = "[^/]+";
-    private static final String SUBTYPE = "[^;]+";
-    private static final String CHARSET = "charset=([^;]+)";
-    private static final Pattern CONTENT_TYPE_FORMAT = Pattern.compile(String.format("%s/%s(?:;\\s*%s)+", TYPE, SUBTYPE, CHARSET));
-
-    private static final int ENCODING = 1;
-
-    private static Charset parseCharset(String contentType) {
-        java.util.regex.Matcher matcher = CONTENT_TYPE_FORMAT.matcher(contentType);
-        if (!matcher.matches()) return null;
-        return Charset.forName(matcher.group(ENCODING));
     }
 }
