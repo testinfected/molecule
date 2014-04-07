@@ -8,6 +8,9 @@ import static com.vtence.molecule.HttpHeaders.CONTENT_TYPE;
 
 public class ContentType {
 
+    private static final int TYPE = 0;
+    private static final int SUB_TYPE = 1;
+
     private final String type;
     private final String subType;
     private final String charset;
@@ -28,11 +31,11 @@ public class ContentType {
     }
 
     private static String type(String[] tokens) {
-        return tokens[0];
+        return tokens[TYPE];
     }
 
     private static String subType(String[] tokens) {
-        return tokens.length > 1 ? tokens[1] : null;
+        return tokens.length > 1 ? tokens[SUB_TYPE] : null;
     }
 
     private static String charset(Header.Value header) {

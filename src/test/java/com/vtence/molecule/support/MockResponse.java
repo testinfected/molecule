@@ -2,7 +2,7 @@ package com.vtence.molecule.support;
 
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.simple.SimpleResponse;
+import com.vtence.molecule.Response;
 import org.hamcrest.Matcher;
 
 import java.io.ByteArrayInputStream;
@@ -20,11 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
-public class MockResponse extends SimpleResponse {
-
-    public MockResponse() {
-        super(null);
-    }
+public class MockResponse extends Response {
 
     public void assertStatusCode(int code) {
         assertThat("status code", statusCode(), equalTo(code));
@@ -111,10 +107,6 @@ public class MockResponse extends SimpleResponse {
 
     public long contentSize() {
         return content().length;
-    }
-
-    public <T> T unwrap(Class<T> type) {
-        throw new UnsupportedOperationException();
     }
 
     public MockResponse withContentType(String contentType) {

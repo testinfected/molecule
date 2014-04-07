@@ -20,19 +20,19 @@ public final class MimeTypes {
 
     public static MimeTypes defaults() {
         MimeTypes mimeTypes = new MimeTypes();
-        mimeTypes.map("txt", TEXT);
-        mimeTypes.map("html", HTML);
-        mimeTypes.map("css", CSS);
-        mimeTypes.map("js", JAVASCRIPT);
-        mimeTypes.map("png", PNG);
-        mimeTypes.map("gif", GIF);
-        mimeTypes.map("jpg", JPEG);
-        mimeTypes.map("jpeg", JPEG);
-        mimeTypes.map("ico", ICON);
+        mimeTypes.register("txt", TEXT);
+        mimeTypes.register("html", HTML);
+        mimeTypes.register("css", CSS);
+        mimeTypes.register("js", JAVASCRIPT);
+        mimeTypes.register("png", PNG);
+        mimeTypes.register("gif", GIF);
+        mimeTypes.register("jpg", JPEG);
+        mimeTypes.register("jpeg", JPEG);
+        mimeTypes.register("ico", ICON);
         return mimeTypes;
     }
 
-    public void map(String extension, String mimeType) {
+    public void register(String extension, String mimeType) {
         knownTypes.put(extension, mimeType);
     }
 

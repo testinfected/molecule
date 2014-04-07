@@ -37,14 +37,14 @@ public class MimeTypesTest {
     @Test public void
     letsRedefineKnownTypes() {
         MimeTypes types = MimeTypes.defaults();
-        types.map("css", "text/new-css");
+        types.register("css", "text/new-css");
         assertThat("media type", types.guessFrom("style.css"), equalTo("text/new-css"));
     }
 
     @Test public void
     canLearnNewTypes() {
         MimeTypes types = MimeTypes.defaults();
-        types.map("bar", "application/bar");
+        types.register("bar", "application/bar");
         assertThat("media type", types.guessFrom("file.bar"), equalTo("application/bar"));
     }
 

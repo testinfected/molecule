@@ -3,13 +3,13 @@ package com.vtence.molecule.simple;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import com.vtence.molecule.simple.session.DisableSessions;
 import com.vtence.molecule.simple.session.SessionTracker;
 import com.vtence.molecule.simple.session.SessionTracking;
 import com.vtence.molecule.util.FailureReporter;
 import org.simpleframework.http.Request;
-import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
@@ -71,12 +71,12 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(Request req, Response res) {
+        public void handle(Request req, org.simpleframework.http.Response res) {
             try {
                 // todo progressively morph our request and response from adapters of their
                 // simpleweb counterparts to state containers. Once this is done, we will
                 // make our request and response concrete classes.
-                SimpleResponse response = new SimpleResponse(res);
+                Response response = new Response();
                 SimpleRequest request = new SimpleRequest(req, new SessionTracking(tracker, response));
 
                 app.handle(request, response);
@@ -88,7 +88,7 @@ public class SimpleServer implements Server {
             }
         }
 
-        private void commitResponse(Response simple, SimpleResponse response) throws IOException {
+        private void commitResponse(org.simpleframework.http.Response simple, Response response) throws IOException {
             simple.setCode(response.statusCode());
             simple.setDescription(response.statusText());
             for (String name : response.names()) {
@@ -104,7 +104,7 @@ public class SimpleServer implements Server {
             body.close();
         }
 
-        private void close(Response response) {
+        private void close(org.simpleframework.http.Response response) {
             try {
                 response.close();
             } catch (IOException e) {

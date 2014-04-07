@@ -38,7 +38,7 @@ public class FileServer implements Application {
     }
 
     public void registerMediaType(String extension, String mediaType) {
-        mediaTypes.map(extension, mediaType);
+        mediaTypes.register(extension, mediaType);
     }
 
     public FileServer addHeader(String header, String value) {
