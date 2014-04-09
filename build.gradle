@@ -1,0 +1,21 @@
+apply plugin: 'java'
+
+group = 'com.vtence.molecule'
+version = '0.3-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile 'org.simpleframework:simple:5.1.6'
+  compile 'com.samskivert:jmustache:1.9'
+
+  testCompile 'junit:junit:4.11'
+  testCompile 'org.jmock:jmock:2.6.0'
+  testCompile 'org.jmock:jmock-junit4:2.6.0'
+  testCompile 'org.jmock:jmock-legacy:2.6.0'
+  testCompile 'org.hamcrest:hamcrest-all:1.3'
+  testCompile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+  testCompile 'net.sourceforge.htmlunit:htmlunit:2.14'
+}

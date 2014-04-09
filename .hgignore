@@ -8,3 +8,5 @@ target
 reports
 .idea
 buildr.rb
+.gradle
+build
