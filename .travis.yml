@@ -4,12 +4,4 @@ jdk:
   - oraclejdk7
   - openjdk7
 
-rvm:
-  - 1.9.3
-
-install:
-  - rvm use 1.9.3
-  - gem install bundler
-  - bundle install
-
-script: buildr clean package
+script: gradle clean build
