@@ -1,10 +1,11 @@
 [![Stories Ready](https://badge.waffle.io/testinfected/molecule.png?label=ready&title=Ready)](https://waffle.io/testinfected/molecule)
 [![Stories In Progress](https://badge.waffle.io/testinfected/molecule.png?label=In%20Progress&title=Started)](https://waffle.io/testinfected/molecule)
 [![Build Status](https://travis-ci.org/testinfected/molecule.png?branch=master)](https://travis-ci.org/testinfected/molecule)
+[![Coverage Status](https://coveralls.io/repos/testinfected/molecule/badge.png)](https://coveralls.io/r/testinfected/molecule)
 
 ## Getting started
 
-Build yourself using [Buildr](http://buildr.apache.org), or simply download from Maven Central:
+Build yourself using [Gradle](http://www.gradle.org) or [Buildr](http://buildr.apache.org), or simply download from Maven Central:
 
 ```xml
 <dependency>
