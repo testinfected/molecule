@@ -9,4 +9,5 @@ env:
    - secure: bB3Tkk8PmzhuJcmBcljWWIAI9a30ro1lcuok4K/XMywUH0FYwfIja4gdRbMRLxTyWEiYdT6WMaF7PmANSwrd9WNeFmeT+q/4uk5KZms9qBNeet87pYCyJQCC6hffVtGM/qWFefUm3MfKcZvwcP4+hlIayD5Iyxhl7TpSIDyUYCU=
 
 after_success:
+- gradle coverage coveralls
 - .scripts/publish-to-sonatype.sh
