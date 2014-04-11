@@ -50,3 +50,7 @@ dependencies {
   testCompile libs.juniversal_chardet
   testCompile libs.htmlunit
 }
+
+task 'version' << {
+  println version
+}
