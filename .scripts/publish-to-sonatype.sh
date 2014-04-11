@@ -15,6 +15,7 @@ if [ "$TRAVIS_REPO_SLUG" == "testinfected/molecule" ] && [ "$TRAVIS_PULL_REQUEST
 
   if [ $RETVAL -eq 0 ]; then
     echo 'Published!'
+    return 0
   else
     echo 'Publish failed.'
     return 1
