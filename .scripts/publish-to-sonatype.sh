@@ -2,11 +2,11 @@
 
 if [ "$TRAVIS_REPO_SLUG" == "testinfected/molecule" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
   if [[ $(gradle -q version) != *SNAPSHOT* ]]; then
-    echo 'Travis will only publish snapshots. instance.'
+    echo 'Travis will only publish snapshots.'
     exit 0
   fi
 
-  echo -e "Publishing to Sonatype OSS Maven Repository...\n"
+  echo -e "Publishing to Sonatype OSS Maven Repository..."
 
   gradle uploadArchives -PnexusUsername="${SONATYPE_USERNAME}" -PnexusPassword="${SONATYPE_PASSWORD}"
 
@@ -16,7 +16,7 @@ if [ "$TRAVIS_REPO_SLUG" == "testinfected/molecule" ] && [ "$TRAVIS_PULL_REQUEST
       echo -e '\nPublished!'
       exit 0
   else
-      echo -e '\nPublish failed.'
+      echo -e '\nPublication failed.'
       exit 1
   fi
 fi
