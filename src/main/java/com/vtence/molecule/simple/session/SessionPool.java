@@ -36,8 +36,12 @@ public class SessionPool implements SessionStore, SessionHouse {
         this.listener = listener;
     }
 
-    public Session load(String key) {
-        return locateSession(key);
+    public Session load(String id) {
+        return locateSession(id);
+    }
+
+    public String save(Session session) {
+        return null;
     }
 
     public Session create(String key) {

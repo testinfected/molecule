@@ -139,8 +139,9 @@ public class MockRequest implements Request {
         return null;
     }
 
-    public void withCookie(String name, String value) {
+    public MockRequest withCookie(String name, String value) {
         cookies.put(name, new Cookie(name, value));
+        return this;
     }
 
     public List<Cookie> cookies() {
@@ -151,6 +152,12 @@ public class MockRequest implements Request {
         return cookies.get(name);
     }
 
+    @Override
+    public String cookieValue(String name) {
+        Cookie cookie = cookie(name);
+        return cookie != null ? cookie.value() : null;
+    }
+
     public <T> T unwrap(Class<T> type) {
         throw new UnsupportedOperationException();
     }
@@ -159,8 +166,9 @@ public class MockRequest implements Request {
         return ip;
     }
 
-    public Object attribute(Object key) {
-        return attributes.get(key);
+    @SuppressWarnings("unchecked")
+    public <T> T attribute(Object key) {
+        return (T) attributes.get(key);
     }
 
     public void attribute(Object key, Object value) {

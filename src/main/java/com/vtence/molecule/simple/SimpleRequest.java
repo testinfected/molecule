@@ -87,8 +87,14 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return new Cookie(cooky.getName(), cooky.getValue());
     }
 
-    public Object attribute(Object key) {
-        return request.getAttribute(key);
+    public String cookieValue(String name) {
+        Cookie cookie = cookie(name);
+        return cookie != null ? cookie.value() : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T attribute(Object key) {
+        return (T) request.getAttribute(key);
     }
 
     @SuppressWarnings("unchecked")

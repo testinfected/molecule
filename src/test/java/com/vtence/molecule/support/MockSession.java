@@ -26,6 +26,11 @@ public class MockSession implements Session {
         return id;
     }
 
+    @Override
+    public boolean isNew() {
+        return false;
+    }
+
     public boolean contains(Object key) {
         return attributes.containsKey(key);
     }
@@ -69,6 +74,10 @@ public class MockSession implements Session {
 
     public boolean invalid() {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    public boolean isEmpty() {
+        return attributes.isEmpty();
     }
 
     public Date createdAt() {

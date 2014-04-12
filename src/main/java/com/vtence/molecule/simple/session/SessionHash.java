@@ -21,6 +21,11 @@ public class SessionHash implements Session {
     private Date lastAccessedAt;
     private boolean invalid;
 
+    public SessionHash(String id) {
+        this.id = id;
+        this.createdAt = null;
+    }
+
     public SessionHash(String id, Date createdAt) {
         this(id, createdAt, createdAt);
     }
@@ -33,6 +38,10 @@ public class SessionHash implements Session {
 
     public String id() {
         return id;
+    }
+
+    public boolean isNew() {
+        return id == null;
     }
 
     public boolean contains(Object key) {
@@ -79,6 +88,10 @@ public class SessionHash implements Session {
 
     public boolean invalid() {
         return invalid;
+    }
+
+    public boolean isEmpty() {
+        return attributes.isEmpty();
     }
 
     public Date createdAt() {

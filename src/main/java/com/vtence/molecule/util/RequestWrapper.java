@@ -72,11 +72,15 @@ public class RequestWrapper implements Request {
         return request.cookie(name);
     }
 
+    public String cookieValue(String name) {
+        return request.cookieValue(name);
+    }
+
     public List<Cookie> cookies() {
         return request.cookies();
     }
 
-    public Object attribute(Object key) {
+    public <T> T attribute(Object key) {
         return request.attribute(key);
     }
 

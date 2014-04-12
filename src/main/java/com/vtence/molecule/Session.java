@@ -10,11 +10,17 @@ public interface Session {
 
     String id();
 
+    boolean isNew();
+
+    Date createdAt();
+
+    Date lastAccessedAt();
+
     boolean contains(Object key);
 
-    void put(Object key, Object value);
-
     <T> T get(Object key);
+
+    void put(Object key, Object value);
 
     Set<?> keys();
 
@@ -24,15 +30,15 @@ public interface Session {
 
     void timeout(long inSeconds);
 
+    // todo expiredAt(Date time)
     boolean expired(Clock clock);
 
+    // todo lastAccessedAt(Date time)
     void touch(Clock clock);
 
     void invalidate();
 
     boolean invalid();
 
-    Date createdAt();
-
-    Date lastAccessedAt();
+    boolean isEmpty();
 }

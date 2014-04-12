@@ -23,7 +23,13 @@ public class Cookie {
         return httpOnly;
     }
 
-    public void httpOnly(boolean httpOnly) {
+    public Cookie httpOnly(boolean httpOnly) {
         this.httpOnly = httpOnly;
+        return this;
+    }
+
+    public String toString() {
+        return name + "=" + value +
+                (httpOnly ? "; HttpOnly" : "");
     }
 }

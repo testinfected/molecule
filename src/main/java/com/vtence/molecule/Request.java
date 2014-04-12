@@ -34,9 +34,11 @@ public interface Request {
 
     Cookie cookie(String name);
 
+    String cookieValue(String name);
+
     List<Cookie> cookies();
 
-    Object attribute(Object key);
+    <T> T attribute(Object key);
 
     Map<Object, Object> attributes();
 

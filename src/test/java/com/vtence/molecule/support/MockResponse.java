@@ -63,6 +63,10 @@ public class MockResponse extends Response {
         assertCookie(name, notNullValue());
     }
 
+    public void assertHasNoCookie(String name) {
+        assertCookie(name, nullValue());
+    }
+
     public void assertCookie(String name, Matcher<? super Cookie> matches) {
         assertThat(name, cookie(name), matches);
     }
