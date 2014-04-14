@@ -10,4 +10,6 @@ public interface SessionStore {
     Session load(String id);
 
     String save(Session session); // return data
+
+    void destroy(String id);
 }

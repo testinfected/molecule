@@ -48,14 +48,36 @@ public class CookieSessionTracker extends AbstractMiddleware {
 
     private void commitSession(Request request, Response response) {
         Session session = request.attribute(Session.class);
-        if (!shouldCommit(session)) return;
-        String data = store.save(session);
-        if (!data.equals(sessionId(request))) {
-            response.add(new Cookie(sessionCookieName, data).httpOnly(true));
+        if (!shouldCommit(session)) {
+            return;
+        }
+        if (session.invalid()) {
+            destroy(session);
+            return;
+        }
+        String data = save(session);
+        if (newSession(request, data)) {
+            setSessionCookie(response, data);
         }
     }
 
     private boolean shouldCommit(Session session) {
         return !session.isNew() || !session.isEmpty();
+    }
+
+    private void destroy(Session session) {
+        store.destroy(session.id());
+    }
+
+    private String save(Session session) {
+        return store.save(session);
+    }
+
+    private boolean newSession(Request request, String data) {
+        return !data.equals(sessionId(request));
+    }
+
+    private void setSessionCookie(Response response, String data) {
+        response.add(new Cookie(sessionCookieName, data).httpOnly(true));
     }
 }

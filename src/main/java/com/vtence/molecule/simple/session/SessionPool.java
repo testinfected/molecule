@@ -44,6 +44,9 @@ public class SessionPool implements SessionStore, SessionHouse {
         return null;
     }
 
+    public void destroy(String id) {
+    }
+
     public Session create(String key) {
         return createSession(key);
     }

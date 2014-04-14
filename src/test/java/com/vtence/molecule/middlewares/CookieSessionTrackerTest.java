@@ -69,7 +69,8 @@ public class CookieSessionTrackerTest {
         Session clientSession = store.load("existing-session");
         clientSession.put("counter", 1);
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithId("existing-session"))); will(returnValue("existing-session"));
+            oneOf(store).save(with(sessionWithId("existing-session")));
+            will(returnValue("existing-session"));
         }});
 
         tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
@@ -104,6 +105,22 @@ public class CookieSessionTrackerTest {
         tracker.connectTo(nothing());
         context.checking(new Expectations() {{
             allowing(store).save(with(sessionWithId("existing-session"))); will(returnValue("existing-session"));
+        }});
+
+        tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
+        response.assertHasNoCookie("JSESSIONID");
+    }
+
+    @Test public void
+    destroysInvalidSessions() throws Exception {
+        tracker.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                Session session = request.attribute(Session.class);
+                session.invalidate();
+            }
+        });
+        context.checking(new Expectations() {{
+            oneOf(store).destroy(with("existing-session"));
         }});
 
         tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
