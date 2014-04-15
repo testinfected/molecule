@@ -20,6 +20,7 @@ public class SessionHash implements Session {
     private long timeoutInMillis;
     private Date lastAccessedAt;
     private boolean invalid;
+    private int maxAge;
 
     public SessionHash(String id) {
         this.id = id;
@@ -79,6 +80,14 @@ public class SessionHash implements Session {
 
     public void touch(Clock clock) {
         lastAccessedAt = clock.now();
+    }
+
+    public int maxAge() {
+        return maxAge;
+    }
+
+    public void maxAge(int seconds) {
+        maxAge = seconds;
     }
 
     public void invalidate() {

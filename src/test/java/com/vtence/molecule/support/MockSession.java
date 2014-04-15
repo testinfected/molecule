@@ -13,6 +13,7 @@ public class MockSession implements Session {
 
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
     private final String id;
+    private int maxAge;
 
     public MockSession() {
         this("mock session");
@@ -66,6 +67,13 @@ public class MockSession implements Session {
 
     public void touch(Clock clock) {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    public int maxAge() {
+        return 0;
+    }
+
+    public void maxAge(int seconds) {
     }
 
     public void invalidate() {

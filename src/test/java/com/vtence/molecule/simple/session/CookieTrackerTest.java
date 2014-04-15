@@ -9,8 +9,8 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.CookieMatchers.cookieWithValue;
-import static com.vtence.molecule.support.CookieMatchers.httpOnlyCookie;
+import static com.vtence.molecule.support.Cookies.cookieWithValue;
+import static com.vtence.molecule.support.Cookies.httpOnlyCookie;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;

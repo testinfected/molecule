@@ -26,6 +26,10 @@ public interface Session {
 
     Collection<?> values();
 
+    int maxAge();
+
+    void maxAge(int seconds);
+
     long timeout();
 
     void timeout(long inSeconds);

@@ -95,9 +95,9 @@ public class SimpleServer implements Server {
                 simple.setValue(name, response.get(name));
             }
             for (Cookie cookie : response.cookies()) {
-                org.simpleframework.http.Cookie cooky = simple.setCookie(cookie.name(),
-                        cookie.value());
+                org.simpleframework.http.Cookie cooky = simple.setCookie(cookie.name(), cookie.value());
                 cooky.setProtected(cookie.httpOnly());
+                cooky.setExpiry(cookie.maxAge());
             }
             Body body = response.body();
             body.writeTo(simple.getOutputStream(), response.charset());

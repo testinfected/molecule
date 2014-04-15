@@ -7,9 +7,9 @@ import org.hamcrest.Matcher;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-public class CookieMatchers {
+public class Cookies {
 
-    private CookieMatchers() {}
+    private Cookies() {}
 
     public static Matcher<? super Cookie> cookieWithValue(String value) {
         return cookieWithValue(equalTo(value));
@@ -31,6 +31,18 @@ public class CookieMatchers {
         return new FeatureMatcher<Cookie, Boolean>(matching, "http only cookie", "http only") {
             protected Boolean featureValueOf(Cookie actual) {
                 return actual.httpOnly();
+            }
+        };
+    }
+
+    public static Matcher<? super Cookie> cookieWithMaxAge(int maxAge) {
+        return cookieWithMaxAge(equalTo(maxAge));
+    }
+
+    public static Matcher<? super Cookie> cookieWithMaxAge(final Matcher<? super Integer> matching) {
+        return new FeatureMatcher<Cookie, Integer>(matching, "cookie with max age", "max age") {
+            protected Integer featureValueOf(Cookie actual) {
+                return actual.maxAge();
             }
         };
     }

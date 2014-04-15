@@ -5,6 +5,7 @@ public class Cookie {
 
     private String value;
     private boolean httpOnly;
+    private int maxAge = -1;
 
     public Cookie(String name, String value) {
         this.name = name;
@@ -28,8 +29,18 @@ public class Cookie {
         return this;
     }
 
+    public Cookie maxAge(int maxAge) {
+        this.maxAge = maxAge;
+        return this;
+    }
+
+    public int maxAge() {
+        return maxAge;
+    }
+
     public String toString() {
         return name + "=" + value +
+                (maxAge >= 0 ? "Max-Age=" + maxAge : "") +
                 (httpOnly ? "; HttpOnly" : "");
     }
 }

@@ -34,7 +34,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -237,13 +237,16 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 Cookie cookie = new Cookie("cookie", "value");
                 cookie.httpOnly(true);
+                cookie.maxAge(1800);
                 response.add(cookie);
             }
         });
 
         response = request.send();
         assertNoError();
-        response.assertHasCookie(equalToIgnoringCase("cookie=value; Version=1; Path=/; HttpOnly"));
+        response.assertHasCookie(containsString("cookie=value"));
+        response.assertHasCookie(containsString("max-age=1800"));
+        response.assertHasCookie(containsString("httponly"));
     }
 
     @Test public void

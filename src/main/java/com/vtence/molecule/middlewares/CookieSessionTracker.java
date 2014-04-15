@@ -12,15 +12,22 @@ public class CookieSessionTracker extends AbstractMiddleware {
     private static final String STANDARD_SERVLET_SESSION_COOKIE = "JSESSIONID";
 
     private final SessionStore store;
-    private String sessionCookieName;
+
+    private String name = STANDARD_SERVLET_SESSION_COOKIE;
+    private int expireAfter = -1;
 
     public CookieSessionTracker(SessionStore store) {
-        this(store, STANDARD_SERVLET_SESSION_COOKIE);
+        this.store = store;
     }
 
-    public CookieSessionTracker(SessionStore store, String cookieName) {
-        this.store = store;
-        this.sessionCookieName = cookieName;
+    public CookieSessionTracker cookie(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public CookieSessionTracker expireAfter(int seconds) {
+        this.expireAfter = seconds;
+        return this;
     }
 
     public void handle(Request request, Response response) throws Exception {
@@ -32,6 +39,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     private void prepareSession(Request request) {
         Session session = acquireSession(request);
         request.attribute(Session.class, session);
+        session.maxAge(expireAfter);
     }
 
     private Session acquireSession(Request request) {
@@ -43,7 +51,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private String sessionId(Request request) {
-        return request.cookieValue(sessionCookieName);
+        return request.cookieValue(name);
     }
 
     private void commitSession(Request request, Response response) {
@@ -55,14 +63,25 @@ public class CookieSessionTracker extends AbstractMiddleware {
             destroy(session);
             return;
         }
-        String data = save(session);
-        if (newSession(request, data)) {
-            setSessionCookie(response, data);
+        String sid = save(session);
+        if (newSession(request, sid) || expires(session)) {
+            Cookie cookie = new Cookie(name, sid);
+            cookie.httpOnly(true);
+            cookie.maxAge(session.maxAge());
+            response.add(cookie);
         }
     }
 
     private boolean shouldCommit(Session session) {
         return !session.isNew() || !session.isEmpty();
+    }
+
+    private boolean newSession(Request request, String sid) {
+        return !sid.equals(sessionId(request));
+    }
+
+    private boolean expires(Session session) {
+        return session.maxAge() >= 0;
     }
 
     private void destroy(Session session) {
@@ -71,13 +90,5 @@ public class CookieSessionTracker extends AbstractMiddleware {
 
     private String save(Session session) {
         return store.save(session);
-    }
-
-    private boolean newSession(Request request, String data) {
-        return !data.equals(sessionId(request));
-    }
-
-    private void setSessionCookie(Response response, String data) {
-        response.add(new Cookie(sessionCookieName, data).httpOnly(true));
     }
 }

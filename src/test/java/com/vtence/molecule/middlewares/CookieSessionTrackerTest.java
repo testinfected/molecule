@@ -1,9 +1,6 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
-import com.vtence.molecule.Session;
+import com.vtence.molecule.*;
 import com.vtence.molecule.simple.session.SessionHash;
 import com.vtence.molecule.simple.session.SessionStore;
 import com.vtence.molecule.support.MockRequest;
@@ -15,8 +12,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.CookieMatchers.cookieWithValue;
-import static com.vtence.molecule.support.CookieMatchers.httpOnlyCookie;
+import java.util.concurrent.TimeUnit;
+
+import static com.vtence.molecule.support.Cookies.cookieWithMaxAge;
+import static com.vtence.molecule.support.Cookies.cookieWithValue;
+import static com.vtence.molecule.support.Cookies.httpOnlyCookie;
 import static org.hamcrest.Matchers.equalTo;
 
 public class CookieSessionTrackerTest {
@@ -24,6 +24,7 @@ public class CookieSessionTrackerTest {
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 
     SessionStore store = context.mock(SessionStore.class);
+    int timeout = (int) TimeUnit.MINUTES.toSeconds(30);
     CookieSessionTracker tracker = new CookieSessionTracker(store);
 
     MockRequest request = new MockRequest();
@@ -32,8 +33,8 @@ public class CookieSessionTrackerTest {
     @Before public void
     stubSessionStore() {
         context.checking(new Expectations() {{
-            allowing(store).load("existing-session"); will(returnValue(new SessionHash("existing-session")));
-            allowing(store).load("expired-session"); will(returnValue(null));
+            allowing(store).load("existing"); will(returnValue(new SessionHash("existing")));
+            allowing(store).load("expired"); will(returnValue(null));
         }});
     }
 
@@ -50,15 +51,15 @@ public class CookieSessionTrackerTest {
     }
 
     @Test public void
-    createsANewCookieAndStoresNewSessionIfNewlyCreatedSessionContainsData() throws Exception {
+    createsANewCookieAndStoresNewSessionIfItContainsData() throws Exception {
         tracker.connectTo(incrementCounter());
         context.checking(new Expectations() {{
-            oneOf(store).save(with(newSession())); will(returnValue("new-session"));
+            oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
         tracker.handle(request, response);
         response.assertBody("Counter: 1");
-        response.assertCookie("JSESSIONID", cookieWithValue("new-session"));
+        response.assertCookie("JSESSIONID", cookieWithValue("new"));
         response.assertCookie("JSESSIONID", httpOnlyCookie(true));
     }
 
@@ -66,14 +67,13 @@ public class CookieSessionTrackerTest {
     tracksExistingSessionsUsingACookieAndSavesSessionIfModified() throws Exception {
         tracker.connectTo(incrementCounter());
 
-        Session clientSession = store.load("existing-session");
+        Session clientSession = store.load("existing");
         clientSession.put("counter", 1);
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithId("existing-session")));
-            will(returnValue("existing-session"));
+            oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
+        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
         response.assertBody("Counter: 2");
     }
 
@@ -81,10 +81,10 @@ public class CookieSessionTrackerTest {
     savesExistingSessionEvenIfNotWritten() throws Exception {
         tracker.connectTo(nothing());
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithId("existing-session"))); will(returnValue("existing-session"));
+            oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
+        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
     }
 
     @Test public void
@@ -92,22 +92,22 @@ public class CookieSessionTrackerTest {
         tracker.connectTo(incrementCounter());
 
         context.checking(new Expectations() {{
-            oneOf(store).save(with(newSession())); will(returnValue("new-session"));
+            oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "expired-session"), response);
+        tracker.handle(request.withCookie("JSESSIONID", "expired"), response);
         response.assertBody("Counter: 1");
-        response.assertCookie("JSESSIONID", cookieWithValue("new-session"));
+        response.assertCookie("JSESSIONID", cookieWithValue("new"));
     }
 
     @Test public void
     doesNotSendTheSameSessionIdIfItDidNotChange() throws Exception {
         tracker.connectTo(nothing());
         context.checking(new Expectations() {{
-            allowing(store).save(with(sessionWithId("existing-session"))); will(returnValue("existing-session"));
+            allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
+        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
         response.assertHasNoCookie("JSESSIONID");
     }
 
@@ -120,11 +120,51 @@ public class CookieSessionTrackerTest {
             }
         });
         context.checking(new Expectations() {{
-            oneOf(store).destroy(with("existing-session"));
+            oneOf(store).destroy(with("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing-session"), response);
+        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
         response.assertHasNoCookie("JSESSIONID");
+    }
+
+    @Test public void
+    usesPersistentSessionsByDefault() throws Exception {
+        tracker.connectTo(incrementCounter());
+        context.checking(new Expectations() {{
+            oneOf(store).save(with(sessionWithMaxAge(-1))); will(returnValue("persistent"));
+        }});
+        tracker.handle(request, response);
+        response.assertCookie("JSESSIONID", cookieWithMaxAge(-1));
+    }
+
+    @Test public void
+    setsSessionsToExpireAfterMaxAge() throws Exception {
+        tracker.connectTo(expireSessionAfter(timeout));
+        context.checking(new Expectations() {{
+            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
+        }});
+        tracker.handle(request, response);
+        response.assertCookie("JSESSIONID", cookieWithMaxAge(timeout));
+    }
+
+    @Test public void
+    setsNewSessionsToExpiresIfMaxAgeSpecified() throws Exception {
+        tracker.expireAfter(timeout);
+        tracker.connectTo(incrementCounter());
+        context.checking(new Expectations() {{
+            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
+        }});
+        tracker.handle(request, response);
+    }
+
+    @Test public void
+    setsCookieEvenOnExistingSessionsIfMaxAgeSpecified() throws Exception {
+        tracker.connectTo(expireSessionAfter(timeout));
+        context.checking(new Expectations() {{
+            allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
+        }});
+        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
+        response.assertCookie("JSESSIONID", cookieWithMaxAge(timeout));
     }
 
     private FeatureMatcher<Session, String> newSession() {
@@ -132,44 +172,55 @@ public class CookieSessionTrackerTest {
     }
 
     private FeatureMatcher<Session, String> sessionWithId(String sessionId) {
-        return new FeatureMatcher<Session, String>(equalTo(sessionId), "session with id",
-                "session id") {
+        return new FeatureMatcher<Session, String>(equalTo(sessionId), "session with id", "session id") {
             protected String featureValueOf(Session actual) {
                 return actual.id();
             }
         };
     }
 
-    private Incrementor incrementCounter() {
-        return new Incrementor();
+    private FeatureMatcher<Session, Integer> sessionWithMaxAge(final int maxAge) {
+        return new FeatureMatcher<Session, Integer>(equalTo(maxAge), "session with max age", "max age") {
+            protected Integer featureValueOf(Session actual) {
+                return actual.maxAge();
+            }
+        };
     }
 
-    private Nothing nothing() {
-        return new Nothing();
+    private Application echoSessionId() {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                Session session = request.attribute(Session.class);
+                response.body("Session: " + session.id());
+            }
+        };
     }
 
-    private Echo echoSessionId() {
-        return new Echo();
+    private Application incrementCounter() {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                Session session = request.attribute(Session.class);
+                Integer counter = session.contains("counter") ? session.<Integer>get("counter") : 0;
+                session.put("counter", counter++);
+                response.body("Counter: " + counter);
+            }
+        };
     }
 
-    private static class Incrementor implements Application {
-        public void handle(Request request, Response response) throws Exception {
-            Session session = request.attribute(Session.class);
-            Integer counter = session.contains("counter") ? session.<Integer>get("counter") : 0;
-            session.put("counter", counter++);
-            response.body("Counter: " + counter);
-        }
+    private Application nothing() {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+            }
+        };
     }
 
-    private static class Echo implements Application {
-        public void handle(Request request, Response response) throws Exception {
-            Session session = request.attribute(Session.class);
-            response.body("Session: " + session.id());
-        }
-    }
-
-    private static class Nothing implements Application {
-        public void handle(Request request, Response response) throws Exception {
-        }
+    private Application expireSessionAfter(final int timeout) {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                Session session = request.attribute(Session.class);
+                session.put("written", true);
+                session.maxAge(timeout);
+            }
+        };
     }
 }
