@@ -29,7 +29,7 @@ public class CookieTracker implements SessionTracker {
 
     public Session acquireSession(Request request, Response response) {
         Cookie sessionCookie = request.cookie(cookieName);
-        return sessionCookie != null ? store.load(sessionCookie.value()) : null;
+        return sessionCookie != null ? store.get(sessionCookie.value()) : null;
     }
 
     public Session openSession(Request request, Response response) {

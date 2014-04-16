@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import static com.vtence.molecule.HttpMethod.DELETE;
 import static com.vtence.molecule.HttpMethod.GET;
-import static com.vtence.molecule.support.DateBuilder.calendarDate;
+import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class ApacheCommonLoggerTest {
@@ -29,7 +29,7 @@ public class ApacheCommonLoggerTest {
         setThreadingPolicy(new Synchroniser());
     }};
     Logger logger = context.mock(Logger.class);
-    Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").build();
+    Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").toDate();
     ApacheCommonLogger apacheCommonLogger =
             new ApacheCommonLogger(logger, BrokenClock.stoppedAt(currentTime), TimeZone.getTimeZone("GMT+01:00"));
 

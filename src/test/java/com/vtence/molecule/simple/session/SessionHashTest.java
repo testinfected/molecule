@@ -1,150 +1,122 @@
 package com.vtence.molecule.simple.session;
 
 import com.vtence.molecule.Session;
-import com.vtence.molecule.support.BrokenClock;
-import com.vtence.molecule.util.Clock;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.vtence.molecule.support.DateBuilder.namedDate;
-import static java.util.concurrent.TimeUnit.DAYS;
+import static com.vtence.molecule.support.Dates.namedDate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 public class SessionHashTest {
 
-    long TIMEOUT = TimeUnit.MINUTES.toSeconds(30);
-    Date creationTime = namedDate("creation time").build();
-    Session session = new SessionHash("session-id", creationTime);
+    int TIMEOUT = (int) TimeUnit.MINUTES.toSeconds(30);
+    Date updateTime = namedDate("last update time").toDate();
 
     @Test public void
-    isInitiallyValid() {
-        assertThat("id", session.id(), equalTo("session-id"));
-        assertThat("invalid", session.invalid(), equalTo(false));
+    needsAnIdToExist() {
+        Session fresh = new SessionHash();
+        assertThat("exists when fresh?", fresh.exists(), equalTo(false));
+        assertThat("fresh id", fresh.id(), nullValue());
+
+        Session existing = new SessionHash("exists");
+        assertThat("exists with an id?", existing.exists(), equalTo(true));
+        assertThat("exists id", existing.id(), equalTo("exists"));
     }
 
     @Test public void
-    isInitiallyEmpty() {
-        assertThat("attribute keys", session.keys(), emptyIterable());
-        assertThat("attribute values", session.values(), emptyIterable());
-    }
-
-    @Test public void
-    storesAndRestoresAttributes() {
-        session.put("A1", "V1");
-        assertThat("A1?", session.contains("A1"), equalTo(true));
-        assertThat("A1", session.<String>get("A1"), equalTo("V1"));
+    isInitiallyEmptyAndValid() {
+        Session session = new SessionHash();
+        assertThat("initially valid?", !session.invalid(), equalTo(true));
+        assertThat("initial keys", session.keys(), emptyIterable());
+        assertThat("initial values", session.values(), emptyIterable());
     }
 
     @Test public void
     storesMultipleAttributes() {
-        session.put("A1", "V1");
-        session.put("A2", "V2");
-        session.put("A3", "V3");
-        assertThat("A1", session.<String>get("A1"), equalTo("V1"));
-        assertThat("A2", session.<String>get("A2"), equalTo("V2"));
-        assertThat("A3", session.<String>get("A3"), equalTo("V3"));
+        Session session = new SessionHash();
+        session.put("A", "Alice");
+        session.put("B", "Bob");
+        session.put("C", "Chris");
+        assertThat("A(lice)", session.<String>get("A"), equalTo("Alice"));
+        assertThat("B(ob)", session.<String>get("B"), equalTo("Bob"));
+        assertThat("C(hris)", session.<String>get("C"), equalTo("Chris"));
     }
 
     @Test public void
     allowsOverridingAttributes() {
-        session.put("A1", "V1");
-        session.put("A1", "V1.1");
-        assertThat("A1", session.<String>get("A1"), equalTo("V1.1"));
+        Session session = new SessionHash();
+        session.put("key", "original");
+        session.put("key", "override");
+        assertThat("overridden value", session.<String>get("key"), equalTo("override"));
     }
 
     @Test public void
-    knowsAttributesKeysAndValues() {
-        session.put("A1", "1");
-        session.put("A2", "2");
-        session.put("A3", "3");
-        session.put("A4", "4");
-        session.put("A5", "5");
+    knowsItsContent() {
+        Session session = new SessionHash();
+        session.put("A", "Alice");
+        session.put("B", "Bob");
+        session.put("C", "Chris");
 
-        assertThat("attribute keys", session.keys(), containsItems("A1", "A2", "A3", "A4", "A5"));
-        assertThat("attribute values", session.values(), containsItems("1", "2", "3", "4", "5"));
+        assertThat("knows A?", session.contains("A"), equalTo(true));
+        assertThat("knows Z?", session.contains("Z"), equalTo(false));
+        assertThat("known size", session.size(), equalTo(3));
+        assertThat("known keys", session.keys(), containsItems("A", "B", "C"));
+        assertThat("known values", session.values(), containsItems("Alice", "Bob", "Chris"));
     }
 
     @Test public void
-    isInitiallySetToNeverExpire() {
-        assertThat("timeout", session.timeout(), equalTo(0L));
-        assertThat("expired after 1 day", session.expired(clockSet(aDayAfter(creationTime))), equalTo(false));
-        assertThat("expired after 1 year", session.expired(clockSet(aYearAfter(creationTime))), equalTo(false));
-    }
+    updatesContentFromOtherSession() {
+        Session session = new SessionHash();
+        session.put("A", "Albert");
+        session.put("C", "Chris");
+        Session other = new SessionHash();
+        other.put("A", "Alice");
+        other.put("B", "Bob");
 
-    @Test public void
-    expiresAfterTimeout() {
-        session.timeout(TIMEOUT);
-
-        assertThat("expired before timeout", session.expired(clockSet(justBefore(whenTimeoutOccurs(creationTime)))), equalTo(false));
-        assertThat("expired at timeout", session.expired(clockSet(whenTimeoutOccurs(creationTime))), equalTo(true));
-        assertThat("expired after timeout", session.expired(clockSet(justAfter(whenTimeoutOccurs(creationTime)))), equalTo(true));
-    }
-
-    @Test public void
-    resetsTimeoutWhenTouched() {
-        session.timeout(TIMEOUT);
-
-        Date lastAccessTime = aDayAfter(creationTime);
-        session.touch(clockSet(lastAccessTime));
-
-        assertThat("expired after initial timeout", session.expired(clockSet(whenTimeoutOccurs(creationTime))), equalTo(false));
-        assertThat("expired at reset timeout", session.expired(clockSet(whenTimeoutOccurs(lastAccessTime))), equalTo(true));
-    }
-
-    @Test public void
-    informsOfCreationAndAccessTimes() {
-        Date lastAccessTime = namedDate("last access time").build();
-        session.touch(clockSet(lastAccessTime));
-
-        assertThat("creation time", session.createdAt(), equalTo(creationTime));
-        assertThat("last access time", session.lastAccessedAt(), equalTo(lastAccessTime));
+        session.merge(other);
+        assertThat("merged keys", session.keys(), containsItems("A", "B", "C"));
+        assertThat("merged values", session.values(), containsItems("Alice", "Bob", "Chris"));
     }
 
     @Test public void
     dropsContentWhenInvalidated() {
-        session.put("A1", "V1");
-        session.put("A2", "V2");
-        session.put("A3", "V3");
+        Session session = new SessionHash();
+
+        session.put("A", "Alice");
+        session.put("B", "Bob");
+        session.put("C", "Chris");
 
         session.invalidate();
 
-        assertThat("invalid", session.invalid(), equalTo(true));
-        assertThat("attribute keys", session.keys(), emptyIterable());
-        assertThat("attribute values", session.values(), emptyIterable());
+        assertThat("invalid?", session.invalid(), equalTo(true));
+        assertThat("keys once invalid", session.keys(), emptyIterable());
+        assertThat("values once invalid", session.values(), emptyIterable());
     }
 
-    private Clock clockSet(Date pointInTime) {
-        return BrokenClock.stoppedAt(pointInTime);
+    @Test public void
+    isInitiallySetToNeverExpires() {
+        Session session = new SessionHash();
+        assertThat("initial max age", session.maxAge(), equalTo(-1));
+        assertThat("initial expiration time", session.expirationTime(), nullValue());
     }
 
-    private Date justBefore(Date pointInTime) {
-        return at(pointInTime, -1);
-    }
-
-    private Date justAfter(Date pointInTime) {
-        return at(pointInTime, +1);
+    @Test public void
+    expiresAtSpecifiedTime() {
+        Session session = new SessionHash();
+        session.updatedAt(updateTime);
+        session.maxAge(TIMEOUT);
+        assertThat("expiration time", session.expirationTime(), equalTo(whenTimeoutOccurs(updateTime)));
     }
 
     private Date whenTimeoutOccurs(Date pointInTime) {
-        return at(pointInTime, TimeUnit.SECONDS.toMillis(TIMEOUT));
-    }
-
-    private Date aDayAfter(Date pointInTime) {
-        return at(pointInTime, TimeUnit.DAYS.toMillis(1));
-    }
-
-    private Date aYearAfter(Date pointInTime) {
-        return at(pointInTime, DAYS.toMillis(365));
-    }
-
-    private Date at(Date currentTime, long millis) {
-        return new Date(currentTime.getTime() + millis);
+        return new Date(pointInTime.getTime() + TimeUnit.SECONDS.toMillis(TIMEOUT));
     }
 
     private Matcher<Iterable<?>> containsItems(Object... items) {

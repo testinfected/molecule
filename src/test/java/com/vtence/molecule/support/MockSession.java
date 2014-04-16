@@ -1,7 +1,6 @@
 package com.vtence.molecule.support;
 
 import com.vtence.molecule.Session;
-import com.vtence.molecule.util.Clock;
 
 import java.util.Collection;
 import java.util.Date;
@@ -28,7 +27,7 @@ public class MockSession implements Session {
     }
 
     @Override
-    public boolean isNew() {
+    public boolean exists() {
         return false;
     }
 
@@ -53,19 +52,19 @@ public class MockSession implements Session {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public long timeout() {
-        throw new UnsupportedOperationException("Not implemented");
+    public void clear() {
+
     }
 
-    public void timeout(long inSeconds) {
-        throw new UnsupportedOperationException("Not implemented");
+    public Date createdAt() {
+        return null;
     }
 
-    public boolean expired(Clock clock) {
-        throw new UnsupportedOperationException("Not implemented");
+    public void createdAt(Date time) {
+
     }
 
-    public void touch(Clock clock) {
+    public boolean expiredAt(Date time) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -74,6 +73,10 @@ public class MockSession implements Session {
     }
 
     public void maxAge(int seconds) {
+    }
+
+    public Date expirationTime() {
+        return null;
     }
 
     public void invalidate() {
@@ -88,12 +91,20 @@ public class MockSession implements Session {
         return attributes.isEmpty();
     }
 
-    public Date createdAt() {
+    public void merge(Session other) {
+
+    }
+
+    public Date updatedAt() {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public Date lastAccessedAt() {
-        throw new UnsupportedOperationException("Not implemented");
+    public void updatedAt(Date time) {
+
+    }
+
+    public int size() {
+        return 0;
     }
 
     public String toString() {

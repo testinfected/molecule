@@ -44,10 +44,9 @@ public class CookieSessionTracker extends AbstractMiddleware {
 
     private Session acquireSession(Request request) {
         String id = sessionId(request);
-        Session session = null;
-        if (id != null) session = store.load(id);
-        if (session == null) session = new SessionHash(null);
-        return session;
+        if (id == null) return new SessionHash();
+        Session session = store.load(id);
+        return session != null ? session : new SessionHash();
     }
 
     private String sessionId(Request request) {
@@ -73,7 +72,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private boolean shouldCommit(Session session) {
-        return !session.isNew() || !session.isEmpty();
+        return session.exists() || !session.isEmpty();
     }
 
     private boolean newSession(Request request, String sid) {

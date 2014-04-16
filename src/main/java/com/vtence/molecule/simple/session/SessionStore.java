@@ -4,12 +4,15 @@ import com.vtence.molecule.Session;
 
 public interface SessionStore {
 
+    Session load(String id);
+
+    String save(Session session);
+
+    void destroy(String sid);
+
     // todo remove
     Session create(String key);
 
-    Session load(String id);
-
-    String save(Session session); // return data
-
-    void destroy(String id);
+    // todo remove
+    Session get(String id);
 }

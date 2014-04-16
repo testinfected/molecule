@@ -40,7 +40,7 @@ public class CookieTrackerTest {
 
         final Session clientSession = new MockSession("client-session");
         context.checking(new Expectations() {{
-            allowing(store).load("client-session"); will(returnValue(clientSession));
+            allowing(store).get("client-session"); will(returnValue(clientSession));
         }});
 
         Session acquired = tracker.acquireSession(request, response);
@@ -79,4 +79,5 @@ public class CookieTrackerTest {
         public String generateId() {
             return id;
         }
-    }}
+    }
+}

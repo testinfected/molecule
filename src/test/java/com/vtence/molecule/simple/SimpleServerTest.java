@@ -8,11 +8,12 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Session;
 import com.vtence.molecule.simple.session.CookieTracker;
+import com.vtence.molecule.simple.session.SecureIdentifierPolicy;
 import com.vtence.molecule.simple.session.SessionPool;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.util.Clock;
+import com.vtence.molecule.util.Delorean;
 import com.vtence.molecule.util.FailureReporter;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -22,7 +23,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +59,7 @@ public class SimpleServerTest {
                 SimpleServerTest.this.error = error;
             }
         });
-        server.enableSessions(new CookieTracker(new SessionPool(delorean, THIRTY_MINUTES)));
+        server.enableSessions(new CookieTracker(new SessionPool(new SecureIdentifierPolicy(), delorean, THIRTY_MINUTES)));
     }
 
     @After public void
@@ -322,7 +322,7 @@ public class SimpleServerTest {
         response = request.withParameter("username", "Vincent").post("/login");
         assertNoError();
 
-        delorean.travel(SECONDS.toMillis(THIRTY_MINUTES));
+        delorean.travelInTime(SECONDS.toMillis(THIRTY_MINUTES));
         response = request.but().removeParameters().get("/");
         assertNoError();
 
@@ -339,22 +339,5 @@ public class SimpleServerTest {
 
     private void assertNoError() {
         if (error != null) fail(StackTrace.of(error));
-    }
-
-    private static class Delorean implements Clock {
-
-        private long timeTravel = 0;
-
-        public Date now() {
-            return new Date(System.currentTimeMillis() + timeTravel);
-        }
-
-        public void travel(long offsetInMillis) {
-            this.timeTravel = offsetInMillis;
-        }
-
-        public void back() {
-            travel(0);
-        }
     }
 }

@@ -1,7 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.util.Clock;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -10,11 +8,25 @@ public interface Session {
 
     String id();
 
-    boolean isNew();
+    boolean exists();
 
     Date createdAt();
 
-    Date lastAccessedAt();
+    void createdAt(Date time);
+
+    Date updatedAt();
+
+    void updatedAt(Date time);
+
+    int maxAge();
+
+    void maxAge(int seconds);
+
+    Date expirationTime();
+
+    int size();
+
+    boolean isEmpty();
 
     boolean contains(Object key);
 
@@ -26,23 +38,11 @@ public interface Session {
 
     Collection<?> values();
 
-    int maxAge();
+    void clear();
 
-    void maxAge(int seconds);
-
-    long timeout();
-
-    void timeout(long inSeconds);
-
-    // todo expiredAt(Date time)
-    boolean expired(Clock clock);
-
-    // todo lastAccessedAt(Date time)
-    void touch(Clock clock);
+    void merge(Session other);
 
     void invalidate();
 
     boolean invalid();
-
-    boolean isEmpty();
 }

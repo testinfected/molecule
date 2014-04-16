@@ -4,13 +4,13 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.vtence.molecule.support.DateBuilder.calendarDate;
+import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class HttpDateTest {
 
-    Date date = calendarDate(2014, 3, 6).atTime(8, 49, 37).build();
+    Date date = calendarDate(2014, 3, 6).atTime(8, 49, 37).toDate();
 
     @Test public void
     parsesRfc1123Dates() {

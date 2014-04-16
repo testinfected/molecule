@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class DateBuilder {
+public class Dates {
 
     private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
@@ -18,43 +18,43 @@ public class DateBuilder {
     private int millisecond;
     private String name;
 
-    public static DateBuilder aDate() {
-        return aDate(System.currentTimeMillis());
+    public static Dates aDate() {
+        return now();
     }
 
-    public static DateBuilder aDate(long time) {
-        return new DateBuilder().fromMillis(time);
+    public static Dates now() {
+        return new Dates().at(System.currentTimeMillis());
     }
 
-    public static DateBuilder namedDate(String name) {
+    public static Dates namedDate(String name) {
         return aDate().named(name);
     }
 
-    public static DateBuilder calendarDate(int year, int month, int day) {
+    public static Dates calendarDate(int year, int month, int day) {
         return aDate().onCalendar(year, month, day);
     }
 
-    public DateBuilder inZone(String zone) {
+    public Dates inZone(String zone) {
         return in(TimeZone.getTimeZone(zone));
     }
 
-    public DateBuilder in(TimeZone zone) {
+    public Dates in(TimeZone zone) {
         timeZone = zone;
         return this;
     }
 
-    public DateBuilder onCalendar(int year, int month, int day) {
+    public Dates onCalendar(int year, int month, int day) {
         this.year = year;
         this.month = month;
         this.day = day;
         return this;
     }
 
-    public DateBuilder atTime(int hour, int minute, int second) {
+    public Dates atTime(int hour, int minute, int second) {
         return atTime(hour, minute, second, 0);
     }
 
-    public DateBuilder atTime(int hour, int minute, int second, int millisecond) {
+    public Dates atTime(int hour, int minute, int second, int millisecond) {
         this.hour = hour;
         this.minute = minute;
         this.second = second;
@@ -62,13 +62,13 @@ public class DateBuilder {
         return this;
     }
 
-    public DateBuilder atMidnight() {
+    public Dates atMidnight() {
         return atTime(0, 0, 0);
     }
 
-    public DateBuilder fromMillis(long millis) {
+    public Dates at(long pointInTime) {
         Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(millis);
+        calendar.setTimeInMillis(pointInTime);
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH) + 1;
         day = calendar.get(Calendar.DATE);
@@ -79,16 +79,16 @@ public class DateBuilder {
         return this;
     }
 
-    public DateBuilder named(String name) {
+    public Dates named(String name) {
         this.name = name;
         return this;
     }
 
-    public DateBuilder but() {
-        return aDate(toMillis()).named(name);
+    public Dates but() {
+        return new Dates().at(toMillis()).named(name);
     }
 
-    public Date build() {
+    public Date toDate() {
         return name != null ? new Date(toMillis()) {
             public String toString() {
                 return name;
@@ -96,7 +96,7 @@ public class DateBuilder {
         } : new Date(toMillis());
     }
 
-    private long toMillis() {
+    public long toMillis() {
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month - 1);
