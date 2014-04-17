@@ -113,18 +113,13 @@ public class CookieSessionTrackerTest {
 
     @Test public void
     destroysInvalidSessions() throws Exception {
-        tracker.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                Session session = request.attribute(Session.class);
-                session.invalidate();
-            }
-        });
+        tracker.connectTo(invalidateSession());
         context.checking(new Expectations() {{
             oneOf(store).destroy(with("existing"));
         }});
 
         tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
-        response.assertHasNoCookie("JSESSIONID");
+        response.assertCookie("JSESSIONID", cookieWithMaxAge(0));
     }
 
     @Test public void
@@ -220,6 +215,15 @@ public class CookieSessionTrackerTest {
                 Session session = request.attribute(Session.class);
                 session.put("written", true);
                 session.maxAge(timeout);
+            }
+        };
+    }
+
+    private Application invalidateSession() {
+        return new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                Session session = request.attribute(Session.class);
+                session.invalidate();
             }
         };
     }

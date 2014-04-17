@@ -115,6 +115,13 @@ public class SessionHashTest {
         assertThat("expiration time", session.expirationTime(), equalTo(whenTimeoutOccurs(updateTime)));
     }
 
+    @Test(expected = IllegalStateException.class) public void
+    canNoLongerBeWrittenOnceInvalidated() {
+        Session session = new SessionHash();
+        session.invalidate();
+        session.put("A", "Alice");
+    }
+
     private Date whenTimeoutOccurs(Date pointInTime) {
         return new Date(pointInTime.getTime() + TimeUnit.SECONDS.toMillis(TIMEOUT));
     }

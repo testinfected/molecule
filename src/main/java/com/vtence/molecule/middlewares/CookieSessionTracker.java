@@ -60,13 +60,16 @@ public class CookieSessionTracker extends AbstractMiddleware {
         }
         if (session.invalid()) {
             destroy(session);
+            Cookie cookie = new Cookie(name, session.id()).maxAge(0);
+            response.add(cookie);
             return;
         }
+
         String sid = save(session);
         if (newSession(request, sid) || expires(session)) {
-            Cookie cookie = new Cookie(name, sid);
-            cookie.httpOnly(true);
-            cookie.maxAge(session.maxAge());
+            Cookie cookie = new Cookie(name, sid)
+                    .httpOnly(true)
+                    .maxAge(session.maxAge());
             response.add(cookie);
         }
     }

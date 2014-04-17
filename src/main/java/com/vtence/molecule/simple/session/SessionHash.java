@@ -81,7 +81,12 @@ public class SessionHash implements Session {
     }
 
     public void put(Object key, Object value) {
+        checkValid();
         attributes.put(key, value);
+    }
+
+    private void checkValid() {
+        if (invalid) throw new IllegalStateException("Session invalidated");
     }
 
     @SuppressWarnings("unchecked")
