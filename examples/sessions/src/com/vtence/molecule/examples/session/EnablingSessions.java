@@ -27,7 +27,7 @@ public class EnablingSessions {
             run(draw(new DynamicRoutes() {{
                 map("/").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
-                        Session session = request.attribute(Session.class);
+                        Session session = Session.get(request);
                         String username = session.contains("username") ? session.<String>get("username") : "Guest";
                         response.body("Welcome, " + username);
                     }
@@ -36,7 +36,7 @@ public class EnablingSessions {
                 post("/login").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
                         String username = request.parameter("username");
-                        Session session = request.attribute(Session.class);
+                        Session session = Session.get(request);
                         session.put("username", username);
                         response.redirectTo("/");
                     }
@@ -44,7 +44,7 @@ public class EnablingSessions {
 
                 delete("/logout").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
-                        Session session = request.attribute(Session.class);
+                        Session session = Session.get(request);
                         session.invalidate();
                         response.redirectTo("/");
                     }

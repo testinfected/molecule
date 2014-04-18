@@ -1,6 +1,5 @@
-package com.vtence.molecule.session;
+package com.vtence.molecule;
 
-import com.vtence.molecule.Session;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
@@ -14,25 +13,25 @@ import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
-public class SessionHashTest {
+public class SessionTest {
 
     int TIMEOUT = (int) TimeUnit.MINUTES.toSeconds(30);
     Date updateTime = namedDate("last update time").toDate();
 
     @Test public void
     needsAnIdToExist() {
-        Session fresh = new SessionHash();
+        Session fresh = new Session();
         assertThat("exists when fresh?", fresh.exists(), equalTo(false));
         assertThat("fresh id", fresh.id(), nullValue());
 
-        Session existing = new SessionHash("exists");
+        Session existing = new Session("exists");
         assertThat("exists with an id?", existing.exists(), equalTo(true));
         assertThat("exists id", existing.id(), equalTo("exists"));
     }
 
     @Test public void
     isInitiallyEmptyAndValid() {
-        Session session = new SessionHash();
+        Session session = new Session();
         assertThat("initially valid?", !session.invalid(), equalTo(true));
         assertThat("initial keys", session.keys(), emptyIterable());
         assertThat("initial values", session.values(), emptyIterable());
@@ -40,7 +39,7 @@ public class SessionHashTest {
 
     @Test public void
     storesMultipleAttributes() {
-        Session session = new SessionHash();
+        Session session = new Session();
         session.put("A", "Alice");
         session.put("B", "Bob");
         session.put("C", "Chris");
@@ -51,15 +50,25 @@ public class SessionHashTest {
 
     @Test public void
     allowsOverridingAttributes() {
-        Session session = new SessionHash();
+        Session session = new Session();
         session.put("key", "original");
         session.put("key", "override");
         assertThat("overridden value", session.<String>get("key"), equalTo("override"));
     }
 
     @Test public void
+    allowsRemovingAttributes() {
+        Session session = new Session();
+        session.put("A", "Alice");
+        session.put("B", "Bob");
+        session.put("C", "Chris");
+        session.remove("B");
+        assertThat("values", session.values(), containsItems("Alice", "Chris"));
+    }
+
+    @Test public void
     knowsItsContent() {
-        Session session = new SessionHash();
+        Session session = new Session();
         session.put("A", "Alice");
         session.put("B", "Bob");
         session.put("C", "Chris");
@@ -73,10 +82,10 @@ public class SessionHashTest {
 
     @Test public void
     updatesContentFromOtherSession() {
-        Session session = new SessionHash();
+        Session session = new Session();
         session.put("A", "Albert");
         session.put("C", "Chris");
-        Session other = new SessionHash();
+        Session other = new Session();
         other.put("A", "Alice");
         other.put("B", "Bob");
 
@@ -87,7 +96,7 @@ public class SessionHashTest {
 
     @Test public void
     dropsContentWhenInvalidated() {
-        Session session = new SessionHash();
+        Session session = new Session();
 
         session.put("A", "Alice");
         session.put("B", "Bob");
@@ -102,14 +111,14 @@ public class SessionHashTest {
 
     @Test public void
     isInitiallySetToNeverExpires() {
-        Session session = new SessionHash();
+        Session session = new Session();
         assertThat("initial max age", session.maxAge(), equalTo(-1));
         assertThat("initial expiration time", session.expirationTime(), nullValue());
     }
 
     @Test public void
     expiresAtSpecifiedTime() {
-        Session session = new SessionHash();
+        Session session = new Session();
         session.updatedAt(updateTime);
         session.maxAge(TIMEOUT);
         assertThat("expiration time", session.expirationTime(), equalTo(whenTimeoutOccurs(updateTime)));
@@ -117,7 +126,7 @@ public class SessionHashTest {
 
     @Test(expected = IllegalStateException.class) public void
     canNoLongerBeWrittenOnceInvalidated() {
-        Session session = new SessionHash();
+        Session session = new Session();
         session.invalidate();
         session.put("A", "Alice");
     }

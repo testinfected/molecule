@@ -40,7 +40,7 @@ public class ConnectionScope extends AbstractMiddleware {
         }
 
         public Connection get() {
-            return (Connection) request.attribute(Connection.class);
+            return request.attribute(Connection.class);
         }
 
         private void set(Connection connection) {

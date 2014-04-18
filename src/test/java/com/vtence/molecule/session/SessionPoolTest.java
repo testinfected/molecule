@@ -38,7 +38,7 @@ public class SessionPoolTest {
 
     @Test public void
     generatesIdsForNewSessions() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         String id = pool.save(data);
         Session session = pool.load(id);
         assertThat("created session", session, notNullValue());
@@ -47,7 +47,7 @@ public class SessionPoolTest {
 
     @Test public void
     preservesExistingSessionsIds() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         String id = pool.save(data);
         Session session = pool.load(id);
         assertThat("original id", pool.save(session), equalTo(id));
@@ -55,7 +55,7 @@ public class SessionPoolTest {
 
     @Test public void
     replacesIdsOfSessionsNotInPool() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         String id = pool.save(data);
         assertThat("original id", id, equalTo("1"));
         Session session = pool.load(id);
@@ -65,7 +65,7 @@ public class SessionPoolTest {
 
     @Test public void
     savesSessionContentDefensively() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         data.put("a", "Alice");
         data.put("b", "Bob");
         data.put("c", "Chris");
@@ -74,7 +74,7 @@ public class SessionPoolTest {
         Session saved = save(data);
         data.clear();
 
-        assertThat("saved session", saved, not(Matchers.<Session>sameInstance(data)));
+        assertThat("saved session", saved, not(Matchers.sameInstance(data)));
         assertThat("saved session expiration time", saved.maxAge(), equalTo(maxAge));
         assertThat("saved session keys", saved.keys(), Matchers.<Object>contains("a", "b", "c"));
         assertThat("saved session values", saved.values(), Matchers.<Object>contains("Alice", "Bob", "Chris"));
@@ -82,7 +82,7 @@ public class SessionPoolTest {
 
     @Test public void
     loadsSessionContentDefensively() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         data.put("a", "Alice");
         data.put("b", "Bob");
         data.put("c", "Chris");
@@ -99,7 +99,7 @@ public class SessionPoolTest {
     storesMultipleSessions() {
         int count = 5;
         for (int i = 1; i <= count; i++) {
-            String id = pool.save(new SessionHash());
+            String id = pool.save(new Session());
             assertThat("session #" + id, pool.load(id), sessionWithId(valueOf(i)));
         }
         assertThat("pool size", pool.size(), equalTo(count));
@@ -107,14 +107,14 @@ public class SessionPoolTest {
 
     @Test(expected = IllegalStateException.class) public void
     forbidsSavingInvalidSessions() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         data.invalidate();
         pool.save(data);
     }
 
     @Test public void
     marksSessionUpdateTime() throws InterruptedException {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         Date updateTime = delorean.freeze();
         Session session = save(data);
         assertThat("update time", session.updatedAt(), equalTo(updateTime));
@@ -122,7 +122,7 @@ public class SessionPoolTest {
 
     @Test public void
     marksSessionCreationTime() throws InterruptedException {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         Date creationTime = delorean.freeze();
         Session session = save(data);
         assertThat("creation time", session.createdAt(), equalTo(creationTime));
@@ -136,7 +136,7 @@ public class SessionPoolTest {
 
     @Test public void
     discardsExpiredSessions() {
-        SessionHash data = new SessionHash();
+        Session data = new Session();
         data.maxAge(maxAge);
         String sid = pool.save(data);
         delorean.travelInTime(timeJump(maxAge));
@@ -158,7 +158,7 @@ public class SessionPoolTest {
 
     @Test public void
     notifiesWhenSessionsAreLoaded() {
-        final String sid = pool.save(new SessionHash());
+        final String sid = pool.save(new Session());
         pool.setSessionListener(listener);
         context.checking(new Expectations() {{
             oneOf(listener).sessionLoaded(with(sid));
@@ -168,7 +168,7 @@ public class SessionPoolTest {
 
     @Test public void
     notifiesWhenSessionsAreSaved() {
-        final String sid = pool.save(new SessionHash());
+        final String sid = pool.save(new Session());
         Session session = pool.load(sid);
 
         pool.setSessionListener(listener);
@@ -184,12 +184,12 @@ public class SessionPoolTest {
         context.checking(new Expectations() {{
             oneOf(listener).sessionCreated(with("1"));
         }});
-        pool.save(new SessionHash());
+        pool.save(new Session());
     }
 
     @Test public void
     notifiesWhenSessionsAreDropped() {
-        final String sid = pool.save(new SessionHash());
+        final String sid = pool.save(new Session());
         pool.setSessionListener(listener);
 
         pool.destroy("not-in-pool");
@@ -215,7 +215,7 @@ public class SessionPoolTest {
     private Collection<String> addSessionsToPool(int count) {
         Collection<String> sessions = new ArrayList<String>();
         for (int i = 0; i < count; i++) {
-            Session data = new SessionHash();
+            Session data = new Session();
             sessions.add(pool.save(data));
         }
         return sessions;

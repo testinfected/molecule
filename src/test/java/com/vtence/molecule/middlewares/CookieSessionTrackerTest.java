@@ -1,7 +1,9 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.*;
-import com.vtence.molecule.session.SessionHash;
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
+import com.vtence.molecule.Session;
 import com.vtence.molecule.session.SessionStore;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
@@ -18,6 +20,7 @@ import static com.vtence.molecule.support.Cookies.cookieWithMaxAge;
 import static com.vtence.molecule.support.Cookies.cookieWithValue;
 import static com.vtence.molecule.support.Cookies.httpOnlyCookie;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 public class CookieSessionTrackerTest {
 
@@ -33,7 +36,7 @@ public class CookieSessionTrackerTest {
     @Before public void
     stubSessionStore() {
         context.checking(new Expectations() {{
-            allowing(store).load("existing"); will(returnValue(new SessionHash("existing")));
+            allowing(store).load("existing"); will(returnValue(new Session("existing")));
             allowing(store).load("expired"); will(returnValue(null));
         }});
     }
@@ -70,7 +73,8 @@ public class CookieSessionTrackerTest {
         Session clientSession = store.load("existing");
         clientSession.put("counter", 1);
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
+            oneOf(store).save(with(sessionWithId("existing")));
+            will(returnValue("existing"));
         }});
 
         tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
@@ -147,7 +151,8 @@ public class CookieSessionTrackerTest {
         tracker.expireAfter(timeout);
         tracker.connectTo(incrementCounter());
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
+            oneOf(store).save(with(sessionWithMaxAge(timeout)));
+            will(returnValue("expires"));
         }});
         tracker.handle(request, response);
     }
@@ -156,10 +161,18 @@ public class CookieSessionTrackerTest {
     setsCookieEvenOnExistingSessionsIfMaxAgeSpecified() throws Exception {
         tracker.connectTo(expireSessionAfter(timeout));
         context.checking(new Expectations() {{
-            allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
+            allowing(store).save(with(sessionWithId("existing")));
+            will(returnValue("existing"));
         }});
         tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
         response.assertCookie("JSESSIONID", cookieWithMaxAge(timeout));
+    }
+
+    @Test public void
+    unsetsSessionAfterwards() throws Exception {
+        tracker.connectTo(nothing());
+        tracker.handle(request, response);
+        request.assertAttribute(Session.class, nullValue());
     }
 
     private FeatureMatcher<Session, String> newSession() {
@@ -185,7 +198,7 @@ public class CookieSessionTrackerTest {
     private Application echoSessionId() {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Session session = request.attribute(Session.class);
+                Session session = Session.get(request);
                 response.body("Session: " + session.id());
             }
         };
@@ -194,7 +207,7 @@ public class CookieSessionTrackerTest {
     private Application incrementCounter() {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Session session = request.attribute(Session.class);
+                Session session = Session.get(request);
                 Integer counter = session.contains("counter") ? session.<Integer>get("counter") : 0;
                 session.put("counter", counter++);
                 response.body("Counter: " + counter);
@@ -212,7 +225,7 @@ public class CookieSessionTrackerTest {
     private Application expireSessionAfter(final int timeout) {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Session session = request.attribute(Session.class);
+                Session session = Session.get(request);
                 session.put("written", true);
                 session.maxAge(timeout);
             }
@@ -222,7 +235,8 @@ public class CookieSessionTrackerTest {
     private Application invalidateSession() {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Session session = request.attribute(Session.class);
+                Session session = Session.get(request);
+                session.put("written", true);
                 session.invalidate();
             }
         };

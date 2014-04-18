@@ -3,7 +3,6 @@ package com.vtence.molecule.support;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.Session;
 import org.hamcrest.Matcher;
 
 import java.io.IOException;
@@ -26,7 +25,6 @@ public class MockRequest implements Request {
     private String path = "/";
     private String ip = "127.0.0.1";
     private String protocol = "HTTP/1.1";
-    private Session session;
 
     public MockRequest() {}
 

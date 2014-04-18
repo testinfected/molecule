@@ -4,7 +4,6 @@ import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Session;
-import com.vtence.molecule.session.SessionHash;
 import com.vtence.molecule.session.SessionStore;
 
 public class CookieSessionTracker extends AbstractMiddleware {
@@ -31,30 +30,34 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        prepareSession(request);
-        forward(request, response);
-        commitSession(request, response);
+        Session session = prepareSession(request);
+        try {
+            forward(request, response);
+            commitSession(request, response, session);
+        } finally {
+            session.unset(request);
+        }
     }
 
-    private void prepareSession(Request request) {
+    private Session prepareSession(Request request) {
         Session session = acquireSession(request);
-        request.attribute(Session.class, session);
         session.maxAge(expireAfter);
+        session.set(request);
+        return session;
     }
 
     private Session acquireSession(Request request) {
         String id = sessionId(request);
-        if (id == null) return new SessionHash();
+        if (id == null) return new Session();
         Session session = store.load(id);
-        return session != null ? session : new SessionHash();
+        return session != null ? session : new Session();
     }
 
     private String sessionId(Request request) {
         return request.cookieValue(name);
     }
 
-    private void commitSession(Request request, Response response) {
-        Session session = request.attribute(Session.class);
+    private void commitSession(Request request, Response response, Session session) {
         if (!shouldCommit(session)) {
             return;
         }

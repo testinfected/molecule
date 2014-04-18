@@ -1,5 +1,6 @@
 package com.vtence.molecule.session;
 
+import com.vtence.molecule.Session;
 import org.jmock.lib.concurrent.Blitzer;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class SessionPoolStressTest {
     supportsStoringAndRetrievingSessionsFromMultipleThreadsSimultaneously() throws InterruptedException {
         blitzer.blitz(new Runnable() {
             public void run() {
-                String sid = pool.save(new SessionHash());
+                String sid = pool.save(new Session());
                 if (pool.load(sid) == null) errorCount.incrementAndGet();
             }
         });
