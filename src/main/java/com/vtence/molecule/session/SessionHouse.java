@@ -1,4 +1,4 @@
-package com.vtence.molecule.simple.session;
+package com.vtence.molecule.session;
 
 public interface SessionHouse {
 

@@ -1,4 +1,4 @@
-package com.vtence.molecule.simple.session;
+package com.vtence.molecule.session;
 
 import com.vtence.molecule.Session;
 import com.vtence.molecule.util.Delorean;

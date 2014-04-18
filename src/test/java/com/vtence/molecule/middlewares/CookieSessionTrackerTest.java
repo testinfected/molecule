@@ -1,8 +1,8 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.*;
-import com.vtence.molecule.simple.session.SessionHash;
-import com.vtence.molecule.simple.session.SessionStore;
+import com.vtence.molecule.session.SessionHash;
+import com.vtence.molecule.session.SessionStore;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.hamcrest.FeatureMatcher;

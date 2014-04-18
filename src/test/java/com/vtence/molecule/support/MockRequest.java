@@ -187,17 +187,6 @@ public class MockRequest implements Request {
         assertThat("attribute[" + key.toString() + "]", attribute(key), attributeMatcher);
     }
 
-    public Session session() {
-        return session(true);
-    }
-
-    public Session session(boolean create) {
-        if (session == null && create) {
-            session = new MockSession();
-        }
-        return session;
-    }
-
     public String toString() {
         return String.format("%s %s", method(), pathInfo());
     }

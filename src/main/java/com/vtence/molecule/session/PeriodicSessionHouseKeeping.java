@@ -1,4 +1,4 @@
-package com.vtence.molecule.simple.session;
+package com.vtence.molecule.session;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;

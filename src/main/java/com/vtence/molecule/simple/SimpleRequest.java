@@ -2,8 +2,6 @@ package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.Session;
-import com.vtence.molecule.simple.session.SessionTracking;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,11 +11,9 @@ import java.util.Map;
 public class SimpleRequest implements com.vtence.molecule.Request {
 
     private final org.simpleframework.http.Request request;
-    private final SessionTracking sessionTracking;
 
-    public SimpleRequest(org.simpleframework.http.Request request, SessionTracking sessionTracking) {
+    public SimpleRequest(org.simpleframework.http.Request request) {
         this.request = request;
-        this.sessionTracking = sessionTracking;
     }
 
     public String body() throws IOException {
@@ -109,14 +105,6 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     public void removeAttribute(Object key) {
         request.getAttributes().remove(key);
-    }
-
-    public Session session() {
-        return session(true);
-    }
-
-    public Session session(boolean create) {
-        return sessionTracking.openSession(this, create);
     }
 
     public <T> T unwrap(Class<T> type) {

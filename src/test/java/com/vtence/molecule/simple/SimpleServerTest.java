@@ -2,18 +2,12 @@ package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Cookie;
-import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Session;
-import com.vtence.molecule.simple.session.CookieTracker;
-import com.vtence.molecule.simple.session.SecureIdentifierPolicy;
-import com.vtence.molecule.simple.session.SessionPool;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.util.Delorean;
 import com.vtence.molecule.util.FailureReporter;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -28,8 +22,6 @@ import java.util.Map;
 
 import static com.vtence.molecule.HttpStatus.CREATED;
 import static com.vtence.molecule.support.HttpRequest.aRequest;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
@@ -42,14 +34,10 @@ import static org.junit.Assert.fail;
 
 public class SimpleServerTest {
 
-    static final String SESSION_COOKIE = "JSESSIONID";
-    static final long THIRTY_MINUTES = MINUTES.toSeconds(30);
-
     SimpleServer server = new SimpleServer(9999);
     HttpRequest request = aRequest().onPort(server.port());
     HttpResponse response;
 
-    Delorean delorean = new Delorean();
     Exception error;
 
     @Before public void
@@ -59,12 +47,10 @@ public class SimpleServerTest {
                 SimpleServerTest.this.error = error;
             }
         });
-        server.enableSessions(new CookieTracker(new SessionPool(new SecureIdentifierPolicy(), delorean, THIRTY_MINUTES)));
     }
 
     @After public void
     stopServer() throws Exception {
-        delorean.back();
         server.shutdown();
     }
 
@@ -135,7 +121,7 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.withParameter("names", "Alice", "Bob", "Charles").send();
+        response = request.withParameters("names", "Alice", "Bob", "Charles").send();
         assertNoError();
         response.assertHasContent("[Alice, Bob, Charles]");
     }
@@ -221,9 +207,7 @@ public class SimpleServerTest {
             }
         });
 
-        request.withCookie("cookie1", "value1")
-                .withCookie("cookie2", "value2")
-                .send();
+        request.withCookie("cookie1", "value1").withCookie("cookie2", "value2").send();
         assertNoError();
 
         assertThat("request cookies", cookies, allOf(
@@ -265,68 +249,9 @@ public class SimpleServerTest {
         request.send();
         assertNoError();
 
-        assertThat("attributes", attributes, allOf(
-                containsEntry("name", "Velociraptor"),
-                not(containsKey("family")),
-                containsEntry("clade", "Dinosauria")));
-    }
-
-    @Test public void
-    onlyCreatesSessionsOnDemand() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("Hello, World");
-            }
-        });
-
-        response = request.send();
-        assertNoError();
-        response.assertHasNoCookie(SESSION_COOKIE);
-    }
-
-    @Test public void
-    maintainsSessionsAcrossRequestUsingCookies() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                if (request.method() == HttpMethod.POST)
-                    request.session().put("username", request.parameter("username"));
-                else
-                    response.body("Hello, " + request.session(false).get("username"));
-            }
-        });
-
-        response = request.withParameter("username", "Vincent").post("/login");
-        assertNoError();
-        response.assertHasCookie(SESSION_COOKIE);
-
-        response = request.but().removeParameters().get("/");
-        assertNoError();
-        response.assertHasContent("Hello, Vincent");
-        response.assertHasNoCookie(SESSION_COOKIE);
-    }
-
-    @Test public void
-    expiresSessionsAfterTimeout() throws Exception {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                if (request.method() == HttpMethod.POST)
-                    request.session().put("username", request.parameter("username"));
-                else {
-                    Session session = request.session(false);
-                    String username = session != null ? session.<String>get("username") : "X";
-                    response.body("Hello, " + username);
-                }
-            }
-        });
-
-        response = request.withParameter("username", "Vincent").post("/login");
-        assertNoError();
-
-        delorean.travelInTime(SECONDS.toMillis(THIRTY_MINUTES));
-        response = request.but().removeParameters().get("/");
-        assertNoError();
-
-        response.assertHasContent("Hello, X");
+        assertThat("attributes", attributes, allOf(containsEntry("name", "Velociraptor"),
+                                                   not(containsKey("family")),
+                                                   containsEntry("clade", "Dinosauria")));
     }
 
     private Matcher<Map<?, ?>> containsKey(Object key) {

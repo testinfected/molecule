@@ -46,9 +46,5 @@ public interface Request {
 
     void removeAttribute(Object key);
 
-    Session session();
-
-    Session session(boolean create);
-
     <T> T unwrap(Class<T> type);
 }

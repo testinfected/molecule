@@ -1,4 +1,4 @@
-package com.vtence.molecule.simple.session;
+package com.vtence.molecule.session;
 
 import com.vtence.molecule.Session;
 
@@ -9,10 +9,4 @@ public interface SessionStore {
     String save(Session session);
 
     void destroy(String sid);
-
-    // todo remove
-    Session create(String key);
-
-    // todo remove
-    Session get(String id);
 }

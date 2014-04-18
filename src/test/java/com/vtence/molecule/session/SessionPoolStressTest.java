@@ -1,4 +1,4 @@
-package com.vtence.molecule.simple.session;
+package com.vtence.molecule.session;
 
 import org.jmock.lib.concurrent.Blitzer;
 import org.junit.Test;

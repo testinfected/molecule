@@ -3,7 +3,6 @@ package com.vtence.molecule.util;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.Session;
 
 import java.io.IOException;
 import java.util.List;
@@ -94,14 +93,6 @@ public class RequestWrapper implements Request {
 
     public void removeAttribute(Object key) {
         request.removeAttribute(key);
-    }
-
-    public Session session() {
-        return request.session();
-    }
-
-    public Session session(boolean create) {
-        return request.session(create);
     }
 
     public <T> T unwrap(Class<T> type) {

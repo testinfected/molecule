@@ -4,8 +4,8 @@ import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Session;
-import com.vtence.molecule.simple.session.SessionHash;
-import com.vtence.molecule.simple.session.SessionStore;
+import com.vtence.molecule.session.SessionHash;
+import com.vtence.molecule.session.SessionStore;
 
 public class CookieSessionTracker extends AbstractMiddleware {
 

@@ -64,7 +64,7 @@ public class HttpRequest {
             other.withCookie(cookie, cookies.get(cookie));
         }
         for (String name: parameters.keySet()) {
-            other.withParameter(name, parameters(name));
+            other.withParameters(name, parameters(name));
         }
 
         return other;
@@ -100,7 +100,11 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest withParameter(String name, String... value) {
+    public HttpRequest withParameter(String name, String value) {
+        return withParameters(name, value);
+    }
+
+    public HttpRequest withParameters(String name, String... value) {
         parameters.put(name, Arrays.asList(value));
         return this;
     }

@@ -1,4 +1,4 @@
-package com.vtence.molecule.simple.session;
+package com.vtence.molecule.session;
 
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.concurrent.DeterministicScheduler;

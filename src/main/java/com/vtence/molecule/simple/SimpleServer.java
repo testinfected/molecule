@@ -5,9 +5,6 @@ import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.simple.session.DisableSessions;
-import com.vtence.molecule.simple.session.SessionTracker;
-import com.vtence.molecule.simple.session.SessionTracking;
 import com.vtence.molecule.util.FailureReporter;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.core.Container;
@@ -25,7 +22,6 @@ public class SimpleServer implements Server {
 
     private int port;
     private FailureReporter failureReporter = FailureReporter.IGNORE;
-    private SessionTracker tracker = new DisableSessions();
 
     private Connection connection;
 
@@ -39,10 +35,6 @@ public class SimpleServer implements Server {
 
     public void reportErrorsTo(FailureReporter reporter) {
         this.failureReporter = reporter;
-    }
-
-    public void enableSessions(SessionTracker tracker) {
-        this.tracker = tracker;
     }
 
     public void port(int port) {
@@ -77,7 +69,7 @@ public class SimpleServer implements Server {
                 // simpleweb counterparts to state containers. Once this is done, we will
                 // make our request and response concrete classes.
                 Response response = new Response();
-                SimpleRequest request = new SimpleRequest(req, new SessionTracking(tracker, response));
+                SimpleRequest request = new SimpleRequest(req);
 
                 app.handle(request, response);
                 commitResponse(res, response);
