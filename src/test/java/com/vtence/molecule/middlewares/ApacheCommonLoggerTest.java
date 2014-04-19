@@ -38,7 +38,7 @@ public class ApacheCommonLoggerTest {
 
     @Test public void
     logsRequestsServedInApacheCommonLogFormat() throws Exception {
-        request.withIp("192.168.0.1").withMethod(GET).withPath("/products?keyword=dogs");
+        request.remoteIp("192.168.0.1").withMethod(GET).uri("/products?keyword=dogs");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("a response with a size of 28");
@@ -54,7 +54,7 @@ public class ApacheCommonLoggerTest {
 
     @Test public void
     hyphenReplacesContentSizeForEmptyResponses() throws Exception {
-        request.withIp("192.168.0.1").withMethod(DELETE).withPath("/logout");
+        request.remoteIp("192.168.0.1").withMethod(DELETE).uri("/logout");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.contentLength(0);

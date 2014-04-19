@@ -66,7 +66,7 @@ public class FileServerTest {
 
     @Test public void
     rendersNotFoundWhenFileIsNotFound() throws Exception {
-        fileServer.handle(request.withPath("/images/missing.png"), response);
+        fileServer.handle(request.path("/images/missing.png"), response);
         response.assertStatus(NOT_FOUND);
         response.assertContentType("text/plain");
         response.assertBody("File not found: /images/missing.png");
@@ -74,7 +74,7 @@ public class FileServerTest {
 
     @Test public void
     rendersNotFoundWhenFileIsNotReadable() throws Exception {
-        fileServer.handle(request.withPath("/images"), response);
+        fileServer.handle(request.path("/images"), response);
         response.assertStatus(NOT_FOUND);
     }
 

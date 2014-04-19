@@ -43,7 +43,7 @@ public class DynamicRoute implements Route {
 
         public RequestWithPathBoundParameters(Request request, WithBoundParameters path) {
             super(request);
-            boundParameters = path.boundParameters(request.pathInfo());
+            boundParameters = path.boundParameters(request.path());
         }
 
         public String parameter(String name) {

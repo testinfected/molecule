@@ -53,11 +53,11 @@ public class FileServer implements Application {
             return;
         }
 
-        File file = new File(root, request.pathInfo());
+        File file = new File(root, request.path());
         if (!canServe(file)) {
             response.status(HttpStatus.NOT_FOUND);
             response.contentType(MimeTypes.TEXT);
-            response.body("File not found: " + request.pathInfo());
+            response.body("File not found: " + request.path());
             return;
         }
 

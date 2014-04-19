@@ -33,7 +33,7 @@ public class StaticAssets extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        if (canServe(request.pathInfo())) {
+        if (canServe(request.path())) {
             serve(request, response);
         } else {
             forward(request, response);
@@ -42,13 +42,13 @@ public class StaticAssets extends AbstractMiddleware {
 
     private void serve(Request request, Response response) throws Exception {
         if (targetsDirectory(request)) {
-            request = override(request).withPath(request.pathInfo() + indexFile);
+            request = override(request).withPath(request.path() + indexFile);
         }
         fileServer.handle(request, response);
     }
 
     private boolean targetsDirectory(Request request) {
-        return request.pathInfo().endsWith("/");
+        return request.path().endsWith("/");
     }
 
     private boolean canServe(String path) throws Exception {
@@ -78,8 +78,8 @@ public class StaticAssets extends AbstractMiddleware {
             return this;
         }
 
-        public String pathInfo() {
-            return path != null ? path : super.pathInfo();
+        public String path() {
+            return path != null ? path : super.path();
         }
     }
 }

@@ -22,9 +22,13 @@ public interface Request {
 
     String uri();
 
-    String pathInfo();
+    String path();
 
-    String ip();
+    String remoteIp();
+
+    String remoteHost();
+
+    int remotePort();
 
     String protocol();
 

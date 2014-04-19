@@ -1,25 +1,24 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.Request;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
-
 public class NotFoundTest {
 
     NotFound notFound = new NotFound();
 
-    MockRequest request = aRequest().withPath("/resource");
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     String content = "Not found: /resource";
 
     @Before public void
     handleRequest() throws Exception {
-        notFound.handle(request, response);
+        notFound.handle(request.path("/resource"), response);
     }
 
     @Test public void

@@ -11,7 +11,7 @@ public class RequestWithPath implements Matcher<Request> {
     }
 
     public boolean matches(Request actual) {
-        return path.matches(actual.pathInfo());
+        return path.matches(actual.path());
     }
 
     public static RequestWithPath withPath(Matcher<? super String> pathMatcher) {

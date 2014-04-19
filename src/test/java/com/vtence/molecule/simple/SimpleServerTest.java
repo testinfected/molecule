@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -132,20 +133,24 @@ public class SimpleServerTest {
         final Map<String, String> info = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                info.put("ip", request.ip());
                 info.put("uri", request.uri());
-                info.put("pathInfo", request.pathInfo());
+                info.put("path", request.path());
+                info.put("ip", request.remoteIp());
+                info.put("hostname", request.remoteHost());
+                info.put("port", String.valueOf(request.remotePort()));
                 info.put("protocol", request.protocol());
             }
         });
 
-        request.post("/uri");
+        request.get("/path?query");
         assertNoError();
 
         assertThat("request information", info, allOf(
+                hasEntry("uri", "/path?query"),
+                hasEntry("path", "/path"),
                 hasEntry("ip", "127.0.0.1"),
-                hasEntry("pathInfo", "/uri"),
-                hasEntry("uri", "/uri"),
+                hasEntry("hostname", "localhost"),
+                hasEntry(equalTo("port"), notNullValue()),
                 hasEntry("protocol", "HTTP/1.1")));
     }
 

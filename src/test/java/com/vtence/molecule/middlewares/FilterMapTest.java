@@ -53,7 +53,7 @@ public class FilterMapTest {
 
     @Test public void
     matchesOnPathPrefix() throws Exception {
-        request.withPath("/filtered/path");
+        request.path("/filtered/path");
         filters.map("/filtered", filter("filter"));
 
         filters.handle(request, response);

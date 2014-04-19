@@ -2,7 +2,7 @@ package com.vtence.molecule.support;
 
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.Request;
+import com.vtence.molecule.simple.SimpleRequest;
 import org.hamcrest.Matcher;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertThat;
 
-public class MockRequest implements Request {
+public class MockRequest extends SimpleRequest {
 
     private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
     private final Map<String, List<String>> params = new HashMap<String, List<String>>();
@@ -22,49 +22,43 @@ public class MockRequest implements Request {
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     private HttpMethod method = HttpMethod.GET;
-    private String path = "/";
-    private String ip = "127.0.0.1";
-    private String protocol = "HTTP/1.1";
 
-    public MockRequest() {}
+    public MockRequest() {
+        uri("/");
+        path("/");
+        protocol("HTTP/1.1");
+    }
 
     public static MockRequest aRequest() {
         return new MockRequest();
     }
 
     public static MockRequest GET(String path) {
-        return aRequest().withPath(path).withMethod(HttpMethod.GET);
+        return aRequest().path(path).withMethod(HttpMethod.GET);
     }
 
     public static MockRequest POST(String path) {
-        return aRequest().withPath(path).withMethod(HttpMethod.POST);
+        return aRequest().path(path).withMethod(HttpMethod.POST);
     }
 
     public static MockRequest PUT(String path) {
-        return aRequest().withPath(path).withMethod(HttpMethod.PUT);
+        return aRequest().path(path).withMethod(HttpMethod.PUT);
     }
 
     public static MockRequest DELETE(String path) {
-        return aRequest().withPath(path).withMethod(HttpMethod.DELETE);
+        return aRequest().path(path).withMethod(HttpMethod.DELETE);
     }
 
-    public MockRequest withPath(String path) {
-        this.path = path;
-        return this;
+    public MockRequest path(String path) {
+        return (MockRequest) super.path(path);
+    }
+
+    public MockRequest remoteIp(String ip) {
+        return (MockRequest) super.remoteIp(ip);
     }
 
     public MockRequest withMethod(HttpMethod method) {
         this.method = method;
-        return this;
-    }
-
-    public MockRequest withIp(String address) {
-        this.ip = address;
-        return this;
-    }
-
-    public MockRequest withProtocol(String protocol) {
-        this.protocol = protocol;
         return this;
     }
 
@@ -99,10 +93,6 @@ public class MockRequest implements Request {
         return method;
     }
 
-    public String pathInfo() {
-        return path;
-    }
-
     public void addParameter(String name, String value) {
         if (!params.containsKey(name)) params.put(name, new ArrayList<String>());
         params.get(name).add(value);
@@ -123,14 +113,6 @@ public class MockRequest implements Request {
         List<String> values = params.get(name);
         if (values == null) return new String[0];
         return values.toArray(new String[values.size()]);
-    }
-
-    public String protocol() {
-        return protocol;
-    }
-
-    public String uri() {
-        return pathInfo();
     }
 
     public String body() throws IOException {
@@ -160,10 +142,6 @@ public class MockRequest implements Request {
         throw new UnsupportedOperationException();
     }
 
-    public String ip() {
-        return ip;
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T attribute(Object key) {
         return (T) attributes.get(key);
@@ -186,6 +164,6 @@ public class MockRequest implements Request {
     }
 
     public String toString() {
-        return String.format("%s %s", method(), pathInfo());
+        return String.format("%s %s", method(), path());
     }
 }

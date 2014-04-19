@@ -55,12 +55,20 @@ public class RequestWrapper implements Request {
         return request.uri();
     }
 
-    public String pathInfo() {
-        return request.pathInfo();
+    public String path() {
+        return request.path();
     }
 
-    public String ip() {
-        return request.ip();
+    public String remoteIp() {
+        return request.remoteIp();
+    }
+
+    public String remoteHost() {
+        return request.remoteHost();
+    }
+
+    public int remotePort() {
+        return request.remotePort();
     }
 
     public String protocol() {
