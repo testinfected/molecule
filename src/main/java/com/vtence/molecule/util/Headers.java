@@ -28,8 +28,8 @@ public class Headers {
         return values.size();
     }
 
-    public Iterable<String> names() {
-        return new LinkedHashSet<String>(names.values());
+    public List<String> names() {
+        return new ArrayList<String>(new LinkedHashSet<String>(names.values()));
     }
 
     public Map<String, String> all() {

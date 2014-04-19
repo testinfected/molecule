@@ -33,7 +33,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "deflate");
+        request.header("Accept-Encoding", "deflate");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "deflate");
         assertThat("body", inflate(response), equalTo("uncompressed body"));
@@ -47,7 +47,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "gzip");
+        request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "gzip");
         assertThat("body", unzip(response), equalTo("uncompressed body"));
@@ -61,7 +61,8 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "gzip", "deflate");
+        request.addHeader("Accept-Encoding", "gzip");
+        request.addHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "gzip");
         assertThat("body", unzip(response), equalTo("uncompressed body"));
@@ -74,7 +75,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "deflate");
+        request.header("Accept-Encoding", "deflate");
         compressor.handle(request, response);
         response.assertNoHeader("Content-Encoding");
     }
@@ -88,7 +89,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "deflate");
+        request.header("Accept-Encoding", "deflate");
         compressor.handle(request, response);
         response.assertNoHeader("Content-Length");
     }
@@ -101,7 +102,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "compress");
+        request.header("Accept-Encoding", "compress");
         compressor.handle(request, response);
         response.assertNoHeader("Content-Encoding");
         response.assertBody("uncompressed body");
@@ -116,7 +117,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "identity");
+        request.header("Accept-Encoding", "identity");
         compressor.handle(request, response);
         response.assertHeader("Content-Length", "128");
     }
@@ -130,7 +131,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "gzip");
+        request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "deflate");
         response.assertBody("compressed body");
@@ -145,7 +146,7 @@ public class CompressorTest {
             }
         });
 
-        request.withHeader("Accept-Encoding", "gzip");
+        request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
@@ -157,7 +158,7 @@ public class CompressorTest {
                 response.body("uncompressed body");
             }
         });
-        request.withHeader("Accept-Encoding", "identity;q=0");
+        request.header("Accept-Encoding", "identity;q=0");
         compressor.handle(request, response);
         response.assertStatus(HttpStatus.NOT_ACCEPTABLE);
         response.assertContentType("text/plain");

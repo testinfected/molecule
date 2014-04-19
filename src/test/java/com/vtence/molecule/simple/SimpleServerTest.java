@@ -171,10 +171,9 @@ public class SimpleServerTest {
                 send();
         assertNoError();
 
-        assertThat("Header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
-        assertThat("Accept header", headers.get("accept"), contains("text/html"));
-        assertThat("Accept-Encoding header", headers.get("encoding"), contains("gzip", "deflate",
-                "identity"));
+        assertThat("header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
+        assertThat("accept", headers.get("accept"), contains("text/html"));
+        assertThat("accept-encoding", headers.get("encoding"), contains("gzip", "deflate", "identity"));
     }
 
     @SuppressWarnings("unchecked")
@@ -195,10 +194,9 @@ public class SimpleServerTest {
                 .post("/uri");
         assertNoError();
 
-        assertThat("request content", content, allOf(
-                hasEntry("contentType", "application/x-www-form-urlencoded"),
-                hasEntry("contentLength", "10"),
-                hasEntry("body", "name=value")));
+        assertThat("request content", content, allOf(hasEntry("contentType", "application/x-www-form-urlencoded"),
+                                                     hasEntry("contentLength", "10"),
+                                                     hasEntry("body", "name=value")));
     }
 
     @Test public void
@@ -215,9 +213,8 @@ public class SimpleServerTest {
         request.withCookie("cookie1", "value1").withCookie("cookie2", "value2").send();
         assertNoError();
 
-        assertThat("request cookies", cookies, allOf(
-                hasEntry("cookie1", "value1"),
-                hasEntry("cookie2", "value2")));
+        assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"),
+                                                     hasEntry("cookie2", "value2")));
     }
 
     @Test public void

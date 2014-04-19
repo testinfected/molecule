@@ -21,8 +21,7 @@ public class HeadersTest {
         headers.put("transfer-encoding", "chunked");
         headers.put("ALLOW", "GET");
 
-        assertThat("names", headers.names(), contains("Content-Type", "transfer-encoding",
-                "ALLOW"));
+        assertThat("names", headers.names(), contains("Content-Type", "transfer-encoding", "ALLOW"));
 
         assertThat("headers", headers.all(), allOf(
                 hasEntry("Content-Type", "text/plain"),

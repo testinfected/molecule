@@ -1,5 +1,6 @@
 package com.vtence.molecule.util;
 
+import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
 import java.nio.charset.Charset;
@@ -15,13 +16,22 @@ public class ContentType {
     private final String subType;
     private final String charset;
 
+    public ContentType(String type, String subType, String charset) {
+        this.type = type;
+        this.subType = subType;
+        this.charset = charset;
+    }
+
     public static ContentType of(Response response) {
-        String header = response.get(CONTENT_TYPE);
-        return header != null ? parse(header) : null;
+        return parse(response.get(CONTENT_TYPE));
+    }
+
+    public static ContentType of(Request request) {
+        return parse(request.header(CONTENT_TYPE));
     }
 
     public static ContentType parse(String header) {
-        return from(new Header(header));
+        return header != null ? from(new Header(header)) : null;
     }
 
     public static ContentType from(Header header) {
@@ -40,12 +50,6 @@ public class ContentType {
 
     private static String charset(Header.Value header) {
         return header.parameter("charset");
-    }
-
-    public ContentType(String type, String subType, String charset) {
-        this.type = type;
-        this.subType = subType;
-        this.charset = charset;
     }
 
     public String mediaType() {

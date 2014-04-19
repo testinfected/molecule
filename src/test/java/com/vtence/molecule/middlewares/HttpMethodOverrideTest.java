@@ -29,27 +29,27 @@ public class HttpMethodOverrideTest {
     @Test public void
     doesNotAffectGetMethods() throws Exception {
         request.addParameter("_method", "delete");
-        methodOverride.handle(request.withMethod(GET), response);
+        methodOverride.handle(request.method(GET), response);
         assertMethod("GET");
     }
 
     @Test public void
     leavesMethodUnchangedWhenOverrideParameterAbsent() throws Exception {
-        methodOverride.handle(request.withMethod(POST), response);
+        methodOverride.handle(request.method(POST), response);
         assertMethod("POST");
     }
 
     @Test public void
     changesPostMethodsAccordingToOverrideParameter() throws Exception {
         request.addParameter("_method", "delete");
-        methodOverride.handle(request.withMethod(POST), response);
+        methodOverride.handle(request.method(POST), response);
         assertMethod("DELETE");
     }
 
     @Test public void
     leavesMethodUnchangedIfMethodIsNotSupported() throws Exception {
         request.withParameter("_method", "unsupported");
-        methodOverride.handle(request.withMethod(POST), response);
+        methodOverride.handle(request.method(POST), response);
         assertMethod("POST");
     }
 

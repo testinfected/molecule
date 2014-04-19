@@ -10,22 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertThat;
 
 public class MockRequest extends SimpleRequest {
 
-    private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
     private final Map<String, List<String>> params = new HashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
-
-    private HttpMethod method = HttpMethod.GET;
 
     public MockRequest() {
         uri("/");
         path("/");
         protocol("HTTP/1.1");
+        method(HttpMethod.GET);
     }
 
     public static MockRequest aRequest() {
@@ -33,19 +30,19 @@ public class MockRequest extends SimpleRequest {
     }
 
     public static MockRequest GET(String path) {
-        return aRequest().path(path).withMethod(HttpMethod.GET);
+        return aRequest().path(path).method(HttpMethod.GET);
     }
 
     public static MockRequest POST(String path) {
-        return aRequest().path(path).withMethod(HttpMethod.POST);
+        return aRequest().path(path).method(HttpMethod.POST);
     }
 
     public static MockRequest PUT(String path) {
-        return aRequest().path(path).withMethod(HttpMethod.PUT);
+        return aRequest().path(path).method(HttpMethod.PUT);
     }
 
     public static MockRequest DELETE(String path) {
-        return aRequest().path(path).withMethod(HttpMethod.DELETE);
+        return aRequest().path(path).method(HttpMethod.DELETE);
     }
 
     public MockRequest path(String path) {
@@ -56,9 +53,8 @@ public class MockRequest extends SimpleRequest {
         return (MockRequest) super.remoteIp(ip);
     }
 
-    public MockRequest withMethod(HttpMethod method) {
-        this.method = method;
-        return this;
+    public MockRequest method(HttpMethod method) {
+        return (MockRequest) super.method(method);
     }
 
     public long contentLength() {
@@ -67,29 +63,6 @@ public class MockRequest extends SimpleRequest {
 
     public String contentType() {
         return null;
-    }
-
-    public MockRequest withHeader(String header, String... values) {
-        headers.put(header, asList(values));
-        return this;
-    }
-
-    public List<String> headerNames() {
-        return new ArrayList<String>(headers.keySet());
-    }
-
-    public List<String> headers(String name) {
-        List<String> values = headers.get(name);
-        return values != null ? new ArrayList<String>(values) : new ArrayList<String>();
-    }
-
-    public String header(String name) {
-        List<String> values = headers(name);
-        return values.isEmpty() ? null : values.get(0);
-    }
-
-    public HttpMethod method() {
-        return method;
     }
 
     public void addParameter(String name, String value) {

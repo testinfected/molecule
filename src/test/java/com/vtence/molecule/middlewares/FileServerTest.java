@@ -80,7 +80,7 @@ public class FileServerTest {
 
     @Test public void
     sendsNotModifiedIfFileHasNotBeenModifiedSinceLastServe() throws Exception {
-        request.withHeader("If-Modified-Since", HttpDate.format(file.lastModified()));
+        request.header("If-Modified-Since", HttpDate.format(file.lastModified()));
         fileServer.handle(request, response);
         response.assertStatus(NOT_MODIFIED);
     }
@@ -98,7 +98,7 @@ public class FileServerTest {
 
     @Test public void
     allowsHeadRequests() throws Exception {
-        fileServer.handle(request.withMethod(HttpMethod.HEAD), response);
+        fileServer.handle(request.method(HttpMethod.HEAD), response);
         response.assertStatus(OK);
         response.assertContentSize(0);
         response.assertHeader("Content-Length", valueOf(file.length()));
@@ -106,7 +106,7 @@ public class FileServerTest {
 
     @Test public void
     rejectsUnsupportedMethod() throws Exception {
-        fileServer.handle(request.withMethod(HttpMethod.POST), response);
+        fileServer.handle(request.method(HttpMethod.POST), response);
         response.assertStatus(METHOD_NOT_ALLOWED);
         response.assertHeader("Allow", "GET, HEAD");
         response.assertNoHeader("Last-Modified");
