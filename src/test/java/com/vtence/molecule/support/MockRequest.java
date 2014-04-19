@@ -1,6 +1,5 @@
 package com.vtence.molecule.support;
 
-import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.simple.SimpleRequest;
 import org.hamcrest.Matcher;
@@ -16,7 +15,6 @@ public class MockRequest extends SimpleRequest {
 
     private final Map<String, List<String>> params = new HashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
-    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     public MockRequest() {
         uri("/");
@@ -87,23 +85,8 @@ public class MockRequest extends SimpleRequest {
         return values.toArray(new String[values.size()]);
     }
 
-    public MockRequest withCookie(String name, String value) {
-        cookies.put(name, new Cookie(name, value));
-        return this;
-    }
-
-    public List<Cookie> cookies() {
-        return new ArrayList<Cookie>(cookies.values());
-    }
-
-    public Cookie cookie(String name) {
-        return cookies.get(name);
-    }
-
-    @Override
-    public String cookieValue(String name) {
-        Cookie cookie = cookie(name);
-        return cookie != null ? cookie.value() : null;
+    public MockRequest addCookie(String name, String value) {
+        return (MockRequest) super.addCookie(name, value);
     }
 
     public <T> T unwrap(Class<T> type) {

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class SimpleRequest implements com.vtence.molecule.Request {
     private org.simpleframework.http.Request request;
 
     private final Headers headers = new Headers();
+    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
 
     private String uri;
     private String path;
@@ -37,26 +39,8 @@ public class SimpleRequest implements com.vtence.molecule.Request {
     public SimpleRequest() {
     }
 
-    public SimpleRequest(org.simpleframework.http.Request request) throws IOException {
+    public SimpleRequest(org.simpleframework.http.Request request) {
         this.request = request;
-        // todo that's only temporary, until we no longer need the wrapped request
-        uri(request.getTarget());
-        path(request.getPath().getPath());
-        remoteIp(request.getClientAddress().getAddress().getHostAddress());
-        remotePort(request.getClientAddress().getPort());
-        remoteHost(request.getClientAddress().getHostName());
-        protocol(String.format("HTTP/%s.%s", request.getMajor(), request.getMinor()));
-        input(request.getInputStream());
-        method(request.getMethod());
-        List<String> names = request.getNames();
-        for (int i = 0; i < names.size(); i++) {
-            String header = names.get(i);
-            List<String> values = request.getValues(header);
-            for (int j = 0; j < values.size(); j++) {
-                String value = values.get(j);
-                addHeader(header, value);
-            }
-        }
     }
 
     public Request uri(String uri) {
@@ -178,6 +162,24 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return headers.get(name);
     }
 
+    public Request addCookie(String name, String value) {
+        cookies.put(name, new Cookie(name, value));
+        return this;
+    }
+
+    public List<Cookie> cookies() {
+        return new ArrayList<Cookie>(cookies.values());
+    }
+
+    public Cookie cookie(String name) {
+        return cookies.get(name);
+    }
+
+    public String cookieValue(String name) {
+        Cookie cookie = cookie(name);
+        return cookie != null ? cookie.value() : null;
+    }
+
     public long contentLength() {
         String value = header(HttpHeaders.CONTENT_LENGTH);
         return value != null ? parseLong(value) : -1;
@@ -195,25 +197,6 @@ public class SimpleRequest implements com.vtence.molecule.Request {
     public String[] parameters(String name) {
         List<String> values = request.getQuery().getAll(name);
         return values.toArray(new String[values.size()]);
-    }
-
-    public List<Cookie> cookies() {
-        List<Cookie> cookies = new ArrayList<Cookie>();
-        for (org.simpleframework.http.Cookie cookie : request.getCookies()) {
-            cookies.add(new Cookie(cookie.getName(), cookie.getValue()));
-        }
-        return cookies;
-    }
-
-    public Cookie cookie(String name) {
-        org.simpleframework.http.Cookie cooky = request.getCookie(name);
-        if (cooky == null) return null;
-        return new Cookie(cooky.getName(), cooky.getValue());
-    }
-
-    public String cookieValue(String name) {
-        Cookie cookie = cookie(name);
-        return cookie != null ? cookie.value() : null;
     }
 
     @SuppressWarnings("unchecked")

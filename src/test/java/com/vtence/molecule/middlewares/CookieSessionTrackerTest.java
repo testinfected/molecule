@@ -77,7 +77,7 @@ public class CookieSessionTrackerTest {
             will(returnValue("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
         response.assertBody("Counter: 2");
     }
 
@@ -88,7 +88,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
     }
 
     @Test public void
@@ -99,7 +99,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "expired"), response);
+        tracker.handle(request.addCookie("JSESSIONID", "expired"), response);
         response.assertBody("Counter: 1");
         response.assertCookie("JSESSIONID", cookieWithValue("new"));
     }
@@ -111,7 +111,7 @@ public class CookieSessionTrackerTest {
             allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
         response.assertHasNoCookie("JSESSIONID");
     }
 
@@ -122,7 +122,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).destroy(with("existing"));
         }});
 
-        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
         response.assertCookie("JSESSIONID", cookieWithMaxAge(0));
     }
 
@@ -164,7 +164,7 @@ public class CookieSessionTrackerTest {
             allowing(store).save(with(sessionWithId("existing")));
             will(returnValue("existing"));
         }});
-        tracker.handle(request.withCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
         response.assertCookie("JSESSIONID", cookieWithMaxAge(timeout));
     }
 
