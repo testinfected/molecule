@@ -1,4 +1,4 @@
-package com.vtence.molecule.support;
+package com.vtence.molecule.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +23,11 @@ public final class Streams {
     }
 
     public static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[8 * 1024];
+        copy(in, out, 8 * 1024);
+    }
+
+    public static void copy(InputStream in, OutputStream out, int chunkSize) throws IOException {
+        byte[] buffer = new byte[chunkSize];
         int read;
         while ((read = in.read(buffer)) != -1) {
             out.write(buffer, 0, read);

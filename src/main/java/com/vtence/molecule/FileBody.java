@@ -1,5 +1,7 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.util.Streams;
+
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -35,17 +37,9 @@ public class FileBody implements Body {
     public void writeTo(OutputStream out, Charset charset) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         try {
-            copy(out, in);
+            Streams.copy(in, out, chunkSize);
         } finally {
             close(in);
-        }
-    }
-
-    private void copy(OutputStream out, InputStream in) throws IOException {
-        byte[] buffer = new byte[chunkSize];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
         }
     }
 

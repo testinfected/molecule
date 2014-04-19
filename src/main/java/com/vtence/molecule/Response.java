@@ -125,7 +125,7 @@ public class Response {
 
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
-        if (contentType == null || contentType.charsetName() == null) {
+        if (contentType == null || contentType.charset() == null) {
             return Charsets.ISO_8859_1;
         }
         return contentType.charset();

@@ -3,8 +3,13 @@ package com.vtence.molecule.simple;
 import com.vtence.molecule.Cookie;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.Request;
+import com.vtence.molecule.util.Charsets;
+import com.vtence.molecule.util.Streams;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +23,14 @@ public class SimpleRequest implements com.vtence.molecule.Request {
     private int port;
     private String hostName;
     private String protocol;
+    private InputStream input;
+    private Charset charset;
+
 
     public SimpleRequest() {
     }
 
-    public SimpleRequest(org.simpleframework.http.Request request) {
+    public SimpleRequest(org.simpleframework.http.Request request) throws IOException {
         this.request = request;
         // todo that's only temporary, until we no longer need the wrapped request
         uri(request.getTarget());
@@ -31,6 +39,9 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         remotePort(request.getClientAddress().getPort());
         remoteHost(request.getClientAddress().getHostName());
         protocol(String.format("HTTP/%s.%s", request.getMajor(), request.getMinor()));
+        input(request.getInputStream());
+        charset(request.getContentType() == null ||
+                request.getContentType().getCharset() == null ? Charsets.ISO_8859_1 : Charset.forName(request.getContentType().getCharset()));
     }
 
     public Request uri(String uri) {
@@ -51,17 +62,13 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return path;
     }
 
-    public String remoteIp() {
-        return ip;
-    }
-
     public Request remoteIp(String ip) {
         this.ip = ip;
         return this;
     }
 
-    public String remoteHost() {
-        return hostName;
+    public String remoteIp() {
+        return ip;
     }
 
     public Request remoteHost(String hostName) {
@@ -69,8 +76,8 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return this;
     }
 
-    public int remotePort() {
-        return port;
+    public String remoteHost() {
+        return hostName;
     }
 
     public Request remotePort(int port) {
@@ -78,8 +85,8 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return this;
     }
 
-    public String protocol() {
-        return protocol;
+    public int remotePort() {
+        return port;
     }
 
     public Request protocol(String protocol) {
@@ -87,8 +94,39 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return this;
     }
 
+    public String protocol() {
+        return protocol;
+    }
+
+    public Request input(String body) {
+        return input(body.getBytes(charset()));
+    }
+
+    public Request input(byte[] content) {
+        this.input = new ByteArrayInputStream(content);
+        return this;
+    }
+
+    public Request input(InputStream input) {
+        this.input = input;
+        return this;
+    }
+
+    public InputStream input() {
+        return input;
+    }
+
     public String body() throws IOException {
-        return request.getContent();
+        return Streams.toString(input, charset());
+    }
+
+    public Request charset(Charset charset) {
+        this.charset = charset;
+        return this;
+    }
+
+    public Charset charset() {
+        return charset;
     }
 
     public long contentLength() {
@@ -126,7 +164,7 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     public List<Cookie> cookies() {
         List<Cookie> cookies = new ArrayList<Cookie>();
-        for (org.simpleframework.http.Cookie cookie: request.getCookies()) {
+        for (org.simpleframework.http.Cookie cookie : request.getCookies()) {
             cookies.add(new Cookie(cookie.getName(), cookie.getValue()));
         }
         return cookies;

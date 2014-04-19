@@ -5,7 +5,6 @@ import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.simple.SimpleRequest;
 import org.hamcrest.Matcher;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -113,10 +112,6 @@ public class MockRequest extends SimpleRequest {
         List<String> values = params.get(name);
         if (values == null) return new String[0];
         return values.toArray(new String[values.size()]);
-    }
-
-    public String body() throws IOException {
-        return null;
     }
 
     public MockRequest withCookie(String name, String value) {

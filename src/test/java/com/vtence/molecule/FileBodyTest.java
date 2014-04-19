@@ -1,7 +1,7 @@
 package com.vtence.molecule;
 
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.support.Streams;
+import com.vtence.molecule.util.Streams;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,6 +27,7 @@ public class FileBodyTest {
         response.assertContentSize(file.length());
         response.assertContent(contentOf(file));
     }
+
     private byte[] contentOf(final File file) throws IOException, URISyntaxException {
         return Streams.toBytes(new FileInputStream(file));
     }
