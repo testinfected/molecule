@@ -1,54 +1,217 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.util.Charsets;
+import com.vtence.molecule.util.ContentType;
+import com.vtence.molecule.util.Headers;
+import com.vtence.molecule.util.Streams;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface Request {
+import static java.lang.Long.parseLong;
 
-    String body() throws IOException;
+public class Request {
 
-    long contentLength();
+    private final Headers headers = new Headers();
+    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
+    private final Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
-    String contentType();
+    private String uri;
+    private String path;
+    private String ip;
+    private int port;
+    private String hostName;
+    private String protocol;
+    private InputStream input;
+    private HttpMethod method;
 
-    String header(String name);
+    public Request() {}
 
-    List<String> headers(String name);
+    public Request uri(String uri) {
+        this.uri = uri;
+        return this;
+    }
 
-    List<String> headerNames();
+    public String uri() {
+        return uri;
+    }
 
-    HttpMethod method();
+    public Request path(String path) {
+        this.path = path;
+        return this;
+    }
 
-    String uri();
+    public String path() {
+        return path;
+    }
 
-    String path();
+    public Request remoteIp(String ip) {
+        this.ip = ip;
+        return this;
+    }
 
-    String remoteIp();
+    public String remoteIp() {
+        return ip;
+    }
 
-    String remoteHost();
+    public Request remoteHost(String hostName) {
+        this.hostName = hostName;
+        return this;
+    }
 
-    int remotePort();
+    public String remoteHost() {
+        return hostName;
+    }
 
-    String protocol();
+    public Request remotePort(int port) {
+        this.port = port;
+        return this;
+    }
 
-    String parameter(String name);
+    public int remotePort() {
+        return port;
+    }
 
-    List<String> parameters(String name);
+    public Request protocol(String protocol) {
+        this.protocol = protocol;
+        return this;
+    }
 
-    Cookie cookie(String name);
+    public String protocol() {
+        return protocol;
+    }
 
-    String cookieValue(String name);
+    public Request method(String method) {
+        return method(HttpMethod.valueOf(method));
+    }
 
-    List<Cookie> cookies();
+    public Request method(HttpMethod method) {
+        this.method = method;
+        return this;
+    }
 
-    <T> T attribute(Object key);
+    public HttpMethod method() {
+        return method;
+    }
 
-    Map<Object, Object> attributes();
+    public Request input(String body) {
+        return input(body.getBytes(charset()));
+    }
 
-    void attribute(Object key, Object value);
+    public Request input(byte[] content) {
+        this.input = new ByteArrayInputStream(content);
+        return this;
+    }
 
-    void removeAttribute(Object key);
+    public Request input(InputStream input) {
+        this.input = input;
+        return this;
+    }
 
-    <T> T unwrap(Class<T> type);
+    public InputStream input() {
+        return input;
+    }
+
+    public String body() throws IOException {
+        return Streams.toString(input, charset());
+    }
+
+    public Charset charset() {
+        ContentType contentType = ContentType.of(this);
+        if (contentType == null || contentType.charset() == null) {
+            return Charsets.ISO_8859_1;
+        }
+        return contentType.charset();
+    }
+
+    public Request addHeader(String name, String value) {
+        headers.add(name, value);
+        return this;
+    }
+
+    public Request header(String name, String value) {
+        headers.put(name, value);
+        return this;
+    }
+
+    public List<String> headerNames() {
+        return headers.names();
+    }
+
+    public List<String> headers(String name) {
+        return headers.list(name);
+    }
+
+    public String header(String name) {
+        return headers.get(name);
+    }
+
+    public Request addCookie(String name, String value) {
+        cookies.put(name, new Cookie(name, value));
+        return this;
+    }
+
+    public List<Cookie> cookies() {
+        return new ArrayList<Cookie>(cookies.values());
+    }
+
+    public Cookie cookie(String name) {
+        return cookies.get(name);
+    }
+
+    public String cookieValue(String name) {
+        Cookie cookie = cookie(name);
+        return cookie != null ? cookie.value() : null;
+    }
+
+    public long contentLength() {
+        String value = header(HttpHeaders.CONTENT_LENGTH);
+        return value != null ? parseLong(value) : -1;
+    }
+
+    public String contentType() {
+        ContentType contentType = ContentType.of(this);
+        return contentType != null ? contentType.mediaType() : null;
+    }
+
+    public Request addParameter(String name, String value) {
+        if (!parameters.containsKey(name)) {
+            parameters.put(name, new ArrayList<String>());
+        }
+        parameters.get(name).add(value);
+        return this;
+    }
+
+    public String parameter(String name) {
+        List<String> values = parameters(name);
+        return parameters.isEmpty() ?  null : values.get(values.size() - 1);
+    }
+
+    public List<String> parameters(String name) {
+        return parameters.containsKey(name) ? new ArrayList<String>(parameters.get(name)) : new ArrayList<String>();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T attribute(Object key) {
+        return (T) attributes.get(key);
+    }
+
+    public void attribute(Object key, Object value) {
+        attributes.put(key, value);
+    }
+
+    public void removeAttribute(Object key) {
+        attributes.remove(key);
+    }
+
+    public Map<Object, Object> attributes() {
+        return attributes;
+    }
 }

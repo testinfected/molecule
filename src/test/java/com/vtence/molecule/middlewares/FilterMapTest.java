@@ -10,14 +10,13 @@ import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
 import static java.lang.String.format;
 
 public class FilterMapTest {
 
     FilterMap filters = new FilterMap();
 
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Before public void

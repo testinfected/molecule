@@ -23,7 +23,7 @@ public class DynamicRouteDefinitionTest {
     DynamicRouteDefinition definition = new DynamicRouteDefinition();
     Mockery context = new JUnit4Mockery();
     Application app = context.mock(Application.class);
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Test(expected = IllegalStateException.class) public void

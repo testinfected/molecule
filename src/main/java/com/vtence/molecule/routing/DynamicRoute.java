@@ -7,7 +7,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.matchers.Combination;
 import com.vtence.molecule.matchers.Matchers;
-import com.vtence.molecule.util.RequestWrapper;
 
 import java.util.Map;
 
@@ -33,22 +32,13 @@ public class DynamicRoute implements Route {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        Request wrapper = path instanceof WithBoundParameters ?
-                new RequestWithPathBoundParameters(request, (WithBoundParameters) path) : request;
-        app.handle(wrapper, response);
-    }
-
-    public class RequestWithPathBoundParameters extends RequestWrapper {
-        private final Map<String, String> boundParameters;
-
-        public RequestWithPathBoundParameters(Request request, WithBoundParameters path) {
-            super(request);
-            boundParameters = path.boundParameters(request.path());
+        if (path instanceof WithBoundParameters) {
+            WithBoundParameters dynamicPath = (WithBoundParameters) path;
+            Map<String, String> dynamicParameters = dynamicPath.parametersBoundTo(request.path());
+            for (String name: dynamicParameters.keySet()  ) {
+                request.addParameter(name, dynamicParameters.get(name));
+            }
         }
-
-        public String parameter(String name) {
-            if (boundParameters.containsKey(name)) return boundParameters.get(name);
-            else return super.parameter(name);
-        }
+        app.handle(request, response);
     }
 }

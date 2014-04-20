@@ -1,12 +1,12 @@
 package com.vtence.molecule.support;
 
 import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.simple.SimpleRequest;
+import com.vtence.molecule.Request;
 import org.hamcrest.Matcher;
 
 import static org.junit.Assert.assertThat;
 
-public class MockRequest extends SimpleRequest {
+public class MockRequest extends Request {
 
     public MockRequest() {
         uri("/");
@@ -15,44 +15,32 @@ public class MockRequest extends SimpleRequest {
         method(HttpMethod.GET);
     }
 
-    public static MockRequest aRequest() {
-        return new MockRequest();
-    }
-
     public static MockRequest GET(String path) {
-        return aRequest().path(path).method(HttpMethod.GET);
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.GET);
+        return request;
     }
 
     public static MockRequest POST(String path) {
-        return aRequest().path(path).method(HttpMethod.POST);
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.POST);
+        return request;
     }
 
     public static MockRequest PUT(String path) {
-        return aRequest().path(path).method(HttpMethod.PUT);
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.PUT);
+        return request;
     }
 
     public static MockRequest DELETE(String path) {
-        return aRequest().path(path).method(HttpMethod.DELETE);
-    }
-
-    public MockRequest path(String path) {
-        return (MockRequest) super.path(path);
-    }
-
-    public MockRequest remoteIp(String ip) {
-        return (MockRequest) super.remoteIp(ip);
-    }
-
-    public MockRequest method(HttpMethod method) {
-        return (MockRequest) super.method(method);
-    }
-
-    public MockRequest addCookie(String name, String value) {
-        return (MockRequest) super.addCookie(name, value);
-    }
-
-    public <T> T unwrap(Class<T> type) {
-        throw new UnsupportedOperationException();
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.DELETE);
+        return request;
     }
 
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {

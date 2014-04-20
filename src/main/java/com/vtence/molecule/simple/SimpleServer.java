@@ -3,10 +3,10 @@ package com.vtence.molecule.simple;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Cookie;
+import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import com.vtence.molecule.util.FailureReporter;
-import org.simpleframework.http.Request;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
@@ -67,7 +67,7 @@ public class SimpleServer implements Server {
 
         public void handle(org.simpleframework.http.Request simpleRequest, org.simpleframework.http.Response simpleResponse) {
             try {
-                SimpleRequest request = new SimpleRequest(simpleRequest);
+                Request request = new Request();
                 Response response = new Response();
                 build(simpleRequest, request);
                 app.handle(request, response);
@@ -79,7 +79,7 @@ public class SimpleServer implements Server {
             }
         }
 
-        private void build(org.simpleframework.http.Request simple, SimpleRequest request) throws IOException {
+        private void build(org.simpleframework.http.Request simple, Request request) throws IOException {
             request.uri(simple.getTarget());
             request.path(simple.getPath().getPath());
             request.remoteIp(simple.getClientAddress().getAddress().getHostAddress());
@@ -95,14 +95,14 @@ public class SimpleServer implements Server {
         }
 
         @SuppressWarnings("unchecked")
-        private void buildAttributes(Request simple, SimpleRequest request) {
+        private void buildAttributes(org.simpleframework.http.Request simple, Request request) {
             Map<Object, Object> attributes = simple.getAttributes();
             for (Object key : attributes.keySet()) {
                 request.attribute(key, attributes.get(key));
             }
         }
 
-        private void buildHeaders(org.simpleframework.http.Request simple, SimpleRequest request) {
+        private void buildHeaders(org.simpleframework.http.Request simple, Request request) {
             List<String> names = simple.getNames();
             for (String header : names) {
                 List<String> values = simple.getValues(header);
@@ -112,13 +112,13 @@ public class SimpleServer implements Server {
             }
         }
 
-        private void buildCookies(org.simpleframework.http.Request simpleRequest, SimpleRequest request) {
+        private void buildCookies(org.simpleframework.http.Request simpleRequest, Request request) {
             for (org.simpleframework.http.Cookie cookie : simpleRequest.getCookies()) {
                 request.addCookie(cookie.getName(), cookie.getValue());
             }
         }
 
-        private void buildParameters(Request simple, SimpleRequest request) {
+        private void buildParameters(org.simpleframework.http.Request simple, Request request) {
             for (String name : simple.getQuery().keySet()) {
                 List<String> values = simple.getQuery().getAll(name);
                 for (String value : values) {

@@ -14,7 +14,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -22,7 +21,7 @@ public class CompressorTest {
 
     Compressor compressor = new Compressor();
 
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Test public void

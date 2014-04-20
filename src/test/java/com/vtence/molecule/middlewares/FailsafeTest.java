@@ -9,7 +9,6 @@ import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -24,7 +23,7 @@ public class FailsafeTest {
         });
     }};
 
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Before public void

@@ -17,7 +17,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.Writer;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
 
@@ -30,7 +29,7 @@ public class SiteMeshTest {
     String decoratedPage = "<decorated page>";
     States page = context.states("page").startsAs("selected");
 
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Before public void

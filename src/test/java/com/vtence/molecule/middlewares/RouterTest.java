@@ -11,14 +11,13 @@ import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RouterTest {
 
     Router router = new Router(new NotFound());
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Test public void

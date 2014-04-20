@@ -30,7 +30,7 @@ public class DynamicPath implements Matcher<String>, WithBoundParameters {
         return segment.startsWith(":");
     }
 
-    public Map<String, String> boundParameters(String path) {
+    public Map<String, String> parametersBoundTo(String path) {
         Path p = new Path(path);
         Map<String, String> boundParameters = new HashMap<String, String>();
 

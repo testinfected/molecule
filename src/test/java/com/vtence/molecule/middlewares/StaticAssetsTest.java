@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
-
 public class StaticAssetsTest {
 
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
@@ -22,7 +20,7 @@ public class StaticAssetsTest {
     };
     StaticAssets assets = new StaticAssets(fileServer, "/favicon.ico");
 
-    MockRequest request = aRequest();
+    MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
 
     @Before public void
