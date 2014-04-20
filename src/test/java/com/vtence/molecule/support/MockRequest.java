@@ -4,14 +4,9 @@ import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.simple.SimpleRequest;
 import org.hamcrest.Matcher;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.assertThat;
 
 public class MockRequest extends SimpleRequest {
-
-    private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
     public MockRequest() {
         uri("/");
@@ -58,23 +53,6 @@ public class MockRequest extends SimpleRequest {
 
     public <T> T unwrap(Class<T> type) {
         throw new UnsupportedOperationException();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T attribute(Object key) {
-        return (T) attributes.get(key);
-    }
-
-    public void attribute(Object key, Object value) {
-        attributes.put(key, value);
-    }
-
-    public void removeAttribute(Object key) {
-        attributes.remove(key);
-    }
-
-    public Map<Object, Object> attributes() {
-        return attributes;
     }
 
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {

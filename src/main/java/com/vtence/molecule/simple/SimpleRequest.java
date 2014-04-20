@@ -27,6 +27,7 @@ public class SimpleRequest implements com.vtence.molecule.Request {
     private final Headers headers = new Headers();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
     private final Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
     private String uri;
     private String path;
@@ -210,21 +211,19 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     @SuppressWarnings("unchecked")
     public <T> T attribute(Object key) {
-        return (T) request.getAttribute(key);
+        return (T) attributes.get(key);
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<Object, Object> attributes() {
-        return request.getAttributes();
-    }
-
-    @SuppressWarnings("unchecked")
     public void attribute(Object key, Object value) {
-        request.getAttributes().put(key, value);
+        attributes.put(key, value);
     }
 
     public void removeAttribute(Object key) {
-        request.getAttributes().remove(key);
+        attributes.remove(key);
+    }
+
+    public Map<Object, Object> attributes() {
+        return attributes;
     }
 
     public <T> T unwrap(Class<T> type) {
