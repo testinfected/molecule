@@ -48,7 +48,7 @@ public class HttpMethodOverrideTest {
 
     @Test public void
     leavesMethodUnchangedIfMethodIsNotSupported() throws Exception {
-        request.withParameter("_method", "unsupported");
+        request.addParameter("_method", "unsupported");
         methodOverride.handle(request.method(POST), response);
         assertMethod("POST");
     }

@@ -57,7 +57,7 @@ public class DynamicRouteDefinitionTest {
         context.checking(new Expectations() {{
             oneOf(app).handle(with(hasParameter("number", "100")), with(any(Response.class)));
         }});
-        route.handle(request.path("/resource").withParameter("number", "100"), response);
+        route.handle(request.path("/resource").addParameter("number", "100"), response);
     }
 
     @Test public void
@@ -66,7 +66,7 @@ public class DynamicRouteDefinitionTest {
         context.checking(new Expectations() {{
             oneOf(app).handle(with(hasParameter("id", "1")), with(any(Response.class)));
         }});
-        route.handle(request.path("/resource/1").withParameter("id", "not 1"), response);
+        route.handle(request.path("/resource/1").addParameter("id", "not 1"), response);
     }
 
     private Matcher<Request> hasParameter(final String name, String value) {

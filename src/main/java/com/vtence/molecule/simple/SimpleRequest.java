@@ -26,6 +26,7 @@ public class SimpleRequest implements com.vtence.molecule.Request {
 
     private final Headers headers = new Headers();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
+    private final Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 
     private String uri;
     private String path;
@@ -190,13 +191,21 @@ public class SimpleRequest implements com.vtence.molecule.Request {
         return contentType != null ? contentType.mediaType() : null;
     }
 
-    public String parameter(String name) {
-        return request.getParameter(name);
+    public Request addParameter(String name, String value) {
+        if (!parameters.containsKey(name)) {
+            parameters.put(name, new ArrayList<String>());
+        }
+        parameters.get(name).add(value);
+        return this;
     }
 
-    public String[] parameters(String name) {
-        List<String> values = request.getQuery().getAll(name);
-        return values.toArray(new String[values.size()]);
+    public String parameter(String name) {
+        List<String> values = parameters(name);
+        return parameters.isEmpty() ?  null : values.get(values.size() - 1);
+    }
+
+    public List<String> parameters(String name) {
+        return parameters.containsKey(name) ? new ArrayList<String>(parameters.get(name)) : new ArrayList<String>();
     }
 
     @SuppressWarnings("unchecked")

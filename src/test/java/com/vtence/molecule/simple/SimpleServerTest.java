@@ -118,7 +118,7 @@ public class SimpleServerTest {
     supportsArrayParameters() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(Arrays.toString(request.parameters("names")));
+                response.body(request.parameters("names").toString());
             }
         });
 

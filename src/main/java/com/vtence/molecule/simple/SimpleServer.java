@@ -6,6 +6,7 @@ import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import com.vtence.molecule.util.FailureReporter;
+import org.simpleframework.http.Request;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
@@ -88,6 +89,7 @@ public class SimpleServer implements Server {
             request.method(simple.getMethod());
             buildHeaders(simple, request);
             buildCookies(simple, request);
+            buildParameters(simple, request);
         }
 
         private void buildHeaders(org.simpleframework.http.Request simple, SimpleRequest request) {
@@ -103,6 +105,15 @@ public class SimpleServer implements Server {
         private void buildCookies(org.simpleframework.http.Request simpleRequest, SimpleRequest request) {
             for (org.simpleframework.http.Cookie cookie : simpleRequest.getCookies()) {
                 request.addCookie(cookie.getName(), cookie.getValue());
+            }
+        }
+
+        private void buildParameters(Request simple, SimpleRequest request) {
+            for (String name : simple.getQuery().keySet()) {
+                List<String> values = simple.getQuery().getAll(name);
+                for (String value : values) {
+                    request.addParameter(name, value);
+                }
             }
         }
 

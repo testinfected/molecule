@@ -4,16 +4,13 @@ import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.simple.SimpleRequest;
 import org.hamcrest.Matcher;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertThat;
 
 public class MockRequest extends SimpleRequest {
 
-    private final Map<String, List<String>> params = new HashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
     public MockRequest() {
@@ -53,36 +50,6 @@ public class MockRequest extends SimpleRequest {
 
     public MockRequest method(HttpMethod method) {
         return (MockRequest) super.method(method);
-    }
-
-    public long contentLength() {
-        return -1;
-    }
-
-    public String contentType() {
-        return null;
-    }
-
-    public void addParameter(String name, String value) {
-        if (!params.containsKey(name)) params.put(name, new ArrayList<String>());
-        params.get(name).add(value);
-    }
-
-    public MockRequest withParameter(String name, String value) {
-        addParameter(name, value);
-        return this;
-    }
-
-    public String parameter(String name) {
-        String[] values = parameters(name);
-        if (values.length == 0) return null;
-        return values[0];
-    }
-
-    public String[] parameters(String name) {
-        List<String> values = params.get(name);
-        if (values == null) return new String[0];
-        return values.toArray(new String[values.size()]);
     }
 
     public MockRequest addCookie(String name, String value) {

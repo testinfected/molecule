@@ -34,7 +34,7 @@ public interface Request {
 
     String parameter(String name);
 
-    String[] parameters(String name);
+    List<String> parameters(String name);
 
     Cookie cookie(String name);
 
