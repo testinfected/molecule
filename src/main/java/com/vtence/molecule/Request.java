@@ -203,12 +203,13 @@ public class Request {
         return (T) attributes.get(key);
     }
 
-    public void attribute(Object key, Object value) {
+    public Request attribute(Object key, Object value) {
         attributes.put(key, value);
+        return this;
     }
 
-    public void removeAttribute(Object key) {
-        attributes.remove(key);
+    public Object removeAttribute(Object key) {
+        return attributes.remove(key);
     }
 
     public Map<Object, Object> attributes() {

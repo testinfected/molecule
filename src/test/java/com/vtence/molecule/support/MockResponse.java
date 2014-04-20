@@ -35,16 +35,16 @@ public class MockResponse extends Response {
         assertStatusText(expected.text);
     }
 
-    public void assertRedirectedTo(String expectedLocation) {
-        assertThat("redirection", get(LOCATION), equalTo(expectedLocation));
+    public void assertRedirectedTo(String location) {
+        assertThat("redirection", get(LOCATION), equalTo(location));
     }
 
     public void assertHeader(String name, String value) {
         assertHeader(name, equalTo(value));
     }
 
-    public void assertHeader(String name, Matcher<? super String> valueMatcher) {
-        assertThat(name, get(name), valueMatcher);
+    public void assertHeader(String name, Matcher<? super String> matching) {
+        assertThat(name, get(name), matching);
     }
 
     public void assertNoHeader(String name) {
@@ -55,8 +55,8 @@ public class MockResponse extends Response {
         assertContentType(equalTo(contentType));
     }
 
-    public void assertContentType(Matcher<? super String> contentTypeMatcher) {
-        assertHeader("Content-Type", contentTypeMatcher);
+    public void assertContentType(Matcher<? super String> matching) {
+        assertHeader("Content-Type", matching);
     }
 
     public void assertHasCookie(String name) {
@@ -67,16 +67,16 @@ public class MockResponse extends Response {
         assertCookie(name, nullValue());
     }
 
-    public void assertCookie(String name, Matcher<? super Cookie> matches) {
-        assertThat(name, cookie(name), matches);
+    public void assertCookie(String name, Matcher<? super Cookie> matching) {
+        assertThat(name, cookie(name), matching);
     }
 
     public void assertBody(String body) {
         assertBody(equalTo(body));
     }
 
-    public void assertBody(Matcher<? super String> bodyMatcher) {
-        assertThat("body", text(), bodyMatcher);
+    public void assertBody(Matcher<? super String> matching) {
+        assertThat("body", text(), matching);
     }
 
     public void assertContent(byte[] content) {
@@ -111,16 +111,6 @@ public class MockResponse extends Response {
 
     public long contentSize() {
         return content().length;
-    }
-
-    public MockResponse withContentType(String contentType) {
-        contentType(contentType);
-        return this;
-    }
-
-    public MockResponse withStatus(HttpStatus status) {
-        status(status);
-        return this;
     }
 
     public String toString() {

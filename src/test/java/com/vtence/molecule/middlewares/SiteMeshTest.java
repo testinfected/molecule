@@ -67,7 +67,7 @@ public class SiteMeshTest {
 
     @Test public void
     preservesOriginalResponseEncodingWhenDecorating() throws Exception {
-        response.withContentType("text/html; charset=utf-8");
+        response.contentType("text/html; charset=utf-8");
         decoratedPage = "<The following characters require encoding: éçë>";
 
         siteMesh.handle(request, response);

@@ -17,25 +17,25 @@ public class HtmlPageSelectorTest {
 
     @Test public void
     selectsContentOfTypeTextHtmlWhenResponseIsOk() throws IOException {
-        response.withContentType("text/html; charset=iso-8859-1").withStatus(HttpStatus.OK);
+        response.contentType("text/html; charset=iso-8859-1").status(HttpStatus.OK);
         assertThat("content selection", selector.selected(response), equalTo(true));
     }
 
     @Test public void
     doesNotSelectContentIfNotHtml() throws IOException {
-        response.withContentType("text/plain").withStatus(HttpStatus.OK);
+        response.contentType("text/plain").status(HttpStatus.OK);
         assertThat("content selection", selector.selected(response), equalTo(false));
     }
 
     @Test public void
     doesNotSelectContentWhenStatusNotOK() throws IOException {
-        response.withStatus(HttpStatus.SEE_OTHER);
+        response.status(HttpStatus.SEE_OTHER);
         assertThat("content selection", selector.selected(response), equalTo(false));
     }
 
     @Test public void
     doesNotSelectResponseWithoutContentType() throws IOException {
-        response.withStatus(HttpStatus.OK);
+        response.status(HttpStatus.OK);
         assertThat("content selection", selector.selected(response), equalTo(false));
     }
 }

@@ -23,35 +23,38 @@ public class Response {
 
     private int statusCode = HttpStatus.OK.code;
     private String statusText = HttpStatus.OK.text;
-
     private Body body = BinaryBody.empty();
 
     public Response() {}
 
-    public void status(HttpStatus status) {
+    public Response status(HttpStatus status) {
         statusCode(status.code);
         statusText(status.text);
+        return this;
     }
 
-    public void statusCode(int code) {
+    public Response statusCode(int code) {
         statusCode = code;
+        return this;
     }
 
     public int statusCode() {
         return statusCode;
     }
 
-    public void statusText(String text) {
+    public Response statusText(String text) {
         statusText = text;
+        return this;
     }
 
     public String statusText() {
         return statusText;
     }
 
-    public void redirectTo(String location) {
+    public Response redirectTo(String location) {
         status(HttpStatus.SEE_OTHER);
         set(HttpHeaders.LOCATION, location);
+        return this;
     }
 
     public boolean has(String name) {
@@ -67,24 +70,26 @@ public class Response {
         return value != null ? parseLong(value) : -1;
     }
 
-    public void set(String name, String value) {
+    public Response set(String name, String value) {
         headers.put(name, value);
+        return this;
     }
 
-    public void setLong(String name, long value) {
-        set(name, String.valueOf(value));
+    public Response setLong(String name, long value) {
+        return set(name, String.valueOf(value));
     }
 
-    public void set(String name, Date date) {
-        headers.put(name, HttpDate.format(date));
+    public Response set(String name, Date date) {
+        return set(name, HttpDate.format(date));
     }
 
-    public void setDate(String name, long date) {
-        set(name, new Date(date));
+    public Response setDate(String name, long date) {
+        return set(name, new Date(date));
     }
 
-    public void remove(String name) {
+    public Response remove(String name) {
         headers.remove(name);
+        return this;
     }
 
     public Iterable<String> names() {
@@ -99,20 +104,23 @@ public class Response {
         return get(CONTENT_TYPE);
     }
 
-    public void contentType(String mediaType) {
+    public Response contentType(String mediaType) {
         set(CONTENT_TYPE, mediaType);
+        return this;
     }
 
     public long contentLength() {
         return getLong(CONTENT_LENGTH);
     }
 
-    public void contentLength(long length) {
+    public Response contentLength(long length) {
         setLong(CONTENT_LENGTH, length);
+        return this;
     }
 
-    public void add(Cookie cookie) {
+    public Response add(Cookie cookie) {
         cookies.put(cookie.name(), cookie);
+        return this;
     }
 
     public Cookie cookie(String name) {
@@ -131,12 +139,13 @@ public class Response {
         return contentType.charset();
     }
 
-    public void body(String text) throws IOException {
-        body(text(text));
+    public Response body(String text) throws IOException {
+        return body(text(text));
     }
 
-    public void body(Body body) throws IOException {
+    public Response body(Body body) throws IOException {
         this.body = body;
+        return this;
     }
 
     public Body body() {
