@@ -148,7 +148,7 @@ public class SimpleServerTest {
                 hasEntry("uri", "/path?query"),
                 hasEntry("path", "/path"),
                 hasEntry("ip", "127.0.0.1"),
-                hasEntry("hostname", "localhost"),
+//                hasEntry("hostname", "localhost"),
                 hasEntry(equalTo("port"), notNullValue()),
                 hasEntry("protocol", "HTTP/1.1")));
     }
