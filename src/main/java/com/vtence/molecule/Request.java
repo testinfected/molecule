@@ -191,7 +191,7 @@ public class Request {
 
     public String parameter(String name) {
         List<String> values = parameters(name);
-        return parameters.isEmpty() ?  null : values.get(values.size() - 1);
+        return values.isEmpty() ?  null : values.get(values.size() - 1);
     }
 
     public List<String> parameters(String name) {

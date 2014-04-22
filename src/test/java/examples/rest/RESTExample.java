@@ -1,4 +1,4 @@
-package com.vtence.molecule.examples.rest;
+package examples.rest;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
@@ -9,6 +9,7 @@ import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
+import com.vtence.molecule.util.ConsoleErrorReporter;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,33 +17,15 @@ import java.util.TreeMap;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 
-public class REST {
+public class RESTExample {
 
-    public static class Sequence {
-        private int next = 1;
+    private final SimpleServer server;
 
-        public int next() {
-            return next++;
-        }
+    public RESTExample(int port) {
+        server = new SimpleServer(port);
     }
 
-    public static class Album {
-        public String title;
-        public String artist;
-
-        public Album(String title, String artist) {
-            this.title = title;
-            this.artist = artist;
-        }
-
-        public String info() {
-            return String.format("Title: %s, Artist: %s", title, artist);
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        SimpleServer server = new SimpleServer(8080);
-
+    public void start() throws IOException {
         server.run(new MiddlewareStack() {{
             // Capture internal server errors and display a 500 page
             use(new Failsafe());
@@ -56,7 +39,7 @@ public class REST {
                 get("/albums").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
                         TextBody body = new TextBody();
-                        for(int id: albums.keySet()) {
+                        for (int id : albums.keySet()) {
                             Album album = albums.get(id);
                             body.append(String.format("%d: %s\n", id, album.info()));
                         }
@@ -67,8 +50,7 @@ public class REST {
                 post("/albums").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
                         int id = sequence.next();
-                        Album album =
-                                new Album(request.parameter("title"), request.parameter("artist"));
+                        Album album = new Album(request.parameter("title"), request.parameter("artist"));
                         albums.put(id, album);
                         response.statusCode(201);
                         response.body(album.info());
@@ -119,5 +101,31 @@ public class REST {
                 });
             }}));
         }});
+    }
+
+    public void stop() throws IOException {
+        server.shutdown();
+    }
+
+    public static class Sequence {
+        private int next = 1;
+
+        public int next() {
+            return next++;
+        }
+    }
+
+    public static class Album {
+        public String title;
+        public String artist;
+
+        public Album(String title, String artist) {
+            this.title = title;
+            this.artist = artist;
+        }
+
+        public String info() {
+            return String.format("Title: %s, Artist: %s", title, artist);
+        }
     }
 }
