@@ -34,10 +34,6 @@ public class HttpRequest {
     private String body;
     private String encodingType;
 
-    public static HttpRequest aRequest() {
-        return new HttpRequest();
-    }
-
     public HttpRequest() {
         this(new WebClient());
     }

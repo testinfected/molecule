@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.HttpStatus.CREATED;
-import static com.vtence.molecule.support.HttpRequest.aRequest;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
@@ -36,7 +35,7 @@ import static org.junit.Assert.fail;
 public class SimpleServerTest {
 
     SimpleServer server = new SimpleServer(9999);
-    HttpRequest request = aRequest().onPort(server.port());
+    HttpRequest request = new HttpRequest().onPort(server.port());
     HttpResponse response;
 
     Exception error;
@@ -195,8 +194,8 @@ public class SimpleServerTest {
         assertNoError();
 
         assertThat("request content", content, allOf(hasEntry("contentType", "application/x-www-form-urlencoded"),
-                                                     hasEntry("contentLength", "10"),
-                                                     hasEntry("body", "name=value")));
+                hasEntry("contentLength", "10"),
+                hasEntry("body", "name=value")));
     }
 
     @Test public void
@@ -214,7 +213,7 @@ public class SimpleServerTest {
         assertNoError();
 
         assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"),
-                                                     hasEntry("cookie2", "value2")));
+                hasEntry("cookie2", "value2")));
     }
 
     @Test public void

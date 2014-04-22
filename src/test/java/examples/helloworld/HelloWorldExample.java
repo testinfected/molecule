@@ -1,4 +1,4 @@
-package com.vtence.molecule.examples.helloworld;
+package examples.helloworld;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
@@ -8,18 +8,25 @@ import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
 
-/**
- * Access at <a href="http://localhost:8080">http://localhost:8080</a>
- */
-public class HelloWorld {
+public class HelloWorldExample {
 
-    public static void main(String[] args) throws IOException {
-        Server server = new SimpleServer(8080);
+    private final Server server;
 
+    public HelloWorldExample(int port) {
+        this.server = new SimpleServer(port);
+    }
+
+    public void start() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("Hello, World");
             }
         });
     }
+
+    public void stop() throws IOException {
+        server.shutdown();
+    }
 }
+
+
