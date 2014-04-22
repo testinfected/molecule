@@ -2,17 +2,12 @@ package com.vtence.molecule.simple;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Cookie;
-import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Session;
-import com.vtence.molecule.simple.session.CookieTracker;
-import com.vtence.molecule.simple.session.SessionPool;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.util.Clock;
 import com.vtence.molecule.util.FailureReporter;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -22,33 +17,28 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.vtence.molecule.HttpStatus.CREATED;
 import static com.vtence.molecule.support.HttpRequest.aRequest;
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class SimpleServerTest {
 
-    static final String SESSION_COOKIE = "JSESSIONID";
-    static final long THIRTY_MINUTES = MINUTES.toSeconds(30);
-
     SimpleServer server = new SimpleServer(9999);
     HttpRequest request = aRequest().onPort(server.port());
     HttpResponse response;
 
-    Delorean delorean = new Delorean();
     Exception error;
 
     @Before public void
@@ -58,12 +48,10 @@ public class SimpleServerTest {
                 SimpleServerTest.this.error = error;
             }
         });
-        server.enableSessions(new CookieTracker(new SessionPool(delorean, THIRTY_MINUTES)));
     }
 
     @After public void
     stopServer() throws Exception {
-        delorean.back();
         server.shutdown();
     }
 
@@ -71,21 +59,20 @@ public class SimpleServerTest {
     respondsToRequests() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.status(HttpStatus.OK);
+                response.status(CREATED);
             }
         });
 
         response = request.send();
         assertNoError();
-        response.assertOK();
+        response.assertHasStatus(CREATED);
     }
 
     @Test public void
-    chunksResponseStreamWhenContentLengthUnknown() throws IOException {
+    chunksResponseWhenContentLengthUnknown() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                byte[] content = "<html>...</html>".getBytes(response.charset());
-                response.outputStream().write(content);
+                response.body("<html>...</html>");
             }
         });
 
@@ -99,37 +86,7 @@ public class SimpleServerTest {
     doesNoChunkResponsesWithContentLengthHeader() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                byte[] content = "<html>...</html>".getBytes(response.charset());
-                response.contentLength(content.length);
-                response.outputStream().write(content);
-            }
-        });
-
-        response = request.send();
-        assertNoError();
-        response.assertHasContent("<html>...</html>");
-        response.assertNotChunked();
-    }
-
-    @Test public void
-    doesNotChunkBufferedByteStreams() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                byte[] content = "<html>...</html>".getBytes(response.charset());
-                response.outputStream(content.length).write(content);
-            }
-        });
-
-        response = request.send();
-        assertNoError();
-        response.assertHasContent("<html>...</html>");
-        response.assertNotChunked();
-    }
-
-    @Test public void
-    doesNotChunkResponseBodies() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
+                response.contentLength(16);
                 response.body("<html>...</html>");
             }
         });
@@ -137,6 +94,7 @@ public class SimpleServerTest {
         response = request.send();
         assertNoError();
         response.assertHasContent("<html>...</html>");
+        response.assertHasHeader("Content-Length", "16");
         response.assertNotChunked();
     }
 
@@ -160,11 +118,11 @@ public class SimpleServerTest {
     supportsArrayParameters() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(Arrays.toString(request.parameters("names")));
+                response.body(request.parameters("names").toString());
             }
         });
 
-        response = request.withParameter("names", "Alice", "Bob", "Charles").send();
+        response = request.withParameters("names", "Alice", "Bob", "Charles").send();
         assertNoError();
         response.assertHasContent("[Alice, Bob, Charles]");
     }
@@ -175,20 +133,24 @@ public class SimpleServerTest {
         final Map<String, String> info = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                info.put("ip", request.ip());
                 info.put("uri", request.uri());
-                info.put("pathInfo", request.pathInfo());
+                info.put("path", request.path());
+                info.put("ip", request.remoteIp());
+                info.put("hostname", request.remoteHost());
+                info.put("port", String.valueOf(request.remotePort()));
                 info.put("protocol", request.protocol());
             }
         });
 
-        request.post("/uri");
+        request.get("/path?query");
         assertNoError();
 
         assertThat("request information", info, allOf(
+                hasEntry("uri", "/path?query"),
+                hasEntry("path", "/path"),
                 hasEntry("ip", "127.0.0.1"),
-                hasEntry("pathInfo", "/uri"),
-                hasEntry("uri", "/uri"),
+                hasEntry("hostname", "localhost"),
+                hasEntry(equalTo("port"), notNullValue()),
                 hasEntry("protocol", "HTTP/1.1")));
     }
 
@@ -209,10 +171,9 @@ public class SimpleServerTest {
                 send();
         assertNoError();
 
-        assertThat("Header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
-        assertThat("Accept header", headers.get("accept"), contains("text/html"));
-        assertThat("Accept-Encoding header", headers.get("encoding"), contains("gzip", "deflate",
-                "identity"));
+        assertThat("header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
+        assertThat("accept", headers.get("accept"), contains("text/html"));
+        assertThat("accept-encoding", headers.get("encoding"), contains("gzip", "deflate", "identity"));
     }
 
     @SuppressWarnings("unchecked")
@@ -233,10 +194,9 @@ public class SimpleServerTest {
                 .post("/uri");
         assertNoError();
 
-        assertThat("request content", content, allOf(
-                hasEntry("contentType", "application/x-www-form-urlencoded"),
-                hasEntry("contentLength", "10"),
-                hasEntry("body", "name=value")));
+        assertThat("request content", content, allOf(hasEntry("contentType", "application/x-www-form-urlencoded"),
+                                                     hasEntry("contentLength", "10"),
+                                                     hasEntry("body", "name=value")));
     }
 
     @Test public void
@@ -250,14 +210,11 @@ public class SimpleServerTest {
             }
         });
 
-        request.withCookie("cookie1", "value1")
-                .withCookie("cookie2", "value2")
-                .send();
+        request.withCookie("cookie1", "value1").withCookie("cookie2", "value2").send();
         assertNoError();
 
-        assertThat("request cookies", cookies, allOf(
-                hasEntry("cookie1", "value1"),
-                hasEntry("cookie2", "value2")));
+        assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"),
+                                                     hasEntry("cookie2", "value2")));
     }
 
     @Test public void
@@ -266,13 +223,16 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 Cookie cookie = new Cookie("cookie", "value");
                 cookie.httpOnly(true);
-                response.cookie(cookie);
+                cookie.maxAge(1800);
+                response.add(cookie);
             }
         });
 
         response = request.send();
         assertNoError();
-        response.assertHasCookie(equalToIgnoringCase("cookie=value; Version=1; Path=/; HttpOnly"));
+        response.assertHasCookie(containsString("cookie=value"));
+        response.assertHasCookie(containsString("max-age=1800"));
+        response.assertHasCookie(containsString("httponly"));
     }
 
     @Test public void
@@ -291,68 +251,9 @@ public class SimpleServerTest {
         request.send();
         assertNoError();
 
-        assertThat("attributes", attributes, allOf(
-                containsEntry("name", "Velociraptor"),
-                not(containsKey("family")),
-                containsEntry("clade", "Dinosauria")));
-    }
-
-    @Test public void
-    onlyCreatesSessionsOnDemand() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("Hello, World");
-            }
-        });
-
-        response = request.send();
-        assertNoError();
-        response.assertHasNoCookie(SESSION_COOKIE);
-    }
-
-    @Test public void
-    maintainsSessionsAcrossRequestUsingCookies() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                if (request.method() == HttpMethod.POST)
-                    request.session().put("username", request.parameter("username"));
-                else
-                    response.body("Hello, " + request.session(false).get("username"));
-            }
-        });
-
-        response = request.withParameter("username", "Vincent").post("/login");
-        assertNoError();
-        response.assertHasCookie(SESSION_COOKIE);
-
-        response = request.but().removeParameters().get("/");
-        assertNoError();
-        response.assertHasContent("Hello, Vincent");
-        response.assertHasNoCookie(SESSION_COOKIE);
-    }
-
-    @Test public void
-    expiresSessionsAfterTimeout() throws Exception {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                if (request.method() == HttpMethod.POST)
-                    request.session().put("username", request.parameter("username"));
-                else {
-                    Session session = request.session(false);
-                    String username = session != null ? session.<String>get("username") : "X";
-                    response.body("Hello, " + username);
-                }
-            }
-        });
-
-        response = request.withParameter("username", "Vincent").post("/login");
-        assertNoError();
-
-        delorean.travel(SECONDS.toMillis(THIRTY_MINUTES));
-        response = request.but().removeParameters().get("/");
-        assertNoError();
-
-        response.assertHasContent("Hello, X");
+        assertThat("attributes", attributes, allOf(containsEntry("name", "Velociraptor"),
+                                                   not(containsKey("family")),
+                                                   containsEntry("clade", "Dinosauria")));
     }
 
     private Matcher<Map<?, ?>> containsKey(Object key) {
@@ -365,22 +266,5 @@ public class SimpleServerTest {
 
     private void assertNoError() {
         if (error != null) fail(StackTrace.of(error));
-    }
-
-    private static class Delorean implements Clock {
-
-        private long timeTravel = 0;
-
-        public Date now() {
-            return new Date(System.currentTimeMillis() + timeTravel);
-        }
-
-        public void travel(long offsetInMillis) {
-            this.timeTravel = offsetInMillis;
-        }
-
-        public void back() {
-            travel(0);
-        }
     }
 }

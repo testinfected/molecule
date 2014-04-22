@@ -1,35 +1,45 @@
 package com.vtence.molecule.util;
 
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
 public class HeaderTest {
 
     @SuppressWarnings("unchecked") @Test public void
-    parsesAndSortsEntriesInQualityOrder() {
-        Header header = new Header("foo; q=0.5, bar, baz; q=0.9, qux, *;q=0");
-        assertThat("sorted values", header.entries(), contains(
-                value("bar", 1),
-                value("qux", 1),
-                value("baz", 0.9),
-                value("foo", 0.5),
-                value("*", 0)
-        ));
+    parsesAndSortsValuesInQualityOrder() {
+        Header header = new Header("foo; q=0.5, bar, baz; q=0.9, qux, *; q=0");
+        assertThat("header", header.toString(),
+                equalTo("bar, qux, baz; q=0.9, foo; q=0.5, *; q=0"));
+    }
+
+    @Test public void
+    parsesParametersAsAttributeValuePairs() {
+        Header header = new Header("foo; q=0.5; bar; baz= ; qux");
+        assertThat("header", header.toString(),
+                equalTo("foo; q=0.5; bar; baz; qux"));
     }
 
     @SuppressWarnings("unchecked") @Test public void
-    handlesQuotedValues() {
-        Header header = new Header("\"foo, bar\"; q=0.8, baz");
-        assertThat("all values", header.entries(), contains(
-                value("baz", 1),
-                value("\"foo, bar\"", 0.8)
-        ));
+    ignoresLeadingAndTrailingWhitespace() {
+        Header header = new Header("  foo,   bar ;   q  =  0.9   ");
+        assertThat("header", header.toString(), equalTo("foo, bar; q=0.9"));
+    }
+
+    @SuppressWarnings("unchecked") @Test public void
+    recognizesQuotedStringsInValues() {
+        Header header = new Header("\"foo, bar\"; q=0.8, baz, \"qux; q=0.6\"; q=0.6");
+        assertThat("header", header.toString(),
+                equalTo("baz, \"foo, bar\"; q=0.8, \"qux; q=0.6\"; q=0.6"));
+    }
+
+    @SuppressWarnings("unchecked") @Test public void
+    recognizesQuotedStringsInParameters() {
+        Header header = new Header("foo; q=0.8, bar; \"q=0.5\"; \", baz; q=0.8\"");
+        assertThat("header", header.toString(),
+                equalTo("bar; \"q=0.5\"; \", baz; q=0.8\", foo; q=0.8"));
     }
 
     @SuppressWarnings("unchecked") @Test public void
@@ -38,27 +48,9 @@ public class HeaderTest {
         assertThat("acceptable values", header.values(), contains("foo", "baz", "bar"));
     }
 
-    private Matcher<Header.Entry> value(String value, double quality) {
-        return allOf(hasValue(value), hasQuality(quality));
-    }
-
-    private Matcher<Header.Entry> hasValue(String value) {
-        return new FeatureMatcher<Header.Entry, String>(equalTo(value), "has value",
-                "value") {
-
-            protected String featureValueOf(Header.Entry actual) {
-                return actual.value();
-            }
-        };
-    }
-
-    private Matcher<Header.Entry> hasQuality(double quality) {
-        return new FeatureMatcher<Header.Entry, Double>(equalTo(quality), "has quality",
-                "quality") {
-
-            protected Double featureValueOf(Header.Entry actual) {
-                return actual.quality();
-            }
-        };
+    @SuppressWarnings("unchecked") @Test public void
+    ignoresQualityIfNotFirstParameterOrNotANumber() {
+        Header header = new Header("foo; bar; q=0, baz; q=0.8, qux; q=_");
+        assertThat("acceptable values", header.values(), contains("foo", "qux", "baz"));
     }
 }

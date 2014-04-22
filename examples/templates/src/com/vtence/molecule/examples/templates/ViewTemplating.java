@@ -3,10 +3,10 @@ package com.vtence.molecule.examples.templates;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.mustache.JMustacheRenderer;
+import com.vtence.molecule.templating.JMustacheRenderer;
 import com.vtence.molecule.simple.SimpleServer;
+import com.vtence.molecule.templating.Template;
 import com.vtence.molecule.templating.Templates;
-import com.vtence.molecule.templating.View;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +27,10 @@ public class ViewTemplating {
 
         // We use Mustache templates with an .html extension
         Templates templates = new Templates(
-                new JMustacheRenderer().templateDir(templateDir).extension("html"));
+                new JMustacheRenderer().fromDir(templateDir).extension("html"));
 
         // Typically, you would pass the view as a constructor parameter to the controller
-        final View hello = templates.html("hello");
+        final Template hello = templates.named("hello");
 
         server.run(new Application() {
             public void handle(final Request request, final Response response) throws Exception {

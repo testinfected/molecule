@@ -1,7 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpHeaders;
+import com.vtence.molecule.FileBody;
 import com.vtence.molecule.HttpMethod;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
@@ -9,23 +9,20 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.util.HttpDate;
 import com.vtence.molecule.util.Joiner;
 import com.vtence.molecule.util.MimeTypes;
-import com.vtence.molecule.util.Streams;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.vtence.molecule.HttpHeaders.ALLOW;
 import static com.vtence.molecule.HttpHeaders.IF_MODIFIED_SINCE;
 import static com.vtence.molecule.HttpHeaders.LAST_MODIFIED;
 import static com.vtence.molecule.HttpMethod.GET;
 import static com.vtence.molecule.HttpMethod.HEAD;
-import static com.vtence.molecule.middlewares.NotFound.notFound;
+import static com.vtence.molecule.HttpStatus.METHOD_NOT_ALLOWED;
+import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
 
 public class FileServer implements Application {
 
@@ -41,7 +38,7 @@ public class FileServer implements Application {
     }
 
     public void registerMediaType(String extension, String mediaType) {
-        mediaTypes.map(extension, mediaType);
+        mediaTypes.register(extension, mediaType);
     }
 
     public FileServer addHeader(String header, String value) {
@@ -50,24 +47,22 @@ public class FileServer implements Application {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        try {
-            renderFile(request, response);
-        } catch (FileNotFoundException e) {
-            notFound(request, response);
-        }
-    }
-
-    private void renderFile(Request request, Response response) throws IOException {
         if (!methodAllowed(request)) {
-            response.header(HttpHeaders.ALLOW, ALLOW_HEADER);
-            response.status(HttpStatus.METHOD_NOT_ALLOWED);
+            response.set(ALLOW, ALLOW_HEADER);
+            response.status(METHOD_NOT_ALLOWED);
             return;
         }
 
-        File file = new File(root, request.pathInfo());
+        File file = new File(root, request.path());
+        if (!canServe(file)) {
+            response.status(HttpStatus.NOT_FOUND);
+            response.contentType(MimeTypes.TEXT);
+            response.body("File not found: " + request.path());
+            return;
+        }
 
         if (notModifiedSince(request, file)) {
-            response.status(HttpStatus.NOT_MODIFIED);
+            response.status(NOT_MODIFIED);
             return;
         }
 
@@ -77,7 +72,11 @@ public class FileServer implements Application {
         response.status(HttpStatus.OK);
         if (head(request)) return;
 
-        serve(response, file);
+        response.body(new FileBody(file));
+    }
+
+    private boolean canServe(File file) {
+        return file.exists() && file.canRead() && !file.isDirectory();
     }
 
     private boolean methodAllowed(Request request) {
@@ -90,26 +89,17 @@ public class FileServer implements Application {
 
     private void addFileHeaders(Response response, File file) {
         response.contentType(mediaTypes.guessFrom(file.getName()));
-        response.headerDate(LAST_MODIFIED, file.lastModified());
+        response.setDate(LAST_MODIFIED, file.lastModified());
         response.contentLength(file.length());
     }
 
     private void addCustomHeaders(Response response) {
         for (String header : headers.keySet()) {
-            response.header(header, headers.get(header));
+            response.set(header, headers.get(header));
         }
     }
 
     private boolean head(Request request) {
         return request.method() == HEAD;
-    }
-
-    private void serve(Response response, File file) throws IOException {
-        InputStream in = new FileInputStream(file);
-        try {
-            Streams.copy(in, response.outputStream());
-        } finally {
-            Streams.close(in);
-        }
     }
 }

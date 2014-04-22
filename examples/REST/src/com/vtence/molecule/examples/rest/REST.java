@@ -3,6 +3,7 @@ package com.vtence.molecule.examples.rest;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.TextBody;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.middlewares.MiddlewareStack;
@@ -10,7 +11,6 @@ import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -55,12 +55,12 @@ public class REST {
             run(draw(new DynamicRoutes() {{
                 get("/albums").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
-                        Writer out = response.writer();
+                        TextBody body = new TextBody();
                         for(int id: albums.keySet()) {
                             Album album = albums.get(id);
-                            out.write(String.format("%d: %s\n", id, album.info()));
+                            body.append(String.format("%d: %s\n", id, album.info()));
                         }
-                        out.flush();
+                        response.body(body);
                     }
                 });
 

@@ -10,21 +10,18 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.MockRequest.aRequest;
-import static com.vtence.molecule.support.MockResponse.aResponse;
-
 public class StaticAssetsTest {
 
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
     Application fileServer = new Application() {
         public void handle(Request request, Response response) throws Exception {
-            response.body(request.pathInfo());
+            response.body(request.path());
         }
     };
     StaticAssets assets = new StaticAssets(fileServer, "/favicon.ico");
 
-    MockRequest request = aRequest();
-    MockResponse response = aResponse();
+    MockRequest request = new MockRequest();
+    MockResponse response = new MockResponse();
 
     @Before public void
     setUpResponseChain() {
@@ -37,27 +34,27 @@ public class StaticAssetsTest {
 
     @Test public void
     servesFileWhenPathMatchesExactly() throws Exception {
-        assets.handle(request.withPath("/favicon.ico"), response);
+        assets.handle(request.path("/favicon.ico"), response);
         response.assertBody("/favicon.ico");
     }
 
     @Test public void
     servesFileWhenPathMatchesUrlPrefix() throws Exception {
         assets.serve("/assets");
-        assets.handle(request.withPath("/assets/images/logo.png"), response);
+        assets.handle(request.path("/assets/images/logo.png"), response);
         response.assertBody("/assets/images/logo.png");
     }
 
     @Test public void
     servesIndexFileIfPathIndicatesADirectory() throws Exception {
         assets.serve("/faq").index("index.html");
-        assets.handle(request.withPath("/faq/"), response);
+        assets.handle(request.path("/faq/"), response);
         response.assertBody("/faq/index.html");
     }
 
     @Test public void
     forwardsWhenPathIsNotMatched() throws Exception {
-        assets.handle(request.withPath("/"), response);
+        assets.handle(request.path("/"), response);
         response.assertBody("Forwarded");
     }
 }

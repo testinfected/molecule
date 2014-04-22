@@ -6,6 +6,8 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.util.Clock;
 import com.vtence.molecule.util.SystemClock;
 
+import static com.vtence.molecule.HttpHeaders.DATE;
+
 public class DateHeader extends AbstractMiddleware {
 
     private final Clock clock;
@@ -19,7 +21,7 @@ public class DateHeader extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        response.headerDate(HttpHeaders.DATE, clock.now().getTime());
+        response.set(DATE, clock.now());
 
         forward(request, response);
     }

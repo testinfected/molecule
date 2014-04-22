@@ -1,12 +1,15 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Body;
+import com.vtence.molecule.ChunkedBody;
 import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.util.AcceptEncoding;
-import com.vtence.molecule.util.BufferedResponse;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Deflater;
@@ -22,69 +25,104 @@ public class Compressor extends AbstractMiddleware {
     static enum Codings {
 
         gzip {
-            public void encode(Response response, byte[] content) throws IOException {
-                response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, name());
-                GZIPOutputStream out = new GZIPOutputStream(response.outputStream());
-                out.write(content);
-                out.finish();
+            public void encode(Response response) throws IOException {
+                response.remove(CONTENT_LENGTH);
+                response.set(CONTENT_ENCODING, name());
+                response.body(new GZipStream(response.body()));
             }
         },
 
         deflate {
-            public void encode(Response response, byte[] content) throws IOException {
-                response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, name());
-                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-                DeflaterOutputStream out = new DeflaterOutputStream(response.outputStream(), deflater);
-                out.write(content);
-                out.finish();
-                deflater.end();
+            public void encode(Response response) throws IOException {
+                response.remove(CONTENT_LENGTH);
+                response.set(CONTENT_ENCODING, name());
+                response.body(new DeflateStream(response.body()));
             }
         },
 
         identity {
-            public void encode(Response response, byte[] content) throws IOException {
-                response.outputStream(content.length).write(content);
+            public void encode(Response response) throws IOException {
             }
         };
 
-        public abstract void encode(Response to, byte[] content) throws IOException;
+        public abstract void encode(Response response) throws IOException;
 
-        public static String[] available() {
-            List<String> available = new ArrayList<String>();
+        public static String[] all() {
+            List<String> all = new ArrayList<String>();
             for (Codings coding : values()) {
-                available.add(coding.name());
+                all.add(coding.name());
             }
-            return available.toArray(new String[available.size()]);
+            return all.toArray(new String[all.size()]);
+        }
+
+        private static class GZipStream extends ChunkedBody {
+            private final Body body;
+
+            public GZipStream(Body body) {
+                this.body = body;
+            }
+
+            public void writeTo(OutputStream out, Charset charset) throws IOException {
+                GZIPOutputStream zip = new GZIPOutputStream(out);
+                try {
+                    body.writeTo(zip, charset);
+                } finally {
+                    zip.finish();
+                }
+            }
+
+            public void close() throws IOException {
+                body.close();
+            }
+        }
+
+        private static class DeflateStream extends ChunkedBody {
+            private final Body body;
+
+            public DeflateStream(Body body) {
+                this.body = body;
+            }
+
+            public void writeTo(OutputStream out, Charset charset) throws IOException {
+                Deflater zlib = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+                DeflaterOutputStream deflate = new DeflaterOutputStream(out, zlib);
+                try {
+                    body.writeTo(deflate, charset);
+                } finally {
+                    deflate.finish();
+                    zlib.end();
+                }
+            }
+
+            public void close() throws IOException {
+                body.close();
+            }
         }
     }
 
     public void handle(Request request, final Response response) throws Exception {
-        BufferedResponse buffer = new BufferedResponse(response);
-        forward(request, buffer);
+        forward(request, response);
 
-        if (buffer.empty() || alreadyEncoded(response)) {
-            buffer.flush();
+        if (response.empty() || alreadyEncoded(response)) {
             return;
         }
 
         String encoding = selectBestAvailableEncodingFor(request);
         if (encoding != null) {
             Codings coding = Codings.valueOf(encoding);
-            coding.encode(response, buffer.content());
+            coding.encode(response);
         } else {
             notAcceptable(response);
         }
     }
 
     private String selectBestAvailableEncodingFor(Request request) {
-        AcceptEncoding acceptEncoding = AcceptEncoding.parse(request);
-        return acceptEncoding.selectBestEncoding(Codings.available());
+        AcceptEncoding acceptEncoding = AcceptEncoding.of(request);
+        return acceptEncoding.selectBestEncoding(Codings.all());
     }
 
     private boolean alreadyEncoded(Response response) {
-        String contentEncoding = response.header(CONTENT_ENCODING);
+        String contentEncoding = response.get(CONTENT_ENCODING);
         return contentEncoding != null && !isIdentity(contentEncoding);
     }
 

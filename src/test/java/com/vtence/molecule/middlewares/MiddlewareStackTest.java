@@ -3,15 +3,9 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.middlewares.AbstractMiddleware;
-import com.vtence.molecule.middlewares.Middleware;
-import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MiddlewareStackTest {
 
@@ -34,8 +28,8 @@ public class MiddlewareStackTest {
     private Middleware middleware(final String order) {
         return new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(order + " -> ");
                 forward(request, response);
+                response.set("chain", order + " -> " + response.get("chain"));
             }
         };
     }
@@ -43,12 +37,12 @@ public class MiddlewareStackTest {
     private Application application(final String app) {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(app);
+                response.set("chain", app);
             }
         };
     }
 
     private void assertChain(String chaining) {
-        assertThat("chaining", response.body(), equalTo(chaining));
+        response.assertHeader("chain", chaining);
     }
 }

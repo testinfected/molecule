@@ -7,6 +7,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
 import com.vtence.molecule.middlewares.ApacheCommonLogger;
 import com.vtence.molecule.middlewares.Compressor;
+import com.vtence.molecule.middlewares.ContentLengthHeader;
 import com.vtence.molecule.middlewares.DateHeader;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.FailureMonitor;
@@ -31,11 +32,13 @@ public class Middlewares {
 
         server.run(new MiddlewareStack() {{
             // Add information about our server
-            use(new ServerHeader("MyApp/1.0 molecule/0.2"));
+            use(new ServerHeader("MyApp/1.0 molecule/0.3"));
             // Also include date and time of the response
             use(new DateHeader());
             // Log all accesses to the default JDK logger
             use(new ApacheCommonLogger(Logger.getAnonymousLogger()));
+            // Set content length header on responses with fixed-length bodies
+            use(new ContentLengthHeader());
             // Eat up all internal server errors and respond with a 500 page
             use(new Failsafe());
             // Print internal server errors to the standard error stream

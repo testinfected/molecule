@@ -213,12 +213,4 @@ public enum HttpStatus {
         this.text = reason;
         this.code = code;
     }
-
-    public static HttpStatus forCode(int code) {
-        for (HttpStatus status : values()) {
-            if (status.code == code)
-                return status;
-        }
-        throw new IllegalArgumentException("No status with code: " + code);
-    }
 }

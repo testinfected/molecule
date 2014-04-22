@@ -3,13 +3,10 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.util.RequestWrapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.vtence.molecule.middlewares.StaticAssets.RequestOverride.override;
 
 public class StaticAssets extends AbstractMiddleware {
 
@@ -33,7 +30,7 @@ public class StaticAssets extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        if (canServe(request.pathInfo())) {
+        if (canServe(request.path())) {
             serve(request, response);
         } else {
             forward(request, response);
@@ -42,13 +39,13 @@ public class StaticAssets extends AbstractMiddleware {
 
     private void serve(Request request, Response response) throws Exception {
         if (targetsDirectory(request)) {
-            request = override(request).withPath(request.pathInfo() + indexFile);
+            request.path(request.path() + indexFile);
         }
         fileServer.handle(request, response);
     }
 
     private boolean targetsDirectory(Request request) {
-        return request.pathInfo().endsWith("/");
+        return request.path().endsWith("/");
     }
 
     private boolean canServe(String path) throws Exception {
@@ -60,26 +57,5 @@ public class StaticAssets extends AbstractMiddleware {
             if (path.startsWith(url)) return true;
         }
         return false;
-    }
-
-    public static class RequestOverride extends RequestWrapper {
-        private String path;
-
-        public static RequestOverride override(Request request) {
-            return new RequestOverride(request);
-        }
-
-        public RequestOverride(Request request) {
-            super(request);
-        }
-
-        public RequestOverride withPath(String path) {
-            this.path = path;
-            return this;
-        }
-
-        public String pathInfo() {
-            return path != null ? path : super.pathInfo();
-        }
     }
 }

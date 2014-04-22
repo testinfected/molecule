@@ -3,68 +3,86 @@ package com.vtence.molecule.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Header {
 
-    // Split on comma only if that comma has zero, or an even number of quotes in ahead of it.
-    private static final Pattern ENTRIES_DELIMITER =
-            Pattern.compile(",\\s*(?=([^\"]*\"[^\"]*\")*[^\"]*$)\\s*");
-    private static final Pattern PARAMETERS_DELIMITER = Pattern.compile("\\s*;\\s*");
-    private static final Pattern QUALITY = Pattern.compile("\\Aq=([\\d.]+)");
+    private static final String ZERO_OR_EVEN_NUMBER_OF_QUOTES_AHEAD = "(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
 
-    private final List<Entry> entries;
-
-    public Header(String header) {
-        this.entries = sortByQuality(parseEntries(header));
+    private static Pattern ignoringQuotedStrings(String delimiter) {
+        return Pattern.compile("\\s*" + delimiter + "\\s*" + ZERO_OR_EVEN_NUMBER_OF_QUOTES_AHEAD);
     }
 
-    public List<Entry> entries() {
-        return new ArrayList<Entry>(entries);
+    private static final Pattern VALUES_DELIMITER = ignoringQuotedStrings(",");
+    private static final Pattern TOKENS_DELIMITER = ignoringQuotedStrings(";");
+    private static final Pattern NAME_VALUE_DELIMITER = ignoringQuotedStrings("=");
+
+    private final List<Value> values;
+
+    public Header(String header) {
+        this.values = sortByQuality(parseValues(header));
+    }
+
+    public List<Value> all() {
+        return new ArrayList<Value>(values);
+    }
+
+    public Value first() {
+        return values.get(0);
     }
 
     public List<String> values() {
         List<String> values = new ArrayList<String>();
-        for (Entry entry : entries) {
+        for (Value entry : this.values) {
             if (entry.acceptable()) values.add(entry.value());
         }
         return values;
     }
 
-    private List<Entry> parseEntries(String header) {
-        List<Entry> entries = new ArrayList<Entry>();
-        for (String entry : ENTRIES_DELIMITER.split(header)) {
-            String[] parts = PARAMETERS_DELIMITER.split(entry, 2);
-            String value = parts[0];
-            String parameters = parts.length > 1 ? parts[1] : "";
-            double quality = parseQuality(parameters);
-            entries.add(new Entry(value, quality));
+    private List<Value> parseValues(String header) {
+        List<Value> values = new ArrayList<Value>();
+        for (String value : VALUES_DELIMITER.split(header)) {
+            String[] tokens = TOKENS_DELIMITER.split(value);
+            values.add(new Value(value(tokens), parameters(tokens)));
         }
-        return entries;
+        return values;
     }
 
-    private double parseQuality(String parameters) {
-        Matcher matcher = QUALITY.matcher(parameters);
-        if (matcher.find()) {
-            return Double.parseDouble(matcher.group(1));
-        } else {
-            return 1.0;
-        }
+    private String value(String[] tokens) {
+        return tokens[0];
     }
 
-    private List<Entry> sortByQuality(List<Entry> entries) {
+    private List<Parameter> parameters(String[] tokens) {
+        List<Parameter> pairs = new ArrayList<Parameter>();
+        for (int i = 1; i < tokens.length; i++) {
+            String token = tokens[i];
+            String[] parts = NAME_VALUE_DELIMITER.split(token);
+            String attribute = parts[0];
+            String value = parts.length > 1 ? parts[1] : null;
+            pairs.add(new Parameter(attribute, value));
+        }
+
+        return pairs;
+    }
+
+    public String toString() {
+        return Joiner.on(", ").join(values);
+    }
+
+    private List<Value> sortByQuality(List<Value> entries) {
         Collections.sort(entries);
         return entries;
     }
 
-    public static class Entry implements Comparable<Entry> {
+    public static class Value implements Comparable<Value> {
         private final String value;
         private final double quality;
+        private final List<Parameter> parameters;
 
-        public Entry(String value, double quality) {
-            this.value = value;
-            this.quality = quality;
+        public Value(String value, List<Parameter> parameters) {
+            this.value = value.trim();
+            this.parameters = parameters;
+            this.quality = parseQuality();
         }
 
         public String value() {
@@ -83,8 +101,63 @@ public class Header {
             return quality > 0;
         }
 
-        public int compareTo(Entry other) {
-            return Double.compare(other.quality, quality);
+        public List<Parameter> parameters() {
+            return parameters;
+        }
+
+        public String parameter(String name) {
+            for (Parameter parameter : parameters()) {
+                if (parameter.is(name)) return parameter.value();
+            }
+            return null;
+        }
+
+        private double parseQuality() {
+            if (parameters.isEmpty()) return 1.0;
+
+            Parameter first = parameters.get(0);
+            if (!first.is("q") || first.value() == null) return 1.0;
+
+            try {
+                return Double.parseDouble(first.value());
+            } catch (NumberFormatException e) {
+                return 1.0;
+            }
+        }
+
+        public int compareTo(Value other) {
+            return Double.compare(other.quality(), quality);
+        }
+
+        public String toString() {
+            if (parameters.isEmpty()) return value;
+            return value + "; " + Joiner.on("; ").join(parameters);
+        }
+    }
+
+    public static class Parameter {
+        private final String name;
+        private final String value;
+
+        public Parameter(String name, String value) {
+            this.name = name.trim();
+            this.value = value != null ? value.trim() : null;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public boolean is(String name) {
+            return this.name().equals(name);
+        }
+
+        public String value() {
+            return value;
+        }
+
+        public String toString() {
+            return name + (value != null ? "=" + value : "");
         }
     }
 }
