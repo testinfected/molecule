@@ -1,9 +1,8 @@
-package com.vtence.molecule.examples.configuration;
+package examples.simple;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Server;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.util.ConsoleErrorReporter;
@@ -12,20 +11,18 @@ import java.io.IOException;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 
-public class ServerConfiguration {
+public class SimpleExample {
 
-    public static void main(String[] args) throws IOException {
+    private SimpleServer server;
+
+    public void start() throws IOException {
         // By default, server will run on a random available port...
-        SimpleServer server = new SimpleServer();
-        // ... but we can specify any port
-        server.port(8080);
+        server = new SimpleServer();
         // Report internal errors to the console
         server.reportErrorsTo(ConsoleErrorReporter.toStandardError());
-        // Let's shutdown the server properly when the JVM exits
-        stopOnExit(server);
 
         server.run(draw(new DynamicRoutes() {{
-            map("/hello").to(new Application() {
+            map("/pangram").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
                     String encoding = request.parameter("encoding");
                     // The specified charset will be used automatically to encode the response
@@ -35,27 +32,25 @@ public class ServerConfiguration {
                     response.contentType(contentType);
 
                     response.body(
-                        "<html>" +
+                            "<html>" +
                             "<body>" +
                             "<p>" +
                                 "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
                                 "d'être déçus en voyant leurs drôles d'œufs abîmés." +
                             "</p>" +
                             "</body>" +
-                        "</html>");
+                            "</html>"
+                    );
                 }
             });
         }}));
     }
 
-    private static void stopOnExit(final Server server) {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                try {
-                    server.shutdown();
-                } catch (Exception ignored) {
-                }
-            }
-        });
+    public int port() {
+        return server.port();
+    }
+
+    public void stop() throws IOException {
+        server.shutdown();
     }
 }
