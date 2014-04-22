@@ -1,4 +1,4 @@
-package com.vtence.molecule.examples.routing;
+package examples.routing;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.HttpStatus;
@@ -12,13 +12,16 @@ import java.io.IOException;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 
-public class Routing {
+public class RoutingExample {
 
-    public static void main(String[] args) throws IOException {
-        Server server = new SimpleServer(8080);
+    private final SimpleServer server;
 
+    public RoutingExample(int port) {
+        server = new SimpleServer(port);
+    }
+
+    public void start() throws IOException {
         server.run(draw(new DynamicRoutes() {{
-
             map("/").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
                     response.body("Welcome!");
@@ -43,10 +46,10 @@ public class Routing {
                     response.contentType("text/html");
                     response.body(
                             "<html>" +
-                                    "<body>" +
-                                    "<h3>Hello, " + request.parameter("username") + "</h3>" +
-                                    "</body>" +
-                                    "</html>"
+                            "<body>" +
+                                "<h3>Hello, " + request.parameter("username") + "</h3>" +
+                            "</body>" +
+                            "</html>"
 
                     );
                 }
@@ -59,5 +62,9 @@ public class Routing {
                 }
             });
         }}));
+    }
+
+    public void stop() throws IOException {
+        server.shutdown();
     }
 }

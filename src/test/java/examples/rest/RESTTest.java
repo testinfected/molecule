@@ -29,7 +29,7 @@ public class RESTTest {
         response = request.withParameter("title", "My Favorite Things").withParameter("artist", "John Coltrane").post("/albums");
         response.assertHasStatusCode(201);
 
-        response = request.get("/albums/1");
+        response = request.but().get("/albums/1");
         response.assertHasStatusCode(200);
         response.assertHasContent("Title: My Favorite Things, Artist: John Coltrane");
 
