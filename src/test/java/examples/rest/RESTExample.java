@@ -3,15 +3,16 @@ package examples.rest;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.Server;
 import com.vtence.molecule.TextBody;
 import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
-import com.vtence.molecule.util.ConsoleErrorReporter;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,13 +20,7 @@ import static com.vtence.molecule.middlewares.Router.draw;
 
 public class RESTExample {
 
-    private final SimpleServer server;
-
-    public RESTExample(int port) {
-        server = new SimpleServer(port);
-    }
-
-    public void start() throws IOException {
+    public void run(Server server) throws IOException {
         server.run(new MiddlewareStack() {{
             // Capture internal server errors and display a 500 page
             use(new Failsafe());
@@ -70,6 +65,7 @@ public class RESTExample {
                     }
                 });
 
+                // Access with either a PUT or a POST with _method=PUT
                 put("/albums/:id").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
                         int id = Integer.parseInt(request.parameter("id"));
@@ -87,6 +83,7 @@ public class RESTExample {
                     }
                 });
 
+                // Access with either a DELETE or a POST with _method=DELETE
                 delete("/albums/:id").to(new Application() {
                     public void handle(Request request, Response response) throws Exception {
                         int id = Integer.parseInt(request.parameter("id"));
@@ -101,10 +98,6 @@ public class RESTExample {
                 });
             }}));
         }});
-    }
-
-    public void stop() throws IOException {
-        server.shutdown();
     }
 
     public static class Sequence {
@@ -127,5 +120,12 @@ public class RESTExample {
         public String info() {
             return String.format("Title: %s, Artist: %s", title, artist);
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        // By default, server will run on a random available port...
+        SimpleServer server = new SimpleServer();
+        new RESTExample().run(server);
+        System.out.println("Running on http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port());
     }
 }

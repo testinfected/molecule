@@ -1,5 +1,6 @@
 package examples.session;
 
+import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
@@ -20,16 +21,16 @@ public class SessionTest {
 
     String SESSION_COOKIE = "JSESSIONID";
 
-    SessionExample server = new SessionExample(8080);
+    SimpleServer server = new SimpleServer(9999);
     Delorean delorean = new Delorean();
     Exception error;
 
-    HttpRequest request = new HttpRequest().onPort(8080);
+    HttpRequest request = new HttpRequest().onPort(9999);
     HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
-        server.start(delorean);
+        new SessionExample(delorean).run(server);
         server.reportErrorsTo(new FailureReporter() {
             public void errorOccurred(Exception e) {
                 error = e;
@@ -40,7 +41,7 @@ public class SessionTest {
     @After
     public void stopServer() throws IOException {
         delorean.back();
-        server.stop();
+        server.shutdown();
     }
 
     @Test public void

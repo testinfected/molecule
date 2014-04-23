@@ -3,24 +3,19 @@ package examples.simple;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.Server;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.util.ConsoleErrorReporter;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 
 public class SimpleExample {
 
-    private SimpleServer server;
-
-    public void start() throws IOException {
-        // By default, server will run on a random available port...
-        server = new SimpleServer();
-        // Report internal errors to the console
-        server.reportErrorsTo(ConsoleErrorReporter.toStandardError());
-
+    public void run(Server server) throws IOException {
         server.run(draw(new DynamicRoutes() {{
             map("/pangram").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
@@ -33,24 +28,26 @@ public class SimpleExample {
 
                     response.body(
                             "<html>" +
-                            "<body>" +
-                            "<p>" +
-                                "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
-                                "d'être déçus en voyant leurs drôles d'œufs abîmés." +
-                            "</p>" +
-                            "</body>" +
-                            "</html>"
+                                    "<body>" +
+                                    "<p>" +
+                                    "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
+                                    "d'être déçus en voyant leurs drôles d'œufs abîmés." +
+                                    "</p>" +
+                                    "</body>" +
+                                    "</html>"
                     );
                 }
             });
         }}));
     }
 
-    public int port() {
-        return server.port();
+    public static void main(String[] args) throws IOException {
+        // By default, server will run on a random available port...
+        SimpleServer server = new SimpleServer();
+        // Report internal errors to the console
+        server.reportErrorsTo(ConsoleErrorReporter.toStandardError());
+        new SimpleExample().run(server);
+        System.out.println("Running on http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port());
     }
 
-    public void stop() throws IOException {
-        server.shutdown();
-    }
 }

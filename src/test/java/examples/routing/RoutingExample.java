@@ -9,18 +9,13 @@ import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 
 public class RoutingExample {
 
-    private final SimpleServer server;
-
-    public RoutingExample(int port) {
-        server = new SimpleServer(port);
-    }
-
-    public void start() throws IOException {
+    public void run(Server server) throws IOException {
         server.run(draw(new DynamicRoutes() {{
             map("/").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
@@ -64,7 +59,10 @@ public class RoutingExample {
         }}));
     }
 
-    public void stop() throws IOException {
-        server.shutdown();
+    public static void main(String[] args) throws IOException {
+        // By default, server will run on a random available port...
+        SimpleServer server = new SimpleServer();
+        new RoutingExample().run(server);
+        System.out.println("Running on http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port());
     }
 }

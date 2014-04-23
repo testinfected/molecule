@@ -3,6 +3,7 @@ package examples.session;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.Server;
 import com.vtence.molecule.Session;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.middlewares.MiddlewareStack;
@@ -11,25 +12,22 @@ import com.vtence.molecule.session.SecureIdentifierPolicy;
 import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.session.SessionPool;
 import com.vtence.molecule.util.Clock;
-import com.vtence.molecule.util.FailureReporter;
+import com.vtence.molecule.util.SystemClock;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 
 public class SessionExample {
 
-    private final SimpleServer server;
+    private final Clock clock;
 
-    public SessionExample(int port) {
-        server = new SimpleServer(port);
+    public SessionExample(Clock clock) {
+        this.clock = clock;
     }
 
-    public void reportErrorsTo(FailureReporter reporter) {
-        server.reportErrorsTo(reporter);
-    }
-
-    public void start(final Clock clock) throws IOException {
+    public void run(Server server) throws IOException {
         server.run(new MiddlewareStack() {{
             // Track sessions using a cookie strategy and an in-memory session pool and make
             // sessions expire after 5 minutes (i.e. 300s)
@@ -64,7 +62,10 @@ public class SessionExample {
         }});
     }
 
-    public void stop() throws IOException {
-        server.shutdown();
+    public static void main(String[] args) throws IOException {
+        // By default, server will run on a random available port...
+        SimpleServer server = new SimpleServer();
+        new SessionExample(new SystemClock()).run(server);
+        System.out.println("Running on http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port());
     }
 }

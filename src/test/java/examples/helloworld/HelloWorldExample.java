@@ -7,16 +7,11 @@ import com.vtence.molecule.Server;
 import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class HelloWorldExample {
 
-    private final Server server;
-
-    public HelloWorldExample(int port) {
-        this.server = new SimpleServer(port);
-    }
-
-    public void start() throws IOException {
+    public void run(Server server) throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("Hello, World");
@@ -24,9 +19,10 @@ public class HelloWorldExample {
         });
     }
 
-    public void stop() throws IOException {
-        server.shutdown();
+    public static void main(String[] args) throws IOException {
+        // By default, server will run on a random available port...
+        SimpleServer server = new SimpleServer();
+        new HelloWorldExample().run(server);
+        System.out.println("Running on http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port());
     }
 }
-
-
