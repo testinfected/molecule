@@ -11,7 +11,7 @@ Build yourself using [Gradle](http://www.gradle.org) or [Buildr](http://buildr.a
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.3-SNAPSHOT</version>
+      <version>0.4-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -46,12 +46,12 @@ Your application is now available at:
 ## Want to know more?
 
 Check out the examples:
-* [Hello World](https://github.com/testinfected/molecule/blob/master/examples/hello-world/src/com/vtence/molecule/examples/helloworld/HelloWorld.java)
-* [Routing](https://github.com/testinfected/molecule/blob/master/examples/routing/src/com/vtence/molecule/examples/routing/Routing.java)
-* [Server Configuration Options](https://github.com/testinfected/molecule/blob/master/examples/configuration/src/com/vtence/molecule/examples/configuration/ServerConfiguration.java)
-* [Using Sessions](https://github.com/testinfected/molecule/blob/master/examples/sessions/src/com/vtence/molecule/examples/session/EnablingSessions.java)
+* [Hello World](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/helloworld/HelloWorldExample.java)
+* [Basic Functionality](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/simple/SimpleExample.java)
+* [Routing](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java)
+* [Sessions](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java)
+* [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
 * [Available Middlewares](https://github.com/testinfected/molecule/blob/master/examples/middlewares/src/com/vtence/molecule/examples/middlewares/Middlewares.java)
-* [Simply RESTful](https://github.com/testinfected/molecule/blob/master/examples/REST/src/com/vtence/molecule/examples/rest/REST.java)
 * [Static Files](https://github.com/testinfected/molecule/blob/master/examples/files/src/com/vtence/molecule/examples/files/StaticFiles.java)
 * [View Templating](https://github.com/testinfected/molecule/blob/master/examples/templates/src/com/vtence/molecule/examples/templates/ViewTemplating.java)
 * [PetStore](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
