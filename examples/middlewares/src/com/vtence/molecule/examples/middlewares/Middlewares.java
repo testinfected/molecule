@@ -17,7 +17,7 @@ import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.middlewares.ServerHeader;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.simple.SimpleServer;
-import com.vtence.molecule.util.ConsoleErrorReporter;
+import com.vtence.molecule.util.PlainErrorReporter;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -42,7 +42,7 @@ public class Middlewares {
             // Eat up all internal server errors and respond with a 500 page
             use(new Failsafe());
             // Print internal server errors to the standard error stream
-            use(new FailureMonitor(ConsoleErrorReporter.toStandardError()));
+            use(new FailureMonitor(PlainErrorReporter.toStandardError()));
             // Support HTTP method override via the _method request parameter
             use(new HttpMethodOverride());
             // Compress response content using gzip or deflate when acceptable by the client

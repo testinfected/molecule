@@ -5,7 +5,6 @@ import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.RouteBuilder;
 import com.vtence.molecule.simple.SimpleServer;
-import com.vtence.molecule.util.FailureReporter;
 
 import java.io.IOException;
 import java.net.InetAddress;

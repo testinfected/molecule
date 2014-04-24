@@ -5,7 +5,7 @@ import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.util.Delorean;
-import com.vtence.molecule.util.FailureReporter;
+import com.vtence.molecule.FailureReporter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class SessionTest {
     SessionExample sessions = new SessionExample(delorean);
     WebServer server = WebServer.create(9999);
 
-    Exception error;
+    Throwable error;
     String SESSION_COOKIE = "JSESSIONID"; // The default session cookie name is the standard servlet cookie
     int FIVE_MIN = 300;
 
@@ -33,7 +33,7 @@ public class SessionTest {
     public void startServer() throws IOException {
         sessions.run(server);
         server.failureReporter(new FailureReporter() {
-            public void errorOccurred(Exception e) {
+            public void errorOccurred(Throwable e) {
                 error = e;
             }
         });

@@ -8,7 +8,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.util.FailureReporter;
+import com.vtence.molecule.FailureReporter;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -38,12 +38,12 @@ public class SimpleServerTest {
     HttpRequest request = new HttpRequest(server.port());
     HttpResponse response;
 
-    Exception error;
+    Throwable error;
 
     @Before public void
     configureServer() {
         server.reportErrorsTo(new FailureReporter() {
-            public void errorOccurred(Exception error) {
+            public void errorOccurred(Throwable error) {
                 SimpleServerTest.this.error = error;
             }
         });

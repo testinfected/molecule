@@ -2,7 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.util.FailureReporter;
+import com.vtence.molecule.FailureReporter;
 
 public class FailureMonitor extends AbstractMiddleware {
     private final FailureReporter reporter;

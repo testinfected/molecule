@@ -15,8 +15,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class FailsafeTest {
     Failsafe failsafe = new Failsafe();
 
-    String errorMessage = "An internal error occurred!";
-    Exception error = new Exception(errorMessage) {{
+    String errorMessage = "An error occurred!";
+    Error error = new Error(errorMessage) {{
         setStackTrace(new StackTraceElement[] {
                       new StackTraceElement("stack", "trace", "line", 1),
                       new StackTraceElement("stack", "trace", "line", 2)

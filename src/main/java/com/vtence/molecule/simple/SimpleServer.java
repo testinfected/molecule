@@ -6,7 +6,7 @@ import com.vtence.molecule.Cookie;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.util.FailureReporter;
+import com.vtence.molecule.FailureReporter;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
@@ -64,7 +64,7 @@ public class SimpleServer implements Server {
                 build(simpleRequest, request);
                 app.handle(request, response);
                 commit(simpleResponse, response);
-            } catch (Exception failure) {
+            } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
             } finally {
                 close(simpleResponse);
