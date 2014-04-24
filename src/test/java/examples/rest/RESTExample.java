@@ -5,7 +5,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.TextBody;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.routing.DynamicRoutes;
 
@@ -16,8 +15,6 @@ import java.util.TreeMap;
 public class RESTExample {
 
     public void run(WebServer server) throws IOException {
-        // Capture internal server errors and display a 500 page
-        server.add(new Failsafe());
         // Support HTTP method override via the _method request parameter
         server.add(new HttpMethodOverride());
 
@@ -31,6 +28,9 @@ public class RESTExample {
                     for (int id : albums.keySet()) {
                         Album album = albums.get(id);
                         body.append(String.format("%d: %s\n", id, album.info()));
+                    }
+                    if (body.text().isEmpty()) {
+                        body.append("Your music library is empty");
                     }
                     response.body(body);
                 }
@@ -116,9 +116,10 @@ public class RESTExample {
     }
 
     public static void main(String[] args) throws IOException {
-        // Run server on a random available port...
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        new RESTExample().run(webServer);
-        System.out.println("Running on " + webServer.uri());
+        RESTExample example = new RESTExample();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri() + "/albums");
     }
 }

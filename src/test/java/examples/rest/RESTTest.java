@@ -88,6 +88,6 @@ public class RESTTest {
 
         response = request.but().get("/albums");
         response.assertHasStatusCode(200);
-        response.assertHasContent("");
+        response.assertHasContent("Your music library is empty");
     }
 }

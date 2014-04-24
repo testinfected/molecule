@@ -31,9 +31,10 @@ public class TemplatingExample {
     }
 
     public static void main(String[] args) throws IOException {
-        // Run server on a random available port
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        new TemplatingExample().run(webServer);
+        TemplatingExample example = new TemplatingExample();
+        example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "?name=Gandalf");
     }
 }

@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.hamcrest.Matchers.containsString;
+
 public class BasicTest {
 
     BasicExample basic = new BasicExample();
@@ -31,5 +33,12 @@ public class BasicTest {
     public void specifyingResponseEncoding() throws IOException {
         response = request.get("/?encoding=utf-8");
         response.assertContentIsEncodedAs("utf-8");
+    }
+
+    @Test
+    public void causingTheApplicationToCrashAndRenderA500Page() throws IOException {
+        response = request.get("/?encoding=not-supported");
+        response.assertHasStatusCode(500);
+        response.assertHasContent(containsString("java.nio.charset.UnsupportedCharsetException"));
     }
 }

@@ -4,23 +4,23 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.util.ConsoleErrorReporter;
+import com.vtence.molecule.middlewares.Failsafe;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class BasicExample {
 
     public void run(WebServer server) throws IOException {
-        // Report uncaught exceptions to the standard error stream
-        server.failureReporter(ConsoleErrorReporter.toStandardError());
+        // Capture internal server errors and display a 500 page
+        server.add(new Failsafe());
         server.start(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                String encoding = request.parameter("encoding");
+                // An unsupported charset will cause an exception, which will cause the FailSafe middleware
+                // to render a 500 page
+                Charset encoding = Charset.forName(request.parameter("encoding"));
                 // The specified charset will be used automatically to encode the response
-                String contentType = "text/html; charset=" + encoding;
-                // An unsupported charset will cause an exception,
-                // which the failure reporter declared above will catch and log to the console.
-                response.contentType(contentType);
+                response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
 
                 response.body(
                         "<html>" +
@@ -38,9 +38,10 @@ public class BasicExample {
 
 
     public static void main(String[] args) throws IOException {
-        // Run server on a random available port
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        new BasicExample().run(webServer);
-        System.out.println("Running on " + webServer.uri());
+        BasicExample example = new BasicExample();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri() + "?encoding=utf-8");
     }
 }

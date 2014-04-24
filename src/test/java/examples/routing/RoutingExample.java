@@ -35,7 +35,6 @@ public class RoutingExample {
                                 "<h3>Hello, " + request.parameter("username") + "</h3>" +
                             "</body>" +
                             "</html>"
-
                     );
                 }
             });
@@ -43,9 +42,10 @@ public class RoutingExample {
     }
 
     public static void main(String[] args) throws IOException {
-        // Run server on a random available port...
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        new RoutingExample().run(webServer);
-        System.out.println("Running on " + webServer.uri());
+        RoutingExample example = new RoutingExample();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri());
     }
 }

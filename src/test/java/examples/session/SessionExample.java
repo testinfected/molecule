@@ -62,9 +62,10 @@ public class SessionExample {
     }
 
     public static void main(String[] args) throws IOException {
-        // Run server on a random available port...
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        new SessionExample(new SystemClock()).run(webServer);
-        System.out.println("Running on " + webServer.uri());
+        SessionExample example = new SessionExample(new SystemClock());
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri());
     }
 }

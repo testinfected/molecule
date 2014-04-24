@@ -47,4 +47,10 @@ public class RoutingTest {
         response.assertHasContentType("text/html");
         response.assertHasContent("<html><body><h3>Hello, Vincent</h3></body></html>");
     }
+
+    @Test
+    public void requestingAnUndefinedRoute() throws IOException {
+        response = request.get("/nowhere");
+        response.assertHasStatusCode(404);
+    }
 }

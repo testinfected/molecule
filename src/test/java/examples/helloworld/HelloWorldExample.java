@@ -18,9 +18,10 @@ public class HelloWorldExample {
     }
 
     public static void main(String[] args) throws IOException {
-        // Run server on a random available port...
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        new HelloWorldExample().run(webServer);
-        System.out.println("Running on " + webServer.uri());
+        HelloWorldExample example = new HelloWorldExample();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri());
     }
 }
