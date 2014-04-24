@@ -1,31 +1,21 @@
 package examples.routing;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Server;
+import com.vtence.molecule.WebServer;
 import com.vtence.molecule.routing.DynamicRoutes;
-import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
-import java.net.InetAddress;
-
-import static com.vtence.molecule.middlewares.Router.draw;
 
 public class RoutingExample {
 
-    public void run(Server server) throws IOException {
-        server.run(draw(new DynamicRoutes() {{
+    public void run(WebServer server) throws IOException {
+        server.start(new DynamicRoutes() {{
+
             map("/").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
                     response.body("Welcome!");
-                }
-            });
-
-            get("/hello").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    response.body("Hello, World");
                 }
             });
 
@@ -36,7 +26,7 @@ public class RoutingExample {
                 }
             });
 
-            get("/users/:username").to(new Application() {
+            get("/hello/:username").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
                     response.contentType("text/html");
                     response.body(
@@ -49,20 +39,13 @@ public class RoutingExample {
                     );
                 }
             });
-
-            map("/private").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    response.status(HttpStatus.UNAUTHORIZED);
-                    response.body("Go away!");
-                }
-            });
-        }}));
+        }});
     }
 
     public static void main(String[] args) throws IOException {
-        // By default, server will run on a random available port...
-        SimpleServer server = new SimpleServer();
-        new RoutingExample().run(server);
-        System.out.println("Running on http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port());
+        // Run server on a random available port...
+        WebServer webServer = WebServer.create();
+        new RoutingExample().run(webServer);
+        System.out.println("Running on " + webServer.uri());
     }
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class SimpleServer implements Server {
 
-    private static final int RANDOM_PORT = 0;
+    public static final int RANDOM_PORT = 0;
 
     private int port;
     private FailureReporter failureReporter = FailureReporter.IGNORE;

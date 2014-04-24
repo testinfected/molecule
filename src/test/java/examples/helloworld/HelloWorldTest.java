@@ -1,6 +1,6 @@
 package examples.helloworld;
 
-import com.vtence.molecule.simple.SimpleServer;
+import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import org.junit.After;
@@ -11,23 +11,24 @@ import java.io.IOException;
 
 public class HelloWorldTest {
 
-    SimpleServer server = new SimpleServer(9999);
+    HelloWorldExample helloWorld = new HelloWorldExample();
+    WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest().onPort(9999);
+    HttpRequest request = new HttpRequest(9999);
     HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
-        new HelloWorldExample().run(server);
+        helloWorld.run(server);
     }
 
     @After
     public void stopServer() throws IOException {
-        server.shutdown();
+        server.stop();
     }
 
     @Test
-    public void respondsWithHelloWorld() throws IOException {
+    public void respondingWithHelloWorld() throws IOException {
         response = request.get("/");
         response.assertHasContent("Hello, World");
     }

@@ -42,6 +42,10 @@ public class HttpDate {
     }
 
     public static String format(Date date) {
+        return rfc1123(date);
+    }
+
+    public static String rfc1123(Date date) {
         SimpleDateFormat httpDate = new SimpleDateFormat(RFC_1123_FORMAT, Locale.US);
         httpDate.setTimeZone(GMT);
         return httpDate.format(date);

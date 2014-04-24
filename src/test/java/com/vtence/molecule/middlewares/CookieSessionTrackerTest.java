@@ -28,7 +28,8 @@ public class CookieSessionTrackerTest {
 
     SessionStore store = context.mock(SessionStore.class);
     int timeout = (int) TimeUnit.MINUTES.toSeconds(30);
-    CookieSessionTracker tracker = new CookieSessionTracker(store);
+    String SESSION_COOKIE = "molecule.session";
+    CookieSessionTracker tracker = new CookieSessionTracker(store).cookie(SESSION_COOKIE);
 
     MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();
@@ -50,7 +51,7 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request, response);
         response.assertBody("Session: null");
-        response.assertHasNoCookie("JSESSIONID");
+        response.assertHasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
@@ -62,8 +63,8 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request, response);
         response.assertBody("Counter: 1");
-        response.assertCookie("JSESSIONID", cookieWithValue("new"));
-        response.assertCookie("JSESSIONID", httpOnlyCookie(true));
+        response.assertCookie(SESSION_COOKIE, cookieWithValue("new"));
+        response.assertCookie(SESSION_COOKIE, httpOnlyCookie(true));
     }
 
     @Test public void
@@ -77,7 +78,7 @@ public class CookieSessionTrackerTest {
             will(returnValue("existing"));
         }});
 
-        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie(SESSION_COOKIE, "existing"), response);
         response.assertBody("Counter: 2");
     }
 
@@ -88,7 +89,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
+        tracker.handle(request.addCookie(SESSION_COOKIE, "existing"), response);
     }
 
     @Test public void
@@ -99,9 +100,9 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request.addCookie("JSESSIONID", "expired"), response);
+        tracker.handle(request.addCookie(SESSION_COOKIE, "expired"), response);
         response.assertBody("Counter: 1");
-        response.assertCookie("JSESSIONID", cookieWithValue("new"));
+        response.assertCookie(SESSION_COOKIE, cookieWithValue("new"));
     }
 
     @Test public void
@@ -111,8 +112,8 @@ public class CookieSessionTrackerTest {
             allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
-        response.assertHasNoCookie("JSESSIONID");
+        tracker.handle(request.addCookie(SESSION_COOKIE, "existing"), response);
+        response.assertHasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
@@ -122,8 +123,8 @@ public class CookieSessionTrackerTest {
             oneOf(store).destroy(with("existing"));
         }});
 
-        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
-        response.assertCookie("JSESSIONID", cookieWithMaxAge(0));
+        tracker.handle(request.addCookie(SESSION_COOKIE, "existing"), response);
+        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(0));
     }
 
     @Test public void
@@ -133,7 +134,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(sessionWithMaxAge(-1))); will(returnValue("persistent"));
         }});
         tracker.handle(request, response);
-        response.assertCookie("JSESSIONID", cookieWithMaxAge(-1));
+        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(-1));
     }
 
     @Test public void
@@ -143,7 +144,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
         }});
         tracker.handle(request, response);
-        response.assertCookie("JSESSIONID", cookieWithMaxAge(timeout));
+        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(timeout));
     }
 
     @Test public void
@@ -164,8 +165,8 @@ public class CookieSessionTrackerTest {
             allowing(store).save(with(sessionWithId("existing")));
             will(returnValue("existing"));
         }});
-        tracker.handle(request.addCookie("JSESSIONID", "existing"), response);
-        response.assertCookie("JSESSIONID", cookieWithMaxAge(timeout));
+        tracker.handle(request.addCookie(SESSION_COOKIE, "existing"), response);
+        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(timeout));
     }
 
     @Test public void

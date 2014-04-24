@@ -1,6 +1,6 @@
 package examples.session;
 
-import com.vtence.molecule.simple.SimpleServer;
+import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
@@ -11,27 +11,28 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.core.CombinableMatcher.both;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.fail;
 
 public class SessionTest {
 
-    String SESSION_COOKIE = "JSESSIONID";
-
-    SimpleServer server = new SimpleServer(9999);
     Delorean delorean = new Delorean();
-    Exception error;
+    SessionExample sessions = new SessionExample(delorean);
+    WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest().onPort(9999);
+    Exception error;
+    String SESSION_COOKIE = "JSESSIONID"; // The default session cookie name is the standard servlet cookie
+    int FIVE_MIN = 300;
+
+    HttpRequest request = new HttpRequest(9999).followRedirects(false);
     HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
-        new SessionExample(delorean).run(server);
-        server.reportErrorsTo(new FailureReporter() {
+        sessions.run(server);
+        server.failureReporter(new FailureReporter() {
             public void errorOccurred(Exception e) {
                 error = e;
             }
@@ -41,48 +42,86 @@ public class SessionTest {
     @After
     public void stopServer() throws IOException {
         delorean.back();
-        server.shutdown();
+        server.stop();
     }
 
-    @Test public void
-    onlyCreatesSessionsWhenWritten() throws IOException {
+    @Test
+    public void readingButNotCreatingASession() throws IOException {
         response = request.get("/");
         assertNoError();
         response.assertHasNoCookie(SESSION_COOKIE);
         response.assertHasContent("Hello, Guest");
     }
 
-    @Test public void
-    maintainsSessionsAcrossRequestsUsingCookies() throws IOException {
-        response = request.but().withParameter("username", "Vincent").followRedirects(false).post("/login");
+    @Test
+    public void creatingAPersistentSession() throws IOException {
+        response = request.withParameter("username", "Vincent").post("/login");
         assertNoError();
-        // Session cookie should expire in 300s
-        response.assertHasCookie(both(containsString(SESSION_COOKIE)).and(containsString("max-age=300")));
+        response.assertHasCookie(SESSION_COOKIE, not(containsString("max-age")));
+        response.assertHasCookie(SESSION_COOKIE, not(containsString("expire-after")));
+    }
+
+    @Test
+    public void noteThatPersistentSessionCookiesAreNotRefreshed() throws IOException {
+        response = request.withParameter("username", "Vincent").post("/login");
+        assertNoError();
+        // Play the same request again
+        response = request.send();
+        assertNoError();
+        // Cookie needs no refresh
+        response.assertHasNoCookie(SESSION_COOKIE);
+    }
+
+    @Test
+    public void creatingASessionWhichExpires() throws IOException {
+        sessions.expireAfter(FIVE_MIN);
+
+        response = request.withParameter("username", "Vincent").post("/login");
+        assertNoError();
+        response.assertHasCookie(SESSION_COOKIE, containsString("max-age=" + FIVE_MIN));
+
+        // Play the same request again...
+        response = request.send();
+        assertNoError();
+        // ... cookie will be refreshed
+        response.assertHasCookie(SESSION_COOKIE, containsString("max-age=" + FIVE_MIN));
+    }
+
+    @Test
+    public void trackingASessionAcrossRequests() throws IOException {
+        response = request.but().withParameter("username", "Vincent").post("/login");
+        assertNoError();
 
         response = request.but().get("/");
         assertNoError();
-        // Session cookie should have been refreshed
-        response.assertHasCookie(both(containsString(SESSION_COOKIE)).and(containsString("max-age=300")));
         response.assertHasContent("Hello, Vincent");
+    }
 
-        response = request.but().followRedirects(false).delete("/logout");
+    @Test
+    public void deletingASession() throws IOException {
+        response = request.but().withParameter("username", "Vincent").post("/login");
+        assertNoError();
+        response.assertHasCookie(SESSION_COOKIE);
+
+        response = request.but().delete("/logout");
         assertNoError();
         // Session cookie should be expired
-        response.assertHasCookie(both(containsString(SESSION_COOKIE)).and(containsString("max-age=0")));
+        response.assertHasCookie(SESSION_COOKIE, containsString("max-age=0"));
 
-        response = request.get("/");
+        response = request.but().get("/");
         assertNoError();
-        response.assertHasNoCookie(SESSION_COOKIE);
         response.assertHasContent("Hello, Guest");
     }
 
     @Test public void
-    expiresSessionsAfterTimeout() throws Exception {
-        response = request.withParameter("username", "Vincent").post("/login");
+    attemptingToUseAnExpiredSession() throws Exception {
+        sessions.expireAfter(FIVE_MIN);
+
+        response = request.but().withParameter("username", "Vincent").post("/login");
         assertNoError();
 
-        delorean.travelInTime(TimeUnit.SECONDS.toMillis(300));
-        response = request.but().removeParameters().get("/");
+        delorean.travelInTime(SECONDS.toMillis(FIVE_MIN));
+        response = request.but().get("/");
         assertNoError();
         response.assertHasNoCookie(SESSION_COOKIE);
         response.assertHasContent("Hello, Guest");

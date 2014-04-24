@@ -14,6 +14,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.both;
 
 public class HttpResponse {
 
@@ -96,8 +98,9 @@ public class HttpResponse {
         assertHasNoHeader("Transfer-Encoding");
     }
 
+    @SuppressWarnings("unchecked")
     public void assertHasCookie(String name) {
-        assertHasCookie(containsString(name + "="));
+        assertHasCookie(name, any(String.class));
     }
 
     public void assertHasNoCookie(String name) {
@@ -106,5 +109,9 @@ public class HttpResponse {
 
     public void assertHasCookie(Matcher<? super String> matching) {
         assertHasHeader("Set-Cookie", matching);
+    }
+
+    public void assertHasCookie(String name, Matcher<? super String> matching) {
+        assertHasCookie(both(startsWith(name + "=")).and(matching));
     }
 }

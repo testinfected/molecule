@@ -34,18 +34,18 @@ public class HttpRequest {
     private String body;
     private String encodingType;
 
-    public HttpRequest() {
-        this(new WebClient());
+    public HttpRequest(int port) {
+        this(new WebClient(), port);
     }
 
-    public HttpRequest(WebClient client) {
+    public HttpRequest(WebClient client, int port) {
         this.client = client;
+        this.port = port;
     }
 
     public HttpRequest but() {
-        HttpRequest other = new HttpRequest(client).
+        HttpRequest other = new HttpRequest(client, port).
                 withTimeout(timeoutInMillis).
-                onPort(port).
                 usingMethod(method).
                 on(path).
                 applyCookies(applyCookies).
@@ -142,6 +142,10 @@ public class HttpRequest {
 
     public HttpResponse post(String path) throws IOException {
         return usingMethod(HttpMethod.POST).on(path).send();
+    }
+
+    public HttpResponse put(String path) throws IOException {
+        return usingMethod(HttpMethod.PUT).on(path).send();
     }
 
     public HttpResponse delete(String path) throws IOException {
