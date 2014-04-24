@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.containsString;
 
 public class TemplatesTest {
     RenderingEngine renderer = new JMustacheRenderer().fromDir(locateOnClasspath("views"));
-    Templates templates = new Templates(renderer).ofType(MimeTypes.HTML);
+    Templates templates = new Templates(renderer).type(MimeTypes.HTML).as("utf-8");
 
     Template template = templates.named("hello");
     MockResponse response = new MockResponse();

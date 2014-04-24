@@ -53,9 +53,13 @@ public class WebServer {
         server.shutdown();
     }
 
+    public int port() {
+        return server.port();
+    }
+
     public String uri() {
         try {
-            return "http://" + InetAddress.getLocalHost().getHostName() + ":" + server.port();
+            return "http://" + InetAddress.getLocalHost().getHostName() + ":" + port();
         } catch (UnknownHostException e) {
             throw new HttpException("Cannot figure out server local address", e);
         }

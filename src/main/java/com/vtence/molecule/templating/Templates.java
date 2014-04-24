@@ -21,12 +21,12 @@ public class Templates {
         return as(Charset.forName(charsetName));
     }
 
-    private Templates as(Charset charset) {
+    public Templates as(Charset charset) {
         this.charset = charset;
         return this;
     }
 
-    public Templates ofType(String mediaType) {
+    public Templates type(String mediaType) {
         this.mediaType = mediaType;
         return this;
     }

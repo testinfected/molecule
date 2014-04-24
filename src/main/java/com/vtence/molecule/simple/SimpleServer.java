@@ -27,20 +27,12 @@ public class SimpleServer implements Server {
 
     private Connection connection;
 
-    public SimpleServer() {
-        this(RANDOM_PORT);
-    }
-
     public SimpleServer(int port) {
         this.port = port;
     }
 
     public void reportErrorsTo(FailureReporter reporter) {
         this.failureReporter = reporter;
-    }
-
-    public void port(int port) {
-        this.port = port;
     }
 
     public int port() {
