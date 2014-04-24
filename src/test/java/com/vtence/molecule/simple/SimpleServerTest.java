@@ -34,7 +34,7 @@ import static org.junit.Assert.fail;
 
 public class SimpleServerTest {
 
-    SimpleServer server = new SimpleServer(9999);
+    SimpleServer server = new SimpleServer("localhost", 9999);
     HttpRequest request = new HttpRequest(server.port());
     HttpResponse response;
 

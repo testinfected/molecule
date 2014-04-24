@@ -8,5 +8,9 @@ public interface Server {
 
     void shutdown() throws IOException;
 
+    void reportErrorsTo(FailureReporter reporter);
+
+    String host();
+
     int port();
 }

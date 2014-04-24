@@ -7,25 +7,31 @@ import com.vtence.molecule.routing.RouteBuilder;
 import com.vtence.molecule.simple.SimpleServer;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.URI;
 
 public class WebServer {
 
-    private final SimpleServer server;
+    public static final String LOCAL_ADDRESS = "0.0.0.0";
+    public static final int DEFAULT_PORT = 8080;
+
+    private final Server server;
     private final MiddlewareStack stack;
 
     public static WebServer create() {
-        return create(SimpleServer.RANDOM_PORT);
+        return create(DEFAULT_PORT);
     }
 
     public static WebServer create(int port) {
-        return new WebServer(port);
+        return create(LOCAL_ADDRESS, port);
     }
 
-    private WebServer(int port) {
-        server = new SimpleServer(port);
-        stack = new MiddlewareStack();
+    public static WebServer create(String host, int port) {
+        return new WebServer(new SimpleServer(host, port));
+    }
+
+    public WebServer(Server server) {
+        this.server = server;
+        this.stack = new MiddlewareStack();
     }
 
     public WebServer failureReporter(FailureReporter reporter) {
@@ -52,15 +58,7 @@ public class WebServer {
         server.shutdown();
     }
 
-    public int port() {
-        return server.port();
-    }
-
-    public String uri() {
-        try {
-            return "http://" + InetAddress.getLocalHost().getHostName() + ":" + port();
-        } catch (UnknownHostException e) {
-            throw new HttpException("Cannot figure out server local address", e);
-        }
+    public URI uri() {
+        return URI.create("http://" + server.host() + ":" + server.port());
     }
 }

@@ -14,20 +14,19 @@ import org.simpleframework.transport.connect.SocketConnection;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 
 public class SimpleServer implements Server {
 
-    public static final int RANDOM_PORT = 0;
+    private final String host;
+    private final int port;
 
-    private int port;
     private FailureReporter failureReporter = FailureReporter.IGNORE;
-
     private Connection connection;
 
-    public SimpleServer(int port) {
+    public SimpleServer(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
@@ -39,11 +38,13 @@ public class SimpleServer implements Server {
         return port;
     }
 
+    public String host() {
+        return host;
+    }
+
     public void run(final Application app) throws IOException {
         connection = new SocketConnection(new ContainerServer(new ApplicationContainer(app)));
-        SocketAddress address = new InetSocketAddress(port);
-        // The actual port the server is running on, in case we're using any random available port
-        port = ((InetSocketAddress) connection.connect(address)).getPort();
+        connection.connect(new InetSocketAddress(host, port));
     }
 
     public void shutdown() throws IOException {
