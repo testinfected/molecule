@@ -34,7 +34,7 @@ public class StaticFilesTest {
         response = request.get("/");
         response.assertOK();
         response.assertHasContentType("text/html");
-        response.assertHasContent(containsString("<p class=\"hello\"></p>"));
+        response.assertHasContent(containsString("<p class=\"fox\"></p>"));
     }
 
     @Test
