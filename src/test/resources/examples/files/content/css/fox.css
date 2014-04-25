@@ -1,0 +1,8 @@
+p.fox {
+    font-size: 24px;
+    padding-left: 128px;
+    font-weight: bold;
+    color: #66512c;
+    line-height: 128px;
+    background: no-repeat url(../images/favicon.ico) left;
+}

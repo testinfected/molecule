@@ -12,11 +12,12 @@ public class StaticAssets extends AbstractMiddleware {
 
     private final Application fileServer;
     private final List<String> urls = new ArrayList<String>();
-    private String indexFile;
+
+    private String indexFile = "index.html";
 
     public StaticAssets(Application fileServer, String... urls) {
         this.fileServer = fileServer;
-        this.urls.addAll(Arrays.asList(urls));
+        serve(urls);
     }
 
     public StaticAssets serve(String... urls) {

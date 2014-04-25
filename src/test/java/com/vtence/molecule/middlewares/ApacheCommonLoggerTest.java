@@ -57,7 +57,6 @@ public class ApacheCommonLoggerTest {
         request.remoteIp("192.168.0.1").method(DELETE).uri("/logout");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.contentLength(0);
                 response.body("");
                 response.status(HttpStatus.NO_CONTENT);
             }
