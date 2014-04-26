@@ -52,5 +52,5 @@ Check out the examples:
 * [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
 * [Static Files](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/files/StaticFilesExample.java)
 * [View Templating](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingExample.java)
-* [Available Middlewares](https://github.com/testinfected/molecule/blob/master/examples/middlewares/src/com/vtence/molecule/examples/middlewares/Middlewares.java)
+* [Middlewares](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middlewares/MiddlewaresExample.java)
 * [PetStore](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)

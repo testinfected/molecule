@@ -5,7 +5,6 @@ import com.vtence.molecule.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
-import com.vtence.molecule.middlewares.ApacheCommonLogger;
 import com.vtence.molecule.middlewares.Compressor;
 import com.vtence.molecule.middlewares.ContentLengthHeader;
 import com.vtence.molecule.middlewares.DateHeader;
@@ -20,7 +19,6 @@ import com.vtence.molecule.simple.SimpleServer;
 import com.vtence.molecule.util.PlainErrorReporter;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static com.vtence.molecule.middlewares.Router.draw;
 import static java.lang.Integer.parseInt;
@@ -35,8 +33,6 @@ public class Middlewares {
             use(new ServerHeader("MyApp/1.0 molecule/0.3"));
             // Also include date and time of the response
             use(new DateHeader());
-            // Log all accesses to the default JDK logger
-            use(new ApacheCommonLogger(Logger.getAnonymousLogger()));
             // Set content length header on responses with fixed-length bodies
             use(new ContentLengthHeader());
             // Eat up all internal server errors and respond with a 500 page
@@ -70,18 +66,6 @@ public class Middlewares {
                 }
             });
             use(filters);
-
-            // You can add your own middleware to wrap request processing
-            use(new AbstractMiddleware() {
-                public void handle(Request request, Response response) throws Exception {
-                    // The 'before' part
-                    response.contentType("text/plain");
-                    // Carry on with the processing chain
-                    forward(request, response);
-                    // The 'after' part
-                    response.status(HttpStatus.OK);
-                }
-            });
 
             run(draw(new DynamicRoutes() {{
                 get("/orders/:id").to(new Application() {
