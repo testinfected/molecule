@@ -12,7 +12,7 @@ import static com.vtence.molecule.matchers.Matchers.withPath;
 
 public class FilterMap extends AbstractMiddleware {
 
-    private final Map<Matcher<Request>, Middleware> filters = new LinkedHashMap<Matcher<Request>, Middleware>();
+    private final Map<Matcher<? super Request>, Middleware> filters = new LinkedHashMap<Matcher<? super Request>, Middleware>();
 
     public void handle(Request request, Response response) throws Exception {
         Middleware filter = filterMappedTo(request);
@@ -22,7 +22,7 @@ public class FilterMap extends AbstractMiddleware {
 
     private Middleware filterMappedTo(Request request) {
         Middleware bestMatch = new PassThrough();
-        for (Matcher<Request> requestMatcher : filters.keySet()) {
+        for (Matcher<? super Request> requestMatcher : filters.keySet()) {
             if (requestMatcher.matches(request)) bestMatch = filters.get(requestMatcher);
         }
         return bestMatch;
@@ -32,7 +32,7 @@ public class FilterMap extends AbstractMiddleware {
         return map(withPath(Matchers.startingWith(pathPrefix)), filter);
     }
 
-    public FilterMap map(Matcher<Request> requestMatcher, Middleware filter) {
+    public FilterMap map(Matcher<? super Request> requestMatcher, Middleware filter) {
         filters.put(requestMatcher, filter);
         return this;
     }

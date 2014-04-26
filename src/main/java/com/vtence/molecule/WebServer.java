@@ -1,5 +1,6 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.middlewares.FilterMap;
 import com.vtence.molecule.middlewares.Middleware;
 import com.vtence.molecule.middlewares.MiddlewareStack;
 import com.vtence.molecule.middlewares.Router;
@@ -41,6 +42,11 @@ public class WebServer {
 
     public WebServer add(Middleware middleware) {
         stack.use(middleware);
+        return this;
+    }
+
+    public WebServer filter(String path, Middleware filter) {
+        stack.use(new FilterMap().map(path, filter));
         return this;
     }
 
