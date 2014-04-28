@@ -1,7 +1,6 @@
 package com.vtence.molecule.templating;
 
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.util.MimeTypes;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -11,21 +10,15 @@ import static org.hamcrest.Matchers.containsString;
 
 public class TemplatesTest {
     RenderingEngine renderer = new JMustacheRenderer().fromDir(locateOnClasspath("views"));
-    Templates templates = new Templates(renderer).type(MimeTypes.HTML).as("utf-8");
+    Templates templates = new Templates(renderer);
 
     Template template = templates.named("hello");
     MockResponse response = new MockResponse();
 
     @Test public void
-    rendersUsingProvidedContext() throws IOException {
-        template.render(response, new Context());
+    rendersTemplateUsingProvidedContext() throws IOException {
+        response.body(template.render(new Context()));
         response.assertBody(containsString("Hello World"));
-    }
-
-    @Test public void
-    setsMediaTypeUsingUtf8EncodingByDefault() throws IOException {
-        template.render(response, new Context());
-        response.assertContentType("text/html; charset=utf-8");
     }
 
     public static class Context {

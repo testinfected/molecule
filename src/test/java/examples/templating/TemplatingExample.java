@@ -22,10 +22,11 @@ public class TemplatingExample {
         final Template hello = templates.named("hello");
         server.start(new Application() {
             public void handle(final Request request, final Response response) throws Exception {
+                response.contentType("text/html; charset=utf-8");
                 // Mustache can use any object or a Map as a rendering context
-                hello.render(response, new Object() {
+                response.body(hello.render(new Object() {
                     String name = request.parameter("name") != null ? request.parameter("name") : "World";
-                });
+                }));
             }
         });
     }

@@ -1,10 +1,10 @@
 package com.vtence.molecule.templating;
 
-import com.vtence.molecule.Response;
+import com.vtence.molecule.Body;
 
 import java.io.IOException;
 
 public interface Template {
 
-    void render(Response response, Object context) throws IOException;
+    Body render(Object context) throws IOException;
 }

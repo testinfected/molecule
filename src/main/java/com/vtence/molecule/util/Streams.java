@@ -1,12 +1,15 @@
 package com.vtence.molecule.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public final class Streams {
+
+    private Streams() {}
 
     public static String toString(InputStream in) throws IOException {
         return toString(in, Charset.defaultCharset());
@@ -34,6 +37,10 @@ public final class Streams {
         }
     }
 
-    private Streams() {
+    public static void close(Closeable closeable) {
+        try {
+            if (closeable != null) closeable.close();
+        } catch (IOException ignored) {
+        }
     }
 }

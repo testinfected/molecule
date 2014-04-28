@@ -3,7 +3,6 @@ package com.vtence.molecule;
 import com.vtence.molecule.util.Streams;
 
 import java.io.BufferedInputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,14 +38,7 @@ public class FileBody implements Body {
         try {
             Streams.copy(in, out, chunkSize);
         } finally {
-            close(in);
-        }
-    }
-
-    private void close(Closeable closeable) {
-        try {
-            closeable.close();
-        } catch (IOException ignored) {
+            Streams.close(in);
         }
     }
 
