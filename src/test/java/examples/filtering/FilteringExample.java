@@ -1,12 +1,12 @@
 package examples.filtering;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.AbstractMiddleware;
-import com.vtence.molecule.middlewares.Middleware;
+import com.vtence.molecule.lib.AbstractMiddleware;
+import com.vtence.molecule.lib.Middleware;
 import com.vtence.molecule.routing.DynamicRoutes;
 
 import java.io.IOException;

@@ -2,9 +2,10 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.lib.AbstractMiddleware;
 
-import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
-import static com.vtence.molecule.HttpHeaders.TRANSFER_ENCODING;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 
 public class ContentLengthHeader extends AbstractMiddleware {
 

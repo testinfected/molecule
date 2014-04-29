@@ -1,6 +1,6 @@
 package com.vtence.molecule.support;
 
-import com.vtence.molecule.Cookie;
+import com.vtence.molecule.http.Cookie;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 

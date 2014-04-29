@@ -9,7 +9,7 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Test;
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpMethod;
+import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 

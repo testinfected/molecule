@@ -1,9 +1,13 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.util.Charsets;
-import com.vtence.molecule.util.ContentType;
-import com.vtence.molecule.util.Headers;
-import com.vtence.molecule.util.HttpDate;
+import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.http.HeaderNames;
+import com.vtence.molecule.http.HttpStatus;
+import com.vtence.molecule.helpers.Charsets;
+import com.vtence.molecule.http.ContentType;
+import com.vtence.molecule.helpers.Headers;
+import com.vtence.molecule.http.HttpDate;
+import com.vtence.molecule.lib.BinaryBody;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,9 +16,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
-import static com.vtence.molecule.HttpHeaders.CONTENT_TYPE;
-import static com.vtence.molecule.TextBody.text;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
 
 public class Response {
@@ -53,7 +57,7 @@ public class Response {
 
     public Response redirectTo(String location) {
         status(HttpStatus.SEE_OTHER);
-        set(HttpHeaders.LOCATION, location);
+        set(HeaderNames.LOCATION, location);
         return this;
     }
 

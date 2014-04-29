@@ -1,11 +1,12 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Body;
-import com.vtence.molecule.ChunkedBody;
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.lib.AbstractMiddleware;
+import com.vtence.molecule.lib.ChunkedBody;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.util.AcceptEncoding;
+import com.vtence.molecule.http.AcceptEncoding;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,8 +17,8 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static com.vtence.molecule.HttpHeaders.CONTENT_ENCODING;
-import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_ENCODING;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.middlewares.Compressor.Codings.identity;
 
 public class Compressor extends AbstractMiddleware {

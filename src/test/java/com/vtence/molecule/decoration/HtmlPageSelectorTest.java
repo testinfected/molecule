@@ -1,6 +1,6 @@
 package com.vtence.molecule.decoration;
 
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 

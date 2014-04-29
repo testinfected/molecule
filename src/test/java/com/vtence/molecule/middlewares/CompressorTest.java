@@ -1,12 +1,12 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.util.Streams;
+import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
 
 import java.io.IOException;

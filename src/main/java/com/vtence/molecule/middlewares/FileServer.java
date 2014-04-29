@@ -1,14 +1,14 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.FileBody;
-import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.lib.FileBody;
+import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.util.HttpDate;
-import com.vtence.molecule.util.Joiner;
-import com.vtence.molecule.util.MimeTypes;
+import com.vtence.molecule.http.HttpDate;
+import com.vtence.molecule.helpers.Joiner;
+import com.vtence.molecule.http.MimeTypes;
 
 import java.io.File;
 import java.util.Arrays;
@@ -16,13 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.vtence.molecule.HttpHeaders.ALLOW;
-import static com.vtence.molecule.HttpHeaders.IF_MODIFIED_SINCE;
-import static com.vtence.molecule.HttpHeaders.LAST_MODIFIED;
-import static com.vtence.molecule.HttpMethod.GET;
-import static com.vtence.molecule.HttpMethod.HEAD;
-import static com.vtence.molecule.HttpStatus.METHOD_NOT_ALLOWED;
-import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
+import static com.vtence.molecule.http.HeaderNames.ALLOW;
+import static com.vtence.molecule.http.HeaderNames.IF_MODIFIED_SINCE;
+import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
+import static com.vtence.molecule.http.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpMethod.HEAD;
+import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 
 public class FileServer implements Application {
 

@@ -1,11 +1,11 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.matchers.Matcher;
+import com.vtence.molecule.lib.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.matchers.Anything;
-import com.vtence.molecule.matchers.Nothing;
+import com.vtence.molecule.lib.Anything;
+import com.vtence.molecule.lib.Nothing;
 import com.vtence.molecule.routing.Route;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;

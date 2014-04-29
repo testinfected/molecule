@@ -1,10 +1,10 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.HttpMethod;
+import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.util.HttpDate;
-import com.vtence.molecule.util.Streams;
+import com.vtence.molecule.http.HttpDate;
+import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
 
 import java.io.File;
@@ -12,10 +12,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static com.vtence.molecule.HttpStatus.METHOD_NOT_ALLOWED;
-import static com.vtence.molecule.HttpStatus.NOT_FOUND;
-import static com.vtence.molecule.HttpStatus.NOT_MODIFIED;
-import static com.vtence.molecule.HttpStatus.OK;
+import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
+import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
+import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.support.MockRequest.GET;
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
 import static java.lang.String.valueOf;

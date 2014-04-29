@@ -1,8 +1,8 @@
 package com.vtence.molecule.session;
 
 import com.vtence.molecule.Session;
-import com.vtence.molecule.util.Clock;
-import com.vtence.molecule.util.SystemClock;
+import com.vtence.molecule.lib.Clock;
+import com.vtence.molecule.lib.SystemClock;
 
 import java.util.Date;
 import java.util.Map;

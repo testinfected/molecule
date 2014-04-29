@@ -8,8 +8,8 @@ import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.HttpMethod.GET;
-import static com.vtence.molecule.HttpMethod.POST;
+import static com.vtence.molecule.http.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpMethod.POST;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 

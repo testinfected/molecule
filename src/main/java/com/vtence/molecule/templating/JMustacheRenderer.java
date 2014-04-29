@@ -2,8 +2,8 @@ package com.vtence.molecule.templating;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
-import com.vtence.molecule.util.Charsets;
-import com.vtence.molecule.util.Streams;
+import com.vtence.molecule.helpers.Charsets;
+import com.vtence.molecule.helpers.Streams;
 
 import java.io.File;
 import java.io.FileInputStream;

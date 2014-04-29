@@ -1,7 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
-import static com.vtence.molecule.HttpMethod.DELETE;
-import static com.vtence.molecule.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpMethod.DELETE;
+import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.CoreMatchers.containsString;
 

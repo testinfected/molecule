@@ -1,7 +1,7 @@
 package com.vtence.molecule.support;
 
-import com.vtence.molecule.Cookie;
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Response;
 import org.hamcrest.Matcher;
 
@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.vtence.molecule.HttpHeaders.LOCATION;
+import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.support.CharsetDetector.detectedCharset;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;

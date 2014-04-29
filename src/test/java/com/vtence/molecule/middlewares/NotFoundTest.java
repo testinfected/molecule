@@ -1,7 +1,6 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.Request;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;

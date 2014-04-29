@@ -1,6 +1,6 @@
 package com.vtence.molecule.routing;
 
-import com.vtence.molecule.matchers.Matcher;
+import com.vtence.molecule.lib.Matcher;
 
 public interface RouteDefinition {
 

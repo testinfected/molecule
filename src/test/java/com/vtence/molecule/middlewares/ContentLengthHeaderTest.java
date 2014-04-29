@@ -1,7 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.ChunkedBody;
+import com.vtence.molecule.lib.ChunkedBody;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import static com.vtence.molecule.HttpHeaders.TRANSFER_ENCODING;
+import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 
 public class ContentLengthHeaderTest {
 

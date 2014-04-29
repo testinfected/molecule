@@ -1,15 +1,15 @@
 package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpMethod;
-import com.vtence.molecule.matchers.Matcher;
-import com.vtence.molecule.matchers.Matchers;
+import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.lib.Matcher;
+import com.vtence.molecule.lib.Matchers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.vtence.molecule.matchers.Matchers.anyOf;
-import static com.vtence.molecule.matchers.Matchers.equalTo;
+import static com.vtence.molecule.lib.Matchers.anyOf;
+import static com.vtence.molecule.lib.Matchers.equalTo;
 
 public class DynamicRouteDefinition implements RouteDefinition, ViaClause {
 

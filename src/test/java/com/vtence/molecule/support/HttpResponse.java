@@ -1,8 +1,8 @@
 package com.vtence.molecule.support;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.vtence.molecule.HttpStatus;
-import com.vtence.molecule.util.Streams;
+import com.vtence.molecule.http.HttpStatus;
+import com.vtence.molecule.helpers.Streams;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 

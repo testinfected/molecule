@@ -9,8 +9,8 @@ import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.routing.DynamicRoutes;
 import com.vtence.molecule.session.SecureIdentifierPolicy;
 import com.vtence.molecule.session.SessionPool;
-import com.vtence.molecule.util.Clock;
-import com.vtence.molecule.util.SystemClock;
+import com.vtence.molecule.lib.Clock;
+import com.vtence.molecule.lib.SystemClock;
 
 import java.io.IOException;
 

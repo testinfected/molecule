@@ -1,8 +1,8 @@
 package com.vtence.molecule.decoration;
 
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.util.MimeTypes;
+import com.vtence.molecule.http.MimeTypes;
 
 public class HtmlPageSelector implements Selector {
 

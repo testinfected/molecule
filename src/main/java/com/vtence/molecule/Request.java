@@ -1,9 +1,12 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.util.Charsets;
-import com.vtence.molecule.util.ContentType;
-import com.vtence.molecule.util.Headers;
-import com.vtence.molecule.util.Streams;
+import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.http.HeaderNames;
+import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.helpers.Charsets;
+import com.vtence.molecule.http.ContentType;
+import com.vtence.molecule.helpers.Headers;
+import com.vtence.molecule.helpers.Streams;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -172,7 +175,7 @@ public class Request {
     }
 
     public long contentLength() {
-        String value = header(HttpHeaders.CONTENT_LENGTH);
+        String value = header(HeaderNames.CONTENT_LENGTH);
         return value != null ? parseLong(value) : -1;
     }
 

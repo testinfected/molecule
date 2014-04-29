@@ -4,7 +4,7 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.TextBody;
+import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.decoration.ContentProcessor;
 import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;

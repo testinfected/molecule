@@ -1,8 +1,9 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.HttpStatus;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.lib.AbstractMiddleware;
 
 import java.io.IOException;
 import java.io.PrintWriter;

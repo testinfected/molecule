@@ -3,7 +3,7 @@ package examples.rest;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.TextBody;
+import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.routing.DynamicRoutes;

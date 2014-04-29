@@ -1,6 +1,6 @@
 package com.vtence.molecule.templating;
 
-import com.vtence.molecule.ChunkedBody;
+import com.vtence.molecule.lib.ChunkedBody;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

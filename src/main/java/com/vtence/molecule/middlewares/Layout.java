@@ -9,6 +9,7 @@ import com.vtence.molecule.decoration.HtmlDocumentProcessor;
 import com.vtence.molecule.decoration.HtmlPageSelector;
 import com.vtence.molecule.decoration.LayoutTemplate;
 import com.vtence.molecule.decoration.Selector;
+import com.vtence.molecule.lib.AbstractMiddleware;
 import com.vtence.molecule.templating.Template;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import static com.vtence.molecule.HttpHeaders.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 
 public class Layout extends AbstractMiddleware {
 

@@ -1,6 +1,6 @@
 package com.vtence.molecule.support;
 
-import com.vtence.molecule.HttpMethod;
+import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.Request;
 import org.hamcrest.Matcher;
 

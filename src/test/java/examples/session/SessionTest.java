@@ -4,7 +4,7 @@ import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.util.Delorean;
+import com.vtence.molecule.support.Delorean;
 import com.vtence.molecule.FailureReporter;
 import org.junit.After;
 import org.junit.Before;
