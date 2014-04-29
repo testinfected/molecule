@@ -4,9 +4,11 @@ jdk:
   - oraclejdk7
 
 env:
-   global:
+  - TERM=dumb
+  global:
    - secure: HQ4jAQ9/TwBD1lqiPG3JGEkUYqAQ9WezrNv9ip2hfKe9AqThDvi3GTnmNksQ0xgl875IbCucos1i4/i9zGLZq3Wa0fuPU3ZLc5mMWch/qhX1NFAaQsSU/WI7BZowoLdLdDZToEKEcxHzX3PVoRXvYoVKkIXDZUT2N1KE4RgBZTU=
    - secure: bB3Tkk8PmzhuJcmBcljWWIAI9a30ro1lcuok4K/XMywUH0FYwfIja4gdRbMRLxTyWEiYdT6WMaF7PmANSwrd9WNeFmeT+q/4uk5KZms9qBNeet87pYCyJQCC6hffVtGM/qWFefUm3MfKcZvwcP4+hlIayD5Iyxhl7TpSIDyUYCU=
+
 
 after_success:
 - gradle coverage coveralls
