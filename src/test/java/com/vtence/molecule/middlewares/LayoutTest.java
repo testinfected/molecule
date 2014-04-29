@@ -1,8 +1,11 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.TextBody;
+import com.vtence.molecule.decoration.ContentProcessor;
 import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.support.MockRequest;
@@ -15,18 +18,17 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-public class SiteMeshTest {
+public class LayoutTest {
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
     Selector selector = context.mock(Selector.class);
-    SiteMesh siteMesh = new SiteMesh(selector, new FakeDecorator());
+    Layout layout = new Layout(selector, new StubProcessor(), new StubDecorator());
 
-    String originalPage = "<plain page>";
-    String decoratedPage = "<decorated page>";
     States page = context.states("page").startsAs("selected");
 
     MockRequest request = new MockRequest();
@@ -40,53 +42,64 @@ public class SiteMeshTest {
         }});
     }
 
-    @Before public void
-    stubApplication() {
-        siteMesh.connectTo(write(originalPage));
-    }
-
     @Test public void
     runsContentThroughDecoratorWhenPageIsSelected() throws Exception {
-        siteMesh.handle(request, response);
-        response.assertBody(decoratedPage);
+        layout.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("raw content");
+            }
+        });
+
+        layout.handle(request, response);
+        response.assertBody("<decorated>raw content</decorated>");
     }
 
     @Test public void
     removesContentLengthHeaderIfDecorating() throws Exception {
         response.setLong("Content-Length", 140);
-        siteMesh.handle(request, response);
+        layout.handle(request, response);
         response.assertHeader("Content-Length", nullValue());
     }
 
     @Test public void
     leavesContentUntouchedIfNoDecorationOccurs() throws Exception {
+        layout.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("original content");
+            }
+        });
         page.become("unselected");
-        siteMesh.handle(request, response);
-        response.assertBody(originalPage);
+        layout.handle(request, response);
+        response.assertBody("original content");
     }
 
     @Test public void
     preservesOriginalResponseEncodingWhenDecorating() throws Exception {
-        response.contentType("text/html; charset=utf-8");
-        decoratedPage = "<The following characters require encoding: éçë>";
-
-        siteMesh.handle(request, response);
-
-        response.assertContentType(containsString("utf-8"));
-        response.assertContentEncodedAs("utf-8");
-    }
-
-    private Application write(final String text) {
-        return new Application() {
+        layout.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(text);
+                response.body("encoded content (éçëœ)");
             }
-        };
+        });
+
+        response.contentType("text/html; charset=utf-8");
+        layout.handle(request, response);
+
+        response.assertContentType("text/html; charset=utf-8");
+        response.assertContentEncodedAs("utf-8");
+        response.assertBody(containsString("éçëœ"));
     }
 
-    private class FakeDecorator implements Decorator {
-        public void decorate(Writer out, String content) throws IOException {
-            out.write(decoratedPage);
+    private class StubProcessor implements ContentProcessor {
+        public Map<String, String> process(String content) {
+            Map<String, String> data = new HashMap<String, String>();
+            data.put("content", content);
+            return data;
+        }
+    }
+
+    private class StubDecorator implements Decorator {
+        public Body merge(Request request, Map<String, String> content) throws IOException {
+            return TextBody.text("<decorated>" + content.get("content") + "</decorated>");
         }
     }
 }

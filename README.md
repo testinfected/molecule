@@ -53,5 +53,6 @@ Check out the examples:
 * [Static Files](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/files/StaticFilesExample.java)
 * [View Templating](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingExample.java)
 * [Filtering](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
+* [Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/layout/LayoutExample.java)
 * [Middlewares](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middlewares/MiddlewaresExample.java)
 * [PetStore](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
