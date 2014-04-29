@@ -13,15 +13,15 @@ public class HtmlDocumentProcessorTest {
     ContentProcessor processor = new HtmlDocumentProcessor();
 
     String page =
-            "<html>\n" +
-            "<head>\n" +
+            "<html lang=\"en\">\n" +
+            "<head lang=\"en\">\n" +
             "  <title>\n" +
             "  Page Title  \n" +
             "  </title>   \n" +
             "  <meta name=\"description\" content=\"Description\"/>\n" +
             "  <meta name=\"author\" content=\"Author\"/>\n" +
             "</head>\n" +
-            "<body>\n" +
+            "<body class=\"body\">\n" +
             "Content of the body\n" +
             "</body>\n" +
             "</html>\n";
