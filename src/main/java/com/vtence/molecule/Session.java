@@ -30,11 +30,11 @@ public class Session {
         return request.attribute(Session.class);
     }
 
-    public void set(Request request) {
-        request.attribute(Session.class, this);
+    public static void set(Request request, Session session) {
+        request.attribute(Session.class, session);
     }
 
-    public void unset(Request request) {
+    public static void unset(Request request) {
         request.removeAttribute(Session.class);
     }
 

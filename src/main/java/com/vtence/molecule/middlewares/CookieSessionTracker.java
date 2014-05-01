@@ -36,14 +36,14 @@ public class CookieSessionTracker extends AbstractMiddleware {
             forward(request, response);
             commitSession(request, response, session);
         } finally {
-            session.unset(request);
+            Session.unset(request);
         }
     }
 
     private Session prepareSession(Request request) {
         Session session = acquireSession(request);
         session.maxAge(expireAfter);
-        session.set(request);
+        Session.set(request, session);
         return session;
     }
 
