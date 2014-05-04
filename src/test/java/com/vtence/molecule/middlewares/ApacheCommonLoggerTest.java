@@ -15,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -31,7 +32,9 @@ public class ApacheCommonLoggerTest {
     Logger logger = context.mock(Logger.class);
     Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").toDate();
     ApacheCommonLogger apacheCommonLogger =
-            new ApacheCommonLogger(logger, BrokenClock.stoppedAt(currentTime), TimeZone.getTimeZone("GMT+01:00"));
+            new ApacheCommonLogger(logger,
+                                   BrokenClock.stoppedAt(currentTime),
+                                   Locale.US, TimeZone.getTimeZone("GMT+01:00"));
 
     MockRequest request = new MockRequest();
     MockResponse response = new MockResponse();

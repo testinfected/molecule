@@ -8,16 +8,18 @@ import com.vtence.molecule.lib.SystemClock;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
 public class ApacheCommonLogger extends AbstractMiddleware {
 
     private static final String COMMON_LOG_FORMAT = "%s - %s [%s] \"%s %s %s\" %s %s";
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
+    private static final String DATE_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
 
     private final Logger logger;
     private final Clock clock;
+    private final Locale locale;
     private final TimeZone timeZone;
 
     public ApacheCommonLogger(Logger logger) {
@@ -25,12 +27,13 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     }
 
     public ApacheCommonLogger(Logger logger, Clock clock) {
-        this(logger, clock, TimeZone.getDefault());
+        this(logger, clock, Locale.getDefault(), TimeZone.getDefault());
     }
 
-    public ApacheCommonLogger(Logger logger, Clock clock, TimeZone timeZone) {
+    public ApacheCommonLogger(Logger logger, Clock clock, Locale locale, TimeZone timeZone) {
         this.logger = logger;
         this.clock = clock;
+        this.locale = locale;
         this.timeZone = timeZone;
     }
 
@@ -49,8 +52,9 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     }
 
     private String currentTime() {
-        DATE_FORMAT.setTimeZone(timeZone);
-        return DATE_FORMAT.format(clock.now());
+        DateFormat formatter = new SimpleDateFormat(ApacheCommonLogger.DATE_FORMAT, locale);
+        formatter.setTimeZone(timeZone);
+        return formatter.format(clock.now());
     }
 
     private Object contentLengthOrHyphen(Response response) {
