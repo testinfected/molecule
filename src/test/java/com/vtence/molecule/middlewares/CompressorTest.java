@@ -68,7 +68,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    doesNotCompressEmptyContent() throws Exception {
+    skipsCompressionOfEmptyContent() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
             }
@@ -122,7 +122,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    skipsCompressionIfContentEncodingAlreadyPresent() throws Exception {
+    skipsCompressionIfResponseAlreadyEncoded() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.set("Content-Encoding", "deflate");

@@ -10,5 +10,5 @@ env:
     - TERM=dumb
 
 after_success:
-- gradle coverage coveralls
-- .scripts/publish-to-sonatype.sh
+  - gradle coverage coveralls
+  - .scripts/publish-to-sonatype.sh
