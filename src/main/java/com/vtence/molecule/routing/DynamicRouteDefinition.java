@@ -31,8 +31,7 @@ public class DynamicRouteDefinition implements RouteDefinition, ViaClause {
     }
 
     private List<Matcher<? super HttpMethod>> equallyMatching(HttpMethod... methods) {
-        List<Matcher<? super HttpMethod>> matchMethods =
-                new ArrayList<Matcher<? super HttpMethod>>();
+        List<Matcher<? super HttpMethod>> matchMethods = new ArrayList<Matcher<? super HttpMethod>>();
         for (HttpMethod httpMethod : methods) {
             matchMethods.add(equalTo(httpMethod));
         }

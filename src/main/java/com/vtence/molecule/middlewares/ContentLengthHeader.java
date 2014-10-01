@@ -11,11 +11,13 @@ public class ContentLengthHeader extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
         forward(request, response);
-        if (!hasContentLengthHeader(response)
-                && isFixedLengthSize(response)
-                && !isChunked(response)) {
+        if (requiresContentLengthHeader(response)) {
             response.contentLength(response.size());
         }
+    }
+
+    public boolean requiresContentLengthHeader(Response response) {
+        return !hasContentLengthHeader(response) && isFixedLengthSize(response) && !isChunked(response);
     }
 
     private boolean isFixedLengthSize(Response response) {
