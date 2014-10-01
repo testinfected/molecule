@@ -32,6 +32,10 @@ public final class MimeTypes {
         return mimeTypes;
     }
 
+    public static boolean matches(String mediaType, String pattern) {
+        return MediaType.parse(pattern).isGeneralizationOf(MediaType.parse(mediaType));
+    }
+
     public void register(String extension, String mimeType) {
         knownTypes.put(extension, mimeType);
     }
@@ -41,5 +45,27 @@ public final class MimeTypes {
             if (filename.endsWith("." + ext)) return knownTypes.get(ext);
         }
         return BINARY_DATA;
+    }
+
+    private static class MediaType {
+        public static final String WILCARD = "*";
+
+        public final String type;
+        public final String subtype;
+
+        public MediaType(String type, String subtype) {
+            this.type = type;
+            this.subtype = subtype;
+        }
+
+        public static MediaType parse(String mediaType) {
+            String[] parts = mediaType.split("/");
+            return parts.length > 1 ? new MediaType(parts[0], parts[1]) : new MediaType(parts[0], WILCARD);
+        }
+
+        public boolean isGeneralizationOf(MediaType mime) {
+            return (type.equals(mime.type) || type.equals(WILCARD)) &&
+                    (subtype.equals(WILCARD) || subtype.equals(mime.subtype));
+        }
     }
 }
