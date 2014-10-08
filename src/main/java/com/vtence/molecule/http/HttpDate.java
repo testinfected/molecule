@@ -11,7 +11,7 @@ import java.util.TimeZone;
  * <p>
  * This class handles dates as defined by RFC 2616 section 3.3.1
  */
-public class HttpDate {
+public final class HttpDate {
 
     public static final String RFC_1123_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
     public static final String RFC_1036_FORMAT = "EEE, dd-MMM-yy HH:mm:ss zzz";
@@ -50,4 +50,6 @@ public class HttpDate {
         httpDate.setTimeZone(GMT);
         return httpDate.format(date);
     }
+
+    private HttpDate() {}
 }

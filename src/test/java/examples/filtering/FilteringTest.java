@@ -31,7 +31,7 @@ public class FilteringTest {
     public void filteringAccessToContent() throws IOException {
         response = request.get("/private/area?username=admin&password=admin");
         response.assertOK();
-        response.assertHasContent("Hello, admin");
+        response.assertHasContent("Hello, admin!");
     }
 
     @Test
@@ -45,6 +45,6 @@ public class FilteringTest {
     public void filteringOnlyMatchingRequests() throws IOException {
         response = request.get("/hello");
         response.assertOK();
-        response.assertHasContent("Welcome");
+        response.assertHasContent("Welcome, Guest!");
     }
 }

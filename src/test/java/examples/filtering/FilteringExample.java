@@ -42,13 +42,13 @@ public class FilteringExample {
               .start(new DynamicRoutes() {{
                   get("/private/area").to(new Application() {
                       public void handle(Request request, Response response) throws Exception {
-                          response.body("Hello, " + request.attribute("user"));
+                          response.body("Hello, " + request.attribute("user") + "!");
                       }
                   });
 
                   get("/hello").to(new Application() {
                       public void handle(Request request, Response response) throws Exception {
-                          response.body("Welcome");
+                          response.body("Welcome, Guest!");
                       }
                   });
               }});
