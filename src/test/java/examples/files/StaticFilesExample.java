@@ -34,9 +34,9 @@ public class StaticFilesExample {
     }
 
     public static void main(String[] args) throws IOException {
-        WebServer webServer = WebServer.create();
         // Let's log server access to the console, so we can see content we're serving
         StaticFilesExample example = new StaticFilesExample(Logging.toConsole());
+        WebServer webServer = WebServer.create();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

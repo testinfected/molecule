@@ -1,4 +1,4 @@
-package examples.middlewares;
+package examples.middleware;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.HttpRequest;
@@ -11,9 +11,9 @@ import java.io.IOException;
 
 import static java.lang.String.valueOf;
 
-public class MiddlewaresTest {
+public class CustomMiddlewareTest {
 
-    MiddlewaresExample middlewares = new MiddlewaresExample();
+    CustomMiddlewareExample middlewares = new CustomMiddlewareExample();
     WebServer server = WebServer.create(9999);
 
     HttpRequest request = new HttpRequest(9999).followRedirects(false);

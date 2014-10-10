@@ -116,9 +116,9 @@ public class RESTExample {
     }
 
     public static void main(String[] args) throws IOException {
+        RESTExample example = new RESTExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        RESTExample example = new RESTExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "/albums");
     }

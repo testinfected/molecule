@@ -35,8 +35,8 @@ public class LayoutExample {
     }
 
     public static void main(String[] args) throws IOException {
-        WebServer webServer = WebServer.create();
         LayoutExample example = new LayoutExample();
+        WebServer webServer = WebServer.create();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "/hello");
     }

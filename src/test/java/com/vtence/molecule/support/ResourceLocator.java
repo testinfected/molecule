@@ -1,6 +1,7 @@
 package com.vtence.molecule.support;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ResourceLocator {
@@ -20,14 +21,12 @@ public class ResourceLocator {
     }
 
     public File locate(String resource) {
-        URL fileLocation = classLoader.getResource(resource);
-        if (fileLocation == null) throw new IllegalArgumentException("Cannot find " + resource);
-        File target;
+        URL location = classLoader.getResource(resource);
+        if (location == null) throw new IllegalArgumentException("Cannot find " + resource);
         try {
-            target = new File(fileLocation.toURI());
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            return new File(location.toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(resource, e);
         }
-        return target;
     }
 }

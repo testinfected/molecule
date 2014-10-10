@@ -18,9 +18,9 @@ public class HelloWorldExample {
     }
 
     public static void main(String[] args) throws IOException {
+        HelloWorldExample example = new HelloWorldExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        HelloWorldExample example = new HelloWorldExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

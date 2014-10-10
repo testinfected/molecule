@@ -38,9 +38,9 @@ public class BasicExample {
 
 
     public static void main(String[] args) throws IOException {
+        BasicExample example = new BasicExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        BasicExample example = new BasicExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "?encoding=utf-8");
     }

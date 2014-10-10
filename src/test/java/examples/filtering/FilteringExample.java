@@ -55,8 +55,8 @@ public class FilteringExample {
     }
 
     public static void main(String[] args) throws IOException {
-        WebServer webServer = WebServer.create();
         FilteringExample example = new FilteringExample();
+        WebServer webServer = WebServer.create();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "/private/area?username=admin&password=admin");
     }

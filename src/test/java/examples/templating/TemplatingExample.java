@@ -32,9 +32,9 @@ public class TemplatingExample {
     }
 
     public static void main(String[] args) throws IOException {
+        TemplatingExample example = new TemplatingExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        TemplatingExample example = new TemplatingExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "?name=Gandalf");
     }
