@@ -38,7 +38,7 @@ public class StaticFilesTest {
     }
 
     @Test
-    public void servingAnStaticFile() throws IOException {
+    public void servingAStaticFile() throws IOException {
         response = request.get("/js/fox.js");
         response.assertOK();
         response.assertHasContentType("application/javascript");
