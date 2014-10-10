@@ -106,8 +106,9 @@ public class Compressor extends AbstractMiddleware {
         }
     }
 
-    public void compressibleTypes(String... mimeTypes) {
+    public Compressor compressibleTypes(String... mimeTypes) {
         this.compressibleTypes.addAll(Arrays.asList(mimeTypes));
+        return this;
     }
 
     public void handle(Request request, final Response response) throws Exception {
