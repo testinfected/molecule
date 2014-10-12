@@ -22,6 +22,7 @@ public class FilteringExample {
     }
 
     public void run(WebServer server) throws IOException {
+        // An an authentication filter that checks against a map of authorized users
         Middleware authenticate = new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
                 String user = request.parameter("username");
@@ -33,19 +34,23 @@ public class FilteringExample {
                     // Carry on with the processing chain
                     forward(request, response);
                 } else {
+                    // Halt request processing
                     response.status(HttpStatus.UNAUTHORIZED).body("Get away!");
                 }
             }
         };
 
+        // All requests to /private/... go through the authentication filter
         server.filter("/private", authenticate)
               .start(new DynamicRoutes() {{
+                  // This route is private thus requires authentication
                   get("/private/area").to(new Application() {
                       public void handle(Request request, Response response) throws Exception {
                           response.body("Hello, " + request.attribute("user") + "!");
                       }
                   });
 
+                  // This route is public
                   get("/hello").to(new Application() {
                       public void handle(Request request, Response response) throws Exception {
                           response.body("Welcome, Guest!");
