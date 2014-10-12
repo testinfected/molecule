@@ -30,6 +30,16 @@ Then you're ready to go:
 public class HelloWorld {
     public static void main(String[] args) throws IOException {
         WebServer server = WebServer.create();
+        server.run((request, response) -> response.body("Hello, World"));
+    }
+}
+```
+
+If you don't use Java 8, it's almost as good:
+```java
+public class HelloWorld {
+    public static void main(String[] args) throws IOException {
+        WebServer server = WebServer.create();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("Hello, World");
@@ -39,6 +49,7 @@ public class HelloWorld {
 }
 ```
 
+
 Your application is now available at:
 `http://localhost:8080`
 
@@ -46,13 +57,12 @@ Your application is now available at:
 
 Check out the examples:
 * [Hello World](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/helloworld/HelloWorldExample.java)
-* [Basic Functionality](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/basic/BasicExample.java)
+* [Rendering HTML](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/simple/SimpleExample.java)
 * [Routing](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java)
-* [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
-* [Sessions](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java)
 * [Static Files](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/files/StaticFilesExample.java)
-* [View Templating](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingExample.java)
-* [Filtering](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
-* [Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/layout/LayoutExample.java)
-* [Middlewares](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middlewares/MiddlewaresExample.java)
-* [PetStore](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
+* [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
+* [View Templates and Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java)
+* [HTTP Sessions](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java)
+* [Filters](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
+* [Custom Middleware](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middleware/CustomMiddlewareExample.java)
+* [Sample Application](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
