@@ -1,4 +1,4 @@
-package examples.basic;
+package examples.simple;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.HttpRequest;
@@ -11,9 +11,9 @@ import java.io.IOException;
 
 import static org.hamcrest.Matchers.containsString;
 
-public class BasicTest {
+public class SimpleTest {
 
-    BasicExample basic = new BasicExample();
+    SimpleExample basic = new SimpleExample();
     WebServer server = WebServer.create(9999);
 
     HttpRequest request = new HttpRequest(9999);
