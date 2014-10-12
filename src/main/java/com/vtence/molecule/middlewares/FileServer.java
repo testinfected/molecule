@@ -41,7 +41,7 @@ public class FileServer implements Application {
         mediaTypes.register(extension, mediaType);
     }
 
-    public FileServer addHeader(String header, String value) {
+    public FileServer header(String header, String value) {
         headers.put(header, value);
         return this;
     }
@@ -61,7 +61,7 @@ public class FileServer implements Application {
             return;
         }
 
-        if (notModifiedSince(request, file)) {
+        if (notModifiedSince(lastTimeSeen(request), file)) {
             response.status(NOT_MODIFIED);
             return;
         }
@@ -83,8 +83,12 @@ public class FileServer implements Application {
         return ALLOWED_METHODS.contains(request.method());
     }
 
-    private boolean notModifiedSince(Request request, File file) {
-        return HttpDate.format(file.lastModified()).equals(request.header(IF_MODIFIED_SINCE));
+    private boolean notModifiedSince(String date, File file) {
+        return HttpDate.format(file.lastModified()).equals(date);
+    }
+
+    private String lastTimeSeen(Request request) {
+        return request.header(IF_MODIFIED_SINCE);
     }
 
     private void addFileHeaders(Response response, File file) {
