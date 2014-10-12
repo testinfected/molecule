@@ -30,7 +30,7 @@ public class BasicTest {
     }
 
     @Test
-    public void specifyingResponseEncoding() throws IOException {
+    public void specifyingResponseOutputEncoding() throws IOException {
         response = request.get("/?encoding=utf-8");
         response.assertContentIsEncodedAs("utf-8");
     }
