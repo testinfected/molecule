@@ -2,7 +2,6 @@ package examples.files;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.ApacheCommonLogger;
-import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.FileServer;
 import com.vtence.molecule.middlewares.StaticAssets;
 
