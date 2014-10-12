@@ -2,6 +2,7 @@ package examples.files;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.ApacheCommonLogger;
+import com.vtence.molecule.middlewares.Failsafe;
 import com.vtence.molecule.middlewares.FileServer;
 import com.vtence.molecule.middlewares.StaticAssets;
 
@@ -20,7 +21,7 @@ public class StaticFilesExample {
 
     public void run(WebServer server) throws IOException {
         // Serve files in this directory, based on the path of the request.
-        FileServer files = new FileServer(locateOnClasspath("examples/files/content"));
+        FileServer files = new FileServer(locateOnClasspath("examples/fox"));
         // Serve static assets (e.g. js files, images, css files, etc) for any request whose path starts
         // with one of the url prefixes specified (in this example, we're serving all requests).
         StaticAssets assets = new StaticAssets(files).serve("/");
