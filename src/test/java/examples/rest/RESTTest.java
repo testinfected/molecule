@@ -52,7 +52,7 @@ public class RESTTest {
                 "2: Title: Blue Train, Artist: John Coltrane\n"
         );
 
-        // We need to pass PUT parameters as part of the query string
+        // HtmUnit requires us to pass PUT parameters as part of the query string
         response = request.but().put("/albums/2?title=Kind of Blue&artist=Miles Davis");
         response.assertHasStatusCode(200);
 
