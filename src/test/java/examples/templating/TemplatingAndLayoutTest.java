@@ -1,4 +1,4 @@
-package examples.layout;
+package examples.templating;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.HttpRequest;
@@ -11,9 +11,9 @@ import java.io.IOException;
 
 import static org.hamcrest.Matchers.containsString;
 
-public class LayoutTest {
+public class TemplatingAndLayoutTest {
 
-    LayoutExample basic = new LayoutExample();
+    TemplatingAndLayoutExample templating = new TemplatingAndLayoutExample();
     WebServer server = WebServer.create(9999);
 
     HttpRequest request = new HttpRequest(9999);
@@ -21,12 +21,20 @@ public class LayoutTest {
 
     @Before
     public void startServer() throws IOException {
-        basic.run(server);
+        templating.run(server);
     }
 
     @After
     public void stopServer() throws IOException {
         server.stop();
+    }
+
+    @Test
+    public void renderingAnHtmlTemplateUsingMustache() throws IOException {
+        response = request.get("/hello?name=Frodo");
+        response.assertOK();
+        response.assertHasContentType("text/html; charset=utf-8");
+        response.assertHasContent(containsString("<p>Hello, Frodo!</p>"));
     }
 
     @Test
@@ -36,14 +44,11 @@ public class LayoutTest {
         response.assertHasContent(containsString("<title>Layout - Hello World"));
         response.assertHasContent(containsString("<h1>A simple page</h1>"));
         response.assertHasContent(containsString("<meta name=\"description\" content=\"Hello World\">"));
-        response.assertHasContent(containsString(
-                "    <div class=\"content\">\n" +
-                "        <p>Hello, World</p>\n" +
-                "    </div>"));
+        response.assertHasContent(containsString("Hello, World!"));
     }
 
     @Test
-    public void skippingDecorationWhenResponseIsNotOk() throws IOException {
+    public void skippingDecorationWhenResponseStatusIsNotOk() throws IOException {
         response = request.get("/not-found");
         response.assertHasStatusCode(404);
         response.assertHasContent("Not found: /not-found");
