@@ -2,10 +2,44 @@
 [![Stories In Progress](https://badge.waffle.io/testinfected/molecule.png?label=In%20Progress&title=Started)](https://waffle.io/testinfected/molecule)
 [![Build Status](https://travis-ci.org/testinfected/molecule.png?branch=master)](https://travis-ci.org/testinfected/molecule)
 [![Coverage Status](https://coveralls.io/repos/testinfected/molecule/badge.png)](https://coveralls.io/r/testinfected/molecule)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule)
 
 ## Getting started
 
-Build yourself using [Gradle](http://www.gradle.org) or [Buildr](http://buildr.apache.org), or simply download from Maven Central:
+```java
+public class HelloWorld {
+    public static void main(String[] args) throws IOException {
+        WebServer server = WebServer.create();
+        server.run((request, response) -> response.body("Hello, World"));
+    }
+}
+```
+
+Access your application at:
+
+`http://localhost:8080`
+
+If you don't use Java 8, it's almost as good:
+
+```java
+public class HelloWorld {
+    public static void main(String[] args) throws IOException {
+        WebServer server = WebServer.create();
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                response.body("Hello, World");
+            }
+        });
+    }
+}
+```
+
+## Download 
+
+Get the latest release version from Maven Central.
+ 
+If you want the development version, grab the latest snapshot from Sonatype snapshots repositories 
+(```https://oss.sonatype.org/content/repositories/snapshots```).
 
 ```xml
 <dependency>
@@ -24,34 +58,6 @@ To use the default web server, you need to add [Simple](http://www.simpleframewo
       <version>5.1.6</version>
 </dependency>
 ```
-
-Then you're ready to go:
-```java
-public class HelloWorld {
-    public static void main(String[] args) throws IOException {
-        WebServer server = WebServer.create();
-        server.run((request, response) -> response.body("Hello, World"));
-    }
-}
-```
-
-If you don't use Java 8, it's almost as good:
-```java
-public class HelloWorld {
-    public static void main(String[] args) throws IOException {
-        WebServer server = WebServer.create();
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("Hello, World");
-            }
-        });
-    }
-}
-```
-
-
-Your application is now available at:
-`http://localhost:8080`
 
 ## Want to know more?
 
