@@ -114,4 +114,8 @@ public class HttpResponse {
     public void assertHasCookie(String name, Matcher<? super String> matching) {
         assertHasCookie(both(startsWith(name + "=")).and(matching));
     }
+
+    public String header(String name) {
+        return response.getResponseHeaderValue(name);
+    }
 }

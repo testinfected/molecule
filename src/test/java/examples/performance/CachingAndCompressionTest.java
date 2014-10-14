@@ -5,12 +5,14 @@ import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assume.assumeThat;
 
 public class CachingAndCompressionTest {
     CachingAndCompressionExample caching = new CachingAndCompressionExample();
@@ -62,5 +64,17 @@ public class CachingAndCompressionTest {
         // and Content-Length header is missing!
         response.assertNotChunked();
         response.assertHasHeader("Content-Length", nullValue());
+    }
+
+    @Test @Ignore("wip")
+    public void notGeneratingTheResponseBodyWhenETagHasNotChanged() throws IOException {
+        response = request.get("/");
+        response.assertOK();
+        assumeThat("ETag", response.header("ETag"), notNullValue());
+
+        // Play the same request with freshness information...
+        request.but().withHeader("If-None-Match", response.header("ETag")).send();
+        // ... and expect a not modified
+        response.assertHasStatusCode(304);
     }
 }
