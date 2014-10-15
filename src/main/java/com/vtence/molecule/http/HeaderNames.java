@@ -10,6 +10,7 @@ public final class HeaderNames {
     public static final String DATE = "Date";
     public static final String ETAG = "ETag";
     public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
+    public static final String IF_NONE_MATCH = "If-None-Match";
     public static final String LAST_MODIFIED = "Last-Modified";
     public static final String LOCATION = "Location";
     public static final String SERVER = "Server";

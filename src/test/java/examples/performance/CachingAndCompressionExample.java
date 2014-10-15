@@ -35,6 +35,7 @@ public class CachingAndCompressionExample {
 
               // Add content length header when size of content is known
         server.add(new ContentLengthHeader())
+              .add(new ConditionalGet())
               // Add ETag if response has no validation information
               .add(new ETag())
               // Compress bodies that are not images
