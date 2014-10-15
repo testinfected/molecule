@@ -41,7 +41,7 @@ public class ETagTest {
     }
 
     @Test public void
-    willNotSetETagIfStatusIsCacheable() throws Exception {
+    willNotSetETagIfStatusIsNotCacheable() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.status(HttpStatus.NOT_FOUND);
