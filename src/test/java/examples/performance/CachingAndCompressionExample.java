@@ -4,7 +4,12 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.*;
+import com.vtence.molecule.middlewares.Compressor;
+import com.vtence.molecule.middlewares.ConditionalGet;
+import com.vtence.molecule.middlewares.ContentLengthHeader;
+import com.vtence.molecule.middlewares.ETag;
+import com.vtence.molecule.middlewares.FileServer;
+import com.vtence.molecule.middlewares.StaticAssets;
 import com.vtence.molecule.support.ResourceLocator;
 import com.vtence.molecule.templating.JMustacheRenderer;
 import com.vtence.molecule.templating.Template;
@@ -15,13 +20,13 @@ import java.io.IOException;
 
 import static com.vtence.molecule.http.HeaderNames.CACHE_CONTROL;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
 import static com.vtence.molecule.http.MimeTypes.CSS;
 import static com.vtence.molecule.http.MimeTypes.HTML;
 import static com.vtence.molecule.http.MimeTypes.JAVASCRIPT;
 
 public class CachingAndCompressionExample {
-
-    public static final Object NO_CONTEXT = null;
+    private static final Object NO_CONTEXT = null;
 
     public void run(WebServer server) throws IOException {
         File content = ResourceLocator.locateOnClasspath("examples/fox");
@@ -44,6 +49,7 @@ public class CachingAndCompressionExample {
               .start(new Application() {
                   public void handle(Request request, Response response) throws Exception {
                       response.set(CONTENT_TYPE, HTML);
+                      response.set(LAST_MODIFIED, request.parameter("timestamp"));
                       response.body(index.render(NO_CONTEXT));
                   }
               });

@@ -1,14 +1,18 @@
 package examples.performance;
 
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 
+import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -72,6 +76,20 @@ public class CachingAndCompressionTest {
 
         // Play the same request with freshness information...
         response = request.but().withHeader("If-None-Match", response.header("ETag")).send();
+        // ... and expect a not modified
+        response.assertHasStatusCode(304);
+    }
+
+    @Ignore("wip") @Test public void
+    notGeneratingTheResponseBodyWhenResourceHasNotBeenModified() throws IOException {
+        Date timestamp = calendarDate(2014, 10, 14).atTime(21, 20, 0).toDate();
+
+        response = request.withParameter("timestamp", HttpDate.format(timestamp)).get("/");
+        response.assertOK();
+        response.assertHasHeader("Last-Modified", notNullValue());
+
+        // Play the same request with freshness information...
+        response = request.but().withHeader("If-Modified-Since", response.header("Last-Modified")).send();
         // ... and expect a not modified
         response.assertHasStatusCode(304);
     }
