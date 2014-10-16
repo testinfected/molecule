@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.vtence.molecule.http.HttpDate.format;
+import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.HttpStatus.OK;
@@ -104,7 +104,7 @@ public class ConditionalGetTest {
 
     @Test public void
     sendsNotModifiedWhenEntityHasNotBeenModifiedSinceLastServed() throws Exception {
-        final String lastModification = format(now().toDate());
+        final String lastModification = httpDate(now().toDate());
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.set("Last-Modified", lastModification);
@@ -119,7 +119,7 @@ public class ConditionalGetTest {
 
     @Test public void
     leavesResponseUnchangedWhenEntityHasNotBeenModifiedButETagIndicatesItIsNotCurrent() throws Exception {
-        final String lastModification = format(aDate().toDate());
+        final String lastModification = httpDate(aDate().toDate());
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.set("ETag", "12345678").set("Last-Modified", lastModification);
@@ -138,12 +138,12 @@ public class ConditionalGetTest {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.set("ETag", "12345678")
-                        .set("Last-Modified", format(now().toDate()));
+                        .set("Last-Modified", httpDate(now().toDate()));
             }
         });
 
         request.header("If-None-Match", "12345678")
-               .header("If-Modified-Since", format(oneHourAgo().toDate()));
+               .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
         conditional.handle(request, response);
 
         response.assertStatus(OK);

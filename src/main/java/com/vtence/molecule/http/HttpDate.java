@@ -22,13 +22,13 @@ public final class HttpDate {
     };
     private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
-    public static Date parse(String value) {
+    public static Date toDate(String httpDate) {
         for (String format : POSSIBLE_FORMATS) {
-            Date date = parse(value, format);
+            Date date = parse(httpDate, format);
             if (date != null) return date;
 
         }
-        throw new IllegalArgumentException("Invalid date format: " + value);
+        throw new IllegalArgumentException("Invalid date format: " + httpDate);
     }
 
     private static Date parse(String date, String format) {
@@ -38,10 +38,10 @@ public final class HttpDate {
     }
 
     public static String format(long date) {
-        return format(new Date(date));
+        return httpDate(new Date(date));
     }
 
-    public static String format(Date date) {
+    public static String httpDate(Date date) {
         return rfc1123(date);
     }
 

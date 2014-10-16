@@ -14,21 +14,21 @@ public class HttpDateTest {
 
     @Test public void
     parsesRfc1123Dates() {
-        assertThat("date", HttpDate.parse("Thu, 06 Mar 2014 08:49:37 GMT"), equalTo(date));
+        assertThat("date", HttpDate.toDate("Thu, 06 Mar 2014 08:49:37 GMT"), equalTo(date));
     }
 
     @Test public void
     parsesRfc1036Dates() {
-        assertThat("date", HttpDate.parse("Thu, 06-Mar-14 08:49:37 GMT"), equalTo(date));
+        assertThat("date", HttpDate.toDate("Thu, 06-Mar-14 08:49:37 GMT"), equalTo(date));
     }
 
     @Test public void
     parsesAscTimeDates() {
-        assertThat("date", HttpDate.parse("Thu Mar  6 08:49:37 2014"), equalTo(date));
+        assertThat("date", HttpDate.toDate("Thu Mar  6 08:49:37 2014"), equalTo(date));
     }
 
     @Test public void
     formatsDatesAccordingToRfc1123() {
-        assertThat("http date", HttpDate.format(date), equalTo("Thu, 06 Mar 2014 08:49:37 GMT"));
+        assertThat("http date", HttpDate.httpDate(date), equalTo("Thu, 06 Mar 2014 08:49:37 GMT"));
     }
 }

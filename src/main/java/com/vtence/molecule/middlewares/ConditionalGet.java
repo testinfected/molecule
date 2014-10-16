@@ -6,7 +6,7 @@ import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.lib.AbstractMiddleware;
 
 import static com.vtence.molecule.http.HeaderNames.*;
-import static com.vtence.molecule.http.HttpDate.parse;
+import static com.vtence.molecule.http.HttpDate.toDate;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.lib.BinaryBody.empty;
@@ -50,6 +50,6 @@ public class ConditionalGet extends AbstractMiddleware {
 
     private boolean modifiedSince(String modifiedSince, Response response) {
         String lastModified = response.get(LAST_MODIFIED);
-        return (lastModified == null) || !parse(lastModified).equals(parse(modifiedSince));
+        return (lastModified == null) || !toDate(lastModified).equals(toDate(modifiedSince));
     }
 }

@@ -3,13 +3,14 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
 import java.util.Date;
+
+import static com.vtence.molecule.http.HttpDate.httpDate;
 
 public class ETagTest {
 
@@ -80,7 +81,7 @@ public class ETagTest {
     willNotSetETagIfLastModifiedHeaderSet() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("Last-Modified", HttpDate.format(new Date()));
+                response.set("Last-Modified", httpDate(new Date()));
                 response.body("response body");
             }
         });

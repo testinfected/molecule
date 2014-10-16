@@ -1,7 +1,6 @@
 package examples.performance;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import org.junit.After;
@@ -11,6 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Date;
 
+import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -83,7 +83,7 @@ public class CachingAndCompressionTest {
     notGeneratingTheResponseBodyWhenResourceHasNotBeenModified() throws IOException {
         Date timestamp = calendarDate(2014, 10, 14).atTime(21, 20, 0).toDate();
 
-        response = request.withParameter("timestamp", HttpDate.format(timestamp)).get("/");
+        response = request.withParameter("timestamp", httpDate(timestamp)).get("/");
         response.assertOK();
         response.assertHasHeader("Last-Modified", notNullValue());
 
