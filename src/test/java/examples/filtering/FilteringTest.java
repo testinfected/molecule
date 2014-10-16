@@ -31,20 +31,20 @@ public class FilteringTest {
     public void authorizingAccessToPrivateContent() throws IOException {
         response = request.get("/private/area?username=admin&password=admin");
         response.assertOK();
-        response.assertHasContent("Hello, admin!");
+        response.assertContentEqualTo("Hello, admin!");
     }
 
     @Test
     public void preventingAccessToPrivateContent() throws IOException {
         response = request.get("/private/area?username=admin&password=invalid");
         response.assertHasStatusCode(401);
-        response.assertHasContent("Get away!");
+        response.assertContentEqualTo("Get away!");
     }
 
     @Test
     public void givingAccessPublicContent() throws IOException {
         response = request.get("/hello");
         response.assertOK();
-        response.assertHasContent("Welcome, Guest!");
+        response.assertContentEqualTo("Welcome, Guest!");
     }
 }

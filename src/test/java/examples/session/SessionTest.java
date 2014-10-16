@@ -50,7 +50,7 @@ public class SessionTest {
         response = request.get("/");
         assertNoError();
         response.assertHasNoCookie(SESSION_COOKIE);
-        response.assertHasContent("Hello, Guest");
+        response.assertContentEqualTo("Hello, Guest");
     }
 
     @Test
@@ -94,7 +94,7 @@ public class SessionTest {
 
         response = request.but().get("/");
         assertNoError();
-        response.assertHasContent("Hello, Vincent");
+        response.assertContentEqualTo("Hello, Vincent");
     }
 
     @Test
@@ -110,7 +110,7 @@ public class SessionTest {
 
         response = request.but().get("/");
         assertNoError();
-        response.assertHasContent("Hello, Guest");
+        response.assertContentEqualTo("Hello, Guest");
     }
 
     @Test public void
@@ -124,7 +124,7 @@ public class SessionTest {
         response = request.but().get("/");
         assertNoError();
         response.assertHasNoCookie(SESSION_COOKIE);
-        response.assertHasContent("Hello, Guest");
+        response.assertContentEqualTo("Hello, Guest");
     }
 
     private void assertNoError() {

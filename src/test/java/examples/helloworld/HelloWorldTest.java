@@ -30,6 +30,6 @@ public class HelloWorldTest {
     @Test
     public void respondingWithHelloWorld() throws IOException {
         response = request.get("/");
-        response.assertHasContent("Hello, World!");
+        response.assertContentEqualTo("Hello, World!");
     }
 }

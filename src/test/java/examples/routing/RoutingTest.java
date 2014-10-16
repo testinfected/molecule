@@ -31,7 +31,7 @@ public class RoutingTest {
     public void mappingRoutesToUrls() throws IOException {
         response = request.get("/");
         response.assertHasStatusCode(200);
-        response.assertHasContent("Welcome!");
+        response.assertContentEqualTo("Welcome!");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class RoutingTest {
         response = request.get("/hello/Vincent");
         response.assertHasStatusCode(200);
         response.assertHasContentType("text/html");
-        response.assertHasContent("<html><body><h3>Hello, Vincent</h3></body></html>");
+        response.assertContentEqualTo("<html><body><h3>Hello, Vincent</h3></body></html>");
     }
 
     @Test
