@@ -39,7 +39,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    gzipsResponseWhenClientsAcceptsGZip() throws Exception {
+    gzipsResponseWhenClientAcceptsGZip() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("uncompressed body");
@@ -126,14 +126,14 @@ public class CompressorTest {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.set("Content-Encoding", "deflate");
-                response.body("compressed body");
+                response.body("<compressed body>");
             }
         });
 
         request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         response.assertHeader("Content-Encoding", "deflate");
-        response.assertBody("compressed body");
+        response.assertBody("<compressed body>");
     }
 
     @Test public void
@@ -151,7 +151,7 @@ public class CompressorTest {
     }
 
     @Test public void
-    handlesLackOfAnAcceptableEncoding() throws Exception {
+    reportsLackOfAnAcceptableEncoding() throws Exception {
         compressor.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("uncompressed body");
@@ -164,9 +164,39 @@ public class CompressorTest {
         response.assertBody("An acceptable encoding could not be found");
     }
 
+    @Test public void
+    skipsMimeTypesDeemedNotCompressible() throws Exception {
+        compressor.connectTo(new Application() {
+            @Override
+            public void handle(Request request, Response response) throws Exception {
+                response.contentType("text/plain");
+                response.body("uncompressed body");
+            }
+        });
+        request.header("Accept-Encoding", "gzip");
+        compressor.compressibleTypes("text/html");
+        compressor.handle(request, response);
+        response.assertNoHeader("Content-Encoding");
+        assertThat("body", response.text(), equalTo("uncompressed body"));
+    }
+
+    @Test public void
+    processesCompressibleMimeTypes() throws Exception {
+        compressor.connectTo(new Application() {
+            @Override
+            public void handle(Request request, Response response) throws Exception {
+                response.contentType("text/plain");
+                response.body("uncompressed body");
+            }
+        });
+        request.header("Accept-Encoding", "gzip");
+        compressor.compressibleTypes("application/json", "text/*");
+        compressor.handle(request, response);
+        assertThat("body", unzip(response), equalTo("uncompressed body"));
+    }
+
     private String inflate(MockResponse response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new InflaterInputStream(response.stream(),
-                new Inflater(true)));
+        return response.empty() ? "" : Streams.toString(new InflaterInputStream(response.stream(), new Inflater(true)));
     }
 
     private String unzip(MockResponse response) throws IOException {

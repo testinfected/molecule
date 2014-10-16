@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MimeTypesTest {
@@ -50,7 +51,36 @@ public class MimeTypesTest {
 
     @Test public void
     assumesPlainTextWhenNotKnown() {
-        assertThat("default media type", new MimeTypes().guessFrom("unknown"),
-                equalTo("application/octet-stream"));
+        MimeTypes types = new MimeTypes();
+        assertThat("default media type", types.guessFrom("unknown"), equalTo("application/octet-stream"));
+    }
+
+    @Test public void
+    matchesTypesThatAreIdentical() {
+        assertThat("text/html is text/html", MimeTypes.matches("text/html", "text/html"), is(true));
+        assertThat("text/html is text/plain", MimeTypes.matches("text/html", "text/plain"), is(false));
+    }
+
+    @Test public void
+    matchesSubtypesAgainstWildCard() {
+        assertThat("text/plain is text/*", MimeTypes.matches("text/plain", "text/*"), is(true));
+        assertThat("text/html is text/*", MimeTypes.matches("text/html", "text/*"), is(true));
+        assertThat("text/html is text", MimeTypes.matches("text/html", "text"), is(true));
+        assertThat("application/json is text", MimeTypes.matches("application/json", "text"), is(false));
+    }
+
+    @Test public void
+    matchesTypesAgainstWildcards() {
+        assertThat("text/plain is */plain", MimeTypes.matches("text/plain", "*/plain"), is(true));
+        assertThat("text/html is */html", MimeTypes.matches("text/html", "*/html"), is(true));
+        assertThat("application/json is */html", MimeTypes.matches("application/json", "*/html"), is(false));
+    }
+
+    @Test public void
+    matchesAgainstFullWildcards() {
+        assertThat("text/plain is */*", MimeTypes.matches("text/plain", "*/*"), is(true));
+        assertThat("text/html is */*", MimeTypes.matches("text/html", "*/*"), is(true));
+        assertThat("text/plain is *", MimeTypes.matches("text/plain", "*"), is(true));
+        assertThat("text/html is *", MimeTypes.matches("text/html", "*"), is(true));
     }
 }

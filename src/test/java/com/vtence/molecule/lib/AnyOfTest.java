@@ -20,12 +20,8 @@ public class AnyOfTest {
 
     @SuppressWarnings("unchecked") @Test public void
     matchesDescendantType() {
-        Matcher<String> anyOf = AnyOf.anyOf(aMatcherOnType(Object.class));
+        Matcher<String> anyOf = AnyOf.anyOf(new Anything<Object>());
 
         assertThat("matches", anyOf.matches("good"), is(true));
-    }
-
-    private <T> Anything<T> aMatcherOnType(Class<T> _) {
-        return new Anything<T>();
     }
 }

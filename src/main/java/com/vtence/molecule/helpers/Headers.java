@@ -21,7 +21,8 @@ public class Headers {
     }
 
     public boolean has(String name) {
-        return values.containsKey(name) || values.containsKey(canonicalForm(name));
+        return values.containsKey(name) && !list(name).isEmpty() ||
+               values.containsKey(canonicalForm(name)) && !list(canonicalForm(name)).isEmpty();
     }
 
     public int size() {
@@ -47,6 +48,7 @@ public class Headers {
     }
 
     public void add(String name, String value) {
+        if (value == null) return;
         values(name).add(value);
         if (literalForm(name) != null && !literalForm(name).equals(name)) {
             names.remove(literalForm(name));

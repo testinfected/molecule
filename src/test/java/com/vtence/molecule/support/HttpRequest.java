@@ -132,6 +132,8 @@ public class HttpRequest {
         if (body != null) request.setRequestBody(body);
         if (encodingType != null) request.setEncodingType(FormEncodingType.getInstance(encodingType));
         request.setAdditionalHeaders(headers);
+        // Clear HtmlUnit internal cache to make sure requests are actually sent
+        client.getCache().clear();
 
         return new HttpResponse(client.loadWebResponse(request));
     }

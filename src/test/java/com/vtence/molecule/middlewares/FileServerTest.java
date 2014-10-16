@@ -88,8 +88,8 @@ public class FileServerTest {
     @Test public void
     addsConfiguredCustomHeadersToResponse() throws Exception {
         fileServer.
-                addHeader("Cache-Control", "public, max-age=60").
-                addHeader("Access-Control-Allow-Origin", "*");
+                          header("Cache-Control", "public, max-age=60").
+                          header("Access-Control-Allow-Origin", "*");
 
         fileServer.handle(request, response);
         response.assertHeader("Cache-Control", "public, max-age=60");

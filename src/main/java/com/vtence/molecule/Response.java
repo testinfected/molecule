@@ -6,7 +6,6 @@ import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.helpers.Headers;
-import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.lib.BinaryBody;
 
 import java.io.IOException;
@@ -18,6 +17,7 @@ import java.util.Map;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
 
@@ -84,7 +84,7 @@ public class Response {
     }
 
     public Response set(String name, Date date) {
-        return set(name, HttpDate.format(date));
+        return set(name, httpDate(date));
     }
 
     public Response setDate(String name, long date) {

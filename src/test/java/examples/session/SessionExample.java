@@ -62,9 +62,9 @@ public class SessionExample {
     }
 
     public static void main(String[] args) throws IOException {
+        SessionExample example = new SessionExample(new SystemClock());
         // Run the default web server
         WebServer webServer = WebServer.create();
-        SessionExample example = new SessionExample(new SystemClock());
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

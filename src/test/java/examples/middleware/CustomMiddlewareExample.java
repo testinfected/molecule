@@ -1,4 +1,4 @@
-package examples.middlewares;
+package examples.middleware;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
@@ -9,7 +9,7 @@ import com.vtence.molecule.lib.Middleware;
 
 import java.io.IOException;
 
-public class MiddlewaresExample {
+public class CustomMiddlewareExample {
 
     public void run(WebServer server) throws IOException {
 
@@ -52,8 +52,9 @@ public class MiddlewaresExample {
     }
 
     public static void main(String[] args) throws IOException {
+        CustomMiddlewareExample example = new CustomMiddlewareExample();
+        // Run the default web server
         WebServer webServer = WebServer.create();
-        MiddlewaresExample example = new MiddlewaresExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

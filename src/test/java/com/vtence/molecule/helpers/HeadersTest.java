@@ -16,6 +16,11 @@ public class HeadersTest {
     Headers headers = new Headers();
 
     @Test public void
+    isInitiallyEmpty() {
+        assertThat("has header", headers.has("header"), is(false));
+    }
+
+    @Test public void
     retainsHeaderNamesCase() {
         headers.put("Content-Type", "text/plain");
         headers.put("transfer-encoding", "chunked");
@@ -63,6 +68,14 @@ public class HeadersTest {
         assertThat("names", headers.names(), emptyIterable());
         assertThat("still there", headers.has("removed"), is(false));
         assertThat("removed", headers.get("removed"), nullValue());
+    }
+
+    @Test public void
+    discardsNullValues() {
+        headers.put("null", null);
+        assertThat("put null header", headers.has("null"), is(false));
+        headers.add("null", null);
+        assertThat("add null header", headers.has("null"), is(false));
     }
 
     @Test public void

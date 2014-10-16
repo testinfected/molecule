@@ -70,8 +70,8 @@ public class HttpResponse {
         assertThat("response encoding", CharsetDetector.detectedCharset(content()).toLowerCase(), containsString(charset.toLowerCase()));
     }
 
-    public void assertHasContentSize(long length) throws IOException {
-        assertHasContentSize((int) length);
+    public void assertHasContentSize(long size) throws IOException {
+        assertHasContentSize((int) size);
     }
 
     public void assertHasContentSize(int size) throws IOException {
@@ -113,5 +113,9 @@ public class HttpResponse {
 
     public void assertHasCookie(String name, Matcher<? super String> matching) {
         assertHasCookie(both(startsWith(name + "=")).and(matching));
+    }
+
+    public String header(String name) {
+        return response.getResponseHeaderValue(name);
     }
 }

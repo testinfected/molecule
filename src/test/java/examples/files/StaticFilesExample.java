@@ -20,7 +20,7 @@ public class StaticFilesExample {
 
     public void run(WebServer server) throws IOException {
         // Serve files in this directory, based on the path of the request.
-        FileServer files = new FileServer(locateOnClasspath("examples/files/content"));
+        FileServer files = new FileServer(locateOnClasspath("examples/fox"));
         // Serve static assets (e.g. js files, images, css files, etc) for any request whose path starts
         // with one of the url prefixes specified (in this example, we're serving all requests).
         StaticAssets assets = new StaticAssets(files).serve("/");
@@ -34,9 +34,9 @@ public class StaticFilesExample {
     }
 
     public static void main(String[] args) throws IOException {
-        WebServer webServer = WebServer.create();
         // Let's log server access to the console, so we can see content we're serving
         StaticFilesExample example = new StaticFilesExample(Logging.toConsole());
+        WebServer webServer = WebServer.create();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

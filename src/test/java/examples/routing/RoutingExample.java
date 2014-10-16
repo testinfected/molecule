@@ -42,9 +42,9 @@ public class RoutingExample {
     }
 
     public static void main(String[] args) throws IOException {
+        RoutingExample example = new RoutingExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        RoutingExample example = new RoutingExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

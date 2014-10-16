@@ -19,12 +19,8 @@ public class AllOfTest {
 
     @SuppressWarnings("unchecked") @Test public void
     matchesDescendantType() {
-        Matcher<String> allOf = AllOf.allOf(startingWith("good"), aMatcherOnType(Object.class));
+        Matcher<String> allOf = AllOf.allOf(startingWith("good"), new Anything<Object>());
 
         assertThat("matches", allOf.matches("good"), is(true));
-    }
-
-    private <T> Anything<T> aMatcherOnType(Class<T> _) {
-        return new Anything<T>();
     }
 }

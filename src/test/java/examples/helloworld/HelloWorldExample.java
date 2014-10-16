@@ -12,15 +12,15 @@ public class HelloWorldExample {
     public void run(WebServer server) throws IOException {
         server.start(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body("Hello, World");
+                response.body("Hello, World!");
             }
         });
     }
 
     public static void main(String[] args) throws IOException {
+        HelloWorldExample example = new HelloWorldExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        HelloWorldExample example = new HelloWorldExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());
     }

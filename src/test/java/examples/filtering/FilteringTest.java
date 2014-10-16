@@ -28,23 +28,23 @@ public class FilteringTest {
     }
 
     @Test
-    public void filteringAccessToContent() throws IOException {
+    public void authorizingAccessToPrivateContent() throws IOException {
         response = request.get("/private/area?username=admin&password=admin");
         response.assertOK();
-        response.assertHasContent("Hello, admin");
+        response.assertHasContent("Hello, admin!");
     }
 
     @Test
-    public void haltingRequestProcessingWhenFiltering() throws IOException {
+    public void preventingAccessToPrivateContent() throws IOException {
         response = request.get("/private/area?username=admin&password=invalid");
         response.assertHasStatusCode(401);
         response.assertHasContent("Get away!");
     }
 
     @Test
-    public void filteringOnlyMatchingRequests() throws IOException {
+    public void givingAccessPublicContent() throws IOException {
         response = request.get("/hello");
         response.assertOK();
-        response.assertHasContent("Welcome");
+        response.assertHasContent("Welcome, Guest!");
     }
 }

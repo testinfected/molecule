@@ -1,4 +1,4 @@
-package examples.basic;
+package examples.simple;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
@@ -9,7 +9,7 @@ import com.vtence.molecule.middlewares.Failsafe;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class BasicExample {
+public class SimpleExample {
 
     public void run(WebServer server) throws IOException {
         // Capture internal server errors and display a 500 page
@@ -38,9 +38,9 @@ public class BasicExample {
 
 
     public static void main(String[] args) throws IOException {
+        SimpleExample example = new SimpleExample();
         // Run the default web server
         WebServer webServer = WebServer.create();
-        BasicExample example = new BasicExample();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "?encoding=utf-8");
     }
