@@ -23,8 +23,10 @@ public class Dates {
     }
 
     public static Dates now() {
-        return new Dates().at(System.currentTimeMillis());
+        return instant(System.currentTimeMillis());
     }
+
+    public static Dates instant(long millis) { return new Dates().at(millis); }
 
     public static Dates namedDate(String name) {
         return aDate().named(name);

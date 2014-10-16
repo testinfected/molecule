@@ -6,7 +6,6 @@ import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -34,6 +33,17 @@ public class CachingAndCompressionTest {
     }
 
     @Test
+    public void compressingResponses() throws IOException {
+        response = request.get("/");
+        response.assertOK();
+        // Stupid Apache Http-Client removes Content-Encoding (and Content-Length) header for compressed content,
+        // so we can't assert its there. In fact we know that content was compressed if is not chunked
+        // and Content-Length header is missing!
+        response.assertNotChunked();
+        response.assertHasHeader("Content-Length", nullValue());
+    }
+
+    @Test
     public void addingETagValidatorAndCacheDirectivesToDynamicContent() throws IOException {
         response = request.get("/");
         response.assertOK();
@@ -42,6 +52,18 @@ public class CachingAndCompressionTest {
         response.assertHasHeader("ETag", notNullValue());
         // These are the default cache directives
         response.assertHasHeader("Cache-Control", "max-age=0; private; no-cache");
+    }
+
+    @Test public void
+    notGeneratingTheResponseBodyWhenETagHasNotChanged() throws IOException {
+        response = request.get("/");
+        response.assertOK();
+        response.assertHasHeader("ETag", notNullValue());
+
+        // Play the same request with freshness information...
+        response = request.but().withHeader("If-None-Match", response.header("ETag")).send();
+        // ... and expect a not modified
+        response.assertHasStatusCode(304);
     }
 
     @Test
@@ -57,30 +79,7 @@ public class CachingAndCompressionTest {
         response.assertHasHeader("Cache-Control", "public; max-age=60");
     }
 
-    @Test
-    public void compressingResponses() throws IOException {
-        response = request.get("/");
-        response.assertOK();
-        // Stupid Apache Http-Client removes Content-Encoding (and Content-Length) header for compressed content,
-        // so we can't assert its there. In fact we know that content was compressed if is not chunked
-        // and Content-Length header is missing!
-        response.assertNotChunked();
-        response.assertHasHeader("Content-Length", nullValue());
-    }
-
     @Test public void
-    notGeneratingTheResponseBodyWhenETagHasNotChanged() throws IOException {
-        response = request.get("/");
-        response.assertOK();
-        response.assertHasHeader("ETag", notNullValue());
-
-        // Play the same request with freshness information...
-        response = request.but().withHeader("If-None-Match", response.header("ETag")).send();
-        // ... and expect a not modified
-        response.assertHasStatusCode(304);
-    }
-
-    @Ignore("wip") @Test public void
     notGeneratingTheResponseBodyWhenResourceHasNotBeenModified() throws IOException {
         Date timestamp = calendarDate(2014, 10, 14).atTime(21, 20, 0).toDate();
 
