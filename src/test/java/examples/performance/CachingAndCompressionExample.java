@@ -40,6 +40,7 @@ public class CachingAndCompressionExample {
 
               // Add content length header when size of content is known
         server.add(new ContentLengthHeader())
+              // Make get and head requests conditional to freshness of client stored representation
               .add(new ConditionalGet())
               // Add ETag if response has no validation information
               .add(new ETag())
