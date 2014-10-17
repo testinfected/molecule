@@ -35,16 +35,24 @@ public class HelloWorld {
 
 ## Download 
 
-Get the latest release version from Maven Central.
- 
-If you want the development version, grab the latest snapshot from Sonatype snapshots repositories 
-(```https://oss.sonatype.org/content/repositories/snapshots```).
+Get the latest release version from Maven Central:
 
 ```xml
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.4</version>
+</dependency>
+```
+ 
+If you want the development version, grab the latest snapshot from Sonatype snapshots repositories 
+(```https://oss.sonatype.org/content/repositories/snapshots```):
+
+```xml
+<dependency>
+      <groupId>com.vtence.molecule</groupId>
+      <artifactId>molecule</artifactId>
+      <version>0.5-SNAPSHOT</version>
 </dependency>
 ```
 
