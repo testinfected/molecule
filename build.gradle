@@ -5,14 +5,14 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
-    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.4.0'
+      classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
+      classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.0'
   }
 }
 
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin: 'coveralls'
+apply plugin: 'com.github.kt3k.coveralls'
 apply from: 'gradle/publish.gradle'
 
 defaultTasks 'build'
