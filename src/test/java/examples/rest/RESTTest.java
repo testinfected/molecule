@@ -37,7 +37,7 @@ public class RESTTest {
 
         response = request.but().get("/albums/1");
         response.assertHasStatusCode(200);
-        response.assertHasContent("Title: My Favorite Things, Artist: John Coltrane");
+        response.assertContentEqualTo("Title: My Favorite Things, Artist: John Coltrane");
 
         response = request.but()
                           .withParameter("title", "Blue Train")
@@ -47,9 +47,9 @@ public class RESTTest {
 
         response = request.but().get("/albums");
         response.assertHasStatusCode(200);
-        response.assertHasContent(
+        response.assertContentEqualTo(
                 "1: Title: My Favorite Things, Artist: John Coltrane\n" +
-                "2: Title: Blue Train, Artist: John Coltrane\n"
+                        "2: Title: Blue Train, Artist: John Coltrane\n"
         );
 
         // HtmUnit requires us to pass PUT parameters as part of the query string
@@ -61,7 +61,7 @@ public class RESTTest {
 
         response = request.but().get("/albums");
         response.assertHasStatusCode(200);
-        response.assertHasContent("2: Title: Kind of Blue, Artist: Miles Davis\n");
+        response.assertContentEqualTo("2: Title: Kind of Blue, Artist: Miles Davis\n");
     }
 
     @Test
@@ -81,13 +81,13 @@ public class RESTTest {
 
         response = request.but().get("/albums/1");
         response.assertHasStatusCode(200);
-        response.assertHasContent("Title: Kind of Blue, Artist: Miles Davis");
+        response.assertContentEqualTo("Title: Kind of Blue, Artist: Miles Davis");
 
         response = request.but().withParameter("_method", "DELETE").post("/albums/1");
         response.assertHasStatusCode(200);
 
         response = request.but().get("/albums");
         response.assertHasStatusCode(200);
-        response.assertHasContent("Your music library is empty");
+        response.assertContentEqualTo("Your music library is empty");
     }
 }

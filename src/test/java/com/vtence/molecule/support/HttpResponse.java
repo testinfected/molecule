@@ -54,15 +54,15 @@ public class HttpResponse {
         assertThat("response", response, HasHeaderWithValue.hasHeader(name, value));
     }
 
-    public void assertHasContent(byte[] content) throws IOException, URISyntaxException {
+    public void assertContentEqualTo(byte[] content) throws IOException, URISyntaxException {
         Assert.assertArrayEquals("content", content, content());
     }
 
-    public void assertHasContent(String content) {
-        assertHasContent(equalTo(content));
+    public void assertContentEqualTo(String content) {
+        assertContent(equalTo(content));
     }
 
-    public void assertHasContent(Matcher<? super String> contentMatcher) {
+    public void assertContent(Matcher<? super String> contentMatcher) {
         assertThat("response", response, HasContent.hasContent(contentMatcher));
     }
 

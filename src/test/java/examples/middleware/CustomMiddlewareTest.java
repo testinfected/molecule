@@ -40,7 +40,7 @@ public class CustomMiddlewareTest {
         response = request.withHeader("User-Agent", "Chrome").get("/");
         response.assertHasContentType("text/html");
         String content = "<html><body>Hello, World</body></html>";
-        response.assertHasContent(content);
+        response.assertContentEqualTo(content);
         response.assertHasHeader("Content-Length", valueOf(content.length()));
     }
 }

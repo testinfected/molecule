@@ -34,23 +34,23 @@ public class TemplatingAndLayoutTest {
         response = request.get("/hello?name=Frodo");
         response.assertOK();
         response.assertHasContentType("text/html; charset=utf-8");
-        response.assertHasContent(containsString("<p>Hello, Frodo!</p>"));
+        response.assertContent(containsString("<p>Hello, Frodo!</p>"));
     }
 
     @Test
     public void applyingACommonLayoutToASetOfPages() throws IOException {
         response = request.get("/hello");
         response.assertOK();
-        response.assertHasContent(containsString("<title>Layout - Hello World"));
-        response.assertHasContent(containsString("<h1>A simple page</h1>"));
-        response.assertHasContent(containsString("<meta name=\"description\" content=\"Hello World\">"));
-        response.assertHasContent(containsString("Hello, World!"));
+        response.assertContent(containsString("<title>Layout - Hello World"));
+        response.assertContent(containsString("<h1>A simple page</h1>"));
+        response.assertContent(containsString("<meta name=\"description\" content=\"Hello World\">"));
+        response.assertContent(containsString("Hello, World!"));
     }
 
     @Test
     public void skippingDecorationWhenResponseStatusIsNotOk() throws IOException {
         response = request.get("/not-found");
         response.assertHasStatusCode(404);
-        response.assertHasContent("Not found: /not-found");
+        response.assertContentEqualTo("Not found: /not-found");
     }
 }

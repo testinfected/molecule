@@ -77,7 +77,7 @@ public class SimpleServerTest {
 
         response = request.send();
         assertNoError();
-        response.assertHasContent("<html>...</html>");
+        response.assertContentEqualTo("<html>...</html>");
         response.assertChunked();
     }
 
@@ -92,7 +92,7 @@ public class SimpleServerTest {
 
         response = request.send();
         assertNoError();
-        response.assertHasContent("<html>...</html>");
+        response.assertContentEqualTo("<html>...</html>");
         response.assertHasHeader("Content-Length", "16");
         response.assertNotChunked();
     }
@@ -123,7 +123,7 @@ public class SimpleServerTest {
 
         response = request.withParameters("names", "Alice", "Bob", "Charles").send();
         assertNoError();
-        response.assertHasContent("[Alice, Bob, Charles]");
+        response.assertContentEqualTo("[Alice, Bob, Charles]");
     }
 
     @SuppressWarnings("unchecked")

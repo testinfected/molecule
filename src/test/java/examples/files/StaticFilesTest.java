@@ -34,7 +34,7 @@ public class StaticFilesTest {
         response = request.get("/");
         response.assertOK();
         response.assertHasContentType("text/html");
-        response.assertHasContent(containsString("<p class=\"fox\"></p>"));
+        response.assertContent(containsString("<p class=\"fox\"></p>"));
     }
 
     @Test
@@ -42,6 +42,6 @@ public class StaticFilesTest {
         response = request.get("/js/fox.js");
         response.assertOK();
         response.assertHasContentType("application/javascript");
-        response.assertHasContent(containsString("The quick brown fox jumps over the lazy dog"));
+        response.assertContent(containsString("The quick brown fox jumps over the lazy dog"));
     }
 }

@@ -39,6 +39,6 @@ public class SimpleTest {
     public void causingTheApplicationToCrashAndRenderA500Page() throws IOException {
         response = request.get("/?encoding=not-supported");
         response.assertHasStatusCode(500);
-        response.assertHasContent(containsString("java.nio.charset.UnsupportedCharsetException"));
+        response.assertContent(containsString("java.nio.charset.UnsupportedCharsetException"));
     }
 }
