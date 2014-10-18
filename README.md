@@ -3,13 +3,13 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule)
 [![Issues In Progress](https://badge.waffle.io/testinfected/molecule.png?label=In%20Progress&title=Started)](https://waffle.io/testinfected/molecule)
 
-## Getting started
+## Quick Start
 
 ```java
 public class HelloWorld {
     public static void main(String[] args) throws IOException {
         WebServer server = WebServer.create();
-        server.run((request, response) -> response.body("Hello, World"));
+        server.start((request, response) -> response.body("Hello, World"));
     }
 }
 ```
@@ -24,7 +24,7 @@ If you don't use Java 8, it's almost as good:
 public class HelloWorld {
     public static void main(String[] args) throws IOException {
         WebServer server = WebServer.create();
-        server.run(new Application() {
+        server.start(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("Hello, World");
             }
@@ -35,7 +35,7 @@ public class HelloWorld {
 
 ## Download 
 
-Get the latest release version from Maven Central:
+You can get the latest release version from Maven Central:
 
 ```xml
 <dependency>
@@ -56,7 +56,7 @@ If you want the development version, grab the latest snapshot from Sonatype snap
 </dependency>
 ```
 
-To use the default web server, you need to add [Simple](http://www.simpleframework.org) as a dependency:
+To use the default web server, you also need to add [Simple](http://www.simpleframework.org) as a dependency:
 
 ```xml
 <dependency>
@@ -66,17 +66,114 @@ To use the default web server, you need to add [Simple](http://www.simpleframewo
 </dependency>
 ```
 
-## Want to know more?
+## Want to start with some code?
 
-Check out the examples:
+Try out the following examples (Java 6 language level):
+
 * [Hello World](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/helloworld/HelloWorldExample.java)
 * [Rendering HTML](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/simple/SimpleExample.java)
-* [Routing](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java)
+* [Dynamic Routes](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java)
 * [Static Files](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/files/StaticFilesExample.java)
 * [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
 * [View Templates and Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java)
 * [HTTP Sessions](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java)
 * [Filters](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
-* [Custom Middleware](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middleware/CustomMiddlewareExample.java)
+* [Creating a Custom Middleware](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middleware/CustomMiddlewareExample.java)
 * [Caching and Compression](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/performance/CachingAndCompressionExample.java)
-* [Sample Application](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
+* [A Sample Application](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
+
+## Getting Started
+
+First thing first, you need a server to run your app:
+
+```java
+WebServer server = WebServer.create();
+```
+
+This will set the default web server, which is powered by [Simple](http://www.simpleframework.org), 
+to run locally on port 8080.
+
+To start the server, give it an app:
+
+```java
+server.start((request, response) -> response.body("Hello, World!"));
+});
+```
+
+To stop the server, call the _stop_ method:
+
+```java
+server.stop()
+```
+
+You can optionally specify the interface and port to bound to when creating the server, e.g.
+
+```java
+WebServer server = WebServer.create("0.0.0.0", 8088);
+```
+
+## Routing
+
+Routes let you route incoming requests to different applications based on the request verb and path. A route is composed
+of a path pattern, an optional set of verbs to match, and an application endpoint: 
+
+```java
+server.start(new DynamicRoutes() {{
+    get("/posts/:id").to((request, response) -> {
+        // retrieve a given post
+    });
+    post("/posts").to((request, response) -> {
+        // create a new post
+    }); 
+    put("/posts/:id").to((request, response) -> {
+        // update an existing post
+    });
+    delete("/posts/:id").to((request, response) -> {
+        // delete a post
+    }); 
+    map("/").to((request, response) -> {
+        // show the home page
+    });
+}});
+```
+
+Routes are matched in the order they are defined. If not defined route matches, the default behaviour is to 
+render a 404 Not Found. This can be configured to pass the control to any default application.
+
+Route patterns can be matched exactly - they are said to be static - or can include named parameters,
+ which are then accessible as regular request parameters on the request object:
+
+
+```java
+// matches "GET /photos/18" and "GET /photos/25"
+// request.parameter("id") is either '18' or '25'
+get("/photos/:id", (request, response) -> {
+    response.body("Photo #" + request.parameter("id"));
+});
+```
+
+## Middlewares
+
+Middlewares are a way to enhance your application with optional building blocks, using a pipeline design. 
+
+They implement functionality you tend to need across all your applications,
+but you don't want to build everytime. Things like **access logging**, **authentication**, 
+**compression**, **static files**, **routing**, etc. 
+
+Being able to separate the processing of the request (and post-processing of the response) in different stages 
+has several benefits:
+
+* It separate concerns, which helps keep your design clean and application well-structured
+* It let you only include the functionality you need, so your server is as small and fast as possible 
+* It let you plug in your own processing stages, to customize the behavior of application
+* It let you reuse and share middlewares, as elemental building blocks of application behavior
+
+For example you could have the following separate stages of the pipeline doing:
+
+1. Capturing internal server errors to render a nice 500 page
+1. Monitoring, logging accesses to the server
+1. Authentication and authorisation, using different mechanisms
+1. Caching, returning a cached result if request has already been processed recently
+1. Compression, to reduce bandwith usage
+1. Security, to prevent attacks, such as CSRF
+1. Processing, to actually process the request
