@@ -148,7 +148,7 @@ By default, a route matches a single verb, specified by the method you use, i.e.
 That can be changed by providing the verbs as arguments to the _via_ method:
 
 ```java
-map("/").via("GET", "HEAD").to((request, response) -> {
+map("/").via(GET, HEAD).to((request, response) -> {
     // show the home page
 });
 ```
