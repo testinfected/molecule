@@ -105,7 +105,7 @@ To stop the server, call the _stop_ method:
 server.stop()
 ```
 
-You can optionally specify the interface and port to bound to when creating the server, e.g.
+You can optionally specify the interface and port to bound to when creating the server, e.g. if you want to make your server globally available:
 
 ```java
 WebServer server = WebServer.create("0.0.0.0", 8088);
@@ -113,7 +113,11 @@ WebServer server = WebServer.create("0.0.0.0", 8088);
 
 ## Routing
 
-Routes let you route incoming requests to different applications based on the request verb and path. A route is composed
+Most modern webapps have nice URLs. Simple URLs are also easier to remember and more user friendly. 
+
+Molecule comes with a routing middleware that let you define your URL routes. 
+
+Routes let you route map incoming requests to different applications based on the request verb and path. A route is composed
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
@@ -135,13 +139,26 @@ server.start(new DynamicRoutes() {{
     });
 }});
 ```
+### Matching
 
 Routes are matched in the order they are defined. If not defined route matches, the default behaviour is to 
-render a 404 Not Found. This behaviour is configurable by providing the default application to route to when no route is matched.
+render a 404 Not Found. This can be configured to pass the control to any default application.
+
+By default, a route matches a single verb, specified by the method you use, i.e. _get_, _post_, _put_, _delete_.
+That can be changed by providing the verbs as arguments to the _via_ method:
+
+```java
+map("/").via("GET", "HEAD").to((request, response) -> {
+    // show the home page
+});
+```
+
+If you don't provide any verbs, _map_ will match on the path, whatever the verb used.
+
+### Dynamic Parameters
 
 Route patterns can be matched exactly - they are said to be static - or can include named parameters,
  which are then accessible as regular request parameters on the request object:
-
 
 ```java
 // matches "GET /photos/18" and "GET /photos/25"
@@ -150,6 +167,12 @@ get("/photos/:id", (request, response) -> {
     response.body("Photo #" + request.parameter("id"));
 });
 ```
+
+### Custom Matching
+
+You are not limited to the provided match patterns. You can easily implement your own matcher and decide exactly how to match an incoming url to an application.
+
+To do this, use the route definition methods that accept a _Matcher_ rather than a _String_.
 
 ## Middlewares
 
