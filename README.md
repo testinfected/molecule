@@ -97,7 +97,6 @@ To start the server, give it an app:
 
 ```java
 server.start((request, response) -> response.body("Hello, World!"));
-});
 ```
 
 To stop the server, call the _stop_ method:
@@ -138,7 +137,7 @@ server.start(new DynamicRoutes() {{
 ```
 
 Routes are matched in the order they are defined. If not defined route matches, the default behaviour is to 
-render a 404 Not Found. This can be configured to pass the control to any default application.
+render a 404 Not Found. This behaviour is configurable by providing the default application to route to when no route is matched.
 
 Route patterns can be matched exactly - they are said to be static - or can include named parameters,
  which are then accessible as regular request parameters on the request object:
@@ -165,15 +164,15 @@ has several benefits:
 
 * It separate concerns, which helps keep your design clean and application well-structured
 * It let you only include the functionality you need, so your server is as small and fast as possible 
-* It let you plug in your own processing stages, to customize the behavior of application
+* It let you plug in your own processing stages, to customize the behavior of your application
 * It let you reuse and share middlewares, as elemental building blocks of application behavior
 
 For example you could have the following separate stages of the pipeline doing:
 
 1. Capturing internal server errors to render a nice 500 page
 1. Monitoring, logging accesses to the server
-1. Authentication and authorisation, using different mechanisms
+1. Authentication and authorisation, to control access to your applicatin
 1. Caching, returning a cached result if request has already been processed recently
 1. Compression, to reduce bandwith usage
-1. Security, to prevent attacks, such as CSRF
+1. Security, to prevent attacks such as CSRF
 1. Processing, to actually process the request
