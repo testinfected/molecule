@@ -174,6 +174,31 @@ You are not limited to the provided match patterns. You can easily implement you
 
 To do this, use the route definition methods that accept a _Matcher_ rather than a _String_.
 
+
+## Working with the Request
+
+### Request Object
+
+### Attributes
+
+### Cookies
+
+## Working with the Response
+
+### Response Object
+
+### Bodies
+
+### Redirection and Errors
+
+## Sessions
+
+## Rendering Templates
+
+## View Layouts
+
+## Testing
+
 ## Middlewares
 
 Middlewares are a way to enhance your application with optional building blocks, using a pipeline design. 
@@ -199,3 +224,27 @@ For example you could have the following separate stages of the pipeline doing:
 1. Compression, to reduce bandwith usage
 1. Security, to prevent attacks such as CSRF
 1. Processing, to actually process the request
+
+### Available Middlewares
+
+Molecule comes with a number of middlewares (more are coming), that you can use to build your processing pipeline:
+
+* Router (See [Routing](http://https://github.com/testinfected/molecule#routing))
+* Static Assets 
+* File Server
+* Access Log
+* Compression
+* ETag
+* Conditional Get
+* Connection Scope
+* Server Header
+* Date Header
+* Content-Length Header
+* Filter Map
+* Cookie Session Tracker
+* Fail Safe
+* Failure Monitor
+* Not Found
+* Http Method Override
+* Layout
+
