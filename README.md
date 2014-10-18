@@ -117,7 +117,7 @@ Most modern webapps have nice URLs. Simple URLs are also easier to remember and 
 
 Molecule comes with a routing middleware that let you define your URL routes. 
 
-Routes let you route map incoming requests to different applications based on the request verb and path. A route is composed
+Routes let you map incoming requests to different applications based on the request verb and path. A route is composed
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
@@ -153,7 +153,7 @@ map("/").via("GET", "HEAD").to((request, response) -> {
 });
 ```
 
-If you don't provide any verbs, _map_ will match on the path, whatever the verb used.
+If you don't provide any verbs, _map_ will match on all verbs.
 
 ### Dynamic Parameters
 
