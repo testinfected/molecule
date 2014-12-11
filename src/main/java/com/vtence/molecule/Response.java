@@ -8,7 +8,6 @@ import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.lib.BinaryBody;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -143,11 +142,11 @@ public class Response {
         return contentType.charset();
     }
 
-    public Response body(String text) throws IOException {
+    public Response body(String text) {
         return body(text(text));
     }
 
-    public Response body(Body body) throws IOException {
+    public Response body(Body body) {
         this.body = body;
         return this;
     }
