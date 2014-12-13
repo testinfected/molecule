@@ -16,12 +16,14 @@ public class MiddlewareStack implements Application {
 
     public MiddlewareStack() {}
 
-    public void use(Middleware middleware) {
+    public MiddlewareStack use(Middleware middleware) {
         stack.add(middleware);
+        return this;
     }
 
-    public void run(Application app) {
+    public MiddlewareStack run(Application app) {
         this.runner = app;
+        return this;
     }
 
     public void handle(Request request, Response response) throws Exception {

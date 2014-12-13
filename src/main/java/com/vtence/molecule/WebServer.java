@@ -7,8 +7,14 @@ import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.RouteBuilder;
 import com.vtence.molecule.servers.SimpleServer;
 
+import javax.net.ssl.SSLContext;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.security.GeneralSecurityException;
+
+import static com.vtence.molecule.ssl.KeyStoreType.DEFAULT;
+import static com.vtence.molecule.ssl.SecureProtocol.TLS;
 
 public class WebServer {
 
@@ -17,6 +23,8 @@ public class WebServer {
 
     private final Server server;
     private final MiddlewareStack stack;
+
+    private SSLContext ssl;
 
     public static WebServer create() {
         return create(DEFAULT_PORT);
@@ -33,6 +41,15 @@ public class WebServer {
     public WebServer(Server server) {
         this.server = server;
         this.stack = new MiddlewareStack();
+    }
+
+    public WebServer enableSSL(File keyStore, String storePassword, String keyPassword) throws GeneralSecurityException, IOException {
+        return enableSSL(TLS.initialize(DEFAULT.loadKeys(keyStore, storePassword, keyPassword)));
+    }
+
+    public WebServer enableSSL(SSLContext context) {
+        this.ssl = context;
+        return this;
     }
 
     public WebServer failureReporter(FailureReporter reporter) {
@@ -55,8 +72,7 @@ public class WebServer {
     }
 
     public Server start(Application application) throws IOException {
-        stack.run(application);
-        server.run(stack);
+        server.run(stack.run(application), ssl);
         return server;
     }
 
@@ -65,6 +81,6 @@ public class WebServer {
     }
 
     public URI uri() {
-        return URI.create("http://" + server.host() + ":" + server.port());
+        return URI.create((ssl != null ? "https://" : "http://") + server.host() + ":" + server.port());
     }
 }

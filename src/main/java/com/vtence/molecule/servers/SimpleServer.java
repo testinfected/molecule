@@ -12,6 +12,7 @@ import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -43,8 +44,12 @@ public class SimpleServer implements Server {
     }
 
     public void run(final Application app) throws IOException {
+        run(app, null);
+    }
+
+    public void run(final Application app, SSLContext context) throws IOException {
         connection = new SocketConnection(new ContainerServer(new ApplicationContainer(app)));
-        connection.connect(new InetSocketAddress(host, port));
+        connection.connect(new InetSocketAddress(host, port), context);
     }
 
     public void shutdown() throws IOException {

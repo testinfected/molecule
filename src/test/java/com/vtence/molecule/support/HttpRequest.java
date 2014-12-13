@@ -33,6 +33,7 @@ public class HttpRequest {
     private boolean applyCookies = true;
     private String body;
     private String encodingType;
+    private boolean secure = false;
 
     public HttpRequest(int port) {
         this(new WebClient(), port);
@@ -51,6 +52,7 @@ public class HttpRequest {
                 applyCookies(applyCookies).
                 followRedirects(followRedirects).
                 withEncodingType(encodingType).
+                useSSL(secure).
                 withBody(body);
 
         for (String header: headers.keySet()) {
@@ -83,6 +85,15 @@ public class HttpRequest {
 
     public HttpRequest on(String path) {
         this.path = path;
+        return this;
+    }
+
+    public HttpRequest useSSL() {
+        return useSSL(true);
+    }
+
+    public HttpRequest useSSL(boolean secure)  {
+        this.secure = secure;
         return this;
     }
 
@@ -122,6 +133,7 @@ public class HttpRequest {
 
     public HttpResponse send() throws IOException {
         client.getOptions().setTimeout(timeoutInMillis);
+        client.getOptions().setUseInsecureSSL(true);
         for (String cookie: cookies.keySet()) {
             client.getCookieManager().addCookie(new Cookie(domain, cookie, cookies.get(cookie)));
         }
@@ -180,6 +192,6 @@ public class HttpRequest {
     }
 
     private URL requestUrl() throws MalformedURLException {
-        return new URL("http://" + domain + ":" + port + path);
+        return new URL((secure ? "https" : "http") + "://" + domain + ":" + port + path);
     }
 }

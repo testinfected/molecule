@@ -80,6 +80,7 @@ Try out the following examples (Java 6 language level):
 * [Filters](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
 * [Creating a Custom Middleware](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middleware/CustomMiddlewareExample.java)
 * [Caching and Compression](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/performance/CachingAndCompressionExample.java)
+* [SSL](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/ssl/SSLExample.java)
 * [A Sample Application](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
 
 ## Getting Started
