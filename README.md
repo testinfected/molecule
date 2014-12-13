@@ -41,7 +41,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.4</version>
+      <version>0.4.1</version>
 </dependency>
 ```
  
