@@ -1,6 +1,6 @@
-VERSION_NUMBER = "0.4.1"
+VERSION_NUMBER = "0.5-SNAPSHOT"
 
-Release.next_version = "0.5-SNAPSHOT"
+Release.next_version = "0.4.2"
 Release.commit_message = lambda { |version| "Bump version number to #{version}" }
 Release.tag_name = lambda { |version| "v#{version}" }
 
