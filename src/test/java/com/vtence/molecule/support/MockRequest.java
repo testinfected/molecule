@@ -43,6 +43,27 @@ public class MockRequest extends Request {
         return request;
     }
 
+    public static MockRequest PATCH(String path) {
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.PATCH);
+        return request;
+    }
+
+    public static Request HEAD(String path) {
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.HEAD);
+        return request;
+    }
+
+    public static Request OPTIONS(String path) {
+        MockRequest request = new MockRequest();
+        request.path(path);
+        request.method(HttpMethod.OPTIONS);
+        return request;
+    }
+
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {
         assertThat("attribute[" + key.toString() + "]", attribute(key), attributeMatcher);
     }

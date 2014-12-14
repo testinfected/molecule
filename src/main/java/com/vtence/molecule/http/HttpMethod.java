@@ -1,7 +1,7 @@
 package com.vtence.molecule.http;
 
 public enum HttpMethod {
-    GET, POST, DELETE, PUT, HEAD;
+    OPTIONS, GET, HEAD, POST, PUT, DELETE, PATCH;
 
     public static boolean valid(String method) {
         for (HttpMethod httpMethod : HttpMethod.values()) {

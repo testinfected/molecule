@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,6 +200,10 @@ public class Request {
 
     public List<String> parameters(String name) {
         return parameters.containsKey(name) ? new ArrayList<String>(parameters.get(name)) : new ArrayList<String>();
+    }
+
+    public Map<String, List<String>> parameters() {
+        return Collections.unmodifiableMap(parameters);
     }
 
     @SuppressWarnings("unchecked")
