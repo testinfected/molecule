@@ -10,3 +10,5 @@ reports
 buildr.rb
 .gradle
 build
+.java-version
+.ruby-version

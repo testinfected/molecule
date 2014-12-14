@@ -1,3 +1,5 @@
+require 'buildr/jacoco'
+
 VERSION_NUMBER = "0.5-SNAPSHOT"
 
 Release.next_version = "0.4.2"
@@ -19,7 +21,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   package :test_jar
 
   pom.name = 'Molecule'
-  pom.description = 'A Rack inspired web micro-framework for Java'
+  pom.description = 'A web micro-framework for Java'
   pom.add_mit_license
   pom.add_github_project(:testinfected, :molecule)
   pom.add_developer('testinfected', 'Vincent Tence', 'vtence@gmail.com', ['Developer'])

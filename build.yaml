@@ -17,5 +17,4 @@ artifacts:
   juniversalchardet: com.googlecode.juniversalchardet:juniversalchardet:jar:1.0.3
   htmlunit: net.sourceforge.htmlunit:htmlunit:jar:2.14
 
-junit: 4.11
 jmock: 2.6.0
