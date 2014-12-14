@@ -1,8 +1,9 @@
+require 'buildr/custom_pom'
 require 'buildr/jacoco'
 
-VERSION_NUMBER = "0.5-SNAPSHOT"
+VERSION_NUMBER = '0.5-SNAPSHOT'
 
-Release.next_version = "0.4.2"
+Release.next_version = '0.4.2'
 Release.commit_message = lambda { |version| "Bump version number to #{version}" }
 Release.tag_name = lambda { |version| "v#{version}" }
 
@@ -23,7 +24,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   pom.name = 'Molecule'
   pom.description = 'A web micro-framework for Java'
   pom.add_mit_license
-  pom.add_github_project(:testinfected, :molecule)
+  pom.add_github_project('testinfected/molecule')
   pom.add_developer('testinfected', 'Vincent Tence', 'vtence@gmail.com', ['Developer'])
   pom.optional_dependencies.concat [:simple, :mustache]
 end
