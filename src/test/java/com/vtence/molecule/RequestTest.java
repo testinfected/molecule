@@ -1,5 +1,8 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.http.Cookie;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -52,8 +55,8 @@ public class RequestTest {
 
         assertThat("headers", request.allHeaders(), allOf(
                 hasEntry("Accept", "text/html"),
-                hasEntry("Accept-Encoding",  "gzip"),
-                hasEntry("Accept-Language",  "en")));
+                hasEntry("Accept-Encoding", "gzip"),
+                hasEntry("Accept-Language", "en")));
         assertThat("header names", request.headerNames(), contains("Accept", "Accept-Encoding", "Accept-Language"));
     }
 
@@ -67,5 +70,33 @@ public class RequestTest {
         assertThat("still there?", request.hasHeader("Accept"), equalTo(false));
 
         assertThat("header names", request.headerNames(), contains("Accept-Encoding"));
+    }
+
+    @Test
+    public void maintainsAListOfCookie() {
+        request.addCookie("mr christie", "peanuts");
+        request.addCookie("petit ecolier", "chocolat noir");
+        request.addCookie("delicious", "chocolat au lait");
+
+        assertThat("cookies", request.cookies(), contains(cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
+    }
+
+    @Test
+    public void cookiesCanBeRemoved() {
+        request.addCookie("mr christie", "peanuts");
+        request.addCookie("petit ecolier", "chocolat noir");
+        assertThat("cookie?", request.hasCookie("mr christie"), equalTo(true));
+        request.removeCookie("mr christie");
+        assertThat("still there?", request.hasCookie("mr christie"), equalTo(false));
+
+        assertThat("cookies", request.cookies(), contains(cookieNamed("petit ecolier")));
+    }
+
+    private Matcher<Cookie> cookieNamed(String name) {
+        return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
+            protected String featureValueOf(Cookie cookie) {
+                return cookie.name();
+            }
+        };
     }
 }

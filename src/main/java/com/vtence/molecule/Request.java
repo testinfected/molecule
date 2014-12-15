@@ -26,7 +26,7 @@ import static java.lang.Long.parseLong;
 public class Request {
 
     private final Headers headers = new Headers();
-    private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
+    private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
     private final Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
@@ -178,8 +178,8 @@ public class Request {
         return this;
     }
 
-    public List<Cookie> cookies() {
-        return new ArrayList<Cookie>(cookies.values());
+    public boolean hasCookie(String name) {
+        return cookies.containsKey(name);
     }
 
     public Cookie cookie(String name) {
@@ -189,6 +189,15 @@ public class Request {
     public String cookieValue(String name) {
         Cookie cookie = cookie(name);
         return cookie != null ? cookie.value() : null;
+    }
+
+    public List<Cookie> cookies() {
+        return new ArrayList<Cookie>(cookies.values());
+    }
+
+    public Request removeCookie(String name) {
+        cookies.remove(name);
+        return this;
     }
 
     public long contentLength() {
