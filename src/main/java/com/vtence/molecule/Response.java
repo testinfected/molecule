@@ -12,7 +12,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
@@ -73,12 +75,17 @@ public class Response {
         return value != null ? parseLong(value) : -1;
     }
 
+    public Response add(String name, String value) {
+        headers.add(name, value);
+        return this;
+    }
+
     public Response set(String name, String value) {
         headers.put(name, value);
         return this;
     }
 
-    public Response setLong(String name, long value) {
+    public Response set(String name, long value) {
         return set(name, String.valueOf(value));
     }
 
@@ -86,20 +93,16 @@ public class Response {
         return set(name, httpDate(date));
     }
 
-    public Response setDate(String name, long date) {
-        return set(name, new Date(date));
-    }
-
     public Response remove(String name) {
         headers.remove(name);
         return this;
     }
 
-    public Iterable<String> names() {
+    public Set<String> names() {
         return headers.names();
     }
 
-    public Map<String, String> headers() {
+    public Map<String, String> all() {
         return headers.all();
     }
 
@@ -117,12 +120,30 @@ public class Response {
     }
 
     public Response contentLength(long length) {
-        setLong(CONTENT_LENGTH, length);
+        set(CONTENT_LENGTH, length);
         return this;
     }
 
-    public Response add(Cookie cookie) {
+    public Response cookie(Cookie cookie) {
         cookies.put(cookie.name(), cookie);
+        return this;
+    }
+
+    public Response cookie(String name, String value) {
+        return cookie(new Cookie(name, value));
+    }
+
+    public boolean hasCookie(String name) {
+        return cookies.containsKey(name);
+    }
+
+    public Response removeCookie(String name) {
+        cookies.remove(name);
+        return this;
+    }
+
+    public Response discardCookie(String name) {
+        cookie(name).maxAge(0);
         return this;
     }
 
@@ -130,7 +151,7 @@ public class Response {
         return cookies.get(name);
     }
 
-    public Iterable<Cookie> cookies() {
+    public List<Cookie> cookies() {
         return new ArrayList<Cookie>(cookies.values());
     }
 

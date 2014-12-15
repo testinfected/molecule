@@ -228,7 +228,7 @@ public class SimpleServerTest {
                 Cookie cookie = new Cookie("cookie", "value");
                 cookie.httpOnly(true);
                 cookie.maxAge(1800);
-                response.add(cookie);
+                response.cookie(cookie);
             }
         });
 

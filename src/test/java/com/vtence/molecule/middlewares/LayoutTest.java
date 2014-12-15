@@ -56,7 +56,7 @@ public class LayoutTest {
 
     @Test public void
     removesContentLengthHeaderIfDecorating() throws Exception {
-        response.setLong("Content-Length", 140);
+        response.set("Content-Length", 140);
         layout.handle(request, response);
         response.assertHeader("Content-Length", nullValue());
     }

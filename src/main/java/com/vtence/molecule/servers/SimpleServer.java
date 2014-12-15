@@ -114,7 +114,7 @@ public class SimpleServer implements Server {
 
         private void buildCookies(org.simpleframework.http.Request simpleRequest, Request request) {
             for (org.simpleframework.http.Cookie cookie : simpleRequest.getCookies()) {
-                request.addCookie(cookie.getName(), cookie.getValue());
+                request.cookie(cookie.getName(), cookie.getValue());
             }
         }
 

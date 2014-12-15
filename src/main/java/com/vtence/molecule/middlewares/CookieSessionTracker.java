@@ -65,7 +65,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
         if (session.invalid()) {
             destroy(session);
             Cookie cookie = new Cookie(name, session.id()).maxAge(0);
-            response.add(cookie);
+            response.cookie(cookie);
             return;
         }
 
@@ -74,7 +74,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
             Cookie cookie = new Cookie(name, sid)
                     .httpOnly(true)
                     .maxAge(session.maxAge());
-            response.add(cookie);
+            response.cookie(cookie);
         }
     }
 

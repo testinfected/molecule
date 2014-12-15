@@ -12,6 +12,7 @@ import com.vtence.molecule.http.MimeTypes;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class FileServer implements Application {
 
     private void addFileHeaders(Response response, File file) {
         response.contentType(mediaTypes.guessFrom(file.getName()));
-        response.setDate(LAST_MODIFIED, file.lastModified());
+        response.set(LAST_MODIFIED, new Date(file.lastModified()));
         response.contentLength(file.length());
     }
 

@@ -50,11 +50,12 @@ public class RequestTest {
     @Test
     public void maintainsAListOfHeaders() throws IOException {
         request.addHeader("Accept", "text/html");
-        request.addHeader("Accept-Encoding", "gzip");
-        request.addHeader("Accept-Language", "en");
+        request.addHeader("Accept", "application/json");
+        request.header("Accept-Encoding", "gzip");
+        request.header("Accept-Language", "en");
 
         assertThat("headers", request.allHeaders(), allOf(
-                hasEntry("Accept", "text/html"),
+                hasEntry("Accept", "text/html, application/json"),
                 hasEntry("Accept-Encoding", "gzip"),
                 hasEntry("Accept-Language", "en")));
         assertThat("header names", request.headerNames(), contains("Accept", "Accept-Encoding", "Accept-Language"));
@@ -74,17 +75,17 @@ public class RequestTest {
 
     @Test
     public void maintainsAListOfCookie() {
-        request.addCookie("mr christie", "peanuts");
-        request.addCookie("petit ecolier", "chocolat noir");
-        request.addCookie("delicious", "chocolat au lait");
+        request.cookie("mr christie", "peanuts");
+        request.cookie("petit ecolier", "chocolat noir");
+        request.cookie("delicious", "chocolat au lait");
 
         assertThat("cookies", request.cookies(), contains(cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
     }
 
     @Test
     public void cookiesCanBeRemoved() {
-        request.addCookie("mr christie", "peanuts");
-        request.addCookie("petit ecolier", "chocolat noir");
+        request.cookie("mr christie", "peanuts");
+        request.cookie("petit ecolier", "chocolat noir");
         assertThat("cookie?", request.hasCookie("mr christie"), equalTo(true));
         request.removeCookie("mr christie");
         assertThat("still there?", request.hasCookie("mr christie"), equalTo(false));

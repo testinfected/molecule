@@ -193,8 +193,12 @@ public class Request {
         return this;
     }
 
-    public Request addCookie(String name, String value) {
-        cookies.put(name, new Cookie(name, value));
+    public Request cookie(String name, String value) {
+        return cookie(new Cookie(name, value));
+    }
+
+    public Request cookie(Cookie cookie) {
+        cookies.put(cookie.name(), cookie);
         return this;
     }
 
