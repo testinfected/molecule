@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.*;
 
 public class RequestTest {
 
-    private Request request = new Request();
+    Request request = new Request();
 
     @Test
     public void maintainsAnOrderedListOfParametersWithSameName() {
@@ -62,7 +62,7 @@ public class RequestTest {
     }
 
     @Test
-    public void headersCanBeRemoved() throws IOException {
+    public void removesHeaders() throws IOException {
         request.addHeader("Accept", "text/html");
         request.addHeader("Accept-Encoding", "gzip");
 
@@ -83,7 +83,7 @@ public class RequestTest {
     }
 
     @Test
-    public void cookiesCanBeRemoved() {
+    public void removesCookies() {
         request.cookie("mr christie", "peanuts");
         request.cookie("petit ecolier", "chocolat noir");
         assertThat("cookie?", request.hasCookie("mr christie"), equalTo(true));

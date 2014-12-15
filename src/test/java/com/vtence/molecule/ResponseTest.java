@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.*;
 
 public class ResponseTest {
 
-    private Response response = new Response();
+    Response response = new Response();
 
     @Test
     public void maintainsAListOfHeaders() throws IOException {
@@ -30,7 +30,15 @@ public class ResponseTest {
     }
 
     @Test
-    public void headersCanBeRemoved() throws IOException {
+    public void convertsHeaderValuesToLongs() throws IOException {
+        assertThat("Content-Length", response.getLong("Content-Length"), equalTo(-1l));
+        response.add("Content-Length", "1258");
+        assertThat("Content-Length", response.getLong("Content-Length"), equalTo(1258l));
+        assertThat("Content-Length", response.contentLength(), equalTo(1258l));
+    }
+
+    @Test
+    public void canRemoveHeaders() throws IOException {
         response.set("Accept", "text/html");
         response.set("Accept-Encoding", "gzip");
 
@@ -42,7 +50,7 @@ public class ResponseTest {
     }
 
     @Test
-    public void maintainsAListOfCookie() {
+    public void maintainsAListOfCookies() {
         response.cookie("mr christie", "peanuts");
         response.cookie("petit ecolier", "chocolat noir");
         response.cookie("delicious", "chocolat au lait");
