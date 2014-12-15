@@ -83,6 +83,7 @@ public class SimpleServer implements Server {
             request.remoteIp(simple.getClientAddress().getAddress().getHostAddress());
             request.remotePort(simple.getClientAddress().getPort());
             request.remoteHost(simple.getClientAddress().getHostName());
+            request.timestamp(simple.getRequestTime());
             request.protocol(String.format("HTTP/%s.%s", simple.getMajor(), simple.getMinor()));
             request.secure(simple.isSecure());
             request.input(simple.getInputStream());

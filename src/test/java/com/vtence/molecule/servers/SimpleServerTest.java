@@ -140,6 +140,7 @@ public class SimpleServerTest {
                 info.put("port", valueOf(request.remotePort()));
                 info.put("protocol", request.protocol());
                 info.put("secure", valueOf(request.secure()));
+                info.put("timestamp", valueOf(request.timestamp()));
             }
         });
 
@@ -150,8 +151,9 @@ public class SimpleServerTest {
                 hasEntry("uri", "/path?query"),
                 hasEntry("path", "/path"),
                 hasEntry("ip", "127.0.0.1"),
-//                hasEntry("hostname", "localhost"),
-                hasEntry(equalTo("port"), notNullValue()),
+                hasEntry(equalTo("hostname"), notNullValue()),
+                hasEntry(equalTo("port"), not(equalTo("0"))),
+                hasEntry(equalTo("timestamp"), not(equalTo("0"))),
                 hasEntry("protocol", "HTTP/1.1"),
                 hasEntry("secure", "false")));
     }

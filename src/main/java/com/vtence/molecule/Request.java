@@ -39,6 +39,7 @@ public class Request {
     private InputStream input;
     private HttpMethod method;
     private boolean secure;
+    private long timestamp;
 
     public Request() {}
 
@@ -103,6 +104,15 @@ public class Request {
     public Request secure(boolean secure) {
         this.secure = secure;
         return this;
+    }
+
+    public Request timestamp(long time) {
+        timestamp = time;
+        return this;
+    }
+
+    public long timestamp() {
+        return timestamp;
     }
 
     public Request method(String method) {
