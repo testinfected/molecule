@@ -204,7 +204,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    readsRequestCookies() throws IOException {
+    readsAllRequestCookies() throws IOException {
         final Map<String, String> cookies = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -225,9 +225,12 @@ public class SimpleServerTest {
     setsResponseCookies() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Cookie cookie = new Cookie("cookie", "value");
-                cookie.httpOnly(true);
-                cookie.maxAge(1800);
+                Cookie cookie = new Cookie("cookie", "value").
+                        maxAge(1800).
+                        domain("localhost").
+                        path("/uri").
+                        secure(true).
+                        httpOnly(true);
                 response.cookie(cookie);
             }
         });
@@ -237,6 +240,9 @@ public class SimpleServerTest {
         response.assertHasCookie(containsString("cookie=value"));
         response.assertHasCookie(containsString("max-age=1800"));
         response.assertHasCookie(containsString("httponly"));
+        response.assertHasCookie(containsString("path=/uri"));
+        response.assertHasCookie(containsString("domain=localhost"));
+        response.assertHasCookie(containsString("secure"));
     }
 
     @Test public void
