@@ -39,14 +39,14 @@ public class ContentTypeTest {
     @Test public void
     hasAStringRepresentation() {
         ContentType contentType = ContentType.parse("text/html; charset=utf-8");
-        assertThat("header", contentType.toString(), equalTo("text/html; charset=utf-8"));
+        assertThat("header", contentType.format(), equalTo("text/html; charset=utf-8"));
     }
 
     @Test public void
     handlesAbsenceOfACharset() {
         ContentType contentType = ContentType.parse("text/html");
         assertThat("charset", contentType.charset(), nullValue());
-        assertThat("header", contentType.toString(), equalTo("text/html"));
+        assertThat("header", contentType.format(), equalTo("text/html"));
     }
 
     @Test public void

@@ -1,5 +1,6 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.http.Cookie;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -66,6 +67,25 @@ public class ResponseTest {
         response.discardCookie("mr christie");
 
         assertThat("expiration", response.cookie("mr christie"), cookieExpiring(0));
+    }
+
+    @Test
+    public void usesISO8859AsDefaultCharset() {
+        assertThat("default charset", response.charset(), equalTo(Charsets.ISO_8859_1));
+    }
+
+    @Test
+    public void readsCharsetFromContentType() {
+        response.contentType("text/html; charset=utf-8");
+        assertThat("charset", response.charset(), equalTo(Charsets.UTF_8));
+    }
+
+    @Test
+    public void setsContentTypeCharset() {
+        response.contentType("text/html; charset=iso-8859-1");
+        response.charset("utf-8");
+        assertThat("charset", response.contentType(), equalTo("text/html; charset=utf-8"));
+        assertThat("charset", response.charset(), equalTo(Charsets.UTF_8));
     }
 
     private Matcher<Cookie> cookieNamed(String name) {

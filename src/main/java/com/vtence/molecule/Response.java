@@ -110,8 +110,8 @@ public class Response {
         return get(CONTENT_TYPE);
     }
 
-    public Response contentType(String mediaType) {
-        set(CONTENT_TYPE, mediaType);
+    public Response contentType(String contentType) {
+        set(CONTENT_TYPE, contentType);
         return this;
     }
 
@@ -153,6 +153,12 @@ public class Response {
 
     public List<Cookie> cookies() {
         return new ArrayList<Cookie>(cookies.values());
+    }
+
+    public Response charset(String charsetName) {
+        ContentType contentType = ContentType.of(this);
+        contentType(new ContentType(contentType.type(), contentType.subType(), charsetName).format());
+        return this;
     }
 
     public Charset charset() {
