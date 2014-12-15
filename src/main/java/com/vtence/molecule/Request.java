@@ -38,6 +38,7 @@ public class Request {
     private String protocol;
     private InputStream input;
     private HttpMethod method;
+    private boolean secure;
 
     public Request() {}
 
@@ -93,6 +94,15 @@ public class Request {
 
     public String protocol() {
         return protocol;
+    }
+
+    public boolean secure() {
+        return secure;
+    }
+
+    public Request secure(boolean secure) {
+        this.secure = secure;
+        return this;
     }
 
     public Request method(String method) {

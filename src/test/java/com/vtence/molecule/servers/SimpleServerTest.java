@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.allOf;
@@ -136,8 +137,9 @@ public class SimpleServerTest {
                 info.put("path", request.path());
                 info.put("ip", request.remoteIp());
                 info.put("hostname", request.remoteHost());
-                info.put("port", String.valueOf(request.remotePort()));
+                info.put("port", valueOf(request.remotePort()));
                 info.put("protocol", request.protocol());
+                info.put("secure", valueOf(request.secure()));
             }
         });
 
@@ -150,7 +152,8 @@ public class SimpleServerTest {
                 hasEntry("ip", "127.0.0.1"),
 //                hasEntry("hostname", "localhost"),
                 hasEntry(equalTo("port"), notNullValue()),
-                hasEntry("protocol", "HTTP/1.1")));
+                hasEntry("protocol", "HTTP/1.1"),
+                hasEntry("secure", "false")));
     }
 
     @SuppressWarnings("unchecked")
@@ -181,8 +184,8 @@ public class SimpleServerTest {
         final Map<String, String> content = new HashMap<String, String>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                content.put("contentType", String.valueOf(request.contentType()));
-                content.put("contentLength", String.valueOf(request.contentLength()));
+                content.put("contentType", valueOf(request.contentType()));
+                content.put("contentLength", valueOf(request.contentLength()));
                 content.put("body", request.body());
             }
         });
