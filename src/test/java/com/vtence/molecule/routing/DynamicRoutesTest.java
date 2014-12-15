@@ -94,7 +94,7 @@ public class DynamicRoutesTest {
         }
 
         public void handle(Request request, Response response) throws Exception {
-            response.body(message + (request.parameters().isEmpty() ? "" : " " + request.parameters()));
+            response.body(message + (request.allParameters().isEmpty() ? "" : " " + request.allParameters()));
         }
     }
 }

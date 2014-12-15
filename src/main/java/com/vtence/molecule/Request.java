@@ -15,8 +15,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.lang.Long.parseLong;
 
@@ -24,7 +27,7 @@ public class Request {
 
     private final Headers headers = new Headers();
     private final Map<String, Cookie> cookies = new HashMap<String, Cookie>();
-    private final Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
 
     private String uri;
@@ -124,7 +127,7 @@ public class Request {
     }
 
     public String body() throws IOException {
-        return Streams.toString(input, charset());
+        return Streams.toString(input(), charset());
     }
 
     public Charset charset() {
@@ -140,12 +143,16 @@ public class Request {
         return this;
     }
 
+    public boolean hasHeader(String name) {
+        return headers.has(name);
+    }
+
     public Request header(String name, String value) {
         headers.put(name, value);
         return this;
     }
 
-    public List<String> headerNames() {
+    public Set<String> headerNames() {
         return headers.names();
     }
 
@@ -155,6 +162,15 @@ public class Request {
 
     public String header(String name) {
         return headers.get(name);
+    }
+
+    public Map<String, String> allHeaders() {
+        return headers.all();
+    }
+
+    public Request removeHeader(String name) {
+        headers.remove(name);
+        return this;
     }
 
     public Request addCookie(String name, String value) {
@@ -202,8 +218,17 @@ public class Request {
         return parameters.containsKey(name) ? new ArrayList<String>(parameters.get(name)) : new ArrayList<String>();
     }
 
-    public Map<String, List<String>> parameters() {
+    public Set<String> parameterNames() {
+        return new LinkedHashSet<String>(parameters.keySet());
+    }
+
+    public Map<String, List<String>> allParameters() {
         return Collections.unmodifiableMap(parameters);
+    }
+
+    public Request removeParameter(String name) {
+        parameters.remove(name);
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -221,6 +246,6 @@ public class Request {
     }
 
     public Map<Object, Object> attributes() {
-        return attributes;
+        return Collections.unmodifiableMap(attributes);
     }
 }
