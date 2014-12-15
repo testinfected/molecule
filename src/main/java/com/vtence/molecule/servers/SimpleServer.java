@@ -16,7 +16,6 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Map;
 
 public class SimpleServer implements Server {
 
@@ -91,15 +90,6 @@ public class SimpleServer implements Server {
             buildHeaders(simple, request);
             buildCookies(simple, request);
             buildParameters(simple, request);
-            buildAttributes(simple, request);
-        }
-
-        @SuppressWarnings("unchecked")
-        private void buildAttributes(org.simpleframework.http.Request simple, Request request) {
-            Map<Object, Object> attributes = simple.getAttributes();
-            for (Object key : attributes.keySet()) {
-                request.attribute(key, attributes.get(key));
-            }
         }
 
         private void buildHeaders(org.simpleframework.http.Request simple, Request request) {
