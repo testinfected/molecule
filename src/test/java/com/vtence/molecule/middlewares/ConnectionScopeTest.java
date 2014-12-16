@@ -1,11 +1,11 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.HttpException;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
+import org.hamcrest.Matchers;
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -19,7 +19,6 @@ import java.sql.Connection;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ConnectionScopeTest {
@@ -52,19 +51,19 @@ public class ConnectionScopeTest {
 
     @Test public void
     gracefullyClosesConnectionAndRemovesFromScopeWhenAnErrorOccurs() throws Exception {
-        connectionScope.connectTo(crashWith(new HttpException("Boom!")));
+        connectionScope.connectTo(crashWith(new Exception("Boom!")));
 
         try {
             connectionScope.handle(request, response);
             fail("HttpException did not bubble up");
-        } catch (HttpException expected) {
-            assertTrue(true);
+        } catch (Exception expected) {
+            assertThat("message", expected.getMessage(), Matchers.equalTo("Boom!"));
         }
 
         request.assertAttribute(Connection.class, nullValue());
     }
 
-    private Application crashWith(final HttpException error) {
+    private Application crashWith(final Exception error) {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
                 throw error;
