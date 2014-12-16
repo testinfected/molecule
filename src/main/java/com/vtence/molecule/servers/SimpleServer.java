@@ -62,80 +62,80 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(org.simpleframework.http.Request simpleRequest, org.simpleframework.http.Response simpleResponse) {
+        public void handle(org.simpleframework.http.Request httpRequest, org.simpleframework.http.Response httpResponse) {
             try {
                 Request request = new Request();
                 Response response = new Response();
-                build(simpleRequest, request);
+                build(request, httpRequest);
                 app.handle(request, response);
-                commit(simpleResponse, response);
+                commit(httpResponse, response);
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
             } finally {
-                close(simpleResponse);
+                close(httpResponse);
             }
         }
 
-        private void build(org.simpleframework.http.Request simple, Request request) throws IOException {
-            request.uri(simple.getTarget());
-            request.path(simple.getPath().getPath());
-            request.remoteIp(simple.getClientAddress().getAddress().getHostAddress());
-            request.remotePort(simple.getClientAddress().getPort());
-            request.remoteHost(simple.getClientAddress().getHostName());
-            request.timestamp(simple.getRequestTime());
-            request.protocol(String.format("HTTP/%s.%s", simple.getMajor(), simple.getMinor()));
-            request.secure(simple.isSecure());
-            request.input(simple.getInputStream());
-            request.method(simple.getMethod());
-            buildHeaders(simple, request);
-            buildCookies(simple, request);
-            buildParameters(simple, request);
+        private void build(Request request, org.simpleframework.http.Request httpRequest) throws IOException {
+            request.uri(httpRequest.getTarget());
+            request.path(httpRequest.getPath().getPath());
+            request.remoteIp(httpRequest.getClientAddress().getAddress().getHostAddress());
+            request.remotePort(httpRequest.getClientAddress().getPort());
+            request.remoteHost(httpRequest.getClientAddress().getHostName());
+            request.timestamp(httpRequest.getRequestTime());
+            request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
+            request.secure(httpRequest.isSecure());
+            request.input(httpRequest.getInputStream());
+            request.method(httpRequest.getMethod());
+            setHeaders(request, httpRequest);
+            setCookies(request, httpRequest);
+            setParameters(request, httpRequest);
         }
 
-        private void buildHeaders(org.simpleframework.http.Request simple, Request request) {
-            List<String> names = simple.getNames();
+        private void setHeaders(Request request, org.simpleframework.http.Request httpRequest) {
+            List<String> names = httpRequest.getNames();
             for (String header : names) {
-                List<String> values = simple.getValues(header);
+                List<String> values = httpRequest.getValues(header);
                 for (String value : values) {
                     request.addHeader(header, value);
                 }
             }
         }
 
-        private void buildCookies(org.simpleframework.http.Request simpleRequest, Request request) {
-            for (org.simpleframework.http.Cookie cookie : simpleRequest.getCookies()) {
+        private void setCookies(Request request, org.simpleframework.http.Request httpRequest) {
+            for (org.simpleframework.http.Cookie cookie : httpRequest.getCookies()) {
                 request.cookie(cookie.getName(), cookie.getValue());
             }
         }
 
-        private void buildParameters(org.simpleframework.http.Request simple, Request request) {
-            for (String name : simple.getQuery().keySet()) {
-                List<String> values = simple.getQuery().getAll(name);
+        private void setParameters(Request request, org.simpleframework.http.Request httpRequest) {
+            for (String name : httpRequest.getQuery().keySet()) {
+                List<String> values = httpRequest.getQuery().getAll(name);
                 for (String value : values) {
                     request.addParameter(name, value);
                 }
             }
         }
 
-        private void commit(org.simpleframework.http.Response simple, Response response) throws IOException {
-            simple.setCode(response.statusCode());
-            simple.setDescription(response.statusText());
-            commitHeaders(simple, response);
-            commitCookies(simple, response);
+        private void commit(org.simpleframework.http.Response httpResponse, Response response) throws IOException {
+            httpResponse.setCode(response.statusCode());
+            httpResponse.setDescription(response.statusText());
+            commitHeaders(httpResponse, response);
+            commitCookies(httpResponse, response);
             Body body = response.body();
-            body.writeTo(simple.getOutputStream(), response.charset());
+            body.writeTo(httpResponse.getOutputStream(), response.charset());
             body.close();
         }
 
-        private void commitHeaders(org.simpleframework.http.Response simple, Response response) {
+        private void commitHeaders(org.simpleframework.http.Response httpResponse, Response response) {
             for (String name : response.names()) {
-                simple.setValue(name, response.get(name));
+                httpResponse.setValue(name, response.get(name));
             }
         }
 
-        private void commitCookies(org.simpleframework.http.Response simple, Response response) {
+        private void commitCookies(org.simpleframework.http.Response httpResponse, Response response) {
             for (Cookie cookie : response.cookies()) {
-                org.simpleframework.http.Cookie httpCookie = simple.setCookie(cookie.name(), cookie.value());
+                org.simpleframework.http.Cookie httpCookie = httpResponse.setCookie(cookie.name(), cookie.value());
                 httpCookie.setExpiry(cookie.maxAge());
                 httpCookie.setDomain(cookie.domain());
                 httpCookie.setPath(cookie.path());
