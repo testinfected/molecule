@@ -96,6 +96,13 @@ public class ResponseTest {
         assertThat("charset", response.charset(), equalTo(Charsets.UTF_8));
     }
 
+    @Test
+    public void silentlyIgnoresCharsetWhenContentTypeNotSet() {
+        response.charset("utf-8");
+        response.contentType("text/html; charset=iso-8859-1");
+        assertThat("charset", response.contentType(), equalTo("text/html; charset=iso-8859-1"));
+    }
+
     private Matcher<Cookie> cookieNamed(String name) {
         return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
             protected String featureValueOf(Cookie cookie) {

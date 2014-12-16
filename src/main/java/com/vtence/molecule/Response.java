@@ -157,6 +157,7 @@ public class Response {
 
     public Response charset(String charsetName) {
         ContentType contentType = ContentType.of(this);
+        if (contentType == null) return this;
         contentType(new ContentType(contentType.type(), contentType.subType(), charsetName).format());
         return this;
     }
