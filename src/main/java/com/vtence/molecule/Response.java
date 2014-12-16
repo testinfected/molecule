@@ -1,5 +1,6 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.http.ContentLanguage;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.http.HttpDate.httpDate;
@@ -93,6 +96,10 @@ public class Response {
         return set(name, httpDate(date));
     }
 
+    public Response set(String name, Object value) {
+        return set(name, String.valueOf(value));
+    }
+
     public Response remove(String name) {
         headers.remove(name);
         return this;
@@ -168,6 +175,30 @@ public class Response {
             return Charsets.ISO_8859_1;
         }
         return contentType.charset();
+    }
+
+    public Response addLocale(Locale locale) {
+        set(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
+        return this;
+    }
+
+    public Response locale(Locale locale) {
+        set(CONTENT_LANGUAGE, new ContentLanguage().add(locale));
+        return this;
+    }
+
+    public Locale locale() {
+        List<Locale> locales = locales();
+        return locales.isEmpty() ? null : locales.get(0);
+    }
+
+    public List<Locale> locales() {
+        return ContentLanguage.of(this).locales();
+    }
+
+    public Response removeLocale(Locale locale) {
+        set(CONTENT_LANGUAGE, ContentLanguage.of(this).remove(locale));
+        return this;
     }
 
     public Response body(String text) {

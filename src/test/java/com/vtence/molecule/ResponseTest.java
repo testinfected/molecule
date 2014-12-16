@@ -8,6 +8,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
+import static java.util.Locale.*;
+import static java.util.Locale.ENGLISH;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -101,6 +105,36 @@ public class ResponseTest {
         response.charset("utf-8");
         response.contentType("text/html; charset=iso-8859-1");
         assertThat("charset", response.contentType(), equalTo("text/html; charset=iso-8859-1"));
+    }
+
+    @Test
+    public void hasNoLocaleByDefault() {
+        assertThat("default locale", response.locale(), nullValue());
+    }
+
+    @Test
+    public void maintainsAnOrderedListOfLocales() {
+        response.addLocale(CANADA_FRENCH);
+        response.addLocale(US);
+        response.addLocale(FRENCH);
+        assertThat("locales", response.locales(), contains(CANADA_FRENCH, US, FRENCH));
+        assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("fr-ca, en-us, fr"));
+    }
+
+    @Test
+    public void setsContentLanguageToSpecifiedLocale() {
+        response.locale(FRENCH);
+        assertThat("locale", response.locale(), equalTo(FRENCH));
+        assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("fr"));
+    }
+
+    @Test
+    public void removesLocalesOnDemand() {
+        response.addLocale(CANADA_FRENCH);
+        response.addLocale(ENGLISH);
+        response.removeLocale(CANADA_FRENCH);
+        assertThat("new preferred locale", response.locale(), equalTo(ENGLISH));
+        assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("en"));
     }
 
     private Matcher<Cookie> cookieNamed(String name) {

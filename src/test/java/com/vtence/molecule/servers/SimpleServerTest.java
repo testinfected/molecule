@@ -9,28 +9,29 @@ import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.FailureReporter;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class SimpleServerTest {
@@ -243,35 +244,6 @@ public class SimpleServerTest {
         response.assertHasCookie(containsString("path=/uri"));
         response.assertHasCookie(containsString("domain=localhost"));
         response.assertHasCookie(containsString("secure"));
-    }
-
-    @Test public void
-    supportsRequestAttributes() throws IOException {
-        final Map<Object, Object> attributes = new HashMap<Object, Object>();
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                request.attribute("name", "Velociraptor");
-                request.attribute("family", "Dromaeosauridae");
-                request.attribute("clade", "Dinosauria");
-                request.removeAttribute("family");
-                attributes.putAll(request.attributes());
-            }
-        });
-
-        request.send();
-        assertNoError();
-
-        assertThat("attributes", attributes, allOf(containsEntry("name", "Velociraptor"),
-                                                   not(containsKey("family")),
-                                                   containsEntry("clade", "Dinosauria")));
-    }
-
-    private Matcher<Map<?, ?>> containsKey(Object key) {
-        return Matchers.hasKey(equalTo(key));
-    }
-
-    private Matcher<Map<?, ?>> containsEntry(Object key, Object value) {
-        return Matchers.hasEntry(equalTo(key), equalTo(value));
     }
 
     private void assertNoError() {

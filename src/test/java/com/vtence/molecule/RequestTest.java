@@ -3,10 +3,15 @@ package com.vtence.molecule;
 import com.vtence.molecule.http.Cookie;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Map;
 
+import static java.util.Locale.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -93,11 +98,59 @@ public class RequestTest {
         assertThat("cookies", request.cookies(), contains(cookieNamed("petit ecolier")));
     }
 
+    @Test
+    public void hasNoPreferredLocaleInAbsenceOfAcceptLanguageHeader() {
+        assertThat("no preference", request.locales(), empty());
+        assertThat("no preferred language", request.locale(), nullValue());
+    }
+
+    @Test
+    public void readsPreferredLocaleFromHeaders() {
+        request.header("Accept-Language", "fr, en");
+        assertThat("preferred locale", request.locale(), equalTo(FRENCH));
+    }
+
+    @Test
+    public void readsAllPossibleLocalesInPreferenceOrder() {
+        request.header("Accept-Language", "en; q=0.8, fr-ca, fr; q=0.7");
+        assertThat("locales", request.locales(), contains(CANADA_FRENCH, ENGLISH, FRENCH));
+    }
+
+    @Test
+    public void maintainsAMapOfAttributes() throws IOException {
+        request.attribute("name", "Velociraptor");
+        request.attribute("family", "Dromaeosauridae");
+        request.attribute("clade", "Dinosauria");
+
+        assertThat("attributes", request.attributes(), allOf(containsEntry("name", "Velociraptor"),
+                containsEntry("family", "Dromaeosauridae"),
+                containsEntry("clade", "Dinosauria")));
+        assertThat("attribute names", request.attributeNames(), containsKeys("name", "family", "clade"));
+    }
+
+    @Test
+    public void removesAttributeOnDemand() throws IOException {
+        request.attribute("name", "Velociraptor");
+        request.attribute("family", "Dromaeosauridae");
+        request.attribute("clade", "Dinosauria");
+        request.removeAttribute("family");
+
+        assertThat("attribute names", request.attributeNames(), containsKeys("name", "clade"));
+    }
+
     private Matcher<Cookie> cookieNamed(String name) {
         return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
             protected String featureValueOf(Cookie cookie) {
                 return cookie.name();
             }
         };
+    }
+
+    private Matcher<Iterable<?>> containsKeys(Object... keys) {
+        return Matchers.containsInAnyOrder(keys);
+    }
+
+    private Matcher<Map<?, ?>> containsEntry(Object key, Object value) {
+        return Matchers.hasEntry(equalTo(key), equalTo(value));
     }
 }

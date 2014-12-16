@@ -10,7 +10,7 @@ import java.util.List;
 import static com.vtence.molecule.http.HeaderNames.ACCEPT_ENCODING;
 
 public class AcceptEncoding {
-    private final Header header;
+    private final List<Header.Value> values;
 
     public static AcceptEncoding of(Request request) {
         String header = request.header(ACCEPT_ENCODING);
@@ -22,7 +22,7 @@ public class AcceptEncoding {
     }
 
     public AcceptEncoding(Header header) {
-        this.header = header;
+        this.values = header.all();
     }
 
     public String selectBestEncoding(String... candidates) {
@@ -41,10 +41,10 @@ public class AcceptEncoding {
     private List<Header.Value> explicitContentCodings(Collection<String> availableEncodings) {
         List<Header.Value> codings = new ArrayList<Header.Value>();
 
-        for (Header.Value accept: header.all()) {
+        for (Header.Value accept: values) {
             if (accept.is("*")) {
                 List<String> others = new ArrayList<String>(availableEncodings);
-                others.removeAll(listValues(header.all()));
+                others.removeAll(listValues(values));
                 for (String other : others) {
                     codings.add(new Header.Value(other, accept.parameters()));
                 }

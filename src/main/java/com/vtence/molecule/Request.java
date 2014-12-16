@@ -1,5 +1,6 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.http.AcceptLanguage;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpMethod;
@@ -15,9 +16,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -274,11 +277,24 @@ public class Request {
         return this;
     }
 
+    public Set<Object> attributeNames() {
+        return new HashSet<Object>(attributes.keySet());
+    }
+
     public Object removeAttribute(Object key) {
         return attributes.remove(key);
     }
 
     public Map<Object, Object> attributes() {
         return Collections.unmodifiableMap(attributes);
+    }
+
+    public Locale locale() {
+        List<Locale> locales = locales();
+        return locales.isEmpty() ? null : locales.get(0);
+    }
+
+    public List<Locale> locales() {
+        return AcceptLanguage.of(this).locales();
     }
 }
