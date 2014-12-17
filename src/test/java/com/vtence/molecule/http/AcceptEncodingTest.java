@@ -1,7 +1,6 @@
 package com.vtence.molecule.http;
 
-import com.vtence.molecule.support.MockRequest;
-import org.hamcrest.Matcher;
+import com.vtence.molecule.Request;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -15,57 +14,52 @@ public class AcceptEncodingTest {
 
     @Test public void
     selectsNoEncodingWhenThereAreNoCandidates() {
-        assertSelected("gzip", in(), nullValue());
+        assertThat("selected", select("gzip", fromCandidates()), nullValue());
     }
 
     @Test public void
     selectsAcceptableEncodingWithHighestQuality() {
-        assertSelected("compress; q=0.5, gzip", in("compress", "gzip"), equalTo("gzip"));
-        assertSelected("gzip, deflate", in("deflate", "gzip"), equalTo("gzip"));
+        assertThat("highest quality", select("compress; q=0.5, gzip", fromCandidates("compress", "gzip")), equalTo("gzip"));
+        assertThat("first", select("gzip, deflate", fromCandidates("deflate", "gzip")), equalTo("gzip"));
     }
 
     @Test public void
     selectsNoEncodingWhenCandidatesAreNotAcceptable() {
-        assertSelected("compress, deflate; q=0", in("gzip", "deflate"), nullValue());
+        assertThat("selected", select("compress, deflate; q=0", fromCandidates("gzip", "deflate")), nullValue());
     }
 
     @Test public void
     considersIdentityEncodingAcceptableByDefault() {
-        assertSelected("", in("gzip", "identity"), equalTo("identity"));
-        assertSelected("deflate, gzip", in("identity"), equalTo("identity"));
-        assertSelected("deflate; q=0, gzip; q=0", in("gzip", "deflate", "identity"),
-                equalTo("identity"));
-        assertSelected("*; q=0, identity; q=0.1", in("gzip", "deflate", "identity"),
-                equalTo("identity"));
+        assertThat("no preference", select("", fromCandidates("gzip", "identity")), equalTo("identity"));
+        assertThat("none specified supported", select("deflate, gzip", fromCandidates("identity")), equalTo("identity"));
+        assertThat("candidates rejected", select("deflate; q=0, gzip; q=0", fromCandidates("gzip", "deflate", "identity")), equalTo("identity"));
+        assertThat("all but identity rejected", select("*; q=0, identity; q=0.1", fromCandidates("gzip", "deflate", "identity")), equalTo("identity"));
     }
 
     @Test public void
     considersIdentityEncodingNoLongerAcceptableWhenExplicitlyOrImplicitlyRefused() {
-        assertSelected("identity; q=0", in("identity"), nullValue());
-        assertSelected("*; q=0", in("identity"), nullValue());
+        assertThat("explicitly refused", select("identity; q=0", fromCandidates("identity")), nullValue());
+        assertThat("implicitly refused", select("*; q=0", fromCandidates("identity")), nullValue());
     }
 
     @Test public void
     selectsFirstOfHighestQualityEncodingsWhenAnyIsAcceptable() {
-        assertSelected("*", in("gzip", "deflate", "identity"), equalTo("gzip"));
-        assertSelected("gzip; q=0.9, *", in("gzip", "deflate", "compress"), equalTo("deflate"));
+        assertThat("all accepted", select("*", fromCandidates("gzip", "deflate", "identity")), equalTo("gzip"));
+        assertThat("all but gzip preferred", select("gzip; q=0.9, *", fromCandidates("gzip", "deflate", "compress")), equalTo("deflate"));
     }
 
     @Test public void
     handlesAbsenceOfAcceptEncodingHeader() {
-        AcceptEncoding accept = AcceptEncoding.of(new MockRequest());
-        assertThat("selected encoding", accept.selectBestEncoding("gzip", "identity"),
-                equalTo("identity"));
+        AcceptEncoding accept = AcceptEncoding.of(new Request());
+        assertThat("encoding of missing header", accept.selectBestEncoding("gzip", "identity"), equalTo("identity"));
     }
 
-    private void assertSelected(String header,
-                                List<String> candidates,
-                                Matcher<? super String> matcher) {
+    private String select(String header, List<String> candidates) {
         AcceptEncoding acceptEncoding = new AcceptEncoding(header);
-        assertThat("selected encoding", acceptEncoding.selectBestEncoding(candidates), matcher);
+        return acceptEncoding.selectBestEncoding(candidates);
     }
 
-    public static List<String> in(String... candidates) {
+    public static List<String> fromCandidates(String... candidates) {
         return Arrays.asList(candidates);
     }
 }
