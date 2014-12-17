@@ -14,15 +14,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,6 +51,23 @@ public class SimpleServerTest {
     @After public void
     stopServer() throws Exception {
         server.shutdown();
+    }
+
+    @Test public void
+    knowsItsHostName() throws IOException {
+        assertThat("hostname", server.host(), equalTo("localhost"));
+    }
+
+    @Test public void
+    notifiesReportersOfFailures() throws IOException {
+        server.run(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                throw new RuntimeException("Crash!");
+            }
+        });
+        request.send();
+        assertThat("error", error, notNullValue());
+        assertThat("error message", error.getMessage(), equalTo("Crash!"));
     }
 
     @Test public void
@@ -116,7 +130,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    supportsArrayParameters() throws IOException {
+    supportsRequestArrayParameters() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body(request.parameters("names").toString());
@@ -161,12 +175,12 @@ public class SimpleServerTest {
 
     @SuppressWarnings("unchecked")
     @Test public void
-    supportsRequestHeaders() throws IOException {
+    readsRequestHeaders() throws IOException {
         final Map<String, Iterable<String>> headers = new HashMap<String, Iterable<String>>();
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 headers.put("names", request.headerNames());
-                headers.put("accept", Arrays.asList(request.header("Accept")));
+                headers.put("accept", asList(request.header("Accept")));
                 headers.put("encoding", request.headers("Accept-Encoding"));
             }
         });

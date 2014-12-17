@@ -20,17 +20,19 @@ public class ResponseTest {
     Response response = new Response();
 
     @Test
-    public void maintainsAListOfHeaders() throws IOException {
-        response.add("Accept", "text/html");
-        response.add("Accept", "application/json");
+    public void maintainsAnOrderedListOfHeaderNames() throws IOException {
         response.set("Accept-Encoding", "gzip");
         response.set("Accept-Language", "en");
+        response.add("Accept", "text/html");
+        response.add("Accept", "application/json");
 
-        assertThat("headers", response.all(), allOf(
-                hasEntry("Accept", "text/html, application/json"),
-                hasEntry("Accept-Encoding", "gzip"),
-                hasEntry("Accept-Language", "en")));
-        assertThat("header names", response.names(), contains("Accept", "Accept-Encoding", "Accept-Language"));
+        assertThat("header names", response.names(), contains("Accept-Encoding", "Accept-Language", "Accept"));
+    }
+
+    @Test
+    public void retrievesHeadersByName() throws IOException {
+        response.add("Accept", "text/html; q=0.9, application/json");
+        assertThat("header", response.get("Accept"), equalTo("text/html; q=0.9, application/json"));
     }
 
     @Test

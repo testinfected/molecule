@@ -23,4 +23,9 @@ public class AllOfTest {
 
         assertThat("matches", allOf.matches("good"), is(true));
     }
+
+    @Test public void
+    suppressCoverageNoise() {
+        new Matchers();
+    }
 }

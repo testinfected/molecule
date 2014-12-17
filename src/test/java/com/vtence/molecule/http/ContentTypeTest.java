@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.nullValue;
 
 public class ContentTypeTest {
@@ -39,14 +40,14 @@ public class ContentTypeTest {
     @Test public void
     hasAStringRepresentation() {
         ContentType contentType = ContentType.parse("text/html; charset=utf-8");
-        assertThat("header", contentType.format(), equalTo("text/html; charset=utf-8"));
+        assertThat("header", contentType, hasToString("text/html; charset=utf-8"));
     }
 
     @Test public void
     handlesAbsenceOfACharset() {
         ContentType contentType = ContentType.parse("text/html");
         assertThat("charset", contentType.charset(), nullValue());
-        assertThat("header", contentType.format(), equalTo("text/html"));
+        assertThat("header", contentType, hasToString("text/html"));
     }
 
     @Test public void

@@ -18,7 +18,8 @@ public class PeriodicSessionHouseKeeping {
         this(scheduler, sessions, EVERY_HOUR, TimeUnit.SECONDS);
     }
 
-    public PeriodicSessionHouseKeeping(ScheduledExecutorService scheduler, SessionHouse sessions, long choresInterval, TimeUnit timeUnit) {
+    public PeriodicSessionHouseKeeping(ScheduledExecutorService scheduler, SessionHouse sessions,
+                                       long choresInterval, TimeUnit timeUnit) {
         this.scheduler = scheduler;
         this.sessions = sessions;
         this.choresInterval = TimeUnit.MILLISECONDS.convert(choresInterval, timeUnit);

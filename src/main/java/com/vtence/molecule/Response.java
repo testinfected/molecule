@@ -69,6 +69,10 @@ public class Response {
         return headers.has(name);
     }
 
+    public Set<String> names() {
+        return headers.names();
+    }
+
     public String get(String name) {
         return headers.get(name);
     }
@@ -88,10 +92,6 @@ public class Response {
         return this;
     }
 
-    public Response set(String name, long value) {
-        return set(name, String.valueOf(value));
-    }
-
     public Response set(String name, Date date) {
         return set(name, httpDate(date));
     }
@@ -103,14 +103,6 @@ public class Response {
     public Response remove(String name) {
         headers.remove(name);
         return this;
-    }
-
-    public Set<String> names() {
-        return headers.names();
-    }
-
-    public Map<String, String> all() {
-        return headers.all();
     }
 
     public String contentType() {
@@ -165,7 +157,7 @@ public class Response {
     public Response charset(String charsetName) {
         ContentType contentType = ContentType.of(this);
         if (contentType == null) return this;
-        contentType(new ContentType(contentType.type(), contentType.subType(), charsetName).format());
+        contentType(new ContentType(contentType.type(), contentType.subType(), charsetName).toString());
         return this;
     }
 

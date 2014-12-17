@@ -31,4 +31,9 @@ public class HttpDateTest {
     formatsDatesAccordingToRfc1123() {
         assertThat("http date", HttpDate.httpDate(date), equalTo("Thu, 06 Mar 2014 08:49:37 GMT"));
     }
+
+    @Test public void
+    suppressCoverageNoise() {
+        new HttpDate();
+    }
 }

@@ -32,4 +32,9 @@ public class HexTest {
     convertsBytesToHexRepresentation() {
         assertThat("hex representation", Hex.from(bytes), equalTo(hex));
     }
+
+    @Test public void
+    suppressCoverageNoise() {
+        new Hex();
+    }
 }

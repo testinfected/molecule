@@ -55,7 +55,7 @@ public class RequestTest {
     }
 
     @Test
-    public void maintainsAListOfHeaders() throws IOException {
+    public void maintainsAnOrderedListOfHeaders() throws IOException {
         request.addHeader("Accept", "text/html");
         request.addHeader("Accept", "application/json");
         request.header("Accept-Encoding", "gzip");
@@ -66,6 +66,26 @@ public class RequestTest {
                 hasEntry("Accept-Encoding", "gzip"),
                 hasEntry("Accept-Language", "en")));
         assertThat("header names", request.headerNames(), contains("Accept", "Accept-Encoding", "Accept-Language"));
+    }
+
+    @Test
+    public void retrievesHeadersByName() throws IOException {
+        request.header("Accept", "text/html; q=0.9, application/json");
+        assertThat("header", request.header("Accept"), equalTo("text/html; q=0.9, application/json"));
+    }
+
+    @Test
+    public void retrievesListOfHeadersWithSameName() throws IOException {
+        request.addHeader("Accept-Language", "en").
+                addHeader("Accept-Language", "fr");
+        assertThat("header", request.headers("Accept-Language"), contains("en", "fr"));
+    }
+
+    @Test
+    public void joinsHeadersWithSameName() throws IOException {
+        request.addHeader("Accept", "text/html; q=0.9").
+                addHeader("Accept", "application/json");
+        assertThat("header", request.header("Accept"), equalTo("text/html; q=0.9, application/json"));
     }
 
     @Test

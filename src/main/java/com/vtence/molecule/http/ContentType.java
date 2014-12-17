@@ -72,11 +72,7 @@ public class ContentType {
         return charset;
     }
 
-    public String format() {
-        return mediaType() + (charset != null ? "; charset=" + charset : "");
-    }
-
     public String toString() {
-        return format();
+        return mediaType() + (charset != null ? "; charset=" + charset : "");
     }
 }

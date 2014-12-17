@@ -39,4 +39,9 @@ public class ContentLanguageTest {
         ContentLanguage contentLanguage = ContentLanguage.parse("fr-ca, en");
         assertThat("header", contentLanguage.toString(), equalTo("fr-ca, en"));
     }
+
+    @Test public void
+    suppressCoverageNoise() {
+        new LanguageTag();
+    }
 }
