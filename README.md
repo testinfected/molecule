@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/testinfected/molecule.svg?branch=master)](https://travis-ci.org/testinfected/molecule)
-[![Coverage Status](https://coveralls.io/repos/testinfected/molecule/badge.svg)](https://coveralls.io/r/testinfected/molecule)
+[![Coverage Status](https://img.shields.io/coveralls/testinfected/molecule.svg?style=flat)](https://coveralls.io/r/testinfected/molecule)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule)
 [![Issues In Progress](https://badge.waffle.io/testinfected/molecule.png?label=In%20Progress&title=Started)](https://waffle.io/testinfected/molecule)
 
