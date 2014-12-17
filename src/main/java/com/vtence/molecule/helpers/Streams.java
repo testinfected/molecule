@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 
 public final class Streams {
 
-    private Streams() {}
+    Streams() {}
 
     public static String toString(InputStream in) throws IOException {
         return toString(in, Charset.defaultCharset());

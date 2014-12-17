@@ -14,5 +14,5 @@ public final class Hex {
         return new String(hex);
     }
 
-    private Hex() {}
+    Hex() {}
 }

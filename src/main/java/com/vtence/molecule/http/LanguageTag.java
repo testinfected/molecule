@@ -16,4 +16,6 @@ public class LanguageTag {
         String country = locale.getCountry();
         return language.toLowerCase() + (country.equals("") ? "" : "-" + country.toLowerCase());
     }
+
+    LanguageTag() {}
 }

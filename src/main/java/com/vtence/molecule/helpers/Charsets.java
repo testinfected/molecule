@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
  */
 public final class Charsets {
 
-    private Charsets() {}
+    Charsets() {}
 
     /**
      * US-ASCII: seven-bit ASCII, the Basic Latin block of the Unicode character set (ISO646-US).

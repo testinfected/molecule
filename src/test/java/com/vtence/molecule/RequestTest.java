@@ -1,5 +1,6 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.http.Cookie;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Map;
 
+import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static java.util.Locale.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -136,6 +138,17 @@ public class RequestTest {
         request.removeAttribute("family");
 
         assertThat("attribute names", request.attributeNames(), containsKeys("name", "clade"));
+    }
+
+    @Test
+    public void usesISO8859AsDefaultCharset() {
+        assertThat("default charset", request.charset(), equalTo(Charsets.ISO_8859_1));
+    }
+
+    @Test
+    public void readsCharsetFromContentType() {
+        request.header(CONTENT_TYPE, "text/html; charset=utf-8");
+        assertThat("charset", request.charset(), equalTo(Charsets.UTF_8));
     }
 
     private Matcher<Cookie> cookieNamed(String name) {

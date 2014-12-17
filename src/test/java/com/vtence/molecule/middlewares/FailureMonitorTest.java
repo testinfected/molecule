@@ -42,6 +42,15 @@ public class FailureMonitorTest {
         }
     }
 
+    @Test public void
+    doesNothingWhenEverythingGoesFine() throws Exception {
+        context.checking(new Expectations() {{
+            never(failureReporter);
+        }});
+
+        monitor.handle(request, response);
+    }
+
     private Application crashWith(final Exception error) {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {

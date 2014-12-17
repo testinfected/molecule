@@ -16,8 +16,7 @@ public class DynamicRoute implements Route {
     private final Matcher<? super HttpMethod> method;
     private final Application app;
 
-    public DynamicRoute(Matcher<? super String> path, Matcher<? super HttpMethod> method,
-                        Application app) {
+    public DynamicRoute(Matcher<? super String> path, Matcher<? super HttpMethod> method, Application app) {
         this.path = path;
         this.method = method;
         this.app = app;

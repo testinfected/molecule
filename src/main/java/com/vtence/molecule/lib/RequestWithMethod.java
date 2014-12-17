@@ -16,7 +16,7 @@ public class RequestWithMethod implements Matcher<Request> {
     }
 
     public static RequestWithMethod withMethod(String name) {
-        return withMethod(HttpMethod.valueOf(name));
+        return withMethod(HttpMethod.valueOf(name.toUpperCase()));
     }
 
     public static RequestWithMethod withMethod(HttpMethod method) {

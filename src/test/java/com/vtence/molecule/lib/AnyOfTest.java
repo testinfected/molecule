@@ -10,7 +10,7 @@ public class AnyOfTest {
 
     @SuppressWarnings("unchecked") @Test public void
     evaluatesToLogicalDisjunctionOfMultipleMatchers() {
-        Matcher<String> anyOf = AnyOf.anyOf(equalTo("one"), equalTo("two"), equalTo("three"));
+        Matcher<String> anyOf = Matchers.anyOf(equalTo("one"), equalTo("two"), equalTo("three"));
 
         assertThat("1st matches", anyOf.matches("one"), is(true));
         assertThat("2nd matches", anyOf.matches("two"), is(true));
@@ -20,7 +20,7 @@ public class AnyOfTest {
 
     @SuppressWarnings("unchecked") @Test public void
     matchesDescendantType() {
-        Matcher<String> anyOf = AnyOf.anyOf(new Anything<Object>());
+        Matcher<String> anyOf = Matchers.anyOf(new Anything<Object>());
 
         assertThat("matches", anyOf.matches("good"), is(true));
     }

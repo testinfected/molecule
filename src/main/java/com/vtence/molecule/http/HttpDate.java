@@ -51,5 +51,5 @@ public final class HttpDate {
         return httpDate.format(date);
     }
 
-    private HttpDate() {}
+    HttpDate() {}
 }

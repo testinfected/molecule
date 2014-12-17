@@ -52,5 +52,5 @@ public final class Matchers {
         return AnyOf.anyOf(matchers);
     }
 
-    private Matchers() {}
+    Matchers() {}
 }
