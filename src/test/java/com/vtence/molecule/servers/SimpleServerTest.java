@@ -1,14 +1,14 @@
 package com.vtence.molecule.servers;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.http.Cookie;
-import com.vtence.molecule.http.HttpStatus;
+import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.HttpRequest;
 import com.vtence.molecule.support.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.FailureReporter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static java.lang.String.valueOf;
-import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -180,19 +179,18 @@ public class SimpleServerTest {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 headers.put("names", request.headerNames());
-                headers.put("accept", asList(request.header("Accept")));
                 headers.put("encoding", request.headers("Accept-Encoding"));
             }
         });
 
         request.withHeader("Accept", "text/html").
+                // with our http client, we cannot set multiple headers with the same name
                 withHeader("Accept-Encoding", "gzip, identity; q=0.5, deflate;q=1.0, *;q=0").
                 send();
         assertNoError();
 
         assertThat("header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
-        assertThat("accept", headers.get("accept"), contains("text/html"));
-        assertThat("accept-encoding", headers.get("encoding"), contains("gzip", "deflate", "identity"));
+        assertThat("accept-encoding", headers.get("encoding"), contains("gzip, identity; q=0.5, deflate;q=1.0, *;q=0"));
     }
 
     @SuppressWarnings("unchecked")
