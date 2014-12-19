@@ -85,7 +85,7 @@ public class SimpleServer implements Server {
             request.timestamp(httpRequest.getRequestTime());
             request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
             request.secure(httpRequest.isSecure());
-            request.input(httpRequest.getInputStream());
+            request.body(httpRequest.getInputStream());
             request.method(httpRequest.getMethod());
             setHeaders(request, httpRequest);
             setCookies(request, httpRequest);

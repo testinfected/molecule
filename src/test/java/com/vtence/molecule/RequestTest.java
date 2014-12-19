@@ -50,21 +50,17 @@ public class RequestTest {
 
     @Test
     public void containsABody() throws IOException {
-        request.input("body");
+        request.body("body");
         assertThat("input", request.body(), equalTo("body"));
     }
 
     @Test
-    public void maintainsAnOrderedListOfHeaders() throws IOException {
+    public void maintainsAnOrderedListOfHeaderNames() throws IOException {
         request.addHeader("Accept", "text/html");
         request.addHeader("Accept", "application/json");
         request.header("Accept-Encoding", "gzip");
         request.header("Accept-Language", "en");
 
-        assertThat("headers", request.allHeaders(), allOf(
-                hasEntry("Accept", "text/html, application/json"),
-                hasEntry("Accept-Encoding", "gzip"),
-                hasEntry("Accept-Language", "en")));
         assertThat("header names", request.headerNames(), contains("Accept", "Accept-Encoding", "Accept-Language"));
     }
 
@@ -106,7 +102,8 @@ public class RequestTest {
         request.cookie("petit ecolier", "chocolat noir");
         request.cookie("delicious", "chocolat au lait");
 
-        assertThat("cookies", request.cookies(), contains(cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
+        assertThat("cookies", request.cookies(), contains(
+                cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
     }
 
     @Test
