@@ -6,7 +6,6 @@ import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.AcceptLanguage;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.Cookie;
-import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpMethod;
 
 import java.io.ByteArrayInputStream;
@@ -523,14 +522,16 @@ public class Request {
     }
 
     /**
-     * Gets the value of a parameter of this request, or null if the parameter does not exist.
+     * Gets the value of a specific parameter of this request, or null if the parameter does not exist.
      *
      * If the parameter has more than one value, the first one is returned.
      *
      * <p>Request parameters are contained in the query string or posted form data.</p>
      *
+     * <p>
      * Note that changing the body of the request will not cause the parameters to change. To change the request
      * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
+     * </p>
      *
      * @param name the name of the parameter
      * @return the parameter value or null
@@ -540,18 +541,70 @@ public class Request {
         return values.isEmpty() ?  null : values.get(values.size() - 1);
     }
 
+    /**
+     * Gets the list of values of a specific parameter of this request. If the parameter does not exist, the list will
+     * be empty. The returned list is safe for modification and will not affect the request.
+     *
+     * <p>Request parameters are contained in the query string or posted form data.</p>
+     *
+     * <p>
+     * Note that changing the body of the request will not cause the parameters to change. To change the request
+     * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
+     * </p>
+     *
+     * @param name the name of the parameter
+     * @return the list of that parameter's values
+     */
     public List<String> parameters(String name) {
         return parameters.containsKey(name) ? new ArrayList<String>(parameters.get(name)) : new ArrayList<String>();
     }
 
+    /**
+     * Returns the names of all the parameters contained in this request.
+     * If the request has no parameter, the method returns an empty Set. The returned
+     * Set is safe for modification and will not affect the request.
+     *
+     * <p>
+     * Parameters are taken from the query or HTTP form posting.
+     * </p>
+     *
+     * <p>
+     * Note that changing the body of the request will not cause the parameters to change. To change the request
+     * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
+     * </p>
+     *
+     * @return the set of parameter names
+     */
     public Set<String> parameterNames() {
         return new LinkedHashSet<String>(parameters.keySet());
     }
 
+    /**
+     * Returns a Map of all the parameters contained in this request. If the request has no parameters,
+     * the map will be empty. The Map is not modifiable.
+     *
+     * <p>
+     * Parameters are taken from the query or HTTP form posting.
+     * </p>
+     *
+     * <p>
+     * Note that changing the body of the request will not cause the parameters to change. To change the request
+     * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
+     * </p>
+     *
+     * @return a map containing all the request parameters
+     */
     public Map<String, List<String>> allParameters() {
         return Collections.unmodifiableMap(parameters);
     }
 
+    /**
+     * Adds a parameter value to this request. If a parameter with the same name already exists,
+     * the new value is appended to this list of values for that parameter.
+     *
+     * @param name the parameter name
+     * @param value the parameter value
+     */
     public Request addParameter(String name, String value) {
         if (!parameters.containsKey(name)) {
             parameters.put(name, new ArrayList<String>());
@@ -560,6 +613,11 @@ public class Request {
         return this;
     }
 
+    /**
+     * Removes a parameter from this request. This removes all values for that parameter from the request.
+     *
+     * @param name the parameter name
+     */
     public Request removeParameter(String name) {
         parameters.remove(name);
         return this;
