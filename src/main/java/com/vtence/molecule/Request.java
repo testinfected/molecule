@@ -690,11 +690,24 @@ public class Request {
         return Collections.unmodifiableMap(attributes);
     }
 
+
+    /**
+     * Acquires the preferred locale from this request <code>Accept-Language</code> header.
+     * If the client accepts more than one locale, the preferred one is returned.
+     *
+     * @return the locale preferred by the client
+     */
     public Locale locale() {
         List<Locale> locales = locales();
         return locales.isEmpty() ? null : locales.get(0);
     }
 
+    /**
+     * Acquires the accepted locales from this request <code>Accept-Language</code> header. The
+     * locales are provided in preference order. If the header is not present, the list will be empty.
+     *
+     * @return all the locales accepted by the client
+     */
     public List<Locale> locales() {
         return AcceptLanguage.of(this).locales();
     }
