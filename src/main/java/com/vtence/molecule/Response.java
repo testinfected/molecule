@@ -25,6 +25,9 @@ import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
 
+/**
+ * The HTTP response to write back to the client.
+ */
 public class Response {
     private final Headers headers = new Headers();
     private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
@@ -35,26 +38,59 @@ public class Response {
 
     public Response() {}
 
+    /**
+     * Sets the HTTP status for this response. This will set both the status code and the status text.
+     *
+     * <p>
+     * The status is set to 200 OK by default.
+     * </p>
+     *
+     * @param status the HTTP status to set
+     */
     public Response status(HttpStatus status) {
         statusCode(status.code);
         statusText(status.text);
         return this;
     }
 
+    /**
+     * Sets the status code for this response. It is usually preferable to set the status and text
+     * together with Response#status(com.vtence.molecule.http.HttpStatus).
+     *
+     * @see Response#status(com.vtence.molecule.http.HttpStatus)
+     * @param code the status code to set
+     */
     public Response statusCode(int code) {
         statusCode = code;
         return this;
     }
 
+    /**
+     * Gets the status code set on this response.
+     *
+     * @return the response status code
+     */
     public int statusCode() {
         return statusCode;
     }
 
+    /**
+     * Sets the status text for this response. It is usually preferable to set the status and text
+     * together with Response#status(com.vtence.molecule.http.HttpStatus).
+     *
+     * @see Response#status(com.vtence.molecule.http.HttpStatus)
+     * @param text the status text to set
+     */
     public Response statusText(String text) {
         statusText = text;
         return this;
     }
 
+    /**
+     * Gets the status text of this response.
+     *
+     * @return the response status text
+     */
     public String statusText() {
         return statusText;
     }
