@@ -623,24 +623,69 @@ public class Request {
         return this;
     }
 
+    /**
+     * Gets the value of a keyed attribute of this request, or null if no attribute with the given key exists.
+     *
+     * <p>
+     *     This method will attempt to cast the attribute value to type T, which can result in a ClassCastException.
+     * </p>
+     *
+     * @see Request#attribute(Object, Object)
+     * @param key the key of the attribute to retrieve
+     * @return <T> the value of the attribute, or null if the attribute does not exist
+     */
     @SuppressWarnings("unchecked")
     public <T> T attribute(Object key) {
         return (T) attributes.get(key);
     }
 
+    /**
+     * Sets an attribute on this request. Attributes make available custom information about the request.
+     *
+     * <p>
+     * Attribute keys are unique. If an attribute exists under the same key, its value will be replaced by the new value.
+     * </p>
+     *
+     * @param key the key of the attribute to set
+     * @param value the attribute value
+     */
     public Request attribute(Object key, Object value) {
         attributes.put(key, value);
         return this;
     }
 
-    public Set<Object> attributeNames() {
+    /**
+     * Gets the set of all attribute keys on this request. If no attribute exist, the set will be empty.
+     *
+     * <p>
+     * Note that the set if a copy, it can be modified without changing the request.
+     * </p>
+     *
+     * @return the set of attribute keys
+     */
+    public Set<Object> attributeKeys() {
         return new HashSet<Object>(attributes.keySet());
     }
 
-    public Object removeAttribute(Object key) {
-        return attributes.remove(key);
+    /**
+     * Removes the attribute with the given key from this request. If no attribute exist, the method does nothing.
+     *
+     * @param key the key of the attribute to remove
+     */
+    public Request removeAttribute(Object key) {
+        attributes.remove(key);
+        return this;
     }
 
+    /**
+     * Gets the map of all attributes of this request. If no attribute exist, the map will be empty.
+     *
+     * <p>
+     * Note that the map is not modifiable.
+     * </p>
+     *
+     * @return the map of request attributes
+     */
     public Map<Object, Object> attributes() {
         return Collections.unmodifiableMap(attributes);
     }

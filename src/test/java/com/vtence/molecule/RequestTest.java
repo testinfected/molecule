@@ -144,7 +144,7 @@ public class RequestTest {
         assertThat("attributes", request.attributes(), allOf(containsEntry("name", "Velociraptor"),
                 containsEntry("family", "Dromaeosauridae"),
                 containsEntry("clade", "Dinosauria")));
-        assertThat("attribute names", request.attributeNames(), containsKeys("name", "family", "clade"));
+        assertThat("attribute names", request.attributeKeys(), containsKeys("name", "family", "clade"));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class RequestTest {
         request.attribute("clade", "Dinosauria");
         request.removeAttribute("family");
 
-        assertThat("attribute names", request.attributeNames(), containsKeys("name", "clade"));
+        assertThat("attribute names", request.attributeKeys(), containsKeys("name", "clade"));
     }
 
     @Test
