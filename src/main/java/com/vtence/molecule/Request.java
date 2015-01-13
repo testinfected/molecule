@@ -27,7 +27,7 @@ import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static java.lang.Long.parseLong;
 
 /**
- * Holds client request information and maintains attributes during the request lifecycle.
+ * Holds client HTTP request information and maintains attributes during the request lifecycle.
  *
  * Information includes body, headers, parameters, cookies, locale.
  */
@@ -375,7 +375,7 @@ public class Request {
      * of existing values for that header name.
      *
      * @param name the name of the header to be added
-     * @param value the value the header will have
+     * @param value the additional value for that header
      */
     public Request addHeader(String name, String value) {
         headers.add(name, value);

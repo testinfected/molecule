@@ -95,47 +95,139 @@ public class Response {
         return statusText;
     }
 
+    /**
+     * Sends a SEE OTHER (303) redirect response to the client using the specified redirect location.
+     *
+     * @param location the url of the other location
+     */
     public Response redirectTo(String location) {
         status(HttpStatus.SEE_OTHER);
         set(HeaderNames.LOCATION, location);
         return this;
     }
 
+    /**
+     * Checks if this response has a header of the specified name.
+     *
+     * @param name the header name
+     * @return true is the header was found, false otherwise
+     */
     public boolean has(String name) {
         return headers.has(name);
     }
 
+    /**
+     * Gets the names of all the header to be sent with this response.
+     * If the response has no header, the set will be empty.
+     * <p>
+     * Modifications to the returned set will not modify the response.
+     * </p>
+     * @return a (possibly empty) <code>Set</code> of header names to send
+     */
     public Set<String> names() {
         return headers.names();
     }
 
+    /**
+     * Gets the value of the specified header of this response. The name is case insensitive.
+     *
+     * <p>
+     * In case there are multiple headers with that name, a comma separated list of values is returned.
+     * </p>
+     *
+     * This method returns a null value if the response does not include any header of the specified name.
+     *
+     * @param name the name of the header to retrieve
+     * @return the header value or null
+     */
     public String get(String name) {
         return headers.get(name);
     }
 
+    /**
+     * Gets the value of the specified header as a <code>long</code>. The name is case insensitive.
+     *
+     * <p>
+     * In case there are multiple headers with that name, a comma separated list of values is returned.
+     * </p>
+     *
+     * This method returns -1 if the response does not include any header of the specified name.
+     *
+     * @param name the name of the header to retrieve
+     * @return the long header value or -1
+     */
     public long getLong(String name) {
         String value = get(name);
         return value != null ? parseLong(value) : -1;
     }
 
+    /**
+     * Adds a response header with the given name and value to this response.
+     * <p>
+     * This method allows response headers to have multiple values. The new value will be added to the list
+     * of existing values for that header name.
+     * </p>
+     *
+     * @param name the name of the header to send
+     * @param value the additional value for that header
+     */
     public Response add(String name, String value) {
         headers.add(name, value);
         return this;
     }
 
+    /**
+     * Sets a header with the given name and value to be sent with this response.
+     * If the header has already been set, the new value overwrites the previous one.
+     * <p>
+     * The {@link Response#has(String)} method can be used to test for the presence of the header before setting its value.
+     * </p>
+     *
+     * @param name the name of the header to send
+     * @param value the new value for that header
+     */
     public Response set(String name, String value) {
         headers.put(name, value);
         return this;
     }
 
-    public Response set(String name, Date date) {
-        return set(name, httpDate(date));
+    /**
+     * Sets a header with the given name and date value to be sent with this response.
+     * If the header has already been set, the new value overwrites the previous one.
+     * <p>
+     * The {@link Response#has(String)} method can be used to test for the presence of the header before setting its value.
+     * </p>
+     *
+     * @param name the name of the header to send
+     * @param value the new date value for that header
+     */
+    public Response set(String name, Date value) {
+        return set(name, httpDate(value));
     }
 
+    /**
+     * Sets a header with the given name and value to be sent with this response.
+     * If the header has already been set, the new value overwrites the previous one.
+     * <p>
+     * The {@link Response#has(String)} method can be used to test for the presence of the header before setting its value.
+     * </p>
+     *
+     * @param name the name of the header to send
+     * @param value the new value for that header
+     */
     public Response set(String name, Object value) {
         return set(name, String.valueOf(value));
     }
 
+    /**
+     * Removes the value of the specified header on this response. The name is case insensitive.
+     *
+     * <p>
+     * In case there are multiple headers with that name, all values are removed.
+     * </p>
+     *
+     * @param name the name of the header to remove
+     */
     public Response remove(String name) {
         headers.remove(name);
         return this;
