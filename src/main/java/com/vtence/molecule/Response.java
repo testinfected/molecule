@@ -239,7 +239,7 @@ public class Response {
      * <p>Note that getting the content type can also be done explicitly using
      * {@link Response#get}. This is a convenient method for doing so.</p>
      *
-     * @return the content type header value
+     * @return the content type header value or null
      */
     public String contentType() {
         return get(CONTENT_TYPE);
@@ -264,7 +264,7 @@ public class Response {
      * <p>Note that getting the content length can also be done explicitly using
      * {@link Response#get}. This is a convenient method for doing so.</p>
      *
-     * @return the content length header value
+     * @return the content length header value or null
      */
     public long contentLength() {
         return getLong(CONTENT_LENGTH);
