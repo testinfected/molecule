@@ -239,7 +239,7 @@ public class Response {
      * <p>Note that getting the content type can also be done explicitly using
      * {@link Response#get}. This is a convenient method for doing so.</p>
      *
-     * @return the current content type of the response
+     * @return the content type header value
      */
     public String contentType() {
         return get(CONTENT_TYPE);
@@ -251,17 +251,33 @@ public class Response {
      * <p>Note that setting the content type can also be done explicitly using {@link Response#set}.
      *  This is a convenient method for doing so</p>
      *
-     * @param contentType the type that is to be set
+     * @param contentType the content type value that is to be set
      */
     public Response contentType(String contentType) {
         set(CONTENT_TYPE, contentType);
         return this;
     }
 
+    /**
+     * Gets the content length of this response.
+     *
+     * <p>Note that getting the content length can also be done explicitly using
+     * {@link Response#get}. This is a convenient method for doing so.</p>
+     *
+     * @return the content length header value
+     */
     public long contentLength() {
         return getLong(CONTENT_LENGTH);
     }
 
+    /**
+     * Sets the content length for this response.
+     *
+     * <p>Note that setting the content length can also be done explicitly using {@link Response#set}.
+     *  This is a convenient method for doing so</p>
+     *
+     * @param length the content length value that is to be set
+     */
     public Response contentLength(long length) {
         set(CONTENT_LENGTH, length);
         return this;
