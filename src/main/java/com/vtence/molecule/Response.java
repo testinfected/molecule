@@ -233,10 +233,26 @@ public class Response {
         return this;
     }
 
+    /**
+     * Gets the content type of this response.
+     *
+     * <p>Note that getting the content type can also be done explicitly using
+     * {@link Response#get}. This is a convenient method for doing so.</p>
+     *
+     * @return the current content type of the response
+     */
     public String contentType() {
         return get(CONTENT_TYPE);
     }
 
+    /**
+     * Sets the content type for this response.
+     *
+     * <p>Note that setting the content type can also be done explicitly using {@link Response#set}.
+     *  This is a convenient method for doing so</p>
+     *
+     * @param contentType the type that is to be set
+     */
     public Response contentType(String contentType) {
         set(CONTENT_TYPE, contentType);
         return this;
