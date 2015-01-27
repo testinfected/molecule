@@ -690,7 +690,6 @@ public class Request {
         return Collections.unmodifiableMap(attributes);
     }
 
-
     /**
      * Acquires the preferred locale from this request <code>Accept-Language</code> header.
      * If the client accepts more than one locale, the preferred one is returned.

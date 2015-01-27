@@ -391,25 +391,55 @@ public class Response {
         return contentType.charset();
     }
 
-    public Response addLocale(Locale locale) {
-        set(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
-        return this;
-    }
-
+    /**
+     * Sets the language of this response using the <code>Content-Language</code> header.
+     * If the <code>Content-Language</code> header is already set, is it replaced by the new locale.
+     *
+     * @param locale the language of this response
+     */
     public Response locale(Locale locale) {
         set(CONTENT_LANGUAGE, new ContentLanguage().add(locale));
         return this;
     }
 
+    /**
+     * Adds a language to the list of languages of this response. Languages are sent to the client
+     * using the <code>Content-Language</code> header.
+     *
+     * @param locale the language of this response
+     */
+    public Response addLocale(Locale locale) {
+        set(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
+        return this;
+    }
+
+    /**
+     * Gets the default locale from this response <code>Content-Language</code> header.
+     * If more than one <code>Content-Language</code> header value exists, the first one is returned.
+     *
+     * @return the default language of this response or null
+     */
     public Locale locale() {
         List<Locale> locales = locales();
         return locales.isEmpty() ? null : locales.get(0);
     }
 
+    /**
+     * Gets the list of locales from this response <code>Content-Language</code> header. The
+     * locales are provided in preference order. If the header is not present, the list will be empty.
+     *
+     * @return the list (which may be empty) of languages to send to the client
+     */
     public List<Locale> locales() {
         return ContentLanguage.of(this).locales();
     }
 
+    /**
+     * Removes a specific locale from this response <code>Content-Language</code> header.
+     * If that locale is not present in the list of values of the header, this method does nothing.
+     *
+     * @param locale the locale to remove from the list of languages to send to the client
+     */
     public Response removeLocale(Locale locale) {
         set(CONTENT_LANGUAGE, ContentLanguage.of(this).remove(locale));
         return this;
