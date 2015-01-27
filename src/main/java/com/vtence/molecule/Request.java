@@ -462,7 +462,7 @@ public class Request {
     }
 
     /**
-     * Sets a cookie with a specific name and value. If a cookie with that name already exists,
+     * Sets a cookie with a specific name and value on this request. If a cookie with that name already exists,
      * it is replaced by the new value.
      *
      * Note that this will not affect the Cookie header that has been set with the request.

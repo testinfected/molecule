@@ -136,7 +136,8 @@ public class SimpleServer implements Server {
         }
 
         private void commitCookies(org.simpleframework.http.Response httpResponse, Response response) {
-            for (Cookie cookie : response.cookies()) {
+            for (String name : response.cookieNames()) {
+                Cookie cookie = response.cookie(name);
                 org.simpleframework.http.Cookie httpCookie = httpResponse.setCookie(cookie.name(), cookie.value());
                 httpCookie.setExpiry(cookie.maxAge());
                 httpCookie.setDomain(cookie.domain());

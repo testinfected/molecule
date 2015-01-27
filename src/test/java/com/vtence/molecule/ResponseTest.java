@@ -13,7 +13,9 @@ import static java.util.Locale.*;
 import static java.util.Locale.ENGLISH;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.nullValue;
 
 public class ResponseTest {
 
@@ -61,7 +63,7 @@ public class ResponseTest {
         response.cookie("petit ecolier", "chocolat noir");
         response.cookie("delicious", "chocolat au lait");
 
-        assertThat("cookies", response.cookies(), contains(cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
+        assertThat("cookies", response.cookieNames(), containsInAnyOrder("mr christie", "petit ecolier", "delicious"));
     }
 
     @Test
@@ -72,15 +74,7 @@ public class ResponseTest {
         response.removeCookie("mr christie");
         assertThat("still there?", response.hasCookie("mr christie"), equalTo(false));
 
-        assertThat("cookies", response.cookies(), contains(cookieNamed("petit ecolier")));
-    }
-
-    @Test
-    public void canDiscardCookies() {
-        response.cookie(new Cookie("mr christie", "peanuts").maxAge(365));
-        response.discardCookie("mr christie");
-
-        assertThat("expiration", response.cookie("mr christie"), cookieExpiring(0));
+        assertThat("cookies", response.cookieNames(), contains("petit ecolier"));
     }
 
     @Test
@@ -137,21 +131,5 @@ public class ResponseTest {
         response.removeLocale(CANADA_FRENCH);
         assertThat("new preferred locale", response.locale(), equalTo(ENGLISH));
         assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("en"));
-    }
-
-    private Matcher<Cookie> cookieNamed(String name) {
-        return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
-            protected String featureValueOf(Cookie cookie) {
-                return cookie.name();
-            }
-        };
-    }
-
-    private Matcher<Cookie> cookieExpiring(int maxAge) {
-        return new FeatureMatcher<Cookie, Integer>(equalTo(maxAge), "cookie expiring", "max age") {
-            protected Integer featureValueOf(Cookie cookie) {
-                return cookie.maxAge();
-            }
-        };
     }
 }

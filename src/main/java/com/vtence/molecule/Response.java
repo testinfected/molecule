@@ -10,8 +10,8 @@ import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.lib.BinaryBody;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -283,35 +283,77 @@ public class Response {
         return this;
     }
 
+    /**
+     * Sets a cookie on this response. The cookie will be added as a <code>Set-Cookie</code> header
+     * when the response is committed.
+     *
+     * <p>If a cookie with the same name already exists, it is replaced by the new cookie.</p>
+     *
+     * @param cookie the cookie to return to the client
+     */
     public Response cookie(Cookie cookie) {
         cookies.put(cookie.name(), cookie);
         return this;
     }
 
+    /**
+     * Sets a cookie with a specific name and value on this response.
+     * The cookie will be added as a <code>Set-Cookie</code> header when the response is committed.
+     *
+     * <p>If a cookie with that name already exists, it is replaced by the new value.</p>
+     *
+     * @param name the name of the cookie to set
+     * @param value the value to return to the client
+     */
     public Response cookie(String name, String value) {
         return cookie(new Cookie(name, value));
     }
 
-    public boolean hasCookie(String name) {
-        return cookies.containsKey(name);
-    }
-
+    /**
+     * Removes a cookie from this response. The cookie will not be sent as a <code>Set-Cookie</code> header
+     * when the response is committed.
+     *
+     * If no cookie with that name exists, the operation does nothing.
+     *
+     * @param name the name of the cookie to remove
+     */
     public Response removeCookie(String name) {
         cookies.remove(name);
         return this;
     }
 
-    public Response discardCookie(String name) {
-        cookie(name).maxAge(0);
-        return this;
+    /**
+     * Checks if a cookie with a specific name has been set on this response.
+     *
+     * @param name the name of the cookie to check
+     * @return true if cookie is set
+     */
+    public boolean hasCookie(String name) {
+        return cookies.containsKey(name);
     }
 
+    /**
+     * Gets a cookie set on this response under a specific name.
+     *
+     * If the cookie exists as an HTTP header then it is returned
+     * as a <code>Cookie</code> object - with the name, value, path as well as the optional domain part.
+     *
+     * @param name the name of the cookie to acquire
+     * @return the cookie with that name or null
+     */
     public Cookie cookie(String name) {
         return cookies.get(name);
     }
 
-    public List<Cookie> cookies() {
-        return new ArrayList<Cookie>(cookies.values());
+    /**
+     * Gets the names of all cookies set on this response, or an empty set if none exist.
+     *
+     * Note that modifications to the set will not change cookies set on the response.
+     *
+     * @return the set of cookie names to return to the client
+     */
+    public Set<String> cookieNames() {
+        return new HashSet<String>(cookies.keySet());
     }
 
     public Response charset(String charsetName) {
