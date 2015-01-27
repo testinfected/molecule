@@ -99,8 +99,8 @@ public class ResponseTest {
     @Test
     public void silentlyIgnoresCharsetWhenContentTypeNotSet() {
         response.charset("utf-8");
-        response.contentType("text/html; charset=iso-8859-1");
-        assertThat("charset", response.contentType(), equalTo("text/html; charset=iso-8859-1"));
+        response.contentType("text/html");
+        assertThat("charset", response.contentType(), equalTo("text/html"));
     }
 
     @Test

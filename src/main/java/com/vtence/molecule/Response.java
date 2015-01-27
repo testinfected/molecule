@@ -246,11 +246,13 @@ public class Response {
     }
 
     /**
-     * Sets the content type for this response.
+     * Sets the content type for this response. If the content type specifies a charset, this charset will
+     * be used to encode text based responses.
      *
      * <p>Note that setting the content type can also be done explicitly using {@link Response#set}.
-     *  This is a convenient method for doing so</p>
+     *  This is a convenient method for doing so.</p>
      *
+     * @see Response#charset(String) 
      * @param contentType the content type value that is to be set
      */
     public Response contentType(String contentType) {
@@ -356,6 +358,19 @@ public class Response {
         return new HashSet<String>(cookies.keySet());
     }
 
+    /**
+     * Replaces the MIME charset of the content type of this response. If not charset is set, <code>ISO-8859-1</code>
+     * is assumed. This method has no effect if no content type has been set on the response.
+     *
+     * Calling {@link Response#contentType(String)} with the value of <code>text/html</code> then
+     * calling this method with the value <code>UTF-8</code> is equivalent to calling <code>contentType</code>
+     * with the value <code>text/html; charset=UTF-8</code>
+     * <p>
+     * Note that the charset will be used for encoding character based bodies.
+     * </p>
+     *
+     * @param charsetName the name of the character encoding to use
+     */
     public Response charset(String charsetName) {
         ContentType contentType = ContentType.of(this);
         if (contentType == null) return this;
@@ -363,6 +378,11 @@ public class Response {
         return this;
     }
 
+    /**
+     * Reads the MIME charset of this response. The charset is read from the content-type header.
+     *
+     * @return the charset set in the content type header or ISO-8859-1
+     */
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
         if (contentType == null || contentType.charset() == null) {
