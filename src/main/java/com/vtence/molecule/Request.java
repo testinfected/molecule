@@ -29,7 +29,7 @@ import static java.lang.Long.parseLong;
 /**
  * Holds client HTTP request information and maintains attributes during the request lifecycle.
  *
- * Information includes body, headers, parameters, cookies, locale.
+ * Information includes among other things the body, headers, parameters, cookies and locales.
  */
 public class Request {
 
@@ -224,7 +224,6 @@ public class Request {
 
     /**
      * Changes the HTTP method of this request.
-     * Method must refer to one of the {@link com.vtence.molecule.http.HttpMethod}s. Matching is done case insensitively.
      *
      * @param method the new method
      */
@@ -234,8 +233,9 @@ public class Request {
     }
 
     /**
-     * Provides the text body of this request.
+     * Provides the text body of this request. The body is decoded using the charset of the request.
      *
+     * @see Request#charset()
      * @return the text that makes up the body
      */
     public String body() throws IOException {
@@ -261,11 +261,12 @@ public class Request {
     }
 
     /**
-     * Changes the body of this request.
+     * Changes the body of this request. The body is encoded using the charset of the request.
      *
      * Note that this will not affect the list of parameters that might have been sent with the original
      * body as POST parameters.
      *
+     * @see Request#charset()
      * @param body the new body as a string
      */
     public Request body(String body) {
@@ -291,7 +292,7 @@ public class Request {
      * Note that this will not affect the list of parameters that might have been sent with the original
      * body as POST parameters.
      *
-     * @param input the new body content as an array of bytes
+     * @param input the new body content as a stream of bytes
      */
     public Request body(InputStream input) {
         this.input = input;
@@ -302,7 +303,7 @@ public class Request {
      * Provides the charset used in the body of this request.
      * The charset is read from the <code>Content-Type</code> header.
      *
-     * @return the charset of this request or null if <pre>Content-Type</pre> is missing.
+     * @return the charset of this request or null if <code>Content-Type</code> is missing.
      */
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
@@ -363,8 +364,8 @@ public class Request {
      * If the request does not include any header of the specified name, the list is empty.
      * Modifications to the provided list are safe and will not affect the request.
      *
-     * @param name the name header of the header to retrieve
-     * @return the list of values of the header
+     * @param name the name of the header to retrieve
+     * @return the list of values for that header
      */
     public List<String> headers(String name) {
         return headers.list(name);
@@ -374,7 +375,7 @@ public class Request {
      * Adds an HTTP message header to this request. The new value will be added to the list
      * of existing values for that header name.
      *
-     * @param name the name of the header to be added
+     * @param name the name of the header to add
      * @param value the additional value for that header
      */
     public Request addHeader(String name, String value) {
@@ -450,9 +451,6 @@ public class Request {
     /**
      * Retrieves the list of all cookies sent with this request.
      *
-     * If the cookie exists as an HTTP header then it is returned
-     * as a <code>Cookie</code> object - with the name, value, path as well as the optional domain part.
-     *
      * Note that the list is safe for modification, it will not affect the request.
      *
      * @return the list of cookies sent
@@ -465,7 +463,7 @@ public class Request {
      * Sets a cookie with a specific name and value on this request. If a cookie with that name already exists,
      * it is replaced by the new value.
      *
-     * Note that this will not affect the Cookie header that has been set with the request.
+     * Note that this will not affect the <code>Cookie</code> header that has been set with the request.
      *
      * @param name the name of the cookie to set
      * @param value the value of the cookie to set
@@ -477,7 +475,7 @@ public class Request {
     /**
      * Sets a cookie on this request. If a cookie with the same name already exists, it is replaced by the new cookie.
      *
-     * Note that this will not affect the Cookie header that has been set with the request.
+     * Note that this will not affect the <code>Cookie</code> header that has been set with the request.
      *
      * @param cookie the cookie to set
      */
@@ -500,10 +498,10 @@ public class Request {
     }
 
     /**
-     * Reads the value of the Content-Length header sent as part of this request. If the Content-Length
-     * header is missing, the value -1 is returned.
+     * Reads the value of the <code>Content-Length</code> header sent as part of this request.
+     * If the header is missing, the value -1 is returned.
      *
-     * @return the Content-Length header value as a long or -1
+     * @return the <code>Content-Length</code> header value as a long or -1
      */
     public long contentLength() {
         String value = header(CONTENT_LENGTH);
@@ -511,10 +509,10 @@ public class Request {
     }
 
     /**
-     * Reads the value of the Content-Type header sent as part of this request. If the Content-Type
+     * Reads the value of the <code>Content-Type</code> header sent as part of this request. If the
      * header is missing, a null value is returned.
      *
-     * @return the Content-Type header or null
+     * @return the <code>Content-Type</code> header value or null
      */
     public String contentType() {
         ContentType contentType = ContentType.of(this);
@@ -561,8 +559,8 @@ public class Request {
 
     /**
      * Returns the names of all the parameters contained in this request.
-     * If the request has no parameter, the method returns an empty Set. The returned
-     * Set is safe for modification and will not affect the request.
+     * If the request has no parameter, the method returns an empty <code>Set</code>. The returned
+     * set is safe for modification and will not affect the request.
      *
      * <p>
      * Parameters are taken from the query or HTTP form posting.
@@ -580,8 +578,8 @@ public class Request {
     }
 
     /**
-     * Returns a Map of all the parameters contained in this request. If the request has no parameters,
-     * the map will be empty. The Map is not modifiable.
+     * Returns a <code>Map</code> of all the parameters contained in this request. If the request has no parameter,
+     * the map will be empty. The map is not modifiable.
      *
      * <p>
      * Parameters are taken from the query or HTTP form posting.
@@ -603,7 +601,7 @@ public class Request {
      * the new value is appended to this list of values for that parameter.
      *
      * @param name the parameter name
-     * @param value the parameter value
+     * @param value the additional parameter value
      */
     public Request addParameter(String name, String value) {
         if (!parameters.containsKey(name)) {
@@ -616,7 +614,7 @@ public class Request {
     /**
      * Removes a parameter from this request. This removes all values for that parameter from the request.
      *
-     * @param name the parameter name
+     * @param name the name of the parameter to remove
      */
     public Request removeParameter(String name) {
         parameters.remove(name);
@@ -627,12 +625,14 @@ public class Request {
      * Gets the value of a keyed attribute of this request, or null if no attribute with the given key exists.
      *
      * <p>
-     *     This method will attempt to cast the attribute value to type T, which can result in a ClassCastException.
+     *     This method will attempt to cast the attribute value to type T,
+     *     which can result in a <code>ClassCastException</code>.
      * </p>
      *
      * @see Request#attribute(Object, Object)
      * @param key the key of the attribute to retrieve
      * @return <T> the value of the attribute, or null if the attribute does not exist
+     * @throws java.lang.ClassCastException if the attribute value is not an instance of the type parameter
      */
     @SuppressWarnings("unchecked")
     public <T> T attribute(Object key) {
@@ -647,7 +647,7 @@ public class Request {
      * </p>
      *
      * @param key the key of the attribute to set
-     * @param value the attribute value
+     * @param value the new attribute value
      */
     public Request attribute(Object key, Object value) {
         attributes.put(key, value);
@@ -658,7 +658,7 @@ public class Request {
      * Gets the set of all attribute keys on this request. If no attribute exist, the set will be empty.
      *
      * <p>
-     * Note that the set if a copy, it can be modified without changing the request.
+     * Note that the set is a copy, it can be modified without changing the request.
      * </p>
      *
      * @return the set of attribute keys
@@ -668,7 +668,7 @@ public class Request {
     }
 
     /**
-     * Removes the attribute with the given key from this request. If no attribute exist, the method does nothing.
+     * Removes the attribute with the given key from this request. If no attribute exists, the method does nothing.
      *
      * @param key the key of the attribute to remove
      */
@@ -678,7 +678,7 @@ public class Request {
     }
 
     /**
-     * Gets the map of all attributes of this request. If no attribute exist, the map will be empty.
+     * Gets the map of all attributes of this request. If no attribute exists, the map will be empty.
      *
      * <p>
      * Note that the map is not modifiable.
@@ -692,7 +692,7 @@ public class Request {
 
     /**
      * Acquires the preferred locale from this request <code>Accept-Language</code> header.
-     * If the client accepts more than one locale, the preferred one is returned.
+     * If the client accepts more than one locale, the preferred one  - i.e. the first one - is returned.
      *
      * @return the locale preferred by the client
      */

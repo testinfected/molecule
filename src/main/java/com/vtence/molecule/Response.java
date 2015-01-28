@@ -117,7 +117,7 @@ public class Response {
     }
 
     /**
-     * Gets the names of all the header to be sent with this response.
+     * Gets the names of all the headers to be sent with this response.
      * If the response has no header, the set will be empty.
      * <p>
      * Modifications to the returned set will not modify the response.
@@ -155,6 +155,7 @@ public class Response {
      *
      * @param name the name of the header to retrieve
      * @return the long header value or -1
+     * @throws java.lang.NumberFormatException is the header value cannot be converted to a <code>long</code>
      */
     public long headerAsLong(String name) {
         String value = header(name);
@@ -253,7 +254,7 @@ public class Response {
      *  This is a convenient method for doing so.</p>
      *
      * @see Response#charset(String) 
-     * @param contentType the content type value that is to be set
+     * @param contentType the new content type value to set
      */
     public Response contentType(String contentType) {
         header(CONTENT_TYPE, contentType);
@@ -278,7 +279,7 @@ public class Response {
      * <p>Note that setting the content length can also be done explicitly using {@link Response#header}.
      *  This is a convenient method for doing so</p>
      *
-     * @param length the content length value that is to be set
+     * @param length the new content length value to set
      */
     public Response contentLength(long length) {
         header(CONTENT_LENGTH, length);
@@ -359,7 +360,7 @@ public class Response {
     }
 
     /**
-     * Replaces the MIME charset of the content type of this response. If not charset is set, <code>ISO-8859-1</code>
+     * Replaces the MIME charset of the content type of this response. If no charset is set, <code>ISO-8859-1</code>
      * is assumed. This method has no effect if no content type has been set on the response.
      *
      * Calling {@link Response#contentType(String)} with the value of <code>text/html</code> then
@@ -379,9 +380,10 @@ public class Response {
     }
 
     /**
-     * Reads the MIME charset of this response. The charset is read from the content-type header.
+     * Reads the MIME charset of this response. The charset is read from the content-type header. A default charset
+     * of <code> ISO-8859-1</code> is assumed.
      *
-     * @return the charset set in the content type header or ISO-8859-1
+     * @return the charset set in the content type header or <code> ISO-8859-1</code>
      */
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
@@ -393,9 +395,9 @@ public class Response {
 
     /**
      * Sets the language of this response using the <code>Content-Language</code> header.
-     * If the <code>Content-Language</code> header is already set, is it replaced by the new locale.
+     * If the <code>Content-Language</code> header is already set, its value is replaced by the new locale.
      *
-     * @param locale the language of this response
+     * @param locale the new language of this response
      */
     public Response locale(Locale locale) {
         header(CONTENT_LANGUAGE, new ContentLanguage().add(locale));
@@ -406,7 +408,7 @@ public class Response {
      * Adds a language to the list of languages of this response. Languages are sent to the client
      * using the <code>Content-Language</code> header.
      *
-     * @param locale the language of this response
+     * @param locale the additional language of this response
      */
     public Response addLocale(Locale locale) {
         header(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
