@@ -3,7 +3,7 @@ require 'buildr/jacoco'
 
 VERSION_NUMBER = '0.5-SNAPSHOT'
 
-Release.next_version = '0.4.2'
+Release.next_version = '0.6-SNAPSHOT'
 Release.commit_message = lambda { |version| "Bump version number to #{version}" }
 Release.tag_name = lambda { |version| "v#{version}" }
 
