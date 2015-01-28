@@ -17,9 +17,8 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   test.with :hamcrest, JMOCK, :juniversalchardet, transitive(artifacts(:htmlunit))
 
   package :jar
-  package_with_sources
-  package_with_javadoc
-
+  package :javadoc
+  package :sources
   package :test_jar
 
   pom.name = 'Molecule'
