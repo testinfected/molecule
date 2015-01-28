@@ -445,23 +445,54 @@ public class Response {
         return this;
     }
 
+    /**
+     * Sets the text content to write back to the client as the body of this response. The text content will be encoded
+     * using the charset of the response.
+     *
+     * @see Response#charset(String)
+     * @see Response#contentType(String)
+     * @param text the text of the body to write back to the client
+     */
     public Response body(String text) {
         return body(text(text));
     }
 
+    /**
+     * Sets the body to write back to the client with this response. Character bodies will be encoded
+     * using the charset of the response.
+     *
+     * @see Response#charset(String)
+     * @see Response#contentType(String)
+     * @param body the body to write back to the client
+     */
     public Response body(Body body) {
         this.body = body;
         return this;
     }
 
+    /**
+     * Gets the body to write back to the client with this response.
+     *
+     * @return the body to send to the client
+     */
     public Body body() {
         return body;
     }
 
+    /**
+     * Gets the size of the body of this response.
+     *
+     * @return the size of the body as a long
+     */
     public long size() {
         return body.size(charset());
     }
 
+    /**
+     * Checks whether the body of this response is empty, i.e. has a size of <code>0</code>.
+     *
+     * @return true is the body is empty, false otherwise
+     */
     public boolean empty() {
         return size() == 0;
     }
