@@ -25,6 +25,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   pom.description = 'A web micro-framework for Java'
   pom.add_mit_license
   pom.add_github_project('testinfected/molecule')
+  pom.scm_developer_connection = 'scm:hg:git+ssh://git@github.com:testinfected/molecule.git'
   pom.add_developer('testinfected', 'Vincent Tence', 'vtence@gmail.com', ['Developer'])
   pom.optional_dependencies.concat [:simple, :mustache]
 end
