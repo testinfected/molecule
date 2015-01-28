@@ -32,16 +32,16 @@ public class Compressor extends AbstractMiddleware {
 
         gzip {
             public void encode(Response response) throws IOException {
-                response.remove(CONTENT_LENGTH);
-                response.set(CONTENT_ENCODING, name());
+                response.removeHeader(CONTENT_LENGTH);
+                response.header(CONTENT_ENCODING, name());
                 response.body(new GZipStream(response.body()));
             }
         },
 
         deflate {
             public void encode(Response response) throws IOException {
-                response.remove(CONTENT_LENGTH);
-                response.set(CONTENT_ENCODING, name());
+                response.removeHeader(CONTENT_LENGTH);
+                response.header(CONTENT_ENCODING, name());
                 response.body(new DeflateStream(response.body()));
             }
         },
@@ -136,7 +136,7 @@ public class Compressor extends AbstractMiddleware {
     }
 
     private boolean alreadyEncoded(Response response) {
-        String contentEncoding = response.get(CONTENT_ENCODING);
+        String contentEncoding = response.header(CONTENT_ENCODING);
         return contentEncoding != null && !isIdentity(contentEncoding);
     }
 

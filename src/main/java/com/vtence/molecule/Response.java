@@ -102,7 +102,7 @@ public class Response {
      */
     public Response redirectTo(String location) {
         status(HttpStatus.SEE_OTHER);
-        set(HeaderNames.LOCATION, location);
+        header(HeaderNames.LOCATION, location);
         return this;
     }
 
@@ -112,7 +112,7 @@ public class Response {
      * @param name the header name
      * @return true is the header was found, false otherwise
      */
-    public boolean has(String name) {
+    public boolean hasHeader(String name) {
         return headers.has(name);
     }
 
@@ -124,7 +124,7 @@ public class Response {
      * </p>
      * @return a (possibly empty) <code>Set</code> of header names to send
      */
-    public Set<String> names() {
+    public Set<String> headerNames() {
         return headers.names();
     }
 
@@ -140,7 +140,7 @@ public class Response {
      * @param name the name of the header to retrieve
      * @return the header value or null
      */
-    public String get(String name) {
+    public String header(String name) {
         return headers.get(name);
     }
 
@@ -156,8 +156,8 @@ public class Response {
      * @param name the name of the header to retrieve
      * @return the long header value or -1
      */
-    public long getLong(String name) {
-        String value = get(name);
+    public long headerAsLong(String name) {
+        String value = header(name);
         return value != null ? parseLong(value) : -1;
     }
 
@@ -171,7 +171,7 @@ public class Response {
      * @param name the name of the header to send
      * @param value the additional value for that header
      */
-    public Response add(String name, String value) {
+    public Response addHeader(String name, String value) {
         headers.add(name, value);
         return this;
     }
@@ -180,13 +180,13 @@ public class Response {
      * Sets a header with the given name and value to be sent with this response.
      * If the header has already been set, the new value overwrites the previous one.
      * <p>
-     * The {@link Response#has(String)} method can be used to test for the presence of the header before setting its value.
+     * The {@link Response#hasHeader(String)} method can be used to test for the presence of the header before setting its value.
      * </p>
      *
      * @param name the name of the header to send
      * @param value the new value for that header
      */
-    public Response set(String name, String value) {
+    public Response header(String name, String value) {
         headers.put(name, value);
         return this;
     }
@@ -195,28 +195,28 @@ public class Response {
      * Sets a header with the given name and date value to be sent with this response.
      * If the header has already been set, the new value overwrites the previous one.
      * <p>
-     * The {@link Response#has(String)} method can be used to test for the presence of the header before setting its value.
+     * The {@link Response#hasHeader(String)} method can be used to test for the presence of the header before setting its value.
      * </p>
      *
      * @param name the name of the header to send
      * @param value the new date value for that header
      */
-    public Response set(String name, Date value) {
-        return set(name, httpDate(value));
+    public Response header(String name, Date value) {
+        return header(name, httpDate(value));
     }
 
     /**
      * Sets a header with the given name and value to be sent with this response.
      * If the header has already been set, the new value overwrites the previous one.
      * <p>
-     * The {@link Response#has(String)} method can be used to test for the presence of the header before setting its value.
+     * The {@link Response#hasHeader(String)} method can be used to test for the presence of the header before setting its value.
      * </p>
      *
      * @param name the name of the header to send
      * @param value the new value for that header
      */
-    public Response set(String name, Object value) {
-        return set(name, String.valueOf(value));
+    public Response header(String name, Object value) {
+        return header(name, String.valueOf(value));
     }
 
     /**
@@ -228,7 +228,7 @@ public class Response {
      *
      * @param name the name of the header to remove
      */
-    public Response remove(String name) {
+    public Response removeHeader(String name) {
         headers.remove(name);
         return this;
     }
@@ -237,26 +237,26 @@ public class Response {
      * Gets the content type of this response.
      *
      * <p>Note that getting the content type can also be done explicitly using
-     * {@link Response#get}. This is a convenient method for doing so.</p>
+     * {@link Response#header}. This is a convenient method for doing so.</p>
      *
      * @return the content type header value or null
      */
     public String contentType() {
-        return get(CONTENT_TYPE);
+        return header(CONTENT_TYPE);
     }
 
     /**
      * Sets the content type for this response. If the content type specifies a charset, this charset will
      * be used to encode text based responses.
      *
-     * <p>Note that setting the content type can also be done explicitly using {@link Response#set}.
+     * <p>Note that setting the content type can also be done explicitly using {@link Response#header}.
      *  This is a convenient method for doing so.</p>
      *
      * @see Response#charset(String) 
      * @param contentType the content type value that is to be set
      */
     public Response contentType(String contentType) {
-        set(CONTENT_TYPE, contentType);
+        header(CONTENT_TYPE, contentType);
         return this;
     }
 
@@ -264,24 +264,24 @@ public class Response {
      * Gets the content length of this response.
      *
      * <p>Note that getting the content length can also be done explicitly using
-     * {@link Response#get}. This is a convenient method for doing so.</p>
+     * {@link Response#header}. This is a convenient method for doing so.</p>
      *
      * @return the content length header value or null
      */
     public long contentLength() {
-        return getLong(CONTENT_LENGTH);
+        return headerAsLong(CONTENT_LENGTH);
     }
 
     /**
      * Sets the content length for this response.
      *
-     * <p>Note that setting the content length can also be done explicitly using {@link Response#set}.
+     * <p>Note that setting the content length can also be done explicitly using {@link Response#header}.
      *  This is a convenient method for doing so</p>
      *
      * @param length the content length value that is to be set
      */
     public Response contentLength(long length) {
-        set(CONTENT_LENGTH, length);
+        header(CONTENT_LENGTH, length);
         return this;
     }
 
@@ -398,7 +398,7 @@ public class Response {
      * @param locale the language of this response
      */
     public Response locale(Locale locale) {
-        set(CONTENT_LANGUAGE, new ContentLanguage().add(locale));
+        header(CONTENT_LANGUAGE, new ContentLanguage().add(locale));
         return this;
     }
 
@@ -409,7 +409,7 @@ public class Response {
      * @param locale the language of this response
      */
     public Response addLocale(Locale locale) {
-        set(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
+        header(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
         return this;
     }
 
@@ -441,7 +441,7 @@ public class Response {
      * @param locale the locale to remove from the list of languages to send to the client
      */
     public Response removeLocale(Locale locale) {
-        set(CONTENT_LANGUAGE, ContentLanguage.of(this).remove(locale));
+        header(CONTENT_LANGUAGE, ContentLanguage.of(this).remove(locale));
         return this;
     }
 

@@ -130,8 +130,8 @@ public class SimpleServer implements Server {
         }
 
         private void commitHeaders(org.simpleframework.http.Response httpResponse, Response response) {
-            for (String name : response.names()) {
-                httpResponse.setValue(name, response.get(name));
+            for (String name : response.headerNames()) {
+                httpResponse.setValue(name, response.header(name));
             }
         }
 

@@ -49,8 +49,8 @@ public class CachingAndCompressionExample {
               .add(assets)
               .start(new Application() {
                   public void handle(Request request, Response response) throws Exception {
-                      response.set(CONTENT_TYPE, HTML);
-                      response.set(LAST_MODIFIED, request.parameter("timestamp"));
+                      response.header(CONTENT_TYPE, HTML);
+                      response.header(LAST_MODIFIED, request.parameter("timestamp"));
                       response.body(index.render(NO_CONTEXT));
                   }
               });

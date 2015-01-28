@@ -1,16 +1,15 @@
 package com.vtence.molecule;
 
 import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.http.Cookie;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
-import static java.util.Locale.*;
+import static java.util.Locale.CANADA_FRENCH;
 import static java.util.Locale.ENGLISH;
+import static java.util.Locale.FRENCH;
+import static java.util.Locale.US;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -23,38 +22,38 @@ public class ResponseTest {
 
     @Test
     public void maintainsAnOrderedListOfHeaderNames() throws IOException {
-        response.set("Accept-Encoding", "gzip");
-        response.set("Accept-Language", "en");
-        response.add("Accept", "text/html");
-        response.add("Accept", "application/json");
+        response.header("Accept-Encoding", "gzip");
+        response.header("Accept-Language", "en");
+        response.addHeader("Accept", "text/html");
+        response.addHeader("Accept", "application/json");
 
-        assertThat("header names", response.names(), contains("Accept-Encoding", "Accept-Language", "Accept"));
+        assertThat("header names", response.headerNames(), contains("Accept-Encoding", "Accept-Language", "Accept"));
     }
 
     @Test
     public void retrievesHeadersByName() throws IOException {
-        response.add("Accept", "text/html; q=0.9, application/json");
-        assertThat("header", response.get("Accept"), equalTo("text/html; q=0.9, application/json"));
+        response.addHeader("Accept", "text/html; q=0.9, application/json");
+        assertThat("header", response.header("Accept"), equalTo("text/html; q=0.9, application/json"));
     }
 
     @Test
     public void convertsHeaderValuesToLongs() throws IOException {
-        assertThat("Content-Length", response.getLong("Content-Length"), equalTo(-1l));
-        response.add("Content-Length", "1258");
-        assertThat("Content-Length", response.getLong("Content-Length"), equalTo(1258l));
+        assertThat("Content-Length", response.headerAsLong("Content-Length"), equalTo(-1l));
+        response.addHeader("Content-Length", "1258");
+        assertThat("Content-Length", response.headerAsLong("Content-Length"), equalTo(1258l));
         assertThat("Content-Length", response.contentLength(), equalTo(1258l));
     }
 
     @Test
     public void canRemoveHeaders() throws IOException {
-        response.set("Accept", "text/html");
-        response.set("Accept-Encoding", "gzip");
+        response.header("Accept", "text/html");
+        response.header("Accept-Encoding", "gzip");
 
-        assertThat("header?", response.has("Accept"), equalTo(true));
-        response.remove("Accept");
-        assertThat("still there?", response.has("Accept"), equalTo(false));
+        assertThat("header?", response.hasHeader("Accept"), equalTo(true));
+        response.removeHeader("Accept");
+        assertThat("still there?", response.hasHeader("Accept"), equalTo(false));
 
-        assertThat("header names", response.names(), contains("Accept-Encoding"));
+        assertThat("header names", response.headerNames(), contains("Accept-Encoding"));
     }
 
     @Test
@@ -114,14 +113,14 @@ public class ResponseTest {
         response.addLocale(US);
         response.addLocale(FRENCH);
         assertThat("locales", response.locales(), contains(CANADA_FRENCH, US, FRENCH));
-        assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("fr-ca, en-us, fr"));
+        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("fr-ca, en-us, fr"));
     }
 
     @Test
     public void setsContentLanguageToSpecifiedLocale() {
         response.locale(FRENCH);
         assertThat("locale", response.locale(), equalTo(FRENCH));
-        assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("fr"));
+        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("fr"));
     }
 
     @Test
@@ -130,6 +129,6 @@ public class ResponseTest {
         response.addLocale(ENGLISH);
         response.removeLocale(CANADA_FRENCH);
         assertThat("new preferred locale", response.locale(), equalTo(ENGLISH));
-        assertThat("content-language", response.get(CONTENT_LANGUAGE), equalTo("en"));
+        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("en"));
     }
 }

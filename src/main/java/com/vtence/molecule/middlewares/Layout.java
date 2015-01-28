@@ -52,7 +52,7 @@ public class Layout extends AbstractMiddleware {
     }
 
     private void applyDecoration(Request request, Response response) throws IOException {
-        response.remove(CONTENT_LENGTH);
+        response.removeHeader(CONTENT_LENGTH);
         String content = render(response.body(), response.charset());
         Map<String, String> chunks = processor.process(content);
         response.body(decorator.merge(request, chunks));

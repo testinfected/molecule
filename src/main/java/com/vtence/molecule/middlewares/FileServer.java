@@ -49,7 +49,7 @@ public class FileServer implements Application {
 
     public void handle(Request request, Response response) throws Exception {
         if (!methodAllowed(request)) {
-            response.set(ALLOW, ALLOW_HEADER);
+            response.header(ALLOW, ALLOW_HEADER);
             response.status(METHOD_NOT_ALLOWED);
             return;
         }
@@ -94,13 +94,13 @@ public class FileServer implements Application {
 
     private void addFileHeaders(Response response, File file) {
         response.contentType(mediaTypes.guessFrom(file.getName()));
-        response.set(LAST_MODIFIED, new Date(file.lastModified()));
+        response.header(LAST_MODIFIED, new Date(file.lastModified()));
         response.contentLength(file.length());
     }
 
     private void addCustomHeaders(Response response) {
         for (String header : headers.keySet()) {
-            response.set(header, headers.get(header));
+            response.header(header, headers.get(header));
         }
     }
 

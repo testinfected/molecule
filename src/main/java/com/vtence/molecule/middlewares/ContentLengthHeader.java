@@ -25,11 +25,11 @@ public class ContentLengthHeader extends AbstractMiddleware {
     }
 
     private boolean hasContentLengthHeader(Response response) {
-        return response.has(CONTENT_LENGTH);
+        return response.hasHeader(CONTENT_LENGTH);
     }
 
     private boolean isChunked(Response response) {
-        return response.has(TRANSFER_ENCODING)
-                && response.get(TRANSFER_ENCODING).equalsIgnoreCase("chunked");
+        return response.hasHeader(TRANSFER_ENCODING)
+                && response.header(TRANSFER_ENCODING).equalsIgnoreCase("chunked");
     }
 }

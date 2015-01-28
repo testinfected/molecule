@@ -31,7 +31,7 @@ public class ConditionalGetTest {
     sendsNotModifiedWithoutMessageBodyWhenETagIndicatesEntityIsCurrent() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("ETag", "12345678")
+                response.header("ETag", "12345678")
                         .contentType("text/plain").contentLength(32).body("response content");
             }
         });
@@ -64,7 +64,7 @@ public class ConditionalGetTest {
     ignoresCacheValidatorsIfResponseNotOK() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.status(CREATED).set("ETag", "12345678");
+                response.status(CREATED).header("ETag", "12345678");
             }
         });
 
@@ -78,7 +78,7 @@ public class ConditionalGetTest {
     supportsHeadRequests() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("ETag", "12345678");
+                response.header("ETag", "12345678");
             }
         });
 
@@ -92,7 +92,7 @@ public class ConditionalGetTest {
     ignoresNonGetOrHeadRequests() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("ETag", "12345678");
+                response.header("ETag", "12345678");
             }
         });
 
@@ -107,7 +107,7 @@ public class ConditionalGetTest {
         final String lastModification = httpDate(now().toDate());
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("Last-Modified", lastModification);
+                response.header("Last-Modified", lastModification);
             }
         });
 
@@ -122,7 +122,7 @@ public class ConditionalGetTest {
         final String lastModification = httpDate(aDate().toDate());
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("ETag", "12345678").set("Last-Modified", lastModification);
+                response.header("ETag", "12345678").header("Last-Modified", lastModification);
             }
         });
 
@@ -137,8 +137,8 @@ public class ConditionalGetTest {
     leavesResponseUnchangedWhenEntityWasModifiedButETagIndicatesItIsCurrent() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("ETag", "12345678")
-                        .set("Last-Modified", httpDate(now().toDate()));
+                response.header("ETag", "12345678")
+                        .header("Last-Modified", httpDate(now().toDate()));
             }
         });
 

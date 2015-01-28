@@ -79,7 +79,7 @@ public class ContentLengthHeaderTest {
     doesNotSetContentLengthForChunkedTransferEncoding() throws Exception {
         contentLengthHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set(TRANSFER_ENCODING, "chunked");
+                response.header(TRANSFER_ENCODING, "chunked");
                 response.body("This body is chunked encoded");
             }
         });

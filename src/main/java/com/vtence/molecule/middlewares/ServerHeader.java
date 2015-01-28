@@ -15,7 +15,7 @@ public class ServerHeader extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        response.set(SERVER, serverName);
+        response.header(SERVER, serverName);
 
         forward(request, response);
     }

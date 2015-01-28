@@ -23,7 +23,7 @@ public class ContentType {
     }
 
     public static ContentType of(Response response) {
-        return parse(response.get(CONTENT_TYPE));
+        return parse(response.header(CONTENT_TYPE));
     }
 
     public static ContentType of(Request request) {

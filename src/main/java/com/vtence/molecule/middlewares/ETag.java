@@ -25,10 +25,10 @@ public class ETag extends AbstractMiddleware {
 
         byte[] output = render(response);
         if (isCacheable(response, output)) {
-            response.set(ETAG, "\"" + Hex.from(computeHash(output)) + "\"");
+            response.header(ETAG, "\"" + Hex.from(computeHash(output)) + "\"");
         }
         if (!hasCachingDirective(response)) {
-            response.set(CACHE_CONTROL, REVALIDATE);
+            response.header(CACHE_CONTROL, REVALIDATE);
         }
         response.body(new BinaryBody(output));
     }
@@ -59,11 +59,11 @@ public class ETag extends AbstractMiddleware {
     }
 
     private boolean hasETag(Response response) {
-        return response.has(ETAG);
+        return response.hasHeader(ETAG);
     }
 
     private boolean hasLastModified(Response response) {
-        return response.has(HeaderNames.LAST_MODIFIED);
+        return response.hasHeader(HeaderNames.LAST_MODIFIED);
     }
 
     private boolean preventsCaching(Response response) {
@@ -71,11 +71,11 @@ public class ETag extends AbstractMiddleware {
     }
 
     private boolean hasCachingDirective(Response response) {
-        return response.has(CACHE_CONTROL);
+        return response.hasHeader(CACHE_CONTROL);
     }
 
     private String cachingDirective(Response response) {
-        return response.get(CACHE_CONTROL);
+        return response.header(CACHE_CONTROL);
     }
 
     private byte[] computeHash(byte[] output) throws NoSuchAlgorithmException {

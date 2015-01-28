@@ -13,7 +13,7 @@ public class ContentLanguage {
     private final List<Locale> locales = new ArrayList<Locale>();
 
     public static ContentLanguage of(Response response) {
-        return ContentLanguage.parse(response.get(CONTENT_LANGUAGE));
+        return ContentLanguage.parse(response.header(CONTENT_LANGUAGE));
     }
 
     public static ContentLanguage parse(String header) {

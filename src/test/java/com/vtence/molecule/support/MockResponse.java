@@ -36,7 +36,7 @@ public class MockResponse extends Response {
     }
 
     public void assertRedirectedTo(String location) {
-        assertThat("redirection", get(LOCATION), equalTo(location));
+        assertThat("redirection", header(LOCATION), equalTo(location));
     }
 
     public void assertHeader(String name, String value) {
@@ -44,7 +44,7 @@ public class MockResponse extends Response {
     }
 
     public void assertHeader(String name, Matcher<? super String> matching) {
-        assertThat(name, get(name), matching);
+        assertThat(name, header(name), matching);
     }
 
     public void assertNoHeader(String name) {

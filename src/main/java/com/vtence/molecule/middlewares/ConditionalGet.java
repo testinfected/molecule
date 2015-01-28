@@ -18,8 +18,8 @@ public class ConditionalGet extends AbstractMiddleware {
 
         if (supported(request.method()) && ok(response) && stillFresh(request, response)) {
             response.body(empty());
-            response.remove(CONTENT_TYPE);
-            response.remove(CONTENT_LENGTH);
+            response.removeHeader(CONTENT_TYPE);
+            response.removeHeader(CONTENT_LENGTH);
             response.status(NOT_MODIFIED);
         }
     }
@@ -44,12 +44,12 @@ public class ConditionalGet extends AbstractMiddleware {
     }
 
     private boolean current(String noneMatch, Response response) {
-        String etag = response.get(ETAG);
+        String etag = response.header(ETAG);
         return (etag != null) && etag.equals(noneMatch);
     }
 
     private boolean modifiedSince(String modifiedSince, Response response) {
-        String lastModified = response.get(LAST_MODIFIED);
+        String lastModified = response.header(LAST_MODIFIED);
         return (lastModified == null) || !toDate(lastModified).equals(toDate(modifiedSince));
     }
 }

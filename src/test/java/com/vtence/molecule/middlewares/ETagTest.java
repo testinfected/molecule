@@ -69,7 +69,7 @@ public class ETagTest {
     willNotOverwriteETagIfAlreadySet() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("ETag", "already set");
+                response.header("ETag", "already set");
                 response.body("response body");
             }
         });
@@ -81,7 +81,7 @@ public class ETagTest {
     willNotSetETagIfLastModifiedHeaderSet() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("Last-Modified", httpDate(new Date()));
+                response.header("Last-Modified", httpDate(new Date()));
                 response.body("response body");
             }
         });
@@ -93,7 +93,7 @@ public class ETagTest {
     willNotSetETagIfCacheControlSetToNoCache() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("Cache-Control", "private; no-cache");
+                response.header("Cache-Control", "private; no-cache");
                 response.body("response body");
             }
         });
@@ -116,7 +116,7 @@ public class ETagTest {
     willNoOverwriteCacheControlDirectiveIfAlreadySet() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.set("Cache-Control", "public");
+                response.header("Cache-Control", "public");
                 response.body("response body");
             }
         });

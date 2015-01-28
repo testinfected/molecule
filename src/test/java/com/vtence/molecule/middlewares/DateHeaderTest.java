@@ -25,7 +25,7 @@ public class DateHeaderTest {
     setsDateHeaderFromClockTime() throws Exception {
         dateHeader.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.body(response.get("Date"));
+                response.body(response.header("Date"));
             }
         });
         dateHeader.handle(request, response);
