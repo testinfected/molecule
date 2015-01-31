@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.support.CharsetDetector.detectedCharset;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.*;
@@ -19,52 +18,76 @@ import static org.junit.Assert.assertThat;
 
 public class MockResponse extends Response {
 
-    @Deprecated
     /**
      * @see ResponseAssertions#hasStatusCode(int)
      */
+    @Deprecated
     public void assertStatusCode(int code) {
         assertThat(this).hasStatusCode(code);
     }
 
-    @Deprecated
     /**
      * @see ResponseAssertions#hasStatusText(String)
      */
+    @Deprecated
     public void assertStatusText(String text) {
         assertThat(this).hasStatusText(text);
     }
 
-    @Deprecated
     /**
      * @see ResponseAssertions#hasStatus(com.vtence.molecule.http.HttpStatus)
      */
+    @Deprecated
     public void assertStatus(HttpStatus expected) {
         assertThat(this).hasStatus(expected);
     }
 
+    /**
+     * @see ResponseAssertions#isRedirectedTo(String)
+     */
+    @Deprecated
     public void assertRedirectedTo(String location) {
-        assertThat("redirection", header(LOCATION), equalTo(location));
+        assertThat(this).isRedirectedTo(location);
     }
 
+    /**
+     * @see ResponseAssertions#hasHeader(String, String)
+     */
+    @Deprecated
     public void assertHeader(String name, String value) {
-        assertHeader(name, equalTo(value));
+        assertThat(this).hasHeader(name, value);
     }
 
-    public void assertHeader(String name, Matcher<? super String> matching) {
-        assertThat(name, header(name), matching);
+    /**
+     * @see ResponseAssertions#hasHeader(String, org.hamcrest.Matcher)
+     */
+    @Deprecated
+    public void assertHeader(String name, Matcher<? super String> valueMatching) {
+        assertThat(this).hasHeader(name, valueMatching);
     }
 
+    /**
+     * @see ResponseAssertions#hasNoHeader(String)
+     */
+    @Deprecated
     public void assertNoHeader(String name) {
-        assertHeader(name, nullValue());
+        assertThat(this).hasNoHeader(name);
     }
 
+    /**
+     * @see ResponseAssertions#hasContentType(String)
+     */
+    @Deprecated
     public void assertContentType(String contentType) {
-        assertContentType(equalTo(contentType));
+        assertThat(this).hasContentType(contentType);
     }
 
+    /**
+     * @see ResponseAssertions#hasContentType(org.hamcrest.Matcher)
+     */
+    @Deprecated
     public void assertContentType(Matcher<? super String> matching) {
-        assertHeader("Content-Type", matching);
+        assertThat(this).hasContentType(matching);
     }
 
     public void assertHasCookie(String name) {

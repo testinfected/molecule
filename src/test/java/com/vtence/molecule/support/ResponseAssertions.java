@@ -5,7 +5,9 @@ import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
-import static org.hamcrest.core.Is.is;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.LOCATION;
+import static org.hamcrest.CoreMatchers.*;
 
 public class ResponseAssertions {
 
@@ -38,5 +40,37 @@ public class ResponseAssertions {
     public void hasStatus(HttpStatus expected) {
         hasStatusCode(expected.code);
         hasStatusText(expected.text);
+    }
+
+    public void isRedirectedTo(String location) {
+        isRedirectedTo(equalTo(location));
+    }
+
+    public void isRedirectedTo(Matcher<? super String> matching) {
+        Assert.assertThat("redirection", response.header(LOCATION), matching);
+    }
+
+    public void hasHeader(String name) {
+        hasHeader(name, any(String.class));
+    }
+
+    public void hasHeader(String name, String value) {
+        hasHeader(name, equalTo(value));
+    }
+
+    public void hasHeader(String name, Matcher<? super String> matchingValue) {
+        Assert.assertThat(name, response.header(name), matchingValue);
+    }
+
+    public void hasNoHeader(String name) {
+        hasHeader(name, nullValue());
+    }
+
+    public void hasContentType(String contentType) {
+        hasContentType(equalTo(contentType));
+    }
+
+    public void hasContentType(Matcher<? super String> matching) {
+        hasHeader(CONTENT_TYPE, matching);
     }
 }
