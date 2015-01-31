@@ -18,6 +18,7 @@ import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.support.MockRequest.GET;
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static java.lang.String.valueOf;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -36,7 +37,7 @@ public class FileServerTest {
     servesFiles() throws Exception {
         fileServer.handle(request, response);
 
-        response.assertStatus(OK);
+        assertThat(response).hasStatus(OK);
         response.assertContentSize(file.length());
         response.assertContent(contentOf(file));
         response.assertHeader("Content-Length", valueOf(file.length()));
@@ -67,7 +68,7 @@ public class FileServerTest {
     @Test public void
     rendersNotFoundWhenFileIsNotFound() throws Exception {
         fileServer.handle(request.path("/images/missing.png"), response);
-        response.assertStatus(NOT_FOUND);
+        assertThat(response).hasStatus(NOT_FOUND);
         response.assertContentType("text/plain");
         response.assertBody("File not found: /images/missing.png");
     }
@@ -75,14 +76,14 @@ public class FileServerTest {
     @Test public void
     rendersNotFoundWhenFileIsNotReadable() throws Exception {
         fileServer.handle(request.path("/images"), response);
-        response.assertStatus(NOT_FOUND);
+        assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test public void
     sendsNotModifiedIfFileHasNotBeenModifiedSinceLastServe() throws Exception {
         request.header("If-Modified-Since", HttpDate.format(file.lastModified()));
         fileServer.handle(request, response);
-        response.assertStatus(NOT_MODIFIED);
+        assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
     @Test public void
@@ -99,7 +100,7 @@ public class FileServerTest {
     @Test public void
     allowsHeadRequests() throws Exception {
         fileServer.handle(request.method(HttpMethod.HEAD), response);
-        response.assertStatus(OK);
+        assertThat(response).hasStatus(OK);
         response.assertContentSize(0);
         response.assertHeader("Content-Length", valueOf(file.length()));
     }
@@ -107,7 +108,7 @@ public class FileServerTest {
     @Test public void
     rejectsUnsupportedMethod() throws Exception {
         fileServer.handle(request.method(HttpMethod.POST), response);
-        response.assertStatus(METHOD_NOT_ALLOWED);
+        assertThat(response).hasStatus(METHOD_NOT_ALLOWED);
         response.assertHeader("Allow", "GET, HEAD");
         response.assertNoHeader("Last-Modified");
     }

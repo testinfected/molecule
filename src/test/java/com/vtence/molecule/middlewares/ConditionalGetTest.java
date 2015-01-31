@@ -17,6 +17,7 @@ import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.support.Dates.aDate;
 import static com.vtence.molecule.support.Dates.instant;
 import static com.vtence.molecule.support.Dates.now;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 
 public class ConditionalGetTest {
@@ -39,7 +40,7 @@ public class ConditionalGetTest {
         request.header("If-None-Match", "12345678");
         conditional.handle(request, response);
 
-        response.assertStatus(NOT_MODIFIED);
+        assertThat(response).hasStatus(NOT_MODIFIED);
         response.assertContentSize(0);
         response.assertContentType(nullValue());
         response.assertHeader("Content-Length", nullValue());
@@ -56,7 +57,7 @@ public class ConditionalGetTest {
 
         conditional.handle(request, response);
 
-        response.assertStatus(OK);
+        assertThat(response).hasStatus(OK);
         response.assertBody("response content");
     }
 
@@ -71,7 +72,7 @@ public class ConditionalGetTest {
         request.header("If-None-Match", "12345678");
         conditional.handle(request, response);
 
-        response.assertStatus(CREATED);
+        assertThat(response).hasStatus(CREATED);
     }
 
     @Test public void
@@ -85,7 +86,7 @@ public class ConditionalGetTest {
         request.method("HEAD").header("If-None-Match", "12345678");
         conditional.handle(request, response);
 
-        response.assertStatus(NOT_MODIFIED);
+        assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
     @Test public void
@@ -99,7 +100,7 @@ public class ConditionalGetTest {
         request.method("POST").header("If-None-Match", "12345678");
         conditional.handle(request, response);
 
-        response.assertStatus(OK);
+        assertThat(response).hasStatus(OK);
     }
 
     @Test public void
@@ -114,7 +115,7 @@ public class ConditionalGetTest {
         request.header("If-Modified-Since", lastModification);
         conditional.handle(request, response);
 
-        response.assertStatus(NOT_MODIFIED);
+        assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
     @Test public void
@@ -130,7 +131,7 @@ public class ConditionalGetTest {
                .header("If-Modified-Since", lastModification);
         conditional.handle(request, response);
 
-        response.assertStatus(OK);
+        assertThat(response).hasStatus(OK);
     }
 
     @Test public void
@@ -146,7 +147,7 @@ public class ConditionalGetTest {
                .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
         conditional.handle(request, response);
 
-        response.assertStatus(OK);
+        assertThat(response).hasStatus(OK);
     }
 
     private Dates oneHourAgo() {

@@ -1,7 +1,6 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
@@ -14,6 +13,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -159,7 +160,7 @@ public class CompressorTest {
         });
         request.header("Accept-Encoding", "identity;q=0");
         compressor.handle(request, response);
-        response.assertStatus(HttpStatus.NOT_ACCEPTABLE);
+        assertThat(response).hasStatus(NOT_ACCEPTABLE);
         response.assertContentType("text/plain");
         response.assertBody("An acceptable encoding could not be found");
     }

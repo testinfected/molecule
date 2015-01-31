@@ -6,6 +6,9 @@ import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+
 public class NotFoundTest {
 
     NotFound notFound = new NotFound();
@@ -22,7 +25,7 @@ public class NotFoundTest {
 
     @Test public void
     setsStatusCodeToNotFound() {
-        response.assertStatus(HttpStatus.NOT_FOUND);
+        assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test public void

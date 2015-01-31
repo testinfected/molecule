@@ -1,7 +1,6 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
@@ -9,6 +8,8 @@ import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -38,7 +39,7 @@ public class FailsafeTest {
 
     @Test public void
     setsStatusToInternalServerError() {
-        response.assertStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response).hasStatus(INTERNAL_SERVER_ERROR);
     }
 
     @Test public void
