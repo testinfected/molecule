@@ -96,8 +96,9 @@ public class RequestTest {
         assertThat("header names", request.headerNames(), contains("Accept-Encoding"));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void maintainsAListOfCookie() {
+    public void maintainsAListOfCookies() {
         request.cookie("mr christie", "peanuts");
         request.cookie("petit ecolier", "chocolat noir");
         request.cookie("delicious", "chocolat au lait");
