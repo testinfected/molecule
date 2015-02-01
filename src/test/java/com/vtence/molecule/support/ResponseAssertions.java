@@ -21,56 +21,69 @@ public class ResponseAssertions {
         return new ResponseAssertions(response);
     }
 
-    public void hasStatusCode(int code) {
+    public ResponseAssertions hasStatusCode(int code) {
         hasStatusCode(is(code));
+        return this;
     }
 
-    public void hasStatusCode(Matcher<? super Integer> matching) {
+    public ResponseAssertions hasStatusCode(Matcher<? super Integer> matching) {
         Assert.assertThat("status code", response.statusCode(), matching);
+        return this;
     }
 
-    public void hasStatusText(String text) {
+    public ResponseAssertions hasStatusText(String text) {
         hasStatusText(is(text));
+        return this;
     }
 
-    public void hasStatusText(Matcher<? super String> matching) {
+    public ResponseAssertions hasStatusText(Matcher<? super String> matching) {
         Assert.assertThat("status text", response.statusText(), matching);
+        return this;
     }
 
-    public void hasStatus(HttpStatus expected) {
+    public ResponseAssertions hasStatus(HttpStatus expected) {
         hasStatusCode(expected.code);
         hasStatusText(expected.text);
+        return this;
     }
 
-    public void isRedirectedTo(String location) {
+    public ResponseAssertions isRedirectedTo(String location) {
         isRedirectedTo(equalTo(location));
+        return this;
     }
 
-    public void isRedirectedTo(Matcher<? super String> matching) {
+    public ResponseAssertions isRedirectedTo(Matcher<? super String> matching) {
         Assert.assertThat("redirection", response.header(LOCATION), matching);
+        return this;
     }
 
-    public void hasHeader(String name) {
+    public ResponseAssertions hasHeader(String name) {
         hasHeader(name, any(String.class));
+        return this;
     }
 
-    public void hasHeader(String name, String value) {
+    public ResponseAssertions hasHeader(String name, String value) {
         hasHeader(name, equalTo(value));
+        return this;
     }
 
-    public void hasHeader(String name, Matcher<? super String> matchingValue) {
+    public ResponseAssertions hasHeader(String name, Matcher<? super String> matchingValue) {
         Assert.assertThat(name, response.header(name), matchingValue);
+        return this;
     }
 
-    public void hasNoHeader(String name) {
+    public ResponseAssertions hasNoHeader(String name) {
         hasHeader(name, nullValue());
+        return this;
     }
 
-    public void hasContentType(String contentType) {
+    public ResponseAssertions hasContentType(String contentType) {
         hasContentType(equalTo(contentType));
+        return this;
     }
 
-    public void hasContentType(Matcher<? super String> matching) {
+    public ResponseAssertions hasContentType(Matcher<? super String> matching) {
         hasHeader(CONTENT_TYPE, matching);
+        return this;
     }
 }
