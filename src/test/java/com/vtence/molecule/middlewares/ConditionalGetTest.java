@@ -55,8 +55,8 @@ public class ConditionalGetTest {
 
         conditional.handle(request, response);
 
-        assertThat(response).hasStatus(OK);
-        response.assertBody("response content");
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("response content");
     }
 
     @Test public void

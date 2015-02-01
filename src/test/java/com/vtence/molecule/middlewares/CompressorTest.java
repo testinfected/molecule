@@ -14,6 +14,7 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
+import static com.vtence.molecule.support.BodyContent.asStream;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -50,7 +51,7 @@ public class CompressorTest {
         request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
         assertThat(response).hasHeader("Content-Encoding", "gzip");
-        assertThat("body", unzip(response), equalTo("uncompressed body"));
+        assertThat("response body", unzip(response), equalTo("uncompressed body"));
     }
 
     @Test public void
@@ -104,8 +105,8 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "compress");
         compressor.handle(request, response);
-        assertThat(response).hasNoHeader("Content-Encoding");
-        response.assertBody("uncompressed body");
+        assertThat(response).hasNoHeader("Content-Encoding")
+                            .hasBodyText("uncompressed body");
     }
 
     @Test public void
@@ -133,8 +134,8 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
-        assertThat(response).hasHeader("Content-Encoding", "deflate");
-        response.assertBody("<compressed body>");
+        assertThat(response).hasHeader("Content-Encoding", "deflate")
+                            .hasBodyText("<compressed body>");
     }
 
     @Test public void
@@ -162,8 +163,8 @@ public class CompressorTest {
         compressor.handle(request, response);
 
         assertThat(response).hasStatus(NOT_ACCEPTABLE)
-                            .hasContentType("text/plain");
-        response.assertBody("An acceptable encoding could not be found");
+                            .hasContentType("text/plain")
+                            .hasBodyText("An acceptable encoding could not be found");
     }
 
     @Test public void
@@ -178,8 +179,8 @@ public class CompressorTest {
         request.header("Accept-Encoding", "gzip");
         compressor.compressibleTypes("text/html");
         compressor.handle(request, response);
-        assertThat(response).hasNoHeader("Content-Encoding");
-        assertThat("body", response.text(), equalTo("uncompressed body"));
+        assertThat(response).hasNoHeader("Content-Encoding")
+                            .hasBodyText("uncompressed body");
     }
 
     @Test public void
@@ -197,11 +198,11 @@ public class CompressorTest {
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
-    private String inflate(MockResponse response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new InflaterInputStream(response.stream(), new Inflater(true)));
+    private String inflate(Response response) throws IOException {
+        return response.empty() ? "" : Streams.toString(new InflaterInputStream(asStream(response), new Inflater(true)));
     }
 
-    private String unzip(MockResponse response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new GZIPInputStream(response.stream()));
+    private String unzip(Response response) throws IOException {
+        return response.empty() ? "" : Streams.toString(new GZIPInputStream(asStream(response)));
     }
 }

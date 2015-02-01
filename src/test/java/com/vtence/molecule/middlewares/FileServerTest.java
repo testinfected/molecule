@@ -69,8 +69,8 @@ public class FileServerTest {
         fileServer.handle(request.path("/images/missing.png"), response);
 
         assertThat(response).hasStatus(NOT_FOUND)
-                            .hasContentType("text/plain");
-        response.assertBody("File not found: /images/missing.png");
+                            .hasContentType("text/plain")
+                            .hasBodyText("File not found: /images/missing.png");
     }
 
     @Test public void

@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static com.vtence.molecule.routing.DynamicRoutesTest.Echo.echo;
 import static com.vtence.molecule.support.MockRequest.*;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class DynamicRoutesTest {
 
@@ -20,9 +21,9 @@ public class DynamicRoutesTest {
             map("/other/uri").via(HttpMethod.GET).to(echo("get to /other/uri"));
         }}).defaultsTo(echo("not matched"));
 
-        dispatch(router, POST("/uri")).assertBody("post to /uri");
-        dispatch(router, GET("/uri")).assertBody("not matched");
-        dispatch(router, GET("/other/uri")).assertBody("get to /other/uri");
+        assertThat(dispatch(router, POST("/uri"))).hasBodyText("post to /uri");
+        assertThat(dispatch(router, GET("/uri"))).hasBodyText("not matched");
+        assertThat(dispatch(router, GET("/other/uri"))).hasBodyText("get to /other/uri");
     }
 
     @Test public void
@@ -37,13 +38,13 @@ public class DynamicRoutesTest {
             options("/").to(echo("options"));
         }});
 
-        dispatch(router, GET("/")).assertBody("get");
-        dispatch(router, POST("/")).assertBody("post");
-        dispatch(router, PUT("/")).assertBody("put");
-        dispatch(router, DELETE("/")).assertBody("delete");
-        dispatch(router, PATCH("/")).assertBody("patch");
-        dispatch(router, HEAD("/")).assertBody("head");
-        dispatch(router, OPTIONS("/")).assertBody("options");
+        assertThat(dispatch(router, GET("/"))).hasBodyText("get");
+        assertThat(dispatch(router, POST("/"))).hasBodyText("post");
+        assertThat(dispatch(router, PUT("/"))).hasBodyText("put");
+        assertThat(dispatch(router, DELETE("/"))).hasBodyText("delete");
+        assertThat(dispatch(router, PATCH("/"))).hasBodyText("patch");
+        assertThat(dispatch(router, HEAD("/"))).hasBodyText("head");
+        assertThat(dispatch(router, OPTIONS("/"))).hasBodyText("options");
     }
 
     @Test public void
@@ -53,7 +54,7 @@ public class DynamicRoutesTest {
             map("/").to(echo("override"));
         }});
 
-        dispatch(router, GET("/")).assertBody("original");
+        assertThat(dispatch(router, GET("/"))).hasBodyText("original");
     }
 
     @Test
@@ -63,8 +64,8 @@ public class DynamicRoutesTest {
             map("/").via(HttpMethod.POST, HttpMethod.PUT).to(echo("found"));
         }});
 
-        dispatch(router, POST("/")).assertBody("found");
-        dispatch(router, PUT("/")).assertBody("found");
+        assertThat(dispatch(router, POST("/"))).hasBodyText("found");
+        assertThat(dispatch(router, PUT("/"))).hasBodyText("found");
     }
 
     @Test public void
@@ -73,7 +74,7 @@ public class DynamicRoutesTest {
             map("/resource/:id").to(echo("parameters"));
         }});
 
-        dispatch(router, GET("/resource/42")).assertBody("parameters {id=[42]}");
+        assertThat(dispatch(router, GET("/resource/42"))).hasBodyText("parameters {id=[42]}");
     }
 
     private MockResponse dispatch(Router router, Request request) throws Exception {

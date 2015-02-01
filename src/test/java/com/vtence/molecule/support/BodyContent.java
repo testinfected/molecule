@@ -2,12 +2,14 @@ package com.vtence.molecule.support;
 
 import com.vtence.molecule.Response;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class BodyContent {
 
-    public static byte[] of(Response response) {
+    public static byte[] asBytes(Response response) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             response.body().writeTo(out, response.charset());
@@ -18,7 +20,11 @@ public class BodyContent {
     }
 
     public static String asText(Response response) {
-        return new String(BodyContent.of(response), response.charset());
+        return new String(BodyContent.asBytes(response), response.charset());
+    }
+
+    public static InputStream asStream(Response response) {
+        return new ByteArrayInputStream(asBytes(response));
     }
 
     private BodyContent() {}

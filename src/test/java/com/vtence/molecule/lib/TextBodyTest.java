@@ -7,8 +7,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class TextBodyTest {
 
@@ -21,8 +20,7 @@ public class TextBodyTest {
         body.append(" text");
         body.append(" body");
         response.body(body);
-        assertThat("text", body.text(), equalTo("The entire text body"));
-        response.assertBody(body.text());
+        assertThat(response).hasBodyText("The entire text body");
         response.assertContentSize(body.size(ISO_8859_1));
     }
 

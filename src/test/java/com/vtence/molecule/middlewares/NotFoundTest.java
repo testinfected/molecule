@@ -29,7 +29,7 @@ public class NotFoundTest {
 
     @Test public void
     rendersPageNotFound() {
-        response.assertBody(content);
+        assertThat(response).hasBodyText(content);
     }
 
     @Test public void

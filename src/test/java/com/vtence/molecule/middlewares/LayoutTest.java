@@ -51,7 +51,7 @@ public class LayoutTest {
         });
 
         layout.handle(request, response);
-        response.assertBody("<decorated>raw content</decorated>");
+        assertThat(response).hasBodyText("<decorated>raw content</decorated>");
     }
 
     @Test public void
@@ -70,7 +70,7 @@ public class LayoutTest {
         });
         page.become("unselected");
         layout.handle(request, response);
-        response.assertBody("original content");
+        assertThat(response).hasBodyText("original content");
     }
 
     @Test public void
@@ -86,7 +86,7 @@ public class LayoutTest {
 
         assertThat(response).hasContentType("text/html; charset=utf-8");
         response.assertContentEncodedAs("utf-8");
-        response.assertBody(containsString("éçëœ"));
+        assertThat(response).hasBodyText(containsString("éçëœ"));
     }
 
     private class StubProcessor implements ContentProcessor {

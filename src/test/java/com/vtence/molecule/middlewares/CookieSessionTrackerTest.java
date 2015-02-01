@@ -48,8 +48,8 @@ public class CookieSessionTrackerTest {
         }});
 
         tracker.handle(request, response);
-        response.assertBody("Session: null");
-        assertThat(response).hasNoCookie(SESSION_COOKIE);
+        assertThat(response).hasNoCookie(SESSION_COOKIE)
+                            .hasBodyText("Session: null");
     }
 
     @Test public void
@@ -60,8 +60,8 @@ public class CookieSessionTrackerTest {
         }});
 
         tracker.handle(request, response);
-        response.assertBody("Counter: 1");
-        assertThat(response).hasCookie(SESSION_COOKIE).hasValue("new").isHttpOnly();
+        assertThat(response).hasBodyText("Counter: 1")
+                            .hasCookie(SESSION_COOKIE).hasValue("new").isHttpOnly();
     }
 
     @Test public void
@@ -76,7 +76,7 @@ public class CookieSessionTrackerTest {
         }});
 
         tracker.handle(request.cookie(SESSION_COOKIE, "existing"), response);
-        response.assertBody("Counter: 2");
+        assertThat(response).hasBodyText("Counter: 2");
     }
 
     @Test public void
@@ -98,8 +98,8 @@ public class CookieSessionTrackerTest {
         }});
 
         tracker.handle(request.cookie(SESSION_COOKIE, "expired"), response);
-        response.assertBody("Counter: 1");
-        assertThat(response).hasCookie(SESSION_COOKIE).hasValue("new");
+        assertThat(response).hasBodyText("Counter: 1")
+                            .hasCookie(SESSION_COOKIE).hasValue("new");
     }
 
     @Test public void

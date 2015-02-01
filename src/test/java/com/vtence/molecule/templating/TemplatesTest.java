@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class TemplatesTest {
@@ -18,7 +19,7 @@ public class TemplatesTest {
     @Test public void
     rendersTemplateUsingProvidedContext() throws IOException {
         response.body(template.render(new Context()));
-        response.assertBody(containsString("Hello World"));
+        assertThat(response).hasBodyText(containsString("Hello World"));
     }
 
     public static class Context {

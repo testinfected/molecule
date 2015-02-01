@@ -152,6 +152,10 @@ public class MockResponse extends Response {
         return out.toByteArray();
     }
 
+    /**
+     * @see BodyContent#asStream(com.vtence.molecule.Response)
+     */
+    @Deprecated
     public InputStream stream() {
         return new ByteArrayInputStream(content());
     }

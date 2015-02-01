@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+
 public class StaticAssetsTest {
 
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
@@ -35,26 +37,26 @@ public class StaticAssetsTest {
     @Test public void
     servesFileWhenPathMatchesExactly() throws Exception {
         assets.handle(request.path("/favicon.ico"), response);
-        response.assertBody("/favicon.ico");
+        assertThat(response).hasBodyText("/favicon.ico");
     }
 
     @Test public void
     servesFileWhenPathMatchesUrlPrefix() throws Exception {
         assets.serve("/assets");
         assets.handle(request.path("/assets/images/logo.png"), response);
-        response.assertBody("/assets/images/logo.png");
+        assertThat(response).hasBodyText("/assets/images/logo.png");
     }
 
     @Test public void
     servesIndexFileIfPathIndicatesADirectory() throws Exception {
         assets.serve("/faq").index("index.html");
         assets.handle(request.path("/faq/"), response);
-        response.assertBody("/faq/index.html");
+        assertThat(response).hasBodyText("/faq/index.html");
     }
 
     @Test public void
     forwardsWhenPathIsNotMatched() throws Exception {
         assets.handle(request.path("/"), response);
-        response.assertBody("Forwarded");
+        assertThat(response).hasBodyText("Forwarded");
     }
 }
