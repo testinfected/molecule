@@ -2,6 +2,7 @@ package com.vtence.molecule.support;
 
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -28,7 +29,7 @@ public class ResponseAssertions {
     }
 
     public ResponseAssertions hasStatusCode(Matcher<? super Integer> matching) {
-        Assert.assertThat("status code", response.statusCode(), matching);
+        Assert.assertThat("response status code", response.statusCode(), matching);
         return this;
     }
 
@@ -38,7 +39,7 @@ public class ResponseAssertions {
     }
 
     public ResponseAssertions hasStatusText(Matcher<? super String> matching) {
-        Assert.assertThat("status text", response.statusText(), matching);
+        Assert.assertThat("response status text", response.statusText(), matching);
         return this;
     }
 
@@ -54,7 +55,7 @@ public class ResponseAssertions {
     }
 
     public ResponseAssertions isRedirectedTo(Matcher<? super String> matching) {
-        Assert.assertThat("redirection", response.header(LOCATION), matching);
+        hasHeader(HeaderNames.LOCATION, matching);
         return this;
     }
 
@@ -69,7 +70,7 @@ public class ResponseAssertions {
     }
 
     public ResponseAssertions hasHeader(String name, Matcher<? super String> matchingValue) {
-        Assert.assertThat(name, response.header(name), matchingValue);
+        Assert.assertThat("response " + name + " header", response.header(name), matchingValue);
         return this;
     }
 
@@ -90,12 +91,12 @@ public class ResponseAssertions {
 
     public CookieAssertions hasCookie(String named) {
         Cookie cookie = response.cookie(named);
-        Assert.assertTrue("No cookie " + named, cookie != null);
+        Assert.assertTrue("response is missing cookie " + named, cookie != null);
         return new CookieAssertions(cookie);
     }
 
     public ResponseAssertions hasNoCookie(String named) {
-        Assert.assertFalse("Unexpected cookie " + named, response.hasCookie(named));
+        Assert.assertFalse("response has unexpected cookie " + named, response.hasCookie(named));
         return this;
     }
 }

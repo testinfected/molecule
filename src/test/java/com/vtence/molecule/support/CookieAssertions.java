@@ -24,12 +24,12 @@ public class CookieAssertions {
     }
 
     public CookieAssertions hasValue(Matcher<? super String> matching) {
-        Assert.assertThat("value", cookie.value(), matching);
+        Assert.assertThat(cookie.name() + " cookie value", cookie.value(), matching);
         return this;
     }
 
     public CookieAssertions isHttpOnly() {
-        Assert.assertThat("http only", cookie.httpOnly(), is(true));
+        Assert.assertThat(cookie.name() + " cookie http only", cookie.httpOnly(), is(true));
         return this;
     }
 
@@ -38,7 +38,7 @@ public class CookieAssertions {
     }
 
     public CookieAssertions hasMaxAge(Matcher<? super Integer> matching) {
-        Assert.assertThat("max age", cookie.maxAge(), matching);
+        Assert.assertThat(cookie.name() + " cookie max age", cookie.maxAge(), matching);
         return this;
     }
 }
