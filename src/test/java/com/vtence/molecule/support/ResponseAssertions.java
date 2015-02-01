@@ -7,9 +7,6 @@ import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -107,21 +104,7 @@ public class ResponseAssertions {
     }
 
     public ResponseAssertions hasBodyText(Matcher<? super String> matching) {
-        Assert.assertThat("response body text", responseBodyText(), matching);
+        Assert.assertThat("response body text", BodyContent.asText(response), matching);
         return this;
-    }
-
-    private byte[] responseBodyContent() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            response.body().writeTo(out, response.charset());
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        return out.toByteArray();
-    }
-
-    public String responseBodyText() {
-        return new String(responseBodyContent(), response.charset());
     }
 }
