@@ -90,14 +90,26 @@ public class MockResponse extends Response {
         assertThat(this).hasContentType(matching);
     }
 
+    /**
+     * @see ResponseAssertions#hasCookie(String)
+     */
+    @Deprecated
     public void assertHasCookie(String name) {
-        assertCookie(name, notNullValue());
+        assertThat(this).hasCookie(name);
     }
 
+    /**
+     * @see ResponseAssertions#hasNoCookie(String)
+     */
+    @Deprecated
     public void assertHasNoCookie(String name) {
-        assertCookie(name, nullValue());
+        assertThat(this).hasNoCookie(name);
     }
 
+    /**
+     * @see ResponseAssertions#hasCookie(String)
+     */
+    @Deprecated
     public void assertCookie(String name, Matcher<? super Cookie> matching) {
         assertThat(name, cookie(name), matching);
     }

@@ -1,6 +1,7 @@
 package com.vtence.molecule.support;
 
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -13,7 +14,7 @@ public class ResponseAssertions {
 
     private final Response response;
 
-    public ResponseAssertions(Response response) {
+    protected ResponseAssertions(Response response) {
         this.response = response;
     }
 
@@ -57,8 +58,8 @@ public class ResponseAssertions {
         return this;
     }
 
-    public ResponseAssertions hasHeader(String name) {
-        hasHeader(name, any(String.class));
+    public ResponseAssertions hasHeader(String named) {
+        hasHeader(named, any(String.class));
         return this;
     }
 
@@ -72,8 +73,8 @@ public class ResponseAssertions {
         return this;
     }
 
-    public ResponseAssertions hasNoHeader(String name) {
-        hasHeader(name, nullValue());
+    public ResponseAssertions hasNoHeader(String named) {
+        hasHeader(named, nullValue());
         return this;
     }
 
@@ -84,6 +85,17 @@ public class ResponseAssertions {
 
     public ResponseAssertions hasContentType(Matcher<? super String> matching) {
         hasHeader(CONTENT_TYPE, matching);
+        return this;
+    }
+
+    public CookieAssertions hasCookie(String named) {
+        Cookie cookie = response.cookie(named);
+        Assert.assertTrue("No cookie " + named, cookie != null);
+        return new CookieAssertions(cookie);
+    }
+
+    public ResponseAssertions hasNoCookie(String named) {
+        Assert.assertFalse("Unexpected cookie " + named, response.hasCookie(named));
         return this;
     }
 }

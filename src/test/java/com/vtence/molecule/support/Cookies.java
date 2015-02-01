@@ -7,6 +7,7 @@ import org.hamcrest.Matcher;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+@Deprecated
 public class Cookies {
 
     private Cookies() {}
