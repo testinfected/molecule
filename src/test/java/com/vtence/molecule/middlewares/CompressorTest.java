@@ -35,7 +35,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        response.assertHeader("Content-Encoding", "deflate");
+        assertThat(response).hasHeader("Content-Encoding", "deflate");
         assertThat("body", inflate(response), equalTo("uncompressed body"));
     }
 
@@ -49,7 +49,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
-        response.assertHeader("Content-Encoding", "gzip");
+        assertThat(response).hasHeader("Content-Encoding", "gzip");
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
@@ -64,7 +64,7 @@ public class CompressorTest {
         request.addHeader("Accept-Encoding", "gzip");
         request.addHeader("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        response.assertHeader("Content-Encoding", "gzip");
+        assertThat(response).hasHeader("Content-Encoding", "gzip");
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
@@ -77,7 +77,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        response.assertNoHeader("Content-Encoding");
+        assertThat(response).hasNoHeader("Content-Encoding");
     }
 
     @Test public void
@@ -91,7 +91,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "deflate");
         compressor.handle(request, response);
-        response.assertNoHeader("Content-Length");
+        assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
@@ -104,7 +104,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "compress");
         compressor.handle(request, response);
-        response.assertNoHeader("Content-Encoding");
+        assertThat(response).hasNoHeader("Content-Encoding");
         response.assertBody("uncompressed body");
     }
 
@@ -119,7 +119,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "identity");
         compressor.handle(request, response);
-        response.assertHeader("Content-Length", "128");
+        assertThat(response).hasHeader("Content-Length", "128");
     }
 
     @Test public void
@@ -133,7 +133,7 @@ public class CompressorTest {
 
         request.header("Accept-Encoding", "gzip");
         compressor.handle(request, response);
-        response.assertHeader("Content-Encoding", "deflate");
+        assertThat(response).hasHeader("Content-Encoding", "deflate");
         response.assertBody("<compressed body>");
     }
 
@@ -161,7 +161,7 @@ public class CompressorTest {
         request.header("Accept-Encoding", "identity;q=0");
         compressor.handle(request, response);
         assertThat(response).hasStatus(NOT_ACCEPTABLE);
-        response.assertContentType("text/plain");
+        assertThat(response).hasContentType("text/plain");
         response.assertBody("An acceptable encoding could not be found");
     }
 
@@ -177,7 +177,7 @@ public class CompressorTest {
         request.header("Accept-Encoding", "gzip");
         compressor.compressibleTypes("text/html");
         compressor.handle(request, response);
-        response.assertNoHeader("Content-Encoding");
+        assertThat(response).hasNoHeader("Content-Encoding");
         assertThat("body", response.text(), equalTo("uncompressed body"));
     }
 

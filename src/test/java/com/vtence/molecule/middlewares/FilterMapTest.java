@@ -11,6 +11,7 @@ import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static java.lang.String.format;
 
 public class FilterMapTest {
@@ -70,7 +71,7 @@ public class FilterMapTest {
     }
 
     private void assertFilteredContent(String content) {
-        response.assertHeader("content", content);
+        assertThat(response).hasHeader("content", content);
     }
 
     private Matcher<Request> all() {

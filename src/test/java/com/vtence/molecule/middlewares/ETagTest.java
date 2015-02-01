@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.Date;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class ETagTest {
 
@@ -27,7 +28,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
+        assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
     @Test public void
@@ -38,7 +39,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertNoHeader("ETag");
+        assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
@@ -50,7 +51,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertNoHeader("ETag");
+        assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
@@ -62,7 +63,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
+        assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
     @Test public void
@@ -74,7 +75,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertHeader("ETag", "already set");
+        assertThat(response).hasHeader("ETag", "already set");
     }
 
     @Test public void
@@ -86,7 +87,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertNoHeader("ETag");
+        assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
@@ -98,7 +99,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertNoHeader("ETag");
+        assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
@@ -109,7 +110,7 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertHeader("Cache-Control", "max-age=0; private; no-cache");
+        assertThat(response).hasHeader("Cache-Control", "max-age=0; private; no-cache");
     }
 
     @Test public void
@@ -121,6 +122,6 @@ public class ETagTest {
             }
         });
         etag.handle(request, response);
-        response.assertHeader("Cache-Control", "public");
+        assertThat(response).hasHeader("Cache-Control", "public");
     }
 }

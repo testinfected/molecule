@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class ContentLengthHeaderTest {
 
@@ -30,7 +31,7 @@ public class ContentLengthHeaderTest {
         });
 
         contentLengthHeader.handle(request, response);
-        response.assertHeader("Content-Length", "32");
+        assertThat(response).hasHeader("Content-Length", "32");
     }
 
     @Test public void
@@ -48,7 +49,7 @@ public class ContentLengthHeaderTest {
         });
 
         contentLengthHeader.handle(request, response);
-        response.assertNoHeader("Content-Length");
+        assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
@@ -59,7 +60,7 @@ public class ContentLengthHeaderTest {
         });
 
         contentLengthHeader.handle(request, response);
-        response.assertNoHeader("Content-Length");
+        assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
@@ -72,7 +73,7 @@ public class ContentLengthHeaderTest {
         });
 
         contentLengthHeader.handle(request, response);
-        response.assertHeader("Content-Length", "1");
+        assertThat(response).hasHeader("Content-Length", "1");
     }
 
     @Test public void
@@ -85,6 +86,6 @@ public class ContentLengthHeaderTest {
         });
 
         contentLengthHeader.handle(request, response);
-        response.assertNoHeader("Content-Length");
+        assertThat(response).hasNoHeader("Content-Length");
     }
 }

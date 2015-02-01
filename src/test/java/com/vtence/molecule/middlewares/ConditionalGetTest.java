@@ -18,7 +18,6 @@ import static com.vtence.molecule.support.Dates.aDate;
 import static com.vtence.molecule.support.Dates.instant;
 import static com.vtence.molecule.support.Dates.now;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
-import static org.hamcrest.Matchers.nullValue;
 
 public class ConditionalGetTest {
 
@@ -42,9 +41,8 @@ public class ConditionalGetTest {
 
         assertThat(response).hasStatus(NOT_MODIFIED);
         response.assertContentSize(0);
-        response.assertContentType(nullValue());
-        response.assertHeader("Content-Length", nullValue());
-
+        assertThat(response).hasNoHeader("Content-Type");
+        assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void

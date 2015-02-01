@@ -11,7 +11,6 @@ import org.junit.Test;
 import static com.vtence.molecule.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
 
 public class FailsafeTest {
     Failsafe failsafe = new Failsafe();
@@ -51,6 +50,6 @@ public class FailsafeTest {
 
     @Test public void
     respondsWithHtmlContentUtf8Encoded() {
-        response.assertHeader("Content-Type", equalTo("text/html; charset=utf-8"));
+        assertThat(response).hasContentType("text/html; charset=utf-8");
     }
 }

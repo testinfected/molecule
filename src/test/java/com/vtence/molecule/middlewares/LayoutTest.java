@@ -10,6 +10,7 @@ import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.nullValue;
 
 public class LayoutTest {
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
@@ -58,7 +58,7 @@ public class LayoutTest {
     removesContentLengthHeaderIfDecorating() throws Exception {
         response.header("Content-Length", 140);
         layout.handle(request, response);
-        response.assertHeader("Content-Length", nullValue());
+        assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
@@ -84,7 +84,7 @@ public class LayoutTest {
         response.contentType("text/html; charset=utf-8");
         layout.handle(request, response);
 
-        response.assertContentType("text/html; charset=utf-8");
+        assertThat(response).hasContentType("text/html; charset=utf-8");
         response.assertContentEncodedAs("utf-8");
         response.assertBody(containsString("éçëœ"));
     }

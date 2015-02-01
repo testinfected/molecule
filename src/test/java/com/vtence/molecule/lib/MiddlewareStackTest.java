@@ -7,6 +7,9 @@ import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+
 public class MiddlewareStackTest {
 
     MiddlewareStack stack = new MiddlewareStack();
@@ -22,7 +25,7 @@ public class MiddlewareStackTest {
         stack.run(application("app"));
 
         stack.handle(request, response);
-        assertChain("top -> middle -> bottom -> app");
+        assertChain(is("top -> middle -> bottom -> app"));
     }
 
     private Middleware middleware(final String order) {
@@ -42,7 +45,7 @@ public class MiddlewareStackTest {
         };
     }
 
-    private void assertChain(String chaining) {
-        response.assertHeader("chain", chaining);
+    private void assertChain(org.hamcrest.Matcher<? super String> chaining) {
+        assertThat(response).hasHeader("chain", chaining);
     }
 }

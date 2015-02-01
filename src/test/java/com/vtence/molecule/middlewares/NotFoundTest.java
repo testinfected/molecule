@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
@@ -35,6 +34,6 @@ public class NotFoundTest {
 
     @Test public void
     setsContentTypeToPlainText() {
-        response.assertHeader("Content-Type", "text/plain");
+       assertThat(response).hasContentType("text/plain");
     }
 }
