@@ -36,10 +36,10 @@ public class FileServerTest {
     servesFiles() throws Exception {
         fileServer.handle(request, response);
 
-        assertThat(response).hasStatus(OK);
+        assertThat(response).hasStatus(OK)
+                            .hasHeader("Content-Length", valueOf(file.length()));
         response.assertContentSize(file.length());
         response.assertContent(contentOf(file));
-        assertThat(response).hasHeader("Content-Length", valueOf(file.length()));
     }
 
     @Test public void
@@ -67,14 +67,16 @@ public class FileServerTest {
     @Test public void
     rendersNotFoundWhenFileIsNotFound() throws Exception {
         fileServer.handle(request.path("/images/missing.png"), response);
-        assertThat(response).hasStatus(NOT_FOUND);
-        assertThat(response).hasContentType("text/plain");
+
+        assertThat(response).hasStatus(NOT_FOUND)
+                            .hasContentType("text/plain");
         response.assertBody("File not found: /images/missing.png");
     }
 
     @Test public void
     rendersNotFoundWhenFileIsNotReadable() throws Exception {
         fileServer.handle(request.path("/images"), response);
+
         assertThat(response).hasStatus(NOT_FOUND);
     }
 
@@ -82,34 +84,36 @@ public class FileServerTest {
     sendsNotModifiedIfFileHasNotBeenModifiedSinceLastServe() throws Exception {
         request.header("If-Modified-Since", HttpDate.format(file.lastModified()));
         fileServer.handle(request, response);
+
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
     @Test public void
     addsConfiguredCustomHeadersToResponse() throws Exception {
-        fileServer.
-                          header("Cache-Control", "public, max-age=60").
-                          header("Access-Control-Allow-Origin", "*");
+        fileServer.header("Cache-Control", "public, max-age=60")
+                  .header("Access-Control-Allow-Origin", "*");
 
         fileServer.handle(request, response);
-        assertThat(response).hasHeader("Cache-Control", "public, max-age=60");
-        assertThat(response).hasHeader("Access-Control-Allow-Origin", "*");
+        assertThat(response).hasHeader("Cache-Control", "public, max-age=60")
+                            .hasHeader("Access-Control-Allow-Origin", "*");
     }
 
     @Test public void
     allowsHeadRequests() throws Exception {
         fileServer.handle(request.method(HttpMethod.HEAD), response);
-        assertThat(response).hasStatus(OK);
+
+        assertThat(response).hasStatus(OK)
+                            .hasHeader("Content-Length", valueOf(file.length()));
         response.assertContentSize(0);
-        assertThat(response).hasHeader("Content-Length", valueOf(file.length()));
     }
 
     @Test public void
     rejectsUnsupportedMethod() throws Exception {
         fileServer.handle(request.method(HttpMethod.POST), response);
-        assertThat(response).hasStatus(METHOD_NOT_ALLOWED);
-        assertThat(response).hasHeader("Allow", "GET, HEAD");
-        assertThat(response).hasNoHeader("Last-Modified");
+
+        assertThat(response).hasStatus(METHOD_NOT_ALLOWED)
+                            .hasHeader("Allow", "GET, HEAD")
+                            .hasNoHeader("Last-Modified");
     }
 
     private byte[] contentOf(final File file) throws IOException, URISyntaxException {

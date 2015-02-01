@@ -160,8 +160,9 @@ public class CompressorTest {
         });
         request.header("Accept-Encoding", "identity;q=0");
         compressor.handle(request, response);
-        assertThat(response).hasStatus(NOT_ACCEPTABLE);
-        assertThat(response).hasContentType("text/plain");
+
+        assertThat(response).hasStatus(NOT_ACCEPTABLE)
+                            .hasContentType("text/plain");
         response.assertBody("An acceptable encoding could not be found");
     }
 
