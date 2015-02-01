@@ -16,9 +16,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.vtence.molecule.support.Cookies.cookieWithMaxAge;
-import static com.vtence.molecule.support.Cookies.cookieWithValue;
-import static com.vtence.molecule.support.Cookies.httpOnlyCookie;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -51,7 +49,7 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request, response);
         response.assertBody("Session: null");
-        response.assertHasNoCookie(SESSION_COOKIE);
+        assertThat(response).hasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
@@ -63,8 +61,7 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request, response);
         response.assertBody("Counter: 1");
-        response.assertCookie(SESSION_COOKIE, cookieWithValue("new"));
-        response.assertCookie(SESSION_COOKIE, httpOnlyCookie(true));
+        assertThat(response).hasCookie(SESSION_COOKIE).hasValue("new").isHttpOnly();
     }
 
     @Test public void
@@ -102,7 +99,7 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request.cookie(SESSION_COOKIE, "expired"), response);
         response.assertBody("Counter: 1");
-        response.assertCookie(SESSION_COOKIE, cookieWithValue("new"));
+        assertThat(response).hasCookie(SESSION_COOKIE).hasValue("new");
     }
 
     @Test public void
@@ -113,7 +110,7 @@ public class CookieSessionTrackerTest {
         }});
 
         tracker.handle(request.cookie(SESSION_COOKIE, "existing"), response);
-        response.assertHasNoCookie(SESSION_COOKIE);
+        assertThat(response).hasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
@@ -124,7 +121,7 @@ public class CookieSessionTrackerTest {
         }});
 
         tracker.handle(request.cookie(SESSION_COOKIE, "existing"), response);
-        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(0));
+        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(0);
     }
 
     @Test public void
@@ -134,7 +131,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(sessionWithMaxAge(-1))); will(returnValue("persistent"));
         }});
         tracker.handle(request, response);
-        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(-1));
+        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
     }
 
     @Test public void
@@ -144,7 +141,7 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
         }});
         tracker.handle(request, response);
-        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(timeout));
+        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
     @Test public void
@@ -152,8 +149,7 @@ public class CookieSessionTrackerTest {
         tracker.expireAfter(timeout);
         tracker.connectTo(incrementCounter());
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithMaxAge(timeout)));
-            will(returnValue("expires"));
+            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
         }});
         tracker.handle(request, response);
     }
@@ -162,11 +158,10 @@ public class CookieSessionTrackerTest {
     setsCookieEvenOnExistingSessionsIfMaxAgeSpecified() throws Exception {
         tracker.connectTo(expireSessionAfter(timeout));
         context.checking(new Expectations() {{
-            allowing(store).save(with(sessionWithId("existing")));
-            will(returnValue("existing"));
+            allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
         tracker.handle(request.cookie(SESSION_COOKIE, "existing"), response);
-        response.assertCookie(SESSION_COOKIE, cookieWithMaxAge(timeout));
+        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
     @Test public void
