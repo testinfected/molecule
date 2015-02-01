@@ -114,12 +114,20 @@ public class MockResponse extends Response {
         assertThat(name, cookie(name), matching);
     }
 
+    /**
+     * @see ResponseAssertions#hasBodyText(String)
+     */
+    @Deprecated
     public void assertBody(String body) {
-        assertBody(equalTo(body));
+        assertThat(this).hasBodyText(body);
     }
 
+    /**
+     * @see ResponseAssertions#hasBodyText(org.hamcrest.Matcher)
+     */
+    @Deprecated
     public void assertBody(Matcher<? super String> matching) {
-        assertThat("body", text(), matching);
+        assertThat(this).hasBodyText(matching);
     }
 
     public void assertContent(byte[] content) {
