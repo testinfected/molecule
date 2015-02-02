@@ -1,3 +1,4 @@
+require 'buildr/gpg'
 require 'buildr/custom_pom'
 require 'buildr/jacoco'
 
