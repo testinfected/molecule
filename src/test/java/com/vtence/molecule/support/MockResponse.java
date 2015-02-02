@@ -10,10 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.vtence.molecule.support.CharsetDetector.detectedCharset;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertArrayEquals;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 public class MockResponse extends Response {
@@ -130,18 +128,34 @@ public class MockResponse extends Response {
         assertThat(this).hasBodyText(matching);
     }
 
+    /**
+     * @see ResponseAssertions#hasBodyContent(byte[])
+     */
+    @Deprecated
     public void assertContent(byte[] content) {
-        assertArrayEquals("content", content, content());
+        assertThat(this).hasBodyContent(content);
     }
 
-    public void assertContentSize(long size) {
-        assertThat("content size", contentSize(), is(size));
+    /**
+     * @see ResponseAssertions#hasBodySize(long)
+     */
+    @Deprecated
+    public void assertContentSize(long byteCount) {
+        assertThat(this).hasBodySize(byteCount);
     }
 
+    /**
+     * @see ResponseAssertions#hasBodyEncoding(java.nio.charset.Charset)
+     */
+    @Deprecated
     public void assertContentEncodedAs(String encoding) throws IOException {
-        assertThat("content encoding", detectedCharset(content()).toLowerCase(), containsString(encoding.toLowerCase()));
+        assertThat(this).hasBodyEncoding(containsString(encoding.toUpperCase()));
     }
 
+    @Deprecated
+    /**
+     * @see BodyContent#asBytes(com.vtence.molecule.Response)
+     */
     public byte[] content() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -164,6 +178,7 @@ public class MockResponse extends Response {
         return new String(content(), charset());
     }
 
+    @Deprecated
     public long contentSize() {
         return content().length;
     }

@@ -7,7 +7,10 @@ import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
+import java.nio.charset.Charset;
+
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.support.CharsetDetector.charsetOf;
 import static org.hamcrest.CoreMatchers.*;
 
 public class ResponseAssertions {
@@ -105,6 +108,33 @@ public class ResponseAssertions {
 
     public ResponseAssertions hasBodyText(Matcher<? super String> matching) {
         Assert.assertThat("response body text", BodyContent.asText(response), matching);
+        return this;
+    }
+
+    public ResponseAssertions hasBodyContent(byte[] content) {
+        Assert.assertArrayEquals("response body content", content, BodyContent.asBytes(response));
+        return this;
+    }
+
+    public ResponseAssertions hasBodySize(long byteCount) {
+        return hasSize(is(byteCount));
+    }
+
+    public ResponseAssertions hasSize(Matcher<? super Long> matching) {
+        Assert.assertThat("response size", response.size(), matching);
+        return this;
+    }
+
+    public ResponseAssertions hasBodyEncoding(Charset charset) {
+        return hasBodyEncoding(charset.name());
+    }
+
+    public ResponseAssertions hasBodyEncoding(String encoding) {
+        return hasBodyEncoding(equalTo(encoding));
+    }
+
+    public ResponseAssertions hasBodyEncoding(Matcher<? super String> matching) {
+        Assert.assertThat("response body encoding", charsetOf(BodyContent.asBytes(response)), matching);
         return this;
     }
 }

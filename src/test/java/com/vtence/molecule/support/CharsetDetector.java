@@ -3,11 +3,9 @@ package com.vtence.molecule.support;
 import org.mozilla.universalchardet.CharsetListener;
 import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.IOException;
-
 public class CharsetDetector {
 
-    public static String detectedCharset(byte[] data) throws IOException {
+    public static String charsetOf(byte[] data) {
         UniversalDetector charsetDetector = new UniversalDetector(new CharsetListener() {
             public void report(String charset) {
             }
