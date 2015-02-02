@@ -23,14 +23,16 @@ public class ETag extends AbstractMiddleware {
     public void handle(Request request, Response response) throws Exception {
         forward(request, response);
 
+        if (!isCacheable(response)) return;
+        if (!hasCachingDirective(response)) response.header(CACHE_CONTROL, REVALIDATE);
+
         byte[] output = render(response);
-        if (isCacheable(response, output)) {
-            response.header(ETAG, "\"" + Hex.from(computeHash(output)) + "\"");
-        }
-        if (!hasCachingDirective(response)) {
-            response.header(CACHE_CONTROL, REVALIDATE);
-        }
+        response.header(ETAG, etagOf(output));
         response.body(new BinaryBody(output));
+    }
+
+    private String etagOf(byte[] output) throws NoSuchAlgorithmException {
+        return "\"" + Hex.from(computeHash(output)) + "\"";
     }
 
     private byte[] render(Response response) throws IOException {
@@ -40,12 +42,12 @@ public class ETag extends AbstractMiddleware {
         return out.toByteArray();
     }
 
-    private boolean isCacheable(Response response, byte[] output) {
-        return hasContent(output) && hasCacheableStatus(response) && !skipCaching(response);
+    private boolean isCacheable(Response response) {
+        return hasContent(response) && hasCacheableStatus(response) && !skipCaching(response);
     }
 
-    private boolean hasContent(byte[] output) {
-        return output.length > 0;
+    private boolean hasContent(Response response) {
+        return !response.empty();
     }
 
     private boolean hasCacheableStatus(Response response) {
