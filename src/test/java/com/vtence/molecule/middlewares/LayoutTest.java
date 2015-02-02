@@ -4,12 +4,15 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.decoration.ContentProcessor;
 import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.support.MockRequest;
 import com.vtence.molecule.support.MockResponse;
+
+import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import org.jmock.Expectations;
 import org.jmock.States;
@@ -84,9 +87,9 @@ public class LayoutTest {
         response.contentType("text/html; charset=utf-8");
         layout.handle(request, response);
 
-        assertThat(response).hasContentType("text/html; charset=utf-8");
-        response.assertContentEncodedAs("utf-8");
-        assertThat(response).hasBodyText(containsString("éçëœ"));
+        assertThat(response).hasContentType("text/html; charset=utf-8")
+                            .hasBodyEncoding(UTF_8)
+                            .hasBodyText(containsString("éçëœ"));
     }
 
     private class StubProcessor implements ContentProcessor {
@@ -98,7 +101,7 @@ public class LayoutTest {
     }
 
     private class StubDecorator implements Decorator {
-        public Body merge(Request request, Map<String, String> content) throws IOException {
+        public Body merge(Request request, Map<String, String> content) {
             return TextBody.text("<decorated>" + content.get("content") + "</decorated>");
         }
     }

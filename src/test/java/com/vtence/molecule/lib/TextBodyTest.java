@@ -1,12 +1,12 @@
 package com.vtence.molecule.lib;
 
 import com.vtence.molecule.support.MockResponse;
-import com.vtence.molecule.helpers.Charsets;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
+import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class TextBodyTest {
@@ -20,8 +20,8 @@ public class TextBodyTest {
         body.append(" text");
         body.append(" body");
         response.body(body);
-        assertThat(response).hasBodyText("The entire text body");
-        response.assertContentSize(body.size(ISO_8859_1));
+        assertThat(response).hasBodyText("The entire text body")
+                            .hasBodySize(body.size(ISO_8859_1));
     }
 
     @Test public void
@@ -29,7 +29,7 @@ public class TextBodyTest {
         body.append("De drôles d'œufs abîmés");
         response.contentType("text/plain; charset=UTF-8");
         response.body(body);
-        response.assertContentEncodedAs("UTF-8");
-        response.assertContentSize(body.size(Charsets.UTF_8));
+        assertThat(response).hasBodyEncoding(UTF_8)
+                            .hasBodySize(body.size(UTF_8));
     }
 }

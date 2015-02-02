@@ -7,9 +7,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
@@ -24,11 +24,11 @@ public class FileBodyTest {
         FileBody body = new FileBody(file);
         assertThat("file", body.file(), sameInstance(file));
         response.body(body);
-        response.assertContentSize(file.length());
-        response.assertContent(contentOf(file));
+        assertThat(response).hasBodySize(file.length())
+                            .hasBodyContent(contentOf(file));
     }
 
-    private byte[] contentOf(final File file) throws IOException, URISyntaxException {
+    private byte[] contentOf(final File file) throws IOException {
         return Streams.toBytes(new FileInputStream(file));
     }
 }

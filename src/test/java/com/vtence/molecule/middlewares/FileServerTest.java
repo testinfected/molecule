@@ -37,9 +37,9 @@ public class FileServerTest {
         fileServer.handle(request, response);
 
         assertThat(response).hasStatus(OK)
-                            .hasHeader("Content-Length", valueOf(file.length()));
-        response.assertContentSize(file.length());
-        response.assertContent(contentOf(file));
+                            .hasHeader("Content-Length", valueOf(file.length()))
+                            .hasBodySize(file.length())
+                            .hasBodyContent(contentOf(file));
     }
 
     @Test public void
@@ -103,8 +103,8 @@ public class FileServerTest {
         fileServer.handle(request.method(HttpMethod.HEAD), response);
 
         assertThat(response).hasStatus(OK)
-                            .hasHeader("Content-Length", valueOf(file.length()));
-        response.assertContentSize(0);
+                            .hasHeader("Content-Length", valueOf(file.length()))
+                            .hasBodySize(0);
     }
 
     @Test public void
@@ -116,7 +116,7 @@ public class FileServerTest {
                             .hasNoHeader("Last-Modified");
     }
 
-    private byte[] contentOf(final File file) throws IOException, URISyntaxException {
+    private byte[] contentOf(final File file) throws IOException {
         return Streams.toBytes(new FileInputStream(file));
     }
 }

@@ -39,10 +39,10 @@ public class ConditionalGetTest {
         request.header("If-None-Match", "12345678");
         conditional.handle(request, response);
 
-        assertThat(response).hasStatus(NOT_MODIFIED);
-        response.assertContentSize(0);
-        assertThat(response).hasNoHeader("Content-Type");
-        assertThat(response).hasNoHeader("Content-Length");
+        assertThat(response).hasStatus(NOT_MODIFIED)
+                            .hasBodySize(0)
+                            .hasNoHeader("Content-Type")
+                            .hasNoHeader("Content-Length");
     }
 
     @Test public void
