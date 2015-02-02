@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.vtence.molecule.support.RequestAssertions.assertThat;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
@@ -167,7 +168,7 @@ public class CookieSessionTrackerTest {
     unsetsSessionAfterwards() throws Exception {
         tracker.connectTo(nothing());
         tracker.handle(request, response);
-        request.assertAttribute(Session.class, nullValue());
+        assertThat(request).hasAttribute(Session.class, nullValue());
     }
 
     private FeatureMatcher<Session, String> newSession() {

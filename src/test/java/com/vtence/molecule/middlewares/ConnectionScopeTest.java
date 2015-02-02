@@ -14,6 +14,7 @@ import org.junit.Test;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
+import static com.vtence.molecule.support.RequestAssertions.assertThat;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
@@ -59,7 +60,7 @@ public class ConnectionScopeTest {
             assertThat("message", expected.getMessage(), equalTo("Boom!"));
         }
 
-        request.assertAttribute(Connection.class, nullValue());
+        assertThat(request).hasAttribute(Connection.class, nullValue());
     }
 
     private Application crashWith(final Exception error) {
