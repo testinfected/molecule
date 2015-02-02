@@ -1,10 +1,9 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.FailureReporter;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
@@ -22,7 +21,7 @@ public class FailureMonitorTest {
 
     Exception error = new Exception("An internal error occurred!");
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Test public void

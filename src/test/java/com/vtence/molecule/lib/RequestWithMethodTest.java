@@ -1,7 +1,6 @@
 package com.vtence.molecule.lib;
 
 import com.vtence.molecule.Request;
-import com.vtence.molecule.support.MockRequest;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpMethod.GET;
@@ -15,7 +14,7 @@ public class RequestWithMethodTest {
     @SuppressWarnings("unchecked")
     @Test public void
     matchesWhenRequestMethodsAreEqual() {
-        Request request = MockRequest.GET("/");
+        Request request = new Request().method(GET).path("/");
 
         assertThat("same case match", withMethod("GET").matches(request), is(true));
         assertThat("different case match", withMethod("get").matches(request), is(true));

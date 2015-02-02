@@ -7,8 +7,8 @@ import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.middlewares.Router;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.routing.DynamicRoutesTest.Echo.echo;
-import static com.vtence.molecule.support.MockRequest.*;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class DynamicRoutesTest {
@@ -17,7 +17,7 @@ public class DynamicRoutesTest {
     routesToDefinitionMatchingRequestPathAndVerb() throws Exception {
         Router router = Router.draw(new DynamicRoutes() {{
             map("/uri").via(HttpMethod.POST).to(echo("post to /uri"));
-            map("/other/uri").via(HttpMethod.GET).to(echo("get to /other/uri"));
+            map("/other/uri").via(GET).to(echo("get to /other/uri"));
         }}).defaultsTo(echo("not matched"));
 
         assertThat(dispatch(router, POST("/uri"))).hasBodyText("post to /uri");
@@ -49,7 +49,7 @@ public class DynamicRoutesTest {
     @Test public void
     matchesRoutesInDefinitionOrder() throws Exception {
         Router router = Router.draw(new DynamicRoutes() {{
-            map("/").via(HttpMethod.GET).to(echo("original"));
+            map("/").via(GET).to(echo("original"));
             map("/").to(echo("override"));
         }});
 
@@ -96,5 +96,33 @@ public class DynamicRoutesTest {
         public void handle(Request request, Response response) throws Exception {
             response.body(message + (request.allParameters().isEmpty() ? "" : " " + request.allParameters()));
         }
+    }
+
+    public static Request GET(String path) {
+        return new Request().method(HttpMethod.GET).path(path);
+    }
+
+    public static Request POST(String path) {
+        return new Request().method(HttpMethod.POST).path(path);
+    }
+
+    public static Request PUT(String path) {
+        return new Request().method(HttpMethod.PUT).path(path);
+    }
+
+    public static Request DELETE(String path) {
+        return new Request().method(HttpMethod.DELETE).path(path);
+    }
+
+    public static Request PATCH(String path) {
+        return new Request().method(HttpMethod.PATCH).path(path);
+    }
+
+    public static Request HEAD(String path) {
+        return new Request().method(HttpMethod.HEAD).path(path);
+    }
+
+    public static Request OPTIONS(String path) {
+        return new Request().method(HttpMethod.OPTIONS).path(path);
     }
 }

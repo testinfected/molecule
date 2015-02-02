@@ -1,22 +1,20 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.lib.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.Anything;
+import com.vtence.molecule.lib.Matcher;
 import com.vtence.molecule.lib.Nothing;
 import com.vtence.molecule.routing.Route;
-import com.vtence.molecule.support.MockRequest;
 import org.junit.Test;
 
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
-import static org.hamcrest.CoreMatchers.equalTo;
 
 public class RouterTest {
 
     Router router = new Router(new NotFound());
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Test public void

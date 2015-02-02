@@ -1,22 +1,21 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.helpers.Streams;
+import com.vtence.molecule.http.HttpDate;
+import com.vtence.molecule.http.HttpMethod;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
+import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.HttpStatus.OK;
-import static com.vtence.molecule.support.MockRequest.GET;
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static java.lang.String.valueOf;
@@ -28,8 +27,7 @@ public class FileServerTest {
     File base = onClasspath().locate("assets");
     FileServer fileServer = new FileServer(base);
     File file = new File(base, SAMPLE_IMAGE);
-
-    MockRequest request = GET(SAMPLE_IMAGE);
+    Request request = new Request().method(GET).path(SAMPLE_IMAGE);
     Response response = new Response();
 
     @Test public void

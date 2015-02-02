@@ -4,7 +4,6 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.ChunkedBody;
-import com.vtence.molecule.support.MockRequest;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class ContentLengthHeaderTest {
 
     ContentLengthHeader contentLengthHeader = new ContentLengthHeader();
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Test public void

@@ -3,7 +3,6 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.support.MockRequest;
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -30,7 +29,7 @@ public class ConnectionScopeTest {
     Connection connection = context.mock(Connection.class);
     States connectionStatus = context.states("connection").startsAs("closed");
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Before public void

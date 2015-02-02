@@ -5,7 +5,6 @@ import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
-import com.vtence.molecule.support.MockRequest;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.concurrent.Synchroniser;
@@ -35,12 +34,12 @@ public class ApacheCommonLoggerTest {
                                    BrokenClock.stoppedAt(currentTime),
                                    Locale.US, TimeZone.getTimeZone("GMT+01:00"));
 
-    MockRequest request = new MockRequest();
+    Request request = new Request().protocol("HTTP/1.1").remoteIp("192.168.0.1");
     Response response = new Response();
 
     @Test public void
     logsRequestsServedInApacheCommonLogFormat() throws Exception {
-        request.remoteIp("192.168.0.1").method(GET).uri("/products?keyword=dogs");
+        request.method(GET).uri("/products?keyword=dogs");
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("a response with a size of 28");

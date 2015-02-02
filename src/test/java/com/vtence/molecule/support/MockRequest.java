@@ -6,6 +6,7 @@ import org.hamcrest.Matcher;
 
 import static com.vtence.molecule.support.RequestAssertions.assertThat;
 
+@Deprecated
 public class MockRequest extends Request {
 
     public MockRequest() {

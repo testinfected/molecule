@@ -4,7 +4,6 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
-import com.vtence.molecule.support.MockRequest;
 import org.junit.Test;
 
 import java.util.Date;
@@ -16,7 +15,7 @@ public class DateHeaderTest {
     Date now = calendarDate(2012, 6, 8).atMidnight().inZone("GMT-04:00").toDate();
     DateHeader dateHeader = new DateHeader(BrokenClock.stoppedAt(now));
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Test public void

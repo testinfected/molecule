@@ -6,7 +6,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.AbstractMiddleware;
 import com.vtence.molecule.lib.Matcher;
 import com.vtence.molecule.lib.Matchers;
-import com.vtence.molecule.support.MockRequest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +16,7 @@ public class FilterMapTest {
 
     FilterMap filters = new FilterMap();
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Before public void

@@ -4,14 +4,10 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.decoration.ContentProcessor;
 import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
-import com.vtence.molecule.support.MockRequest;
-
-import static com.vtence.molecule.helpers.Charsets.UTF_8;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import com.vtence.molecule.lib.TextBody;
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -22,6 +18,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.vtence.molecule.helpers.Charsets.UTF_8;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class LayoutTest {
@@ -31,7 +29,7 @@ public class LayoutTest {
 
     States page = context.states("page").startsAs("selected");
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Before public void

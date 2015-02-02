@@ -4,7 +4,6 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.support.MockRequest;
 import org.junit.Test;
 
 import java.util.Date;
@@ -16,7 +15,7 @@ public class ETagTest {
 
     ETag etag = new ETag();
 
-    MockRequest request = new MockRequest();
+    Request request = new Request();
     Response response = new Response();
 
     @Test public void
