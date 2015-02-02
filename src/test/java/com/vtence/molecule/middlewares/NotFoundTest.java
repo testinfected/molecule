@@ -1,7 +1,7 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ public class NotFoundTest {
     NotFound notFound = new NotFound();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     String content = "Not found: /resource";
 

@@ -5,7 +5,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.middlewares.Router;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
 import static com.vtence.molecule.routing.DynamicRoutesTest.Echo.echo;
@@ -77,8 +76,8 @@ public class DynamicRoutesTest {
         assertThat(dispatch(router, GET("/resource/42"))).hasBodyText("parameters {id=[42]}");
     }
 
-    private MockResponse dispatch(Router router, Request request) throws Exception {
-        MockResponse response = new MockResponse();
+    private Response dispatch(Router router, Request request) throws Exception {
+        Response response = new Response();
         router.handle(request, response);
         return response;
     }

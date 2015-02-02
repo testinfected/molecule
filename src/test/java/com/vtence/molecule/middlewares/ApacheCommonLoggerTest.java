@@ -6,7 +6,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.concurrent.Synchroniser;
@@ -37,7 +36,7 @@ public class ApacheCommonLoggerTest {
                                    Locale.US, TimeZone.getTimeZone("GMT+01:00"));
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     logsRequestsServedInApacheCommonLogFormat() throws Exception {

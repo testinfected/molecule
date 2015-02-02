@@ -4,7 +4,6 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
@@ -15,7 +14,7 @@ public class MiddlewareStackTest {
     MiddlewareStack stack = new MiddlewareStack();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     assemblesChainInOrderOfAddition() throws Exception {

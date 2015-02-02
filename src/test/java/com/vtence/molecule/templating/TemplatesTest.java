@@ -1,6 +1,6 @@
 package com.vtence.molecule.templating;
 
-import com.vtence.molecule.support.MockResponse;
+import com.vtence.molecule.Response;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class TemplatesTest {
     Templates templates = new Templates(renderer);
 
     Template template = templates.named("hello");
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     rendersTemplateUsingProvidedContext() throws IOException {

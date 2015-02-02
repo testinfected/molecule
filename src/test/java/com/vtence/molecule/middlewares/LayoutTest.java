@@ -4,13 +4,11 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.decoration.ContentProcessor;
 import com.vtence.molecule.decoration.Decorator;
 import com.vtence.molecule.decoration.Selector;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 
 import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
@@ -21,7 +19,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +32,7 @@ public class LayoutTest {
     States page = context.states("page").startsAs("selected");
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Before public void
     selectPage() throws Exception {

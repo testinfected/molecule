@@ -1,7 +1,7 @@
 package com.vtence.molecule.decoration;
 
+import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class HtmlPageSelectorTest {
 
     Selector selector = new HtmlPageSelector();
 
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     selectsContentOfTypeTextHtmlWhenResponseIsOk() throws IOException {

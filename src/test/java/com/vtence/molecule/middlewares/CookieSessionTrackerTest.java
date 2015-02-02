@@ -6,7 +6,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.Session;
 import com.vtence.molecule.session.SessionStore;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.hamcrest.FeatureMatcher;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -30,7 +29,7 @@ public class CookieSessionTrackerTest {
     CookieSessionTracker tracker = new CookieSessionTracker(store).cookie(SESSION_COOKIE);
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Before public void
     stubSessionStore() {

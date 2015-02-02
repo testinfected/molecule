@@ -14,6 +14,7 @@ import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
+@Deprecated
 public class MockResponse extends Response {
 
     /**

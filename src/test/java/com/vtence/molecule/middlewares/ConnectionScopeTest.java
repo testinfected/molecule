@@ -4,8 +4,6 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
-import org.hamcrest.Matchers;
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -16,9 +14,10 @@ import org.junit.Test;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class ConnectionScopeTest {
@@ -31,7 +30,7 @@ public class ConnectionScopeTest {
     States connectionStatus = context.states("connection").startsAs("closed");
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Before public void
     expectConnectionToBeReleased() throws Exception {
@@ -57,7 +56,7 @@ public class ConnectionScopeTest {
             connectionScope.handle(request, response);
             fail("HttpException did not bubble up");
         } catch (Exception expected) {
-            assertThat("message", expected.getMessage(), Matchers.equalTo("Boom!"));
+            assertThat("message", expected.getMessage(), equalTo("Boom!"));
         }
 
         request.assertAttribute(Connection.class, nullValue());
@@ -80,6 +79,6 @@ public class ConnectionScopeTest {
     }
 
     private void assertScoping(String state) {
-        assertThat("scoping", response.text(), equalTo(state));
+        assertThat(response).hasBodyText(state);
     }
 }

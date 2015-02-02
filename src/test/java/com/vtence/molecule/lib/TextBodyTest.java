@@ -1,6 +1,6 @@
 package com.vtence.molecule.lib;
 
-import com.vtence.molecule.support.MockResponse;
+import com.vtence.molecule.Response;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 public class TextBodyTest {
 
     TextBody body = new TextBody();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     appendsAndRendersText() throws IOException {

@@ -8,17 +8,16 @@ import com.vtence.molecule.lib.Anything;
 import com.vtence.molecule.lib.Nothing;
 import com.vtence.molecule.routing.Route;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RouterTest {
 
     Router router = new Router(new NotFound());
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     routesToDefaultWhenNoRouteMatches() throws Exception {
@@ -36,7 +35,7 @@ public class RouterTest {
     }
 
     private void assertRoutedTo(String route) {
-        assertThat("route", response.text(), equalTo(route));
+        assertThat(response).hasBodyText(route);
     }
 
     private Application route(final String name) {

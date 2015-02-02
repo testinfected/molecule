@@ -4,21 +4,19 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.POST;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class HttpMethodOverrideTest {
 
     HttpMethodOverride methodOverride = new HttpMethodOverride();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Before public void
     echoHttpMethod()  {
@@ -61,6 +59,6 @@ public class HttpMethodOverrideTest {
     }
 
     private void assertMethod(String method) {
-        assertThat("method", response.text(), equalTo(method));
+        assertThat(response).hasBodyText(method);
     }
 }

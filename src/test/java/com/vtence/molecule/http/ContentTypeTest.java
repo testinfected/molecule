@@ -1,6 +1,6 @@
 package com.vtence.molecule.http;
 
-import com.vtence.molecule.support.MockResponse;
+import com.vtence.molecule.Response;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +52,6 @@ public class ContentTypeTest {
 
     @Test public void
     handlesAbsenceOfHeaderInResponse() {
-        assertThat("content type", ContentType.of(new MockResponse()), nullValue());
+        assertThat("content type", ContentType.of(new Response()), nullValue());
     }
 }

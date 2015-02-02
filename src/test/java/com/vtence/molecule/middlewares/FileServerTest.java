@@ -1,8 +1,8 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class FileServerTest {
     File file = new File(base, SAMPLE_IMAGE);
 
     MockRequest request = GET(SAMPLE_IMAGE);
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     servesFiles() throws Exception {

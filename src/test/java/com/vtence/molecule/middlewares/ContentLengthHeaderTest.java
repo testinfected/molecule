@@ -1,11 +1,10 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.lib.ChunkedBody;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.lib.ChunkedBody;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class ContentLengthHeaderTest {
     ContentLengthHeader contentLengthHeader = new ContentLengthHeader();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     setsContentLengthOnFixedLengthBodiesIfNoneSet() throws Exception {

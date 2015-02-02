@@ -4,7 +4,6 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
 
@@ -24,7 +23,7 @@ public class CompressorTest {
     Compressor compressor = new Compressor();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     deflatesResponseWhenClientAcceptsDeflate() throws Exception {

@@ -7,7 +7,6 @@ import com.vtence.molecule.lib.AbstractMiddleware;
 import com.vtence.molecule.lib.Matcher;
 import com.vtence.molecule.lib.Matchers;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +18,7 @@ public class FilterMapTest {
     FilterMap filters = new FilterMap();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Before public void
     stubApplication() {

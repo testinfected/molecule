@@ -5,7 +5,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.Dates;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,7 @@ public class ConditionalGetTest {
     ConditionalGet conditional = new ConditionalGet();
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     sendsNotModifiedWithoutMessageBodyWhenETagIndicatesEntityIsCurrent() throws Exception {

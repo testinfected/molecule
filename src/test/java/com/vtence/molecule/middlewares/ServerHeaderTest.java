@@ -4,11 +4,9 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.MockRequest;
-import com.vtence.molecule.support.MockResponse;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class ServerHeaderTest {
 
@@ -16,24 +14,20 @@ public class ServerHeaderTest {
     ServerHeader serverHeader = new ServerHeader(serverName);
 
     MockRequest request = new MockRequest();
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     setsServerHeader() throws Exception {
-        serverHeader.connectTo(write(serverName));
+        serverHeader.connectTo(writeToBody(serverName));
         serverHeader.handle(request, response);
-        assertServer(serverName);
+        assertThat(response).hasBodyText(serverName);
     }
 
-    private Application write(final String text) {
+    private Application writeToBody(final String text) {
         return new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body(text);
             }
         };
-    }
-
-    private void assertServer(String server) {
-        assertThat("server header", response.text(), equalTo(server));
     }
 }

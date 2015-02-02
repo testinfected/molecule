@@ -1,6 +1,6 @@
 package com.vtence.molecule.lib;
 
-import com.vtence.molecule.support.MockResponse;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class FileBodyTest {
 
     File base = onClasspath().locate("assets/images");
     File file = new File(base, "sample.png");
-    MockResponse response = new MockResponse();
+    Response response = new Response();
 
     @Test public void
     rendersFileContent() throws Exception {
