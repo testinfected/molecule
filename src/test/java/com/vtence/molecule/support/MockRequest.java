@@ -4,7 +4,7 @@ import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.Request;
 import org.hamcrest.Matcher;
 
-import static org.junit.Assert.assertThat;
+import static com.vtence.molecule.support.RequestAssertions.assertThat;
 
 public class MockRequest extends Request {
 
@@ -64,8 +64,12 @@ public class MockRequest extends Request {
         return request;
     }
 
+    /**
+     * @see RequestAssertions#hasAttribute(Object, Matcher)
+     */
+    @Deprecated
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {
-        assertThat("attribute[" + key.toString() + "]", attribute(key), attributeMatcher);
+        assertThat(this).hasAttribute(key, attributeMatcher);
     }
 
     public String toString() {
