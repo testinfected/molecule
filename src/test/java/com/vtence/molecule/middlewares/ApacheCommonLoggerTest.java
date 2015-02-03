@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpStatus.NO_CONTENT;
 import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.CoreMatchers.containsString;
 
@@ -59,7 +60,7 @@ public class ApacheCommonLoggerTest {
         apacheCommonLogger.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.body("");
-                response.status(HttpStatus.NO_CONTENT);
+                response.status(NO_CONTENT);
             }
         });
 

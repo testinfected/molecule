@@ -4,9 +4,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 public class PeriodicSessionHouseKeeping {
 
-    private static final long EVERY_HOUR = TimeUnit.HOURS.toSeconds(1);
+    private static final long EVERY_HOUR = HOURS.toSeconds(1);
 
     private final ScheduledExecutorService scheduler;
     private final SessionHouse sessions;
@@ -15,14 +19,14 @@ public class PeriodicSessionHouseKeeping {
     private ScheduledFuture chores;
 
     public PeriodicSessionHouseKeeping(ScheduledExecutorService scheduler, SessionHouse sessions) {
-        this(scheduler, sessions, EVERY_HOUR, TimeUnit.SECONDS);
+        this(scheduler, sessions, EVERY_HOUR, SECONDS);
     }
 
     public PeriodicSessionHouseKeeping(ScheduledExecutorService scheduler, SessionHouse sessions,
                                        long choresInterval, TimeUnit timeUnit) {
         this.scheduler = scheduler;
         this.sessions = sessions;
-        this.choresInterval = TimeUnit.MILLISECONDS.convert(choresInterval, timeUnit);
+        this.choresInterval = MILLISECONDS.convert(choresInterval, timeUnit);
     }
 
     public void start() {
@@ -30,7 +34,7 @@ public class PeriodicSessionHouseKeeping {
             public void run() {
                 sessions.houseKeeping();
             }
-        }, choresInterval, choresInterval, TimeUnit.MILLISECONDS);
+        }, choresInterval, choresInterval, MILLISECONDS);
     }
 
     public void stop() {

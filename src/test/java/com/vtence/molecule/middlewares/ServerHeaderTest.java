@@ -15,7 +15,8 @@ public class ServerHeaderTest {
     Request request = new Request();
     Response response = new Response();
 
-    @Test public void
+    @Test
+    public void
     setsServerHeader() throws Exception {
         serverHeader.connectTo(writeToBody(serverName));
         serverHeader.handle(request, response);

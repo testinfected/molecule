@@ -1,7 +1,6 @@
 package examples.filtering;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
@@ -12,6 +11,8 @@ import com.vtence.molecule.routing.DynamicRoutes;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.vtence.molecule.http.HttpStatus.UNAUTHORIZED;
 
 public class FilteringExample {
 
@@ -35,7 +36,7 @@ public class FilteringExample {
                     forward(request, response);
                 } else {
                     // Halt request processing
-                    response.status(HttpStatus.UNAUTHORIZED).body("Get away!");
+                    response.status(UNAUTHORIZED).body("Get away!");
                 }
             }
         };

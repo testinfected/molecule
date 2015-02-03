@@ -52,7 +52,7 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     }
 
     private String currentTime() {
-        DateFormat formatter = new SimpleDateFormat(ApacheCommonLogger.DATE_FORMAT, locale);
+        DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, locale);
         formatter.setTimeZone(timeZone);
         return formatter.format(clock.now());
     }

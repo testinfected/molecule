@@ -24,6 +24,7 @@ import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
+import static com.vtence.molecule.http.MimeTypes.TEXT;
 
 public class FileServer implements Application {
 
@@ -57,7 +58,7 @@ public class FileServer implements Application {
         File file = new File(root, request.path());
         if (!canServe(file)) {
             response.status(HttpStatus.NOT_FOUND);
-            response.contentType(MimeTypes.TEXT);
+            response.contentType(TEXT);
             response.body("File not found: " + request.path());
             return;
         }

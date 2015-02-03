@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.AbstractMiddleware;
@@ -8,6 +7,9 @@ import com.vtence.molecule.lib.AbstractMiddleware;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import static com.vtence.molecule.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static com.vtence.molecule.http.MimeTypes.HTML;
 
 public class Failsafe extends AbstractMiddleware {
 
@@ -22,8 +24,8 @@ public class Failsafe extends AbstractMiddleware {
     }
 
     private void failsafeResponse(Throwable error, Response response) throws IOException {
-        response.status(HttpStatus.INTERNAL_SERVER_ERROR);
-        response.contentType("text/html; charset=utf-8");
+        response.status(INTERNAL_SERVER_ERROR);
+        response.contentType(HTML + "; charset=utf-8");
         response.body(formatAsHtml(error));
     }
 

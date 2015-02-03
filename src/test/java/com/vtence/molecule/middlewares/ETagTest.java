@@ -3,12 +3,13 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.HttpStatus;
 import org.junit.Test;
 
 import java.util.Date;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
+import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.support.ResponseAssertions.assertThat;
 
 public class ETagTest {
@@ -44,7 +45,7 @@ public class ETagTest {
     willNotSetETagIfStatusIsNotCacheable() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.status(HttpStatus.NOT_FOUND);
+                response.status(NOT_FOUND);
                 response.body("Not found: resource");
             }
         });
@@ -56,7 +57,7 @@ public class ETagTest {
     willSetETagIfStatusIsCreated() throws Exception {
         etag.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                response.status(HttpStatus.CREATED);
+                response.status(CREATED);
                 response.body("response body");
             }
         });

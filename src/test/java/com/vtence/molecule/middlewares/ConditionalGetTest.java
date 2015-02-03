@@ -28,7 +28,8 @@ public class ConditionalGetTest {
     Request request = new Request().method(GET);
     Response response = new Response();
 
-    @Test public void
+    @Test
+    public void
     sendsNotModifiedWithoutMessageBodyWhenGettingEntityWhoseRepresentationHasNotChanged() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -41,12 +42,13 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
 
         assertThat(response).hasStatus(NOT_MODIFIED)
-                            .hasBodySize(0)
-                            .hasNoHeader("Content-Type")
-                            .hasNoHeader("Content-Length");
+                .hasBodySize(0)
+                .hasNoHeader("Content-Type")
+                .hasNoHeader("Content-Length");
     }
 
-    @Test public void
+    @Test
+    public void
     leavesResponseUnchangedOnGetWhenCacheValidatorsAreMissing() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -57,10 +59,11 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
 
         assertThat(response).hasStatus(OK)
-                            .hasBodyText("response content");
+                .hasBodyText("response content");
     }
 
-    @Test public void
+    @Test
+    public void
     ignoresCacheValidatorsOnGetIfResponseNotOK() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -74,7 +77,8 @@ public class ConditionalGetTest {
         assertThat(response).hasStatus(CREATED);
     }
 
-    @Test public void
+    @Test
+    public void
     appliesConditionalLogicToHeadRequestsAsWell() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -88,7 +92,8 @@ public class ConditionalGetTest {
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
-    @Test public void
+    @Test
+    public void
     ignoresNonGetOrHeadRequests() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -102,7 +107,8 @@ public class ConditionalGetTest {
         assertThat(response).hasStatus(OK);
     }
 
-    @Test public void
+    @Test
+    public void
     sendsNotModifiedWhenGettingEntityWhichHasNotBeenModifiedSinceLastServed() throws Exception {
         final String lastModification = httpDate(now().toDate());
         conditional.connectTo(new Application() {
@@ -117,7 +123,8 @@ public class ConditionalGetTest {
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
-    @Test public void
+    @Test
+    public void
     leavesResponseUnchangedWhenEntityHasNotBeenModifiedButETagIndicatesItIsNotCurrent() throws Exception {
         final String lastModification = httpDate(aDate().toDate());
         conditional.connectTo(new Application() {
@@ -127,13 +134,14 @@ public class ConditionalGetTest {
         });
 
         request.header("If-None-Match", "87654321")
-               .header("If-Modified-Since", lastModification);
+                .header("If-Modified-Since", lastModification);
         conditional.handle(request, response);
 
         assertThat(response).hasStatus(OK);
     }
 
-    @Test public void
+    @Test
+    public void
     leavesResponseUnchangedWhenEntityWasModifiedButETagIndicatesItIsCurrent() throws Exception {
         conditional.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
@@ -143,7 +151,7 @@ public class ConditionalGetTest {
         });
 
         request.header("If-None-Match", "12345678")
-               .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
+                .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
         conditional.handle(request, response);
 
         assertThat(response).hasStatus(OK);

@@ -4,10 +4,11 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
+import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 
 public class SSLExample {
 

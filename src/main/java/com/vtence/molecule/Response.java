@@ -1,12 +1,10 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.http.ContentLanguage;
-import com.vtence.molecule.http.Cookie;
-import com.vtence.molecule.http.HeaderNames;
-import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.helpers.Headers;
+import com.vtence.molecule.http.ContentLanguage;
+import com.vtence.molecule.http.ContentType;
+import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.lib.BinaryBody;
 
 import java.nio.charset.Charset;
@@ -18,12 +16,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.http.HttpDate.httpDate;
+import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
 import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
+import static java.lang.String.valueOf;
 
 /**
  * The HTTP response to write back to the client.
@@ -101,8 +103,8 @@ public class Response {
      * @param location the url of the other location
      */
     public Response redirectTo(String location) {
-        status(HttpStatus.SEE_OTHER);
-        header(HeaderNames.LOCATION, location);
+        status(SEE_OTHER);
+        header(LOCATION, location);
         return this;
     }
 
@@ -217,7 +219,7 @@ public class Response {
      * @param value the new value for that header
      */
     public Response header(String name, Object value) {
-        return header(name, String.valueOf(value));
+        return header(name, valueOf(value));
     }
 
     /**
@@ -388,7 +390,7 @@ public class Response {
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
         if (contentType == null || contentType.charset() == null) {
-            return Charsets.ISO_8859_1;
+            return ISO_8859_1;
         }
         return contentType.charset();
     }

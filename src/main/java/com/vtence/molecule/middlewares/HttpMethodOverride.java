@@ -7,6 +7,8 @@ import com.vtence.molecule.lib.AbstractMiddleware;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.http.HttpMethod.POST;
+
 public class HttpMethodOverride extends AbstractMiddleware {
 
     public static final String METHOD_OVERRIDE_PARAMETER = "_method";
@@ -23,7 +25,7 @@ public class HttpMethodOverride extends AbstractMiddleware {
     }
 
     private boolean overrideDetected(Request request) throws IOException {
-        return methodOverride(request) != null && request.method() == HttpMethod.POST;
+        return methodOverride(request) != null && request.method() == POST;
     }
 
     private String methodOverride(Request request) {

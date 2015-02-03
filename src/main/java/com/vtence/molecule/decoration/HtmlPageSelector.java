@@ -1,8 +1,9 @@
 package com.vtence.molecule.decoration;
 
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.MimeTypes;
+
+import static com.vtence.molecule.http.HttpStatus.OK;
+import static com.vtence.molecule.http.MimeTypes.HTML;
 
 public class HtmlPageSelector implements Selector {
 
@@ -11,10 +12,10 @@ public class HtmlPageSelector implements Selector {
     }
 
     private boolean isOk(int code) {
-        return code == HttpStatus.OK.code;
+        return code == OK.code;
     }
 
     private boolean isHtml(String contentType) {
-        return contentType != null && contentType.startsWith(MimeTypes.HTML);
+        return contentType != null && contentType.startsWith(HTML);
     }
 }

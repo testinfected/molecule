@@ -46,4 +46,5 @@ public class Logging {
         public String format(LogRecord record) {
             return record.getMessage() + "\n";
         }
-    }}
+    }
+}

@@ -24,4 +24,3 @@ public class StartingWithTest {
         assertThat("match", matcher.matches("excerpt"), equalTo(true));
     }
 }
-

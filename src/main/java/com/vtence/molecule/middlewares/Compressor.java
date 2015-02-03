@@ -1,13 +1,12 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Body;
-import com.vtence.molecule.http.MimeTypes;
-import com.vtence.molecule.lib.AbstractMiddleware;
-import com.vtence.molecule.lib.ChunkedBody;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.AcceptEncoding;
+import com.vtence.molecule.http.MimeTypes;
+import com.vtence.molecule.lib.AbstractMiddleware;
+import com.vtence.molecule.lib.ChunkedBody;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,6 +21,8 @@ import java.util.zip.GZIPOutputStream;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_ENCODING;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
+import static com.vtence.molecule.http.MimeTypes.TEXT;
 import static com.vtence.molecule.middlewares.Compressor.Codings.identity;
 
 public class Compressor extends AbstractMiddleware {
@@ -165,8 +166,8 @@ public class Compressor extends AbstractMiddleware {
     }
 
     private void notAcceptable(Response response) throws IOException {
-        response.status(HttpStatus.NOT_ACCEPTABLE);
-        response.contentType("text/plain");
+        response.status(NOT_ACCEPTABLE);
+        response.contentType(TEXT);
         response.body("An acceptable encoding could not be found");
     }
 }
