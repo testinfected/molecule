@@ -1,9 +1,19 @@
 package com.vtence.molecule.http;
 
 /**
- * Shamelessly copied from {@link org.simpleframework.http.Status}
+ * See <a href="https://tools.ietf.org/html/rfc7231#section-6">RFC 7231 Section 6</a>.
  */
 public enum HttpStatus {
+
+    /**
+     * Indicates that the initial part of a request has been received and has not yet been rejected by the server.
+     */
+    CONTINUE(100, "Continue"),
+
+    /**
+     * Indicates that the server understands and is willing for a change of protocol.
+     */
+    SWITCHING_PROTOCOLS(101, "Switching Protocols"),
 
     /**
      * This represents a successful response of a targeted request.
@@ -19,6 +29,11 @@ public enum HttpStatus {
      * This is used to signify that the request has been accepted.
      */
     ACCEPTED(202, "Accepted"),
+
+    /**
+     * Indicates that the request was successful but the enclosed payload has been modified by a transforming proxy.
+     */
+    NON_AUTHORITATIVE_INFORMATION(203, "Non-Authoritative Information"),
 
     /**
      * This represents a response that contains no response content.
@@ -138,12 +153,12 @@ public enum HttpStatus {
     /**
      * This is used to tell the client that the request body is too big.
      */
-    REQUEST_ENTITY_TOO_LARGE(413, "Request Entity Too Large"),
+    PAYLOAD_TOO_LARGE(413, "Payload Too Large"),
 
     /**
      * This is used to tell the client that the request URI is too long.
      */
-    REQUEST_URI_TOO_LONG(414, "Request-URI Too Long"),
+    URI_TOO_LONG(414, "URI Too Long"),
 
     /**
      * This is used to tell the client that the content type is invalid.
@@ -153,7 +168,12 @@ public enum HttpStatus {
     /**
      * This is used to tell the client that the range is invalid.
      */
-    REQUESTED_RANGE_NOT_SATISFIABLE(416, "Requested Range Not Satisfiable"),
+    RANGE_NOT_SATISFIABLE(416, "Range Not Satisfiable"),
+
+    /**
+     * Indicates that the server refuses to perform the request using the current protocol.
+     */
+    UPGRADE_REQUIRED(426, "Upgrade Required"),
 
     /**
      * This is used to tell the client that the expectation has failed.
@@ -188,7 +208,7 @@ public enum HttpStatus {
     /**
      * This is used to tell the client the request version is invalid.
      */
-    VERSION_NOT_SUPPORTED(505, "Version Not Supported");
+    HTTP_VERSION_NOT_SUPPORTED(505, "HTTP Version Not Supported");
 
     /**
      * This is the the textual description of the response state.
