@@ -1,13 +1,14 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.support.http.HttpRequest;
-import com.vtence.molecule.support.http.HttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
+import static com.vtence.molecule.test.HttpAssertions.assertThat;
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -29,7 +30,7 @@ public class WebServerTest {
         });
 
         response = send(request);
-        response.assertContentEqualTo("It works!");
+        assertThat(response).hasBodyText("It works!");
     }
 
     @Test
