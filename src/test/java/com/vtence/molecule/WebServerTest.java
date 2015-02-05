@@ -2,14 +2,15 @@ package com.vtence.molecule;
 
 import com.vtence.molecule.test.HttpRequest;
 import com.vtence.molecule.test.HttpResponse;
+import org.junit.After;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
-import static com.vtence.molecule.test.HttpAssertions.assertThat;
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.test.HttpAssertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -18,6 +19,11 @@ public class WebServerTest {
     WebServer server;
     HttpRequest request = new HttpRequest(8080);
     HttpResponse response;
+
+    @After
+    public void stopServer() throws Exception {
+        server.stop();
+    }
 
     @Test
     public void runsServerOnPort8080ByDefault() throws IOException, GeneralSecurityException {
@@ -29,37 +35,19 @@ public class WebServerTest {
             }
         });
 
-        response = send(request);
+        response = request.get("/");
         assertThat(response).hasBodyText("It works!");
     }
 
     @Test
     public void knowsServerUri() throws IOException {
         server = WebServer.create("0.0.0.0", 9000);
-        server.start(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-            }
-        });
-
         assertThat("server uri", server.uri(), equalTo(URI.create("http://0.0.0.0:9000")));
     }
 
     @Test
     public void tellsWhenServerIsUsingSSL() throws Exception {
         server = WebServer.create("0.0.0.0", 8443).enableSSL(locateOnClasspath("ssl/keystore"), "password", "password");
-        server.start(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-            }
-        });
-
         assertThat("server uri", server.uri(), equalTo(URI.create("https://0.0.0.0:8443")));
-    }
-
-    private HttpResponse send(HttpRequest request) throws IOException {
-        try {
-            return request.send();
-        } finally {
-            server.stop();
-        }
     }
 }

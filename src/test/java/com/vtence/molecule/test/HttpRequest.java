@@ -10,7 +10,7 @@ public class HttpRequest {
     private final String host;
     private final int port;
 
-    private final String path = "/";
+    private String path = "/";
 
     public HttpRequest(int port) {
         this("localhost", port);
@@ -19,6 +19,16 @@ public class HttpRequest {
     public HttpRequest(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public HttpRequest path(String path) {
+        this.path = path;
+        return this;
+    }
+
+    public HttpResponse get(String path) throws IOException {
+        path(path);
+        return send();
     }
 
     public HttpResponse send() throws IOException {
