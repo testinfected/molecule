@@ -3,13 +3,13 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.Anything;
-import com.vtence.molecule.lib.Matcher;
-import com.vtence.molecule.lib.Nothing;
+import com.vtence.molecule.lib.matchers.Anything;
+import com.vtence.molecule.lib.matchers.Matcher;
+import com.vtence.molecule.lib.matchers.Nothing;
 import com.vtence.molecule.routing.Route;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 
 public class RouterTest {
 

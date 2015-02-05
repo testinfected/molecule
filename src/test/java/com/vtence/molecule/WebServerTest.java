@@ -1,7 +1,7 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.support.HttpRequest;
-import com.vtence.molecule.support.HttpResponse;
+import com.vtence.molecule.support.http.HttpRequest;
+import com.vtence.molecule.support.http.HttpResponse;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -5,7 +5,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.AcceptEncoding;
 import com.vtence.molecule.http.MimeTypes;
-import com.vtence.molecule.lib.AbstractMiddleware;
 import com.vtence.molecule.lib.ChunkedBody;
 
 import java.io.IOException;

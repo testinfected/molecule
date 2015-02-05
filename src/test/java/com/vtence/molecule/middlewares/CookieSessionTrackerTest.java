@@ -3,7 +3,7 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Session;
+import com.vtence.molecule.session.Session;
 import com.vtence.molecule.session.SessionStore;
 import org.hamcrest.FeatureMatcher;
 import org.jmock.Expectations;
@@ -14,8 +14,8 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.vtence.molecule.support.RequestAssertions.assertThat;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.RequestAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 

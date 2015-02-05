@@ -2,16 +2,16 @@ package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.Matcher;
+import com.vtence.molecule.lib.matchers.Matcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static com.vtence.molecule.http.HttpMethod.*;
-import static com.vtence.molecule.lib.Matchers.anyOf;
-import static com.vtence.molecule.lib.Matchers.anything;
-import static com.vtence.molecule.lib.Matchers.equalTo;
+import static com.vtence.molecule.lib.matchers.Matchers.anyOf;
+import static com.vtence.molecule.lib.matchers.Matchers.anything;
+import static com.vtence.molecule.lib.matchers.Matchers.equalTo;
 
 public class DynamicRoutes implements RouteBuilder {
 

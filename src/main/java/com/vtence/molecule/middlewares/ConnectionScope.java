@@ -2,7 +2,6 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.AbstractMiddleware;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

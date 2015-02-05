@@ -2,11 +2,11 @@ package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.Matcher;
+import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.Combination;
-import com.vtence.molecule.lib.Matchers;
+import com.vtence.molecule.lib.matchers.Combination;
+import com.vtence.molecule.lib.matchers.Matchers;
 
 import java.util.Map;
 

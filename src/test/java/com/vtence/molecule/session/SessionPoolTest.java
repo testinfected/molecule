@@ -1,6 +1,5 @@
 package com.vtence.molecule.session;
 
-import com.vtence.molecule.Session;
 import com.vtence.molecule.support.Delorean;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;

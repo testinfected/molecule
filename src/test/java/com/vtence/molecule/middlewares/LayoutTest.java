@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.helpers.Charsets.UTF_8;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class LayoutTest {

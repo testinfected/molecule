@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.routing.DynamicRoutesTest.Echo.echo;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 
 public class DynamicRoutesTest {
 

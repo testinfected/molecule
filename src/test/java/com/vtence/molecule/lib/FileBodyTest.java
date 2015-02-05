@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import static com.vtence.molecule.support.ResourceLocator.onClasspath;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 

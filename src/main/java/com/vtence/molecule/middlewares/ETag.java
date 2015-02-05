@@ -4,9 +4,8 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.lib.AbstractMiddleware;
 import com.vtence.molecule.lib.BinaryBody;
-import com.vtence.molecule.lib.Hex;
+import com.vtence.molecule.helpers.Hex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

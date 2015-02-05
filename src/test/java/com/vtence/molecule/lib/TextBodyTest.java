@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
 import static com.vtence.molecule.helpers.Charsets.UTF_8;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 
 public class TextBodyTest {
 

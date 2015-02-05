@@ -1,6 +1,6 @@
 package com.vtence.molecule.routing;
 
-import com.vtence.molecule.lib.Matcher;
+import com.vtence.molecule.lib.matchers.Matcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;

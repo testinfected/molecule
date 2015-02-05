@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 public class MockResponse extends Response {
 
     /**
-     * @see ResponseAssertions#hasStatusCode(int)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasStatusCode(int)
      */
     @Deprecated
     public void assertStatusCode(int code) {
@@ -26,7 +26,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasStatusText(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasStatusText(String)
      */
     @Deprecated
     public void assertStatusText(String text) {
@@ -34,7 +34,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasStatus(com.vtence.molecule.http.HttpStatus)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasStatus(com.vtence.molecule.http.HttpStatus)
      */
     @Deprecated
     public void assertStatus(HttpStatus expected) {
@@ -42,7 +42,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#isRedirectedTo(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#isRedirectedTo(String)
      */
     @Deprecated
     public void assertRedirectedTo(String location) {
@@ -50,7 +50,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasHeader(String, String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasHeader(String, String)
      */
     @Deprecated
     public void assertHeader(String name, String value) {
@@ -58,7 +58,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasHeader(String, org.hamcrest.Matcher)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasHeader(String, org.hamcrest.Matcher)
      */
     @Deprecated
     public void assertHeader(String name, Matcher<? super String> valueMatching) {
@@ -66,7 +66,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasNoHeader(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasNoHeader(String)
      */
     @Deprecated
     public void assertNoHeader(String name) {
@@ -74,7 +74,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasContentType(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasContentType(String)
      */
     @Deprecated
     public void assertContentType(String contentType) {
@@ -82,7 +82,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasContentType(org.hamcrest.Matcher)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasContentType(org.hamcrest.Matcher)
      */
     @Deprecated
     public void assertContentType(Matcher<? super String> matching) {
@@ -90,7 +90,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasCookie(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasCookie(String)
      */
     @Deprecated
     public void assertHasCookie(String name) {
@@ -98,7 +98,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasNoCookie(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasNoCookie(String)
      */
     @Deprecated
     public void assertHasNoCookie(String name) {
@@ -106,7 +106,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasCookie(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasCookie(String)
      */
     @Deprecated
     public void assertCookie(String name, Matcher<? super Cookie> matching) {
@@ -114,7 +114,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasBodyText(String)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasBodyText(String)
      */
     @Deprecated
     public void assertBody(String body) {
@@ -122,7 +122,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasBodyText(org.hamcrest.Matcher)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasBodyText(org.hamcrest.Matcher)
      */
     @Deprecated
     public void assertBody(Matcher<? super String> matching) {
@@ -130,7 +130,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasBodyContent(byte[])
+     * @see com.vtence.molecule.test.ResponseAssertions#hasBodyContent(byte[])
      */
     @Deprecated
     public void assertContent(byte[] content) {
@@ -138,7 +138,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasBodySize(long)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasBodySize(long)
      */
     @Deprecated
     public void assertContentSize(long byteCount) {
@@ -146,7 +146,7 @@ public class MockResponse extends Response {
     }
 
     /**
-     * @see ResponseAssertions#hasBodyEncoding(java.nio.charset.Charset)
+     * @see com.vtence.molecule.test.ResponseAssertions#hasBodyEncoding(java.nio.charset.Charset)
      */
     @Deprecated
     public void assertContentEncodedAs(String encoding) throws IOException {

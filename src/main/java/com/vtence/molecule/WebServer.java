@@ -1,8 +1,6 @@
 package com.vtence.molecule;
 
 import com.vtence.molecule.middlewares.FilterMap;
-import com.vtence.molecule.lib.Middleware;
-import com.vtence.molecule.lib.MiddlewareStack;
 import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.RouteBuilder;
 import com.vtence.molecule.servers.SimpleServer;
@@ -13,8 +11,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
-import static com.vtence.molecule.ssl.KeyStoreType.DEFAULT;
-import static com.vtence.molecule.ssl.SecureProtocol.TLS;
+import static com.vtence.molecule.lib.KeyStoreType.DEFAULT;
+import static com.vtence.molecule.lib.SecureProtocol.TLS;
 
 public class WebServer {
 

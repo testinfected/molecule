@@ -10,7 +10,7 @@ import java.util.Date;
 import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 
 public class ETagTest {
 

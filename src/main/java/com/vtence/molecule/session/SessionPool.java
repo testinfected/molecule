@@ -1,6 +1,5 @@
 package com.vtence.molecule.session;
 
-import com.vtence.molecule.Session;
 import com.vtence.molecule.lib.Clock;
 import com.vtence.molecule.lib.SystemClock;
 

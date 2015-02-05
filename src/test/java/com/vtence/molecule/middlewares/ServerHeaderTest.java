@@ -5,7 +5,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 
 public class ServerHeaderTest {
 

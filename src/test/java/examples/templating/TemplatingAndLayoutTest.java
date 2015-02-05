@@ -1,8 +1,8 @@
 package examples.templating;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.HttpRequest;
-import com.vtence.molecule.support.HttpResponse;
+import com.vtence.molecule.support.http.HttpRequest;
+import com.vtence.molecule.support.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

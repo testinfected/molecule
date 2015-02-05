@@ -1,16 +1,15 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.lib.AbstractMiddleware;
-import com.vtence.molecule.lib.Matcher;
+import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.Matchers;
-import com.vtence.molecule.lib.Middleware;
+import com.vtence.molecule.lib.matchers.Matchers;
+import com.vtence.molecule.Middleware;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.vtence.molecule.lib.Matchers.withPath;
+import static com.vtence.molecule.lib.matchers.Matchers.withPath;
 
 public class FilterMap extends AbstractMiddleware {
 

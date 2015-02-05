@@ -3,7 +3,7 @@ package examples.session;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Session;
+import com.vtence.molecule.session.Session;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.routing.DynamicRoutes;

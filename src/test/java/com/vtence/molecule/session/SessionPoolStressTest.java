@@ -1,6 +1,5 @@
 package com.vtence.molecule.session;
 
-import com.vtence.molecule.Session;
 import org.jmock.lib.concurrent.Blitzer;
 import org.junit.Test;
 

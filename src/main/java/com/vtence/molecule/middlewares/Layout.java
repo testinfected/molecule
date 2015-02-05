@@ -9,7 +9,6 @@ import com.vtence.molecule.decoration.HtmlDocumentProcessor;
 import com.vtence.molecule.decoration.HtmlPageSelector;
 import com.vtence.molecule.decoration.LayoutTemplate;
 import com.vtence.molecule.decoration.Selector;
-import com.vtence.molecule.lib.AbstractMiddleware;
 import com.vtence.molecule.templating.Template;
 
 import java.io.ByteArrayOutputStream;

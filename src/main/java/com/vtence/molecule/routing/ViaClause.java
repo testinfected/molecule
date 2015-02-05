@@ -1,7 +1,7 @@
 package com.vtence.molecule.routing;
 
 import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.Matcher;
+import com.vtence.molecule.lib.matchers.Matcher;
 
 public interface ViaClause extends ToClause {
 

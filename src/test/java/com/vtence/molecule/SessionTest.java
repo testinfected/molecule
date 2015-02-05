@@ -1,5 +1,6 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.session.Session;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 

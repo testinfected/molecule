@@ -3,8 +3,7 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.Session;
-import com.vtence.molecule.lib.AbstractMiddleware;
+import com.vtence.molecule.session.Session;
 import com.vtence.molecule.session.SessionStore;
 
 public class CookieSessionTracker extends AbstractMiddleware {

@@ -1,7 +1,5 @@
 package com.vtence.molecule.session;
 
-import com.vtence.molecule.Session;
-
 public interface SessionStore {
 
     Session load(String id);

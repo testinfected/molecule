@@ -3,13 +3,12 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.AbstractMiddleware;
-import com.vtence.molecule.lib.Matcher;
-import com.vtence.molecule.lib.Matchers;
+import com.vtence.molecule.lib.matchers.Matcher;
+import com.vtence.molecule.lib.matchers.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.support.ResponseAssertions.assertThat;
+import static com.vtence.molecule.test.ResponseAssertions.assertThat;
 import static java.lang.String.format;
 
 public class FilterMapTest {
