@@ -22,6 +22,7 @@ import java.util.Map;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.test.HttpAssertions.assertThat;
 import static java.lang.String.valueOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -124,10 +125,10 @@ public class SimpleServerTest {
             }
         });
 
-        oldResponse = oldRequest.send();
+        response = request.send();
         assertNoError();
-        oldResponse.assertOK();
-        oldResponse.assertContentIsEncodedAs("UTF-16");
+        assertThat(response).isOK()
+                            .hasContentEncodedAs(containsString("UTF-16"));
     }
 
     @Test public void

@@ -1,15 +1,15 @@
 package com.vtence.molecule.support.http;
 
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.helpers.Streams;
-import com.vtence.molecule.support.CharsetDetector;
+import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -68,7 +68,7 @@ public class DeprecatedHttpResponse {
     }
 
     public void assertContentIsEncodedAs(String charset) throws IOException {
-        assertThat("response encoding", CharsetDetector.charsetOf(content()).toLowerCase(), containsString(charset.toLowerCase()));
+        assertThat("response encoding", detectCharsetOf(content()).toLowerCase(), containsString(charset.toLowerCase()));
     }
 
     public void assertHasContentSize(long size) throws IOException {

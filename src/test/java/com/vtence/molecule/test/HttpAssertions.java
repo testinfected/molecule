@@ -6,6 +6,7 @@ import org.junit.Assert;
 import java.util.List;
 
 import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
+import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -21,13 +22,8 @@ public class HttpAssertions {
         return new HttpAssertions(response);
     }
 
-    public HttpAssertions hasBodyText(String text) {
-        return hasBodyText(equalTo(text));
-    }
-
-    public HttpAssertions hasBodyText(Matcher<? super String> matching) {
-        Assert.assertThat("response body text", response.bodyText(), matching);
-        return this;
+    public HttpAssertions isOK() {
+        return hasStatusCode(200);
     }
 
     public HttpAssertions hasStatusCode(int code) {
@@ -69,4 +65,23 @@ public class HttpAssertions {
     public HttpAssertions isNotChunked() {
         return hasHeader(TRANSFER_ENCODING, not("chunked"));
     }
+
+    public HttpAssertions hasBodyText(String text) {
+        return hasBodyText(equalTo(text));
+    }
+
+    public HttpAssertions hasBodyText(Matcher<? super String> matching) {
+        Assert.assertThat("response body text", response.bodyText(), matching);
+        return this;
+    }
+
+    public HttpAssertions hasContentEncodedAs(String charset) {
+        return hasContentEncodedAs(is(charset));
+    }
+
+    public HttpAssertions hasContentEncodedAs(Matcher<? super String> matching) {
+        Assert.assertThat("response content encoding", detectCharsetOf(response.body()), matching);
+        return this;
+    }
+
 }

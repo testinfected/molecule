@@ -36,9 +36,13 @@ public class HttpRequest {
     public HttpResponse send() throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL("http", host, port, path).openConnection();
         connection.connect();
+
+        int statusCode = connection.getResponseCode();
+        String statusMessage = connection.getResponseMessage();
+        Map<String, List<String>> headers = connection.getHeaderFields();
         byte[] content = Streams.toBytes(connection.getInputStream());
         connection.disconnect();
-        Map<String, List<String>> headers = connection.getHeaderFields();
-        return new HttpResponse(connection.getResponseCode(), connection.getResponseMessage(), headers, content);
+
+        return new HttpResponse(statusCode, statusMessage, headers, content);
     }
 }

@@ -5,7 +5,7 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 public class CharsetDetector {
 
-    public static String charsetOf(byte[] data) {
+    public static String detectCharsetOf(byte[] data) {
         UniversalDetector charsetDetector = new UniversalDetector(new CharsetListener() {
             public void report(String charset) {
             }

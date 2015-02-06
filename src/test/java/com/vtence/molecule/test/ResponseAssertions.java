@@ -11,7 +11,7 @@ import org.junit.Assert;
 import java.nio.charset.Charset;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
-import static com.vtence.molecule.support.CharsetDetector.charsetOf;
+import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.*;
 
 public class ResponseAssertions {
@@ -135,7 +135,7 @@ public class ResponseAssertions {
     }
 
     public ResponseAssertions hasBodyEncoding(Matcher<? super String> matching) {
-        Assert.assertThat("response body encoding", charsetOf(BodyContent.asBytes(response)), matching);
+        Assert.assertThat("response body encoding", detectCharsetOf(BodyContent.asBytes(response)), matching);
         return this;
     }
 }

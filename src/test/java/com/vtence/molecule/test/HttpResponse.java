@@ -41,4 +41,8 @@ public class HttpResponse {
         // to ISO-8859-1
         return new String(content);
     }
+
+    public byte[] body() {
+        return content;
+    }
 }
