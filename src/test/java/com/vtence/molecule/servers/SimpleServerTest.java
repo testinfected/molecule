@@ -9,6 +9,8 @@ import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.support.http.DeprecatedHttpRequest;
 import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,23 +20,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static com.vtence.molecule.test.HttpAssertions.assertThat;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 
 public class SimpleServerTest {
 
     SimpleServer server = new SimpleServer("localhost", 9999);
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(server.port());
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(server.port());
+    HttpResponse response;
+
+    DeprecatedHttpRequest oldRequest = new DeprecatedHttpRequest(server.port());
+    DeprecatedHttpResponse oldResponse;
 
     Throwable error;
 
@@ -79,7 +80,8 @@ public class SimpleServerTest {
 
         response = request.send();
         assertNoError();
-        response.assertHasStatus(CREATED);
+        assertThat(response).hasStatusCode(201)
+                            .hasStatusMessage("Created");
     }
 
     @Test public void
@@ -92,8 +94,8 @@ public class SimpleServerTest {
 
         response = request.send();
         assertNoError();
-        response.assertContentEqualTo("<html>...</html>");
-        response.assertChunked();
+        assertThat(response).hasBodyText("<html>...</html>")
+                            .isChunked();
     }
 
     @Test public void
@@ -107,9 +109,9 @@ public class SimpleServerTest {
 
         response = request.send();
         assertNoError();
-        response.assertContentEqualTo("<html>...</html>");
-        response.assertHasHeader("Content-Length", "16");
-        response.assertNotChunked();
+        assertThat(response).hasBodyText("<html>...</html>")
+                            .hasHeader("Content-Length", "16")
+                            .isNotChunked();
     }
 
     @Test public void
@@ -122,10 +124,10 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.send();
+        oldResponse = oldRequest.send();
         assertNoError();
-        response.assertOK();
-        response.assertContentIsEncodedAs("UTF-16");
+        oldResponse.assertOK();
+        oldResponse.assertContentIsEncodedAs("UTF-16");
     }
 
     @Test public void
@@ -136,9 +138,9 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.withParameters("names", "Alice", "Bob", "Charles").send();
+        oldResponse = oldRequest.withParameters("names", "Alice", "Bob", "Charles").send();
         assertNoError();
-        response.assertContentEqualTo("[Alice, Bob, Charles]");
+        oldResponse.assertContentEqualTo("[Alice, Bob, Charles]");
     }
 
     @SuppressWarnings("unchecked")
@@ -158,7 +160,7 @@ public class SimpleServerTest {
             }
         });
 
-        request.get("/path?query");
+        oldRequest.get("/path?query");
         assertNoError();
 
         assertThat("request information", info, allOf(
@@ -183,7 +185,7 @@ public class SimpleServerTest {
             }
         });
 
-        request.withHeader("Accept", "text/html").
+        oldRequest.withHeader("Accept", "text/html").
                 // with our http client, we cannot set multiple headers with the same name
                 withHeader("Accept-Encoding", "gzip, identity; q=0.5, deflate;q=1.0, *;q=0").
                 send();
@@ -205,7 +207,7 @@ public class SimpleServerTest {
             }
         });
 
-        request.withHeader("Accept", "text/html")
+        oldRequest.withHeader("Accept", "text/html")
                 .withEncodingType("application/x-www-form-urlencoded")
                 .withBody("name=value")
                 .post("/uri");
@@ -227,7 +229,7 @@ public class SimpleServerTest {
             }
         });
 
-        request.withCookie("cookie1", "value1").withCookie("cookie2", "value2").send();
+        oldRequest.withCookie("cookie1", "value1").withCookie("cookie2", "value2").send();
         assertNoError();
 
         assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"),
@@ -248,14 +250,14 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.send();
+        oldResponse = oldRequest.send();
         assertNoError();
-        response.assertHasCookie(containsString("cookie=value"));
-        response.assertHasCookie(containsString("max-age=1800"));
-        response.assertHasCookie(containsString("httponly"));
-        response.assertHasCookie(containsString("path=/uri"));
-        response.assertHasCookie(containsString("domain=localhost"));
-        response.assertHasCookie(containsString("secure"));
+        oldResponse.assertHasCookie(containsString("cookie=value"));
+        oldResponse.assertHasCookie(containsString("max-age=1800"));
+        oldResponse.assertHasCookie(containsString("httponly"));
+        oldResponse.assertHasCookie(containsString("path=/uri"));
+        oldResponse.assertHasCookie(containsString("domain=localhost"));
+        oldResponse.assertHasCookie(containsString("secure"));
     }
 
     private void assertNoError() {

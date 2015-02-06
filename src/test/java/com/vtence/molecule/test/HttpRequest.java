@@ -5,6 +5,8 @@ import com.vtence.molecule.helpers.Streams;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 public class HttpRequest {
     private final String host;
@@ -36,6 +38,7 @@ public class HttpRequest {
         connection.connect();
         byte[] content = Streams.toBytes(connection.getInputStream());
         connection.disconnect();
-        return new HttpResponse(content);
+        Map<String, List<String>> headers = connection.getHeaderFields();
+        return new HttpResponse(connection.getResponseCode(), connection.getResponseMessage(), headers, content);
     }
 }
