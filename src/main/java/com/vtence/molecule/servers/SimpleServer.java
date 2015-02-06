@@ -95,11 +95,12 @@ public class SimpleServer implements Server {
         private void setHeaders(Request request, org.simpleframework.http.Request httpRequest) {
             List<String> names = httpRequest.getNames();
             for (String header : names) {
-                // Values returned like this are stripped of the quality values ...
-                int headerCount = httpRequest.getValues(header).size();
-                // ... so we get them by index instead
-                for (int index = 0; index < headerCount; index++) {
+                // Apparently there's no way to know the number of values for a given name,
+                // so we have to iterate until we reach a null value
+                int index = 0;
+                while (httpRequest.getValue(header, index) != null) {
                     request.addHeader(header, httpRequest.getValue(header, index));
+                    index++;
                 }
             }
         }

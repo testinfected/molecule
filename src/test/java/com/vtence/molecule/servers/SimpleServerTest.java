@@ -161,7 +161,7 @@ public class SimpleServerTest {
             }
         });
 
-        oldRequest.get("/path?query");
+        request.get("/path?query");
         assertNoError();
 
         assertThat("request information", info, allOf(
@@ -186,14 +186,14 @@ public class SimpleServerTest {
             }
         });
 
-        oldRequest.withHeader("Accept", "text/html").
-                // with our http client, we cannot set multiple headers with the same name
-                withHeader("Accept-Encoding", "gzip, identity; q=0.5, deflate;q=1.0, *;q=0").
-                send();
+        request.header("Accept", "text/html")
+               .header("Accept-Encoding", "gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0")
+               .send();
         assertNoError();
 
         assertThat("header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
-        assertThat("accept-encoding", headers.get("encoding"), contains("gzip, identity; q=0.5, deflate;q=1.0, *;q=0"));
+        assertThat("accept-encoding", headers.get("encoding"),
+                contains("gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0"));
     }
 
     @SuppressWarnings("unchecked")

@@ -5,12 +5,16 @@ import com.vtence.molecule.helpers.Streams;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HttpRequest {
     private final String host;
     private final int port;
+    private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
 
     private String path = "/";
 
@@ -33,8 +37,16 @@ public class HttpRequest {
         return send();
     }
 
+    public HttpRequest header(String name, String... values) {
+        List<String> headers = headers(name);
+        headers.clear();
+        Collections.addAll(headers, values);
+        return this;
+    }
+
     public HttpResponse send() throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL("http", host, port, path).openConnection();
+        setRequestHeaders(connection);
         connection.connect();
 
         int statusCode = connection.getResponseCode();
@@ -44,5 +56,20 @@ public class HttpRequest {
         connection.disconnect();
 
         return new HttpResponse(statusCode, statusMessage, headers, content);
+    }
+
+    private List<String> headers(String name) {
+        if (!headers.containsKey(name)) {
+            headers.put(name, new ArrayList<String>());
+        }
+        return headers.get(name);
+    }
+
+    private void setRequestHeaders(HttpURLConnection connection) {
+        for (String name : headers.keySet()) {
+            for (String value: headers(name)) {
+                connection.addRequestProperty(name, value);
+            }
+        }
     }
 }
