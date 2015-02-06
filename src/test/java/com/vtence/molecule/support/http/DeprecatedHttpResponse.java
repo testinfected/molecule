@@ -18,11 +18,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.both;
 
-public class HttpResponse {
+public class DeprecatedHttpResponse {
 
     private final WebResponse response;
 
-    public HttpResponse(WebResponse response) {
+    public DeprecatedHttpResponse(WebResponse response) {
         this.response = response;
     }
 

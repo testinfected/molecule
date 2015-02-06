@@ -6,9 +6,9 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.support.http.HttpRequest;
-import com.vtence.molecule.support.http.HttpResponse;
 import com.vtence.molecule.support.StackTrace;
+import com.vtence.molecule.support.http.DeprecatedHttpRequest;
+import com.vtence.molecule.support.http.DeprecatedHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +33,8 @@ import static org.junit.Assert.fail;
 public class SimpleServerTest {
 
     SimpleServer server = new SimpleServer("localhost", 9999);
-    HttpRequest request = new HttpRequest(server.port());
-    HttpResponse response;
+    DeprecatedHttpRequest request = new DeprecatedHttpRequest(server.port());
+    DeprecatedHttpResponse response;
 
     Throwable error;
 

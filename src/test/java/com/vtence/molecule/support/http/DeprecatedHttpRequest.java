@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HttpRequest {
+public class DeprecatedHttpRequest {
 
     private final WebClient client;
     private final String domain = "localhost";
@@ -35,17 +35,17 @@ public class HttpRequest {
     private String encodingType;
     private boolean secure = false;
 
-    public HttpRequest(int port) {
+    public DeprecatedHttpRequest(int port) {
         this(new WebClient(), port);
     }
 
-    public HttpRequest(WebClient client, int port) {
+    public DeprecatedHttpRequest(WebClient client, int port) {
         this.client = client;
         this.port = port;
     }
 
-    public HttpRequest but() {
-        HttpRequest other = new HttpRequest(client, port).
+    public DeprecatedHttpRequest but() {
+        DeprecatedHttpRequest other = new DeprecatedHttpRequest(client, port).
                 withTimeout(timeoutInMillis).
                 usingMethod(method).
                 on(path).
@@ -73,65 +73,65 @@ public class HttpRequest {
         return values.toArray(new String[values.size()]);
     }
 
-    public HttpRequest applyCookies(boolean apply) {
+    public DeprecatedHttpRequest applyCookies(boolean apply) {
         this.applyCookies = apply;
         return this;
     }
 
-    public HttpRequest onPort(int port) {
+    public DeprecatedHttpRequest onPort(int port) {
         this.port = port;
         return this;
     }
 
-    public HttpRequest on(String path) {
+    public DeprecatedHttpRequest on(String path) {
         this.path = path;
         return this;
     }
 
-    public HttpRequest useSSL() {
+    public DeprecatedHttpRequest useSSL() {
         return useSSL(true);
     }
 
-    public HttpRequest useSSL(boolean secure)  {
+    public DeprecatedHttpRequest useSSL(boolean secure)  {
         this.secure = secure;
         return this;
     }
 
-    public HttpRequest followRedirects(boolean follow) {
+    public DeprecatedHttpRequest followRedirects(boolean follow) {
         this.followRedirects = follow;
         return this;
     }
 
-    public HttpRequest withHeader(String header, String value) {
+    public DeprecatedHttpRequest withHeader(String header, String value) {
         this.headers.put(header, value);
         return this;
     }
 
-    public HttpRequest withParameter(String name, String value) {
+    public DeprecatedHttpRequest withParameter(String name, String value) {
         return withParameters(name, value);
     }
 
-    public HttpRequest withParameters(String name, String... value) {
+    public DeprecatedHttpRequest withParameters(String name, String... value) {
         parameters.put(name, Arrays.asList(value));
         return this;
     }
 
-    public HttpRequest withBody(String body) {
+    public DeprecatedHttpRequest withBody(String body) {
         this.body = body;
         return this;
     }
 
-    public HttpRequest withEncodingType(String type) {
+    public DeprecatedHttpRequest withEncodingType(String type) {
         this.encodingType = type;
         return this;
     }
 
-    public HttpRequest withCookie(String name, String value) {
+    public DeprecatedHttpRequest withCookie(String name, String value) {
         this.cookies.put(name, value);
         return this;
     }
 
-    public HttpResponse send() throws IOException {
+    public DeprecatedHttpResponse send() throws IOException {
         client.getOptions().setTimeout(timeoutInMillis);
         client.getOptions().setUseInsecureSSL(true);
         for (String cookie: cookies.keySet()) {
@@ -147,36 +147,36 @@ public class HttpRequest {
         // Clear HtmlUnit internal cache to make sure requests are actually sent
         client.getCache().clear();
 
-        return new HttpResponse(client.loadWebResponse(request));
+        return new DeprecatedHttpResponse(client.loadWebResponse(request));
     }
 
-    public HttpResponse get(String path) throws IOException {
+    public DeprecatedHttpResponse get(String path) throws IOException {
         return usingMethod(HttpMethod.GET).on(path).send();
     }
 
-    public HttpResponse post(String path) throws IOException {
+    public DeprecatedHttpResponse post(String path) throws IOException {
         return usingMethod(HttpMethod.POST).on(path).send();
     }
 
-    public HttpResponse put(String path) throws IOException {
+    public DeprecatedHttpResponse put(String path) throws IOException {
         return usingMethod(HttpMethod.PUT).on(path).send();
     }
 
-    public HttpResponse delete(String path) throws IOException {
+    public DeprecatedHttpResponse delete(String path) throws IOException {
         return usingMethod(HttpMethod.DELETE).on(path).send();
     }
 
-    public HttpRequest withTimeout(int timeoutInMillis) {
+    public DeprecatedHttpRequest withTimeout(int timeoutInMillis) {
         this.timeoutInMillis = timeoutInMillis;
         return this;
     }
 
-    public HttpRequest usingMethod(HttpMethod method) {
+    public DeprecatedHttpRequest usingMethod(HttpMethod method) {
         this.method = method;
         return this;
     }
 
-    public HttpRequest removeParameters() {
+    public DeprecatedHttpRequest removeParameters() {
         parameters.clear();
         return this;
     }

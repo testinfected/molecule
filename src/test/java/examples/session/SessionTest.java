@@ -1,8 +1,8 @@
 package examples.session;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.HttpRequest;
-import com.vtence.molecule.support.http.HttpResponse;
+import com.vtence.molecule.support.http.DeprecatedHttpRequest;
+import com.vtence.molecule.support.http.DeprecatedHttpResponse;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.support.Delorean;
 import com.vtence.molecule.FailureReporter;
@@ -26,8 +26,8 @@ public class SessionTest {
     String SESSION_COOKIE = "JSESSIONID"; // The default session cookie name is the standard servlet cookie
     int FIVE_MIN = 300;
 
-    HttpRequest request = new HttpRequest(9999).followRedirects(false);
-    HttpResponse response;
+    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999).followRedirects(false);
+    DeprecatedHttpResponse response;
 
     @Before
     public void startServer() throws IOException {

@@ -1,8 +1,8 @@
 package examples.ssl;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.HttpRequest;
-import com.vtence.molecule.support.http.HttpResponse;
+import com.vtence.molecule.support.http.DeprecatedHttpRequest;
+import com.vtence.molecule.support.http.DeprecatedHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +15,8 @@ public class SSLTest {
     SSLExample ssl = new SSLExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999).useSSL();
-    HttpResponse response;
+    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999).useSSL();
+    DeprecatedHttpResponse response;
 
     @Before
     public void startServer() throws IOException, GeneralSecurityException {

@@ -1,8 +1,8 @@
 package examples.middleware;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.HttpRequest;
-import com.vtence.molecule.support.http.HttpResponse;
+import com.vtence.molecule.support.http.DeprecatedHttpRequest;
+import com.vtence.molecule.support.http.DeprecatedHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +16,8 @@ public class CustomMiddlewareTest {
     CustomMiddlewareExample middlewares = new CustomMiddlewareExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999).followRedirects(false);
-    HttpResponse response;
+    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999).followRedirects(false);
+    DeprecatedHttpResponse response;
 
     @Before
     public void startServer() throws IOException {
