@@ -5,6 +5,7 @@ import com.vtence.molecule.helpers.Streams;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +18,9 @@ public class HttpRequest {
     private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
 
     private String path = "/";
+    private String method = "GET";
+    private Charset charset = Charset.forName("ISO-8859-1");
+    private byte[] body = new byte[0];
 
     public HttpRequest(int port) {
         this("localhost", port);
@@ -32,11 +36,6 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpResponse get(String path) throws IOException {
-        path(path);
-        return send();
-    }
-
     public HttpRequest header(String name, String... values) {
         List<String> headers = headers(name);
         headers.clear();
@@ -44,9 +43,36 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest contentType(String contentType) {
+        return header("Content-Type", contentType + "; charset=" + charset.name().toLowerCase());
+    }
+
+    public HttpRequest body(String text) {
+        return body(text.getBytes(charset));
+    }
+
+    public HttpRequest body(byte[] content) {
+        body = content;
+        return this;
+    }
+
+    public HttpResponse get(String path) throws IOException {
+        path(path);
+        method = "GET";
+        return send();
+    }
+
+    public HttpResponse post(String path) throws IOException {
+        path(path);
+        method = "POST";
+        return send();
+    }
+
     public HttpResponse send() throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL("http", host, port, path).openConnection();
+        connection.setRequestMethod(method);
         setRequestHeaders(connection);
+        writeBody(connection);
         connection.connect();
 
         int statusCode = connection.getResponseCode();
@@ -58,18 +84,25 @@ public class HttpRequest {
         return new HttpResponse(statusCode, statusMessage, headers, content);
     }
 
-    private List<String> headers(String name) {
-        if (!headers.containsKey(name)) {
-            headers.put(name, new ArrayList<String>());
-        }
-        return headers.get(name);
-    }
-
     private void setRequestHeaders(HttpURLConnection connection) {
         for (String name : headers.keySet()) {
             for (String value: headers(name)) {
                 connection.addRequestProperty(name, value);
             }
         }
+    }
+
+    private void writeBody(HttpURLConnection connection) throws IOException {
+        if (body.length > 0) {
+            connection.setDoOutput(true);
+            connection.getOutputStream().write(body);
+        }
+    }
+
+    private List<String> headers(String name) {
+        if (!headers.containsKey(name)) {
+            headers.put(name, new ArrayList<String>());
+        }
+        return headers.get(name);
     }
 }

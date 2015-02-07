@@ -5,7 +5,6 @@ import org.junit.Assert;
 
 import java.util.List;
 
-import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -59,11 +58,11 @@ public class HttpAssertions {
     }
 
     public HttpAssertions isChunked() {
-        return hasHeader(TRANSFER_ENCODING, "chunked");
+        return hasHeader("Transfer-Encoding", "chunked");
     }
 
     public HttpAssertions isNotChunked() {
-        return hasHeader(TRANSFER_ENCODING, not("chunked"));
+        return hasHeader("Transfer-Encoding", not("chunked"));
     }
 
     public HttpAssertions hasBodyText(String text) {

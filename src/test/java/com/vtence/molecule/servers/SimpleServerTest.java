@@ -208,10 +208,10 @@ public class SimpleServerTest {
             }
         });
 
-        oldRequest.withHeader("Accept", "text/html")
-                .withEncodingType("application/x-www-form-urlencoded")
-                .withBody("name=value")
-                .post("/uri");
+        request.header("Accept", "text/html")
+               .contentType("application/x-www-form-urlencoded")
+               .body("name=value")
+               .post("/uri");
         assertNoError();
 
         assertThat("request content", content, allOf(hasEntry("contentType", "application/x-www-form-urlencoded"),
