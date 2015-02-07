@@ -72,7 +72,7 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasHeader(String name, Matcher<? super String> matchingValue) {
-        Assert.assertThat("response " + name + " header", response.header(name), matchingValue);
+        Assert.assertThat("response '" + name + "' header", response.header(name), matchingValue);
         return this;
     }
 
@@ -93,12 +93,12 @@ public class ResponseAssert {
 
     public CookieAssert hasCookie(String named) {
         Cookie cookie = response.cookie(named);
-        Assert.assertTrue("response is missing cookie " + named, cookie != null);
+        Assert.assertTrue("response is missing cookie '" + named + "'", cookie != null);
         return new CookieAssert(cookie);
     }
 
     public ResponseAssert hasNoCookie(String named) {
-        Assert.assertFalse("response has unexpected cookie " + named, response.hasCookie(named));
+        Assert.assertFalse("response has unexpected cookie '" + named + "'", response.hasCookie(named));
         return this;
     }
 

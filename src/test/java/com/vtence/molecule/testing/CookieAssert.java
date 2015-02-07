@@ -5,7 +5,6 @@ import org.hamcrest.Matcher;
 import org.junit.Assert;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 
 public class CookieAssert {
 
@@ -24,12 +23,12 @@ public class CookieAssert {
     }
 
     public CookieAssert hasValue(Matcher<? super String> matching) {
-        Assert.assertThat(cookie.name() + " cookie value", cookie.value(), matching);
+        Assert.assertThat("cookie '" + cookie.name() + "' value", cookie.value(), matching);
         return this;
     }
 
     public CookieAssert isHttpOnly() {
-        Assert.assertThat(cookie.name() + " cookie http only", cookie.httpOnly(), is(true));
+        Assert.assertTrue("cookie '" + cookie.name() + "' is not http only", cookie.httpOnly());
         return this;
     }
 
@@ -38,7 +37,7 @@ public class CookieAssert {
     }
 
     public CookieAssert hasMaxAge(Matcher<? super Integer> matching) {
-        Assert.assertThat(cookie.name() + " cookie max age", cookie.maxAge(), matching);
+        Assert.assertThat("cookie '" + cookie.name() + "' max age", cookie.maxAge(), matching);
         return this;
     }
 }
