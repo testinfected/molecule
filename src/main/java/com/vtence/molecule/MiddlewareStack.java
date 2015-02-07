@@ -7,8 +7,7 @@ import java.util.Iterator;
 public class MiddlewareStack implements Application {
 
     private final Deque<Middleware> stack = new ArrayDeque<Middleware>();
-    private Application runner;
-    private Application chain;
+    private Application pipeline;
 
     public MiddlewareStack() {}
 
@@ -17,30 +16,24 @@ public class MiddlewareStack implements Application {
         return this;
     }
 
-    public MiddlewareStack run(Application app) {
-        this.runner = app;
+    public MiddlewareStack run(Application runner) {
+        this.pipeline = assemble(runner);
         return this;
     }
 
     public void handle(Request request, Response response) throws Exception {
-        if (!assembled()) assemble();
-
-        chain.handle(request, response);
+        if (pipeline == null) throw new IllegalStateException("Nothing to run");
+        pipeline.handle(request, response);
     }
 
-    public Application assemble() {
-        if (runner == null) throw new IllegalStateException("Nothing to run");
+    public Application assemble(Application runner) {
+        Application chain = runner;
 
-        chain = runner;
         for (Iterator<Middleware> middlewares = stack.descendingIterator(); middlewares.hasNext(); ) {
             Middleware previous = middlewares.next();
             previous.connectTo(chain);
             chain = previous;
         }
         return chain;
-    }
-
-    private boolean assembled() {
-        return chain != null;
     }
 }

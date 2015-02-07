@@ -18,10 +18,17 @@ public class MiddlewareStackTest {
         stack.use(middleware("top"));
         stack.use(middleware("middle"));
         stack.use(middleware("bottom"));
-        stack.run(application("app"));
+        stack.run(application("runner"));
 
         stack.handle(request, response);
-        assertChain(is("top -> middle -> bottom -> app"));
+        assertChain(is("top -> middle -> bottom -> runner"));
+    }
+
+    @Test(expected = IllegalStateException.class) public void
+    reportsIllegalStateIfNoRunnerWasSpecified() throws Exception {
+        stack.use(middleware("middleware"));
+
+        stack.handle(request, response);
     }
 
     private Middleware middleware(final String order) {
