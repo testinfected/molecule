@@ -7,8 +7,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
 import com.vtence.molecule.test.HttpRequest;
 import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
@@ -34,9 +32,6 @@ public class SimpleServerTest {
     SimpleServer server = new SimpleServer("localhost", 9999);
     HttpRequest request = new HttpRequest(server.port());
     HttpResponse response;
-
-    DeprecatedHttpRequest oldRequest = new DeprecatedHttpRequest(server.port());
-    DeprecatedHttpResponse oldResponse;
 
     Throwable error;
 
@@ -139,9 +134,9 @@ public class SimpleServerTest {
             }
         });
 
-        oldResponse = oldRequest.withParameters("names", "Alice", "Bob", "Charles").send();
+        response = request.get("/?names=Alice&names=Bob&names=Charles");
         assertNoError();
-        oldResponse.assertContentEqualTo("[Alice, Bob, Charles]");
+        assertThat(response).hasBodyText("[Alice, Bob, Charles]");
     }
 
     @SuppressWarnings("unchecked")
