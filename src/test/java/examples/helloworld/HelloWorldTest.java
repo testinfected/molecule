@@ -1,21 +1,23 @@
 package examples.helloworld;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+
 public class HelloWorldTest {
 
     HelloWorldExample helloWorld = new HelloWorldExample();
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999);
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
@@ -30,6 +32,6 @@ public class HelloWorldTest {
     @Test
     public void respondingWithHelloWorld() throws IOException {
         response = request.get("/");
-        response.assertContentEqualTo("Hello, World!");
+        assertThat(response).hasBodyText("Hello, World!");
     }
 }
