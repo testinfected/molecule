@@ -3,6 +3,7 @@ package com.vtence.molecule.http;
 public class Cookie {
     private final String name;
 
+    private int version = 1;
     private String value;
     private int maxAge = -1;
     private String domain;
@@ -70,9 +71,10 @@ public class Cookie {
 
     public String toString() {
         return name + "=" + value +
-                (maxAge >= 0 ? "max-age=" + maxAge : "") +
-                (domain != null ? domain : "") +
-                (path != null ? path : "") +
+                "; version=" + version +
+                (path != null ? "; path=" + path : "") +
+                (domain != null ? "; domain=" + domain : "") +
+                (maxAge >= 0 ? "; max-age=" + maxAge : "") +
                 (secure ? "; secure" : "") +
                 (httpOnly ? "; httponly" : "");
     }
