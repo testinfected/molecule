@@ -87,10 +87,18 @@ public class HttpRequest {
         int statusCode = connection.getResponseCode();
         String statusMessage = connection.getResponseMessage();
         Map<String, List<String>> headers = connection.getHeaderFields();
-        byte[] content = Streams.toBytes(connection.getInputStream());
+        byte[] body = readResponseBody(connection);
         connection.disconnect();
 
-        return new HttpResponse(statusCode, statusMessage, headers, content);
+        return new HttpResponse(statusCode, statusMessage, headers, body);
+    }
+
+    private byte[] readResponseBody(HttpURLConnection connection) throws IOException {
+        return Streams.toBytes(successful(connection) ? connection.getInputStream() : connection.getErrorStream());
+    }
+
+    private boolean successful(HttpURLConnection connection) throws IOException {
+        return connection.getResponseCode() < 400;
     }
 
     private void setRequestHeaders(HttpURLConnection connection) {

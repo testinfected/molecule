@@ -1,21 +1,23 @@
 package examples.filtering;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+
 public class FilteringTest {
 
     FilteringExample filters = new FilteringExample();
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999);
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
@@ -30,21 +32,18 @@ public class FilteringTest {
     @Test
     public void authorizingAccessToPrivateContent() throws IOException {
         response = request.get("/private/area?username=admin&password=admin");
-        response.assertOK();
-        response.assertContentEqualTo("Hello, admin!");
+        assertThat(response).isOK().hasBodyText("Hello, admin!");
     }
 
     @Test
     public void preventingAccessToPrivateContent() throws IOException {
         response = request.get("/private/area?username=admin&password=invalid");
-        response.assertHasStatusCode(401);
-        response.assertContentEqualTo("Get away!");
+        assertThat(response).hasStatusCode(401).hasBodyText("Get away!");
     }
 
     @Test
     public void givingAccessPublicContent() throws IOException {
         response = request.get("/hello");
-        response.assertOK();
-        response.assertContentEqualTo("Welcome, Guest!");
+        assertThat(response).isOK().hasBodyText("Welcome, Guest!");
     }
 }
