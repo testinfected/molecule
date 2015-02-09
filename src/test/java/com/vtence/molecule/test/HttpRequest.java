@@ -24,6 +24,7 @@ public class HttpRequest {
     private String method = "GET";
     private Charset charset = Charset.forName("ISO-8859-1");
     private byte[] body = new byte[0];
+    private boolean followRedirects = false;
 
     public HttpRequest(int port) {
         this("localhost", port);
@@ -82,6 +83,7 @@ public class HttpRequest {
         addCookieHeader();
         setRequestHeaders(connection);
         writeBody(connection);
+        connection.setInstanceFollowRedirects(followRedirects);
         connection.connect();
 
         int statusCode = connection.getResponseCode();
