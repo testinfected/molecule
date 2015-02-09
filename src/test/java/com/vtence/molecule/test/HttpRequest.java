@@ -1,5 +1,6 @@
 package com.vtence.molecule.test;
 
+import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.helpers.Streams;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ public class HttpRequest {
     private final String host;
     private final int port;
     private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
+    private final Map<String, String> cookies = new LinkedHashMap<String, String>();
 
     private String path = "/";
     private String method = "GET";
@@ -47,6 +50,11 @@ public class HttpRequest {
         return header("Content-Type", contentType + "; charset=" + charset.name().toLowerCase());
     }
 
+    public HttpRequest cookie(String name, String value) {
+        cookies.put(name, value);
+        return this;
+    }
+
     public HttpRequest body(String text) {
         return body(text.getBytes(charset));
     }
@@ -71,6 +79,7 @@ public class HttpRequest {
     public HttpResponse send() throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL("http", host, port, path).openConnection();
         connection.setRequestMethod(method);
+        addCookieHeader();
         setRequestHeaders(connection);
         writeBody(connection);
         connection.connect();
@@ -90,6 +99,15 @@ public class HttpRequest {
                 connection.addRequestProperty(name, value);
             }
         }
+    }
+
+    private void addCookieHeader() {
+        if (cookies.isEmpty()) return;
+        List<String> pairs = new ArrayList<String>();
+        for (String name : cookies.keySet()) {
+            pairs.add(name + "=" + cookies.get(name));
+        }
+        header("Cookie", Joiner.on("; ").join(pairs));
     }
 
     private void writeBody(HttpURLConnection connection) throws IOException {

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
-import static com.vtence.molecule.test.HttpAssertions.assertThat;
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -230,18 +230,19 @@ public class SimpleServerTest {
             }
         });
 
-        oldRequest.withCookie("cookie1", "value1").withCookie("cookie2", "value2").send();
+        request.cookie("cookie1", "value1")
+               .cookie("cookie2", "value2")
+               .send();
         assertNoError();
 
-        assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"),
-                hasEntry("cookie2", "value2")));
+        assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"), hasEntry("cookie2", "value2")));
     }
 
     @Test public void
     setsResponseCookies() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Cookie cookie = new Cookie("cookie", "value").
+                Cookie cookie = new Cookie("name", "value").
                         maxAge(1800).
                         domain("localhost").
                         path("/uri").
@@ -251,14 +252,14 @@ public class SimpleServerTest {
             }
         });
 
-        oldResponse = oldRequest.send();
+        response = request.send();
         assertNoError();
-        oldResponse.assertHasCookie(containsString("cookie=value"));
-        oldResponse.assertHasCookie(containsString("max-age=1800"));
-        oldResponse.assertHasCookie(containsString("httponly"));
-        oldResponse.assertHasCookie(containsString("path=/uri"));
-        oldResponse.assertHasCookie(containsString("domain=localhost"));
-        oldResponse.assertHasCookie(containsString("secure"));
+        assertThat(response).hasCookie("name")
+                            .hasPath("/uri")
+                            .hasDomain("localhost")
+                            .hasMaxAge(1800)
+                            .isSecure()
+                            .isHttpOnly();
     }
 
     private void assertNoError() {

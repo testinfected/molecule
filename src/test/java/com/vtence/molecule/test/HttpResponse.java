@@ -2,7 +2,9 @@ package com.vtence.molecule.test;
 
 import com.vtence.molecule.helpers.Joiner;
 
+import java.net.HttpCookie;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +36,20 @@ public class HttpResponse {
     public List<String> headers(String name) {
         List<String> values = headers.get(name);
         return values != null ? values : new ArrayList<String>();
+    }
+
+    public Map<String, HttpCookie> cookies() {
+        Map<String, HttpCookie> cookies = new HashMap<String, HttpCookie>();
+        for (String header : headers("Set-Cookie")) {
+            for (HttpCookie cookie : HttpCookie.parse(header)) {
+                cookies.put(cookie.getName(), cookie);
+            }
+        }
+        return cookies;
+    }
+
+    public HttpCookie cookie(String name) {
+        return cookies().get(name);
     }
 
     public String bodyText() {

@@ -58,4 +58,6 @@ public interface HeaderNames {
     static final String ACCEPT_RANGES = "Accept-Ranges";
     static final String ALLOW = "Allow";
     static final String SERVER = "Server";
+
+    static final String SET_COOKIE = "Set-Cookie";
 }

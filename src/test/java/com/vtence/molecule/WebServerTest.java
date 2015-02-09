@@ -10,7 +10,7 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.test.HttpAssertions.assertThat;
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 

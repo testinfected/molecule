@@ -2,11 +2,11 @@ package com.vtence.molecule.servers;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
-import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.FailureReporter;
+import com.vtence.molecule.http.Cookie;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
@@ -16,6 +16,8 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+
+import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
 
 public class SimpleServer implements Server {
 
@@ -62,90 +64,101 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(org.simpleframework.http.Request httpRequest, org.simpleframework.http.Response httpResponse) {
+        public void handle(org.simpleframework.http.Request simpleRequest, org.simpleframework.http.Response simpleResponse) {
             try {
                 Request request = new Request();
                 Response response = new Response();
-                build(request, httpRequest);
+                build(request, simpleRequest);
                 app.handle(request, response);
-                commit(httpResponse, response);
+                commit(simpleResponse, response);
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
             } finally {
-                close(httpResponse);
+                close(simpleResponse);
             }
         }
 
-        private void build(Request request, org.simpleframework.http.Request httpRequest) throws IOException {
-            request.uri(httpRequest.getTarget());
-            request.path(httpRequest.getPath().getPath());
-            request.remoteIp(httpRequest.getClientAddress().getAddress().getHostAddress());
-            request.remotePort(httpRequest.getClientAddress().getPort());
-            request.remoteHost(httpRequest.getClientAddress().getHostName());
-            request.timestamp(httpRequest.getRequestTime());
-            request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
-            request.secure(httpRequest.isSecure());
-            request.body(httpRequest.getInputStream());
-            request.method(httpRequest.getMethod());
-            setHeaders(request, httpRequest);
-            setCookies(request, httpRequest);
-            setParameters(request, httpRequest);
+        private void build(Request request, org.simpleframework.http.Request simple) throws IOException {
+            setRequestDetails(request, simple);
+            setHeaders(request, simple);
+            setCookies(request, simple);
+            setParameters(request, simple);
+            setBody(request, simple);
         }
 
-        private void setHeaders(Request request, org.simpleframework.http.Request httpRequest) {
-            List<String> names = httpRequest.getNames();
+        private void setRequestDetails(Request request, org.simpleframework.http.Request simple) throws IOException {
+            request.uri(simple.getTarget());
+            request.path(simple.getPath().getPath());
+            request.remoteIp(simple.getClientAddress().getAddress().getHostAddress());
+            request.remotePort(simple.getClientAddress().getPort());
+            request.remoteHost(simple.getClientAddress().getHostName());
+            request.timestamp(simple.getRequestTime());
+            request.protocol(String.format("HTTP/%s.%s", simple.getMajor(), simple.getMinor()));
+            request.secure(simple.isSecure());
+            request.method(simple.getMethod());
+        }
+
+        private void setHeaders(Request request, org.simpleframework.http.Request simple) {
+            List<String> names = simple.getNames();
             for (String header : names) {
                 // Apparently there's no way to know the number of values for a given name,
                 // so we have to iterate until we reach a null value
                 int index = 0;
-                while (httpRequest.getValue(header, index) != null) {
-                    request.addHeader(header, httpRequest.getValue(header, index));
+                while (simple.getValue(header, index) != null) {
+                    request.addHeader(header, simple.getValue(header, index));
                     index++;
                 }
             }
         }
 
-        private void setCookies(Request request, org.simpleframework.http.Request httpRequest) {
-            for (org.simpleframework.http.Cookie cookie : httpRequest.getCookies()) {
+        private void setCookies(Request request, org.simpleframework.http.Request simple) {
+            for (org.simpleframework.http.Cookie cookie : simple.getCookies()) {
                 request.cookie(cookie.getName(), cookie.getValue());
             }
         }
 
-        private void setParameters(Request request, org.simpleframework.http.Request httpRequest) {
-            for (String name : httpRequest.getQuery().keySet()) {
-                List<String> values = httpRequest.getQuery().getAll(name);
+        private void setParameters(Request request, org.simpleframework.http.Request simple) {
+            for (String name : simple.getQuery().keySet()) {
+                List<String> values = simple.getQuery().getAll(name);
                 for (String value : values) {
                     request.addParameter(name, value);
                 }
             }
         }
 
-        private void commit(org.simpleframework.http.Response httpResponse, Response response) throws IOException {
-            httpResponse.setCode(response.statusCode());
-            httpResponse.setDescription(response.statusText());
-            commitHeaders(httpResponse, response);
-            commitCookies(httpResponse, response);
-            Body body = response.body();
-            body.writeTo(httpResponse.getOutputStream(), response.charset());
-            body.close();
+        private void setBody(Request request, org.simpleframework.http.Request simple) throws IOException {
+            request.body(simple.getInputStream());
         }
 
-        private void commitHeaders(org.simpleframework.http.Response httpResponse, Response response) {
+        private void commit(org.simpleframework.http.Response simple, Response response) throws IOException {
+            setStatusLine(simple, response);
+            setCookieHeaders(response);
+            setHeaders(simple, response);
+            writeBody(simple, response);
+        }
+
+        private void setStatusLine(org.simpleframework.http.Response simple, Response response) {
+            simple.setCode(response.statusCode());
+            simple.setDescription(response.statusText());
+        }
+
+        private void setHeaders(org.simpleframework.http.Response simple, Response response) {
             for (String name : response.headerNames()) {
-                httpResponse.setValue(name, response.header(name));
+                simple.setValue(name, response.header(name));
             }
         }
 
-        private void commitCookies(org.simpleframework.http.Response httpResponse, Response response) {
+        private void setCookieHeaders(Response response) {
             for (String name : response.cookieNames()) {
                 Cookie cookie = response.cookie(name);
-                org.simpleframework.http.Cookie httpCookie = httpResponse.setCookie(cookie.name(), cookie.value());
-                httpCookie.setExpiry(cookie.maxAge());
-                httpCookie.setDomain(cookie.domain());
-                httpCookie.setPath(cookie.path());
-                httpCookie.setSecure(cookie.secure());
-                httpCookie.setProtected(cookie.httpOnly());
+                response.header(SET_COOKIE, cookie.toString());
             }
+        }
+
+        private void writeBody(org.simpleframework.http.Response simple, Response response) throws IOException {
+            Body body = response.body();
+            body.writeTo(simple.getOutputStream(), response.charset());
+            body.close();
         }
 
         private void close(org.simpleframework.http.Response response) {
