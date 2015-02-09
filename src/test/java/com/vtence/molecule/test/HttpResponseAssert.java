@@ -89,4 +89,12 @@ public class HttpResponseAssert {
         Assert.assertTrue("No cookie named '" + named + "'", cookie != null);
         return HttpCookieAssert.assertThat(cookie);
     }
+
+    public HttpResponseAssert hasContentType(String contentType) {
+        return hasContentType(equalTo(contentType));
+    }
+
+    private HttpResponseAssert hasContentType(Matcher<? super String> matching) {
+        return hasHeader("Content-Type", matching);
+    }
 }
