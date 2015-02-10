@@ -10,6 +10,8 @@ import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 
 public class HttpResponseAssert {
     private final HttpResponse response;
@@ -42,6 +44,14 @@ public class HttpResponseAssert {
     public HttpResponseAssert hasStatusMessage(Matcher<? super String> matching) {
         Assert.assertThat("response status message", response.statusMessage(), matching);
         return this;
+    }
+
+    public HttpResponseAssert hasHeader(String named) {
+        return hasHeader(named, notNullValue());
+    }
+
+    public HttpResponseAssert hasNoHeader(String named) {
+        return hasHeader(named, nullValue());
     }
 
     public HttpResponseAssert hasHeader(String name, String value) {

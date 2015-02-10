@@ -1,26 +1,24 @@
 package examples.performance;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.support.Delorean;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Date;
 
-import static com.vtence.molecule.http.HttpDate.httpDate;
-import static com.vtence.molecule.support.Dates.calendarDate;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
 
 public class CachingAndCompressionTest {
-    CachingAndCompressionExample caching = new CachingAndCompressionExample();
+    Delorean delorean = new Delorean();
+    CachingAndCompressionExample caching = new CachingAndCompressionExample(delorean);
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999).withTimeout(120000);
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
@@ -34,62 +32,67 @@ public class CachingAndCompressionTest {
 
     @Test
     public void compressingResponses() throws IOException {
-        response = request.get("/");
-        response.assertOK();
-        // Stupid Apache Http-Client removes Content-Encoding (and Content-Length) header for compressed content,
-        // so we can't assert its there. In fact we know that content was compressed if is not chunked
-        // and Content-Length header is missing!
-        response.assertNotChunked();
-        response.assertHasHeader("Content-Length", nullValue());
+        response = request.header("Accept-Encoding", "gzip; q=0.9, deflate").get("/");
+
+        assertThat(response).isOK()
+                            // We expect deflate compression, which is preferred by the client
+                            .hasHeader("Content-Encoding", "deflate")
+                            .hasHeader("Content-Length", "170");
     }
 
     @Test
     public void addingETagValidatorAndCacheDirectivesToDynamicContent() throws IOException {
         response = request.get("/");
-        response.assertOK();
-        response.assertHasContentType("text/html");
-        // We expect an ETag, since no other validation information is generated
-        response.assertHasHeader("ETag", notNullValue());
-        // These are the default cache directives
-        response.assertHasHeader("Cache-Control", "max-age=0; private; no-cache");
+
+        assertThat(response).isOK()
+                            .hasContentType("text/html")
+                            // We expect an ETag, since no other validation information is generated
+                            .hasHeader("ETag")
+                            // These are the default cache directives
+                            .hasHeader("Cache-Control", "max-age=0; private; no-cache");
     }
 
     @Test public void
     notGeneratingTheResponseBodyWhenETagHasNotChanged() throws IOException {
         response = request.get("/");
-        response.assertOK();
-        response.assertHasHeader("ETag", notNullValue());
+
+        assertThat(response).isOK()
+                            .hasHeader("ETag");
 
         // Play the same request with freshness information...
-        response = request.but().withHeader("If-None-Match", response.header("ETag")).send();
+        response = request.header("If-None-Match", response.header("ETag")).get("/");
         // ... and expect a not modified
-        response.assertHasStatusCode(304);
+        assertThat(response).hasStatusCode(304);
     }
 
     @Test
     public void addingLastModifiedValidatorAndCacheDirectivesToStaticFiles() throws IOException {
         response = request.get("/js/fox.js");
-        response.assertOK();
-        response.assertHasContentType("application/javascript");
-        // Static files come with validation information
-        response.assertHasHeader("Last-Modified", notNullValue());
-        // We shouldn't add an ETag, since there's already validation information
-        response.assertHasHeader("ETag", nullValue());
-        // Our own cache directives
-        response.assertHasHeader("Cache-Control", "public; max-age=60");
+
+        assertThat(response).isOK()
+                            .hasContentType("application/javascript")
+                            // Static files come with validation information
+                            .hasHeader("Last-Modified")
+                            // We don't expect ETag, since there's already freshness information
+                            .hasNoHeader("ETag")
+                            // Our own cache directives
+                            .hasHeader("Cache-Control", "public; max-age=60");
     }
 
     @Test public void
     notGeneratingTheResponseBodyWhenResourceHasNotBeenModified() throws IOException {
-        Date timestamp = calendarDate(2014, 10, 14).atTime(21, 20, 0).toDate();
+        // Freeze time to get the same validation information for the resource on subsequent calls
+        delorean.freeze();
+        // Request freshness information with the response
+        response = request.get("/?conditional");
 
-        response = request.withParameter("timestamp", httpDate(timestamp)).get("/");
-        response.assertOK();
-        response.assertHasHeader("Last-Modified", notNullValue());
+        assertThat(response).isOK()
+                            // We expect a Last-Modified header with freshness information
+                            .hasHeader("Last-Modified");
 
         // Play the same request with freshness information...
-        response = request.but().withHeader("If-Modified-Since", response.header("Last-Modified")).send();
+        response = request.header("If-Modified-Since", response.header("Last-Modified")).get("/?conditional");
         // ... and expect a not modified
-        response.assertHasStatusCode(304);
+        assertThat(response).hasStatusCode(304);
     }
 }

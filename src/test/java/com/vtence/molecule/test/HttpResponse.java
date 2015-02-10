@@ -30,7 +30,9 @@ public class HttpResponse {
     }
 
     public String header(String name) {
-        return Joiner.on(",").join(headers(name));
+        List<String> headers = headers(name);
+        if (headers.isEmpty()) return null;
+        return Joiner.on(",").join(headers);
     }
 
     public List<String> headers(String name) {
