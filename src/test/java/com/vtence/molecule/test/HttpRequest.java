@@ -8,11 +8,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 public class HttpRequest {
     private final String host;
@@ -40,10 +41,21 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest charset(Charset charset) {
+        this.charset = charset;
+        return this;
+    }
+
     public HttpRequest header(String name, String... values) {
+        return header(name, asList(values));
+    }
+
+    public HttpRequest header(String name, Iterable<String> values) {
         List<String> headers = headers(name);
         headers.clear();
-        Collections.addAll(headers, values);
+        for (String value : values) {
+            headers.add(value);
+        }
         return this;
     }
 
@@ -65,16 +77,60 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest body(HtmlForm form) {
+        contentType(form.contentType());
+        body(form.encode(charset));
+        return this;
+    }
+
+    public HttpRequest method(String method) {
+        this.method = method;
+        return this;
+    }
+
+    public HttpRequest followRedirects(boolean follow) {
+        this.followRedirects = follow;
+        return this;
+    }
+
     public HttpResponse get(String path) throws IOException {
         path(path);
-        method = "GET";
+        method("GET");
         return send();
     }
 
     public HttpResponse post(String path) throws IOException {
         path(path);
-        method = "POST";
+        method("POST");
         return send();
+    }
+
+    public HttpResponse put(String path) throws IOException {
+        path(path);
+        method("PUT");
+        return send();
+    }
+
+    public HttpResponse delete(String path) throws IOException {
+        path(path);
+        method("DELETE");
+        return send();
+    }
+
+    public HttpRequest but() {
+        HttpRequest request = new HttpRequest(host, port);
+        request.path(path);
+        request.method(method);
+        request.charset(charset);
+        request.followRedirects(followRedirects);
+        for (String header : headers.keySet()) {
+            request.header(header, headers.get(header));
+        }
+        for (String cookie : cookies.keySet()) {
+            request.cookie(cookie, cookies.get(cookie));
+        }
+        request.body(body);
+        return request;
     }
 
     public HttpResponse send() throws IOException {
