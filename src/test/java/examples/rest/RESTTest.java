@@ -2,8 +2,6 @@ package examples.rest;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
 import com.vtence.molecule.test.HtmlForm;
 import com.vtence.molecule.test.HttpRequest;
 import com.vtence.molecule.test.HttpResponse;
@@ -22,9 +20,6 @@ public class RESTTest {
 
     HttpRequest request = new HttpRequest(9999).charset(Charsets.UTF_8);
     HttpResponse response;
-
-    DeprecatedHttpRequest oldRequest = new DeprecatedHttpRequest(9999).withTimeout(50000);
-    DeprecatedHttpResponse oldResponse;
 
     @Before
     public void startServer() throws IOException {
@@ -73,28 +68,29 @@ public class RESTTest {
 
     @Test
     public void makingAPostActLikeAnUpdateOrDelete() throws IOException {
-        oldResponse = oldRequest.but()
-                          .withParameter("title", "My Favorite Things")
-                          .withParameter("artist", "John Coltrane")
+        response = request.but()
+                          .body(new HtmlForm().set("title", "My Favorite Things")
+                                              .set("artist", "John Coltrane"))
                           .post("/albums");
-        oldResponse.assertHasStatusCode(201);
+        assertThat(response).hasStatusCode(201);
 
-        oldResponse = oldRequest.but()
-                          .withParameter("_method", "PUT")
-                          .withParameter("title", "Kind of Blue")
-                          .withParameter("artist", "Miles Davis")
-                          .post("/albums/1");
-        oldResponse.assertHasStatusCode(200);
+        response = request.but()
+                          .body(new HtmlForm().set("_method", "PUT")
+                                              .set("title", "Kind of Blue")
+                                              .set("artist", "Miles Davis"))
+                                  .post("/albums/1");
+        assertThat(response).isOK();
 
-        oldResponse = oldRequest.but().get("/albums/1");
-        oldResponse.assertHasStatusCode(200);
-        oldResponse.assertContentEqualTo("Title: Kind of Blue, Artist: Miles Davis");
+        response = request.but().get("/albums/1");
+        assertThat(response).isOK()
+                            .hasBodyText("Title: Kind of Blue, Artist: Miles Davis");
 
-        oldResponse = oldRequest.but().withParameter("_method", "DELETE").post("/albums/1");
-        oldResponse.assertHasStatusCode(200);
+        response = request.but().body(new HtmlForm().set("_method", "DELETE"))
+                                .post("/albums/1");
+        assertThat(response).isOK();
 
-        oldResponse = oldRequest.but().get("/albums");
-        oldResponse.assertHasStatusCode(200);
-        oldResponse.assertContentEqualTo("Your music library is empty");
+        response = request.but().get("/albums");
+        assertThat(response).isOK()
+                            .hasBodyText("Your music library is empty");
     }
 }
