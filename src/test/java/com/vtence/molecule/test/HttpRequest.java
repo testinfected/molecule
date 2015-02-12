@@ -3,16 +3,21 @@ package com.vtence.molecule.test;
 import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.helpers.Streams;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.vtence.molecule.lib.SecureProtocol.TLS;
 import static java.util.Arrays.asList;
 
 public class HttpRequest {
@@ -25,7 +30,8 @@ public class HttpRequest {
     private String method = "GET";
     private Charset charset = Charset.forName("ISO-8859-1");
     private byte[] body = new byte[0];
-    private boolean followRedirects = false;
+    private boolean followRedirects;
+    private boolean secure;
 
     public HttpRequest(int port) {
         this("localhost", port);
@@ -93,6 +99,11 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest secure(boolean secure) {
+        this.secure = secure;
+        return this;
+    }
+
     public HttpResponse get(String path) throws IOException {
         path(path);
         method("GET");
@@ -123,6 +134,7 @@ public class HttpRequest {
         request.method(method);
         request.charset(charset);
         request.followRedirects(followRedirects);
+        request.secure(secure);
         for (String header : headers.keySet()) {
             request.header(header, headers.get(header));
         }
@@ -134,7 +146,7 @@ public class HttpRequest {
     }
 
     public HttpResponse send() throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL("http", host, port, path).openConnection();
+        HttpURLConnection connection = secure ? openSecureConnection() : openUnsecureConnection();
         connection.setRequestMethod(method);
         addCookieHeader();
         setRequestHeaders(connection);
@@ -149,6 +161,23 @@ public class HttpRequest {
         connection.disconnect();
 
         return new HttpResponse(statusCode, statusMessage, headers, body);
+    }
+
+    private HttpURLConnection openUnsecureConnection() throws IOException {
+        return (HttpURLConnection) new URL("http", host, port, path).openConnection();
+    }
+
+    private HttpURLConnection openSecureConnection() throws IOException {
+        HttpsURLConnection connection = (HttpsURLConnection) new URL("https", host, port, path).openConnection();
+        SSLContext sslContext;
+        try {
+            sslContext = TLS.initialize(null, new TrustManager[] { Trust.allCertificates() });
+        } catch (GeneralSecurityException e) {
+            throw new AssertionError("Failed to setup  SSL", e);
+        }
+        connection.setSSLSocketFactory(sslContext.getSocketFactory());
+        connection.setHostnameVerifier(Trust.allHostNames());
+        return connection;
     }
 
     private byte[] readResponseBody(HttpURLConnection connection) throws IOException {

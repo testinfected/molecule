@@ -1,8 +1,8 @@
 package examples.ssl;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,13 +10,15 @@ import org.junit.Test;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+
 public class SSLTest {
 
     SSLExample ssl = new SSLExample();
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999).useSSL();
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999).secure(true);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException, GeneralSecurityException {
@@ -31,6 +33,6 @@ public class SSLTest {
     @Test
     public void connectingSecurely() throws IOException {
         response = request.get("/");
-        response.assertContentEqualTo("You are on a secure channel");
+        assertThat(response).hasBodyText("You are on a secure channel");
     }
 }
