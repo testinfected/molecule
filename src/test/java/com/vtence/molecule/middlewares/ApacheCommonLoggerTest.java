@@ -1,37 +1,35 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.BrokenClock;
-import org.jmock.Expectations;
-import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.jmock.lib.concurrent.Synchroniser;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Rule;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpStatus.NO_CONTENT;
 import static com.vtence.molecule.support.Dates.calendarDate;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 public class ApacheCommonLoggerTest {
-    @Rule public JUnitRuleMockery context = new JUnitRuleMockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
-        setThreadingPolicy(new Synchroniser());
-    }};
-    Logger logger = context.mock(Logger.class);
+    LogRecordingHandler logRecords = new LogRecordingHandler();
     Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").toDate();
     ApacheCommonLogger apacheCommonLogger =
-            new ApacheCommonLogger(logger,
+            new ApacheCommonLogger(anonymousLogger(logRecords),
                                    BrokenClock.stoppedAt(currentTime),
                                    Locale.US, TimeZone.getTimeZone("GMT+01:00"));
 
@@ -47,11 +45,10 @@ public class ApacheCommonLoggerTest {
                 response.status(HttpStatus.OK);
             }
         });
-        context.checking(new Expectations() {{
-            oneOf(logger).info("192.168.0.1 - - [27/Jun/2012:18:04:00 +0100] \"GET /products?keyword=dogs HTTP/1.1\" 200 28");
-        }});
 
         apacheCommonLogger.handle(request, response);
+
+        logRecords.assertEntries(contains("192.168.0.1 - - [27/Jun/2012:18:04:00 +0100] \"GET /products?keyword=dogs HTTP/1.1\" 200 28"));
     }
 
     @Test public void
@@ -64,10 +61,44 @@ public class ApacheCommonLoggerTest {
             }
         });
 
-        context.checking(new Expectations() {{
-            oneOf(logger).info(with(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));
-        }});
-
         apacheCommonLogger.handle(request, response);
+
+        logRecords.assertEntries(contains(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));
+    }
+
+    private Logger anonymousLogger(Handler handler) {
+        Logger logger = Logger.getAnonymousLogger();
+        logger.setUseParentHandlers(false);
+        logger.addHandler(handler);
+        return logger;
+    }
+
+    public static class LogRecordingHandler extends Handler {
+        private final List<LogRecord> records = new ArrayList<LogRecord>();
+
+        @Override
+        public void publish(LogRecord record) {
+            records.add(record);
+        }
+
+        @Override
+        public void flush() {
+        }
+
+        @Override
+        public void close() throws SecurityException {
+        }
+
+        public List<String> messages() {
+            List<String> result = new ArrayList<String>();
+            for (LogRecord record : records) {
+                result.add(record.getMessage());
+            }
+            return result;
+        }
+
+        public void assertEntries(Matcher<? super List<String>> matching) {
+            assertThat("log messages", messages(), matching);
+        }
     }
 }
