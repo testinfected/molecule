@@ -2,16 +2,16 @@ package examples.rest;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.test.HtmlForm;
-import com.vtence.molecule.test.HttpRequest;
-import com.vtence.molecule.test.HttpResponse;
+import com.vtence.molecule.testing.HtmlForm;
+import com.vtence.molecule.testing.HttpRequest;
+import com.vtence.molecule.testing.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 
 public class RESTTest {
 

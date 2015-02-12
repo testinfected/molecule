@@ -7,8 +7,8 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.test.HttpRequest;
-import com.vtence.molecule.test.HttpResponse;
+import com.vtence.molecule.testing.HttpRequest;
+import com.vtence.molecule.testing.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
-import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -237,12 +237,11 @@ public class SimpleServerTest {
     setsResponseCookies() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
-                Cookie cookie = new Cookie("name", "value").
-                        maxAge(1800).
-                        domain("localhost").
-                        path("/uri").
-                        secure(true).
-                        httpOnly(true);
+                Cookie cookie = new Cookie("name", "value").maxAge(1800)
+                                                           .domain("localhost")
+                                                           .path("/uri")
+                                                           .secure(true)
+                                                           .httpOnly(true);
                 response.cookie(cookie);
             }
         });

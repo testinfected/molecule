@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class ContentLengthHeaderTest {
 

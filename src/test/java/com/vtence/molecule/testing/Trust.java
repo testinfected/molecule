@@ -1,4 +1,4 @@
-package com.vtence.molecule.test;
+package com.vtence.molecule.testing;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;

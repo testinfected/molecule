@@ -2,9 +2,10 @@ package com.vtence.molecule.support;
 
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.Request;
+import com.vtence.molecule.testing.RequestAssert;
 import org.hamcrest.Matcher;
 
-import static com.vtence.molecule.test.RequestAssertions.assertThat;
+import static com.vtence.molecule.testing.RequestAssert.assertThat;
 
 @Deprecated
 public class MockRequest extends Request {
@@ -66,7 +67,7 @@ public class MockRequest extends Request {
     }
 
     /**
-     * @see com.vtence.molecule.test.RequestAssertions#hasAttribute(Object, Matcher)
+     * @see RequestAssert#hasAttribute(Object, Matcher)
      */
     @Deprecated
     public void assertAttribute(Object key, Matcher<Object> attributeMatcher) {

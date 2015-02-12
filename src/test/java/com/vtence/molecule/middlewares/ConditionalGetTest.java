@@ -18,7 +18,7 @@ import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.support.Dates.aDate;
 import static com.vtence.molecule.support.Dates.instant;
 import static com.vtence.molecule.support.Dates.now;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class ConditionalGetTest {
 

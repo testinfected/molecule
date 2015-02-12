@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class TemplatesTest {

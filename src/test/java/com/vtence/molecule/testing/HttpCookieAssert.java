@@ -1,4 +1,4 @@
-package com.vtence.molecule.test;
+package com.vtence.molecule.testing;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;

@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.POST;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class HttpMethodOverrideTest {
 

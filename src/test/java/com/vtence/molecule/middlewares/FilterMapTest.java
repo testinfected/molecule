@@ -8,7 +8,7 @@ import com.vtence.molecule.lib.matchers.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.lang.String.format;
 
 public class FilterMapTest {

@@ -9,7 +9,7 @@ import com.vtence.molecule.lib.matchers.Nothing;
 import com.vtence.molecule.routing.Route;
 import org.junit.Test;
 
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class RouterTest {
 

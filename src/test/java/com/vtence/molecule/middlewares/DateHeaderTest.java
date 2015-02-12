@@ -9,7 +9,7 @@ import org.junit.Test;
 import java.util.Date;
 
 import static com.vtence.molecule.support.Dates.calendarDate;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class DateHeaderTest {
     Date now = calendarDate(2012, 6, 8).atMidnight().inZone("GMT-04:00").toDate();

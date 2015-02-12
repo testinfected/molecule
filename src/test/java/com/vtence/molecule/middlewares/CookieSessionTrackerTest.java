@@ -14,8 +14,8 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.vtence.molecule.test.RequestAssertions.assertThat;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.RequestAssert.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 

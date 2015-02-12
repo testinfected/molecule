@@ -13,8 +13,8 @@ import org.junit.Test;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-import static com.vtence.molecule.test.RequestAssertions.assertThat;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.RequestAssert.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;

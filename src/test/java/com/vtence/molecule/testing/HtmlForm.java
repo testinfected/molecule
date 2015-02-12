@@ -1,4 +1,4 @@
-package com.vtence.molecule.test;
+package com.vtence.molecule.testing;
 
 import com.vtence.molecule.helpers.Joiner;
 

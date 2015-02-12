@@ -1,7 +1,7 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.test.HttpRequest;
-import com.vtence.molecule.test.HttpResponse;
+import com.vtence.molecule.testing.HttpRequest;
+import com.vtence.molecule.testing.HttpResponse;
 import org.junit.After;
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 

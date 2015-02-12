@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class FailsafeTest {

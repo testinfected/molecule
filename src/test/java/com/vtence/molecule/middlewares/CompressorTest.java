@@ -13,7 +13,7 @@ import java.util.zip.InflaterInputStream;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
 import static com.vtence.molecule.support.BodyContent.asStream;
-import static com.vtence.molecule.test.ResponseAssertions.assertThat;
+import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
