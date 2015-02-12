@@ -1,14 +1,15 @@
 package examples.simple;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class SimpleTest {
@@ -16,8 +17,8 @@ public class SimpleTest {
     SimpleExample basic = new SimpleExample();
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999);
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
@@ -32,13 +33,13 @@ public class SimpleTest {
     @Test
     public void specifyingResponseOutputEncoding() throws IOException {
         response = request.get("/?encoding=utf-8");
-        response.assertContentIsEncodedAs("utf-8");
+        assertThat(response).hasContentEncodedAs("utf-8");
     }
 
     @Test
     public void causingTheApplicationToCrashAndRenderA500Page() throws IOException {
         response = request.get("/?encoding=not-supported");
-        response.assertHasStatusCode(500);
-        response.assertContent(containsString("java.nio.charset.UnsupportedCharsetException"));
+        assertThat(response).hasStatusCode(500)
+                            .hasBodyText(containsString("java.nio.charset.UnsupportedCharsetException"));
     }
 }

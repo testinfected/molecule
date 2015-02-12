@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 
 public class HttpResponseAssert {
     private final HttpResponse response;
@@ -86,7 +87,7 @@ public class HttpResponseAssert {
     }
 
     public HttpResponseAssert hasContentEncodedAs(String charset) {
-        return hasContentEncodedAs(is(charset));
+        return hasContentEncodedAs(equalToIgnoringCase(charset));
     }
 
     public HttpResponseAssert hasContentEncodedAs(Matcher<? super String> matching) {
