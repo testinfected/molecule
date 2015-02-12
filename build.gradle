@@ -34,7 +34,6 @@ def libs = [
                              'cglib:cglib-nodep:2.1_3',
                              'org.objenesis:objenesis:1.0'],
         juniversal_chardet: 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3',
-        htmlunit          : 'net.sourceforge.htmlunit:htmlunit:2.14'
 ]
 
 repositories {
@@ -51,7 +50,6 @@ dependencies {
   testCompile libs.jmock_junit4
   testCompile libs.jmock_legacy
   testCompile libs.juniversal_chardet
-  testCompile libs.htmlunit
 }
 
 task 'version' << {
