@@ -1,21 +1,24 @@
 package examples.routing;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HtmlForm;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
+
 public class RoutingTest {
 
     RoutingExample routing = new RoutingExample();
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999);
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
@@ -30,27 +33,27 @@ public class RoutingTest {
     @Test
     public void mappingRoutesToUrls() throws IOException {
         response = request.get("/");
-        response.assertHasStatusCode(200);
-        response.assertContentEqualTo("Welcome!");
+        assertThat(response).isOK()
+                            .hasBodyText("Welcome!");
     }
 
     @Test
     public void restrictingARouteToASpecificVerb() throws IOException {
-        response = request.followRedirects(false).withParameter("username", "Vincent").post("/login");
-        response.assertHasStatusCode(303);
+        response = request.body(new HtmlForm().set("username", "Vincent")).post("/login");
+        assertThat(response).hasStatusCode(303);
     }
 
     @Test
     public void bindingDynamicRequestParametersToPath() throws IOException {
         response = request.get("/hello/Vincent");
-        response.assertHasStatusCode(200);
-        response.assertHasContentType("text/html");
-        response.assertContentEqualTo("<html><body><h3>Hello, Vincent</h3></body></html>");
+        assertThat(response).isOK()
+                            .hasContentType("text/html")
+                            .hasBodyText("<html><body><h3>Hello, Vincent</h3></body></html>");
     }
 
     @Test
     public void requestingAnUndefinedRoute() throws IOException {
         response = request.get("/nowhere");
-        response.assertHasStatusCode(404);
+        assertThat(response).hasStatusCode(404);
     }
 }
