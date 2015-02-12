@@ -1,14 +1,15 @@
 package examples.templating;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.http.DeprecatedHttpRequest;
-import com.vtence.molecule.support.http.DeprecatedHttpResponse;
+import com.vtence.molecule.test.HttpRequest;
+import com.vtence.molecule.test.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.test.HttpResponseAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class TemplatingAndLayoutTest {
@@ -16,8 +17,8 @@ public class TemplatingAndLayoutTest {
     TemplatingAndLayoutExample templating = new TemplatingAndLayoutExample();
     WebServer server = WebServer.create(9999);
 
-    DeprecatedHttpRequest request = new DeprecatedHttpRequest(9999);
-    DeprecatedHttpResponse response;
+    HttpRequest request = new HttpRequest(9999);
+    HttpResponse response;
 
     @Before
     public void startServer() throws IOException {
@@ -32,25 +33,25 @@ public class TemplatingAndLayoutTest {
     @Test
     public void renderingAnHtmlTemplateUsingMustache() throws IOException {
         response = request.get("/hello?name=Frodo");
-        response.assertOK();
-        response.assertHasContentType("text/html; charset=utf-8");
-        response.assertContent(containsString("<p>Hello, Frodo!</p>"));
+        assertThat(response).isOK()
+                            .hasContentType("text/html; charset=utf-8")
+                            .hasBodyText(containsString("<p>Hello, Frodo!</p>"));
     }
 
     @Test
     public void applyingACommonLayoutToASetOfPages() throws IOException {
         response = request.get("/hello");
-        response.assertOK();
-        response.assertContent(containsString("<title>Layout - Hello World"));
-        response.assertContent(containsString("<h1>A simple page</h1>"));
-        response.assertContent(containsString("<meta name=\"description\" content=\"Hello World\">"));
-        response.assertContent(containsString("Hello, World!"));
+        assertThat(response).isOK()
+                            .hasBodyText(containsString("<title>Layout - Hello World"))
+                            .hasBodyText(containsString("<h1>A simple page</h1>"))
+                            .hasBodyText(containsString("<meta name=\"description\" content=\"Hello World\">"))
+                            .hasBodyText(containsString("<p>Hello, World!</p>"));
     }
 
     @Test
     public void skippingDecorationWhenResponseStatusIsNotOk() throws IOException {
         response = request.get("/not-found");
-        response.assertHasStatusCode(404);
-        response.assertContentEqualTo("Not found: /not-found");
+        assertThat(response).hasStatusCode(404)
+                            .hasBodyText("Not found: /not-found");
     }
 }
