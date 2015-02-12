@@ -97,8 +97,14 @@ public class HttpResponseAssert {
 
     public HttpCookieAssert hasCookie(String named) {
         HttpCookie cookie = response.cookie(named);
-        Assert.assertTrue("No cookie named '" + named + "'", cookie != null);
+        Assert.assertTrue("response contains no cookie named '" + named + "'", cookie != null);
         return HttpCookieAssert.assertThat(cookie);
+    }
+
+    public HttpResponseAssert hasNoCookie(String named) {
+        HttpCookie cookie = response.cookie(named);
+        Assert.assertTrue("response contains unexpected cookie '" + named + "'", cookie == null);
+        return this;
     }
 
     public HttpResponseAssert hasContentType(String contentType) {
