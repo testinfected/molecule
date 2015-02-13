@@ -1,8 +1,11 @@
 package com.vtence.molecule.testing;
 
+import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Joiner;
+import com.vtence.molecule.http.ContentType;
 
 import java.net.HttpCookie;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +43,18 @@ public class HttpResponse {
         return values != null ? values : new ArrayList<String>();
     }
 
+    public String contentType() {
+        return header("Content-Type");
+    }
+
+    public Charset charset() {
+        ContentType contentType = ContentType.parse(contentType());
+        if (contentType == null || contentType.charset() == null)
+            return Charsets.ISO_8859_1;
+
+        return contentType.charset();
+    }
+
     public Map<String, HttpCookie> cookies() {
         Map<String, HttpCookie> cookies = new HashMap<String, HttpCookie>();
         for (String header : headers("Set-Cookie")) {
@@ -55,9 +70,7 @@ public class HttpResponse {
     }
 
     public String bodyText() {
-        // This is a simplification, we need to read the charset from the Content-Type header or default
-        // to ISO-8859-1
-        return new String(content);
+        return new String(content, charset());
     }
 
     public byte[] body() {

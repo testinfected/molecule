@@ -33,7 +33,8 @@ public class SimpleTest {
     @Test
     public void specifyingResponseOutputEncoding() throws IOException {
         response = request.get("/?encoding=utf-8");
-        assertThat(response).hasContentEncodedAs("utf-8");
+        assertThat(response).hasContentEncodedAs("utf-8")
+                            .hasBodyText(containsString("Les naïfs ægithales hâtifs"));
     }
 
     @Test
