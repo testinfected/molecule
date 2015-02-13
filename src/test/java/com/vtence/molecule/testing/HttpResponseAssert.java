@@ -6,7 +6,7 @@ import org.junit.Assert;
 import java.net.HttpCookie;
 import java.util.List;
 
-import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
+import static com.vtence.molecule.testing.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;

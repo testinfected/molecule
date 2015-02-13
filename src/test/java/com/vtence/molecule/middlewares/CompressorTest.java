@@ -12,7 +12,7 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
-import static com.vtence.molecule.support.BodyContent.asStream;
+import static com.vtence.molecule.testing.BodyContent.stream;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -197,10 +197,10 @@ public class CompressorTest {
     }
 
     private String inflate(Response response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new InflaterInputStream(asStream(response), new Inflater(true)));
+        return response.empty() ? "" : Streams.toString(new InflaterInputStream(stream(response), new Inflater(true)));
     }
 
     private String unzip(Response response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new GZIPInputStream(asStream(response)));
+        return response.empty() ? "" : Streams.toString(new GZIPInputStream(stream(response)));
     }
 }

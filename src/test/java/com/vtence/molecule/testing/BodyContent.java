@@ -1,4 +1,4 @@
-package com.vtence.molecule.support;
+package com.vtence.molecule.testing;
 
 import com.vtence.molecule.Response;
 
@@ -23,7 +23,7 @@ public class BodyContent {
         return new String(BodyContent.asBytes(response), response.charset());
     }
 
-    public static InputStream asStream(Response response) {
+    public static InputStream stream(Response response) {
         return new ByteArrayInputStream(asBytes(response));
     }
 

@@ -4,14 +4,13 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.support.BodyContent;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
 import java.nio.charset.Charset;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
-import static com.vtence.molecule.support.CharsetDetector.detectCharsetOf;
+import static com.vtence.molecule.testing.CharsetDetector.detectCharsetOf;
 import static org.hamcrest.CoreMatchers.*;
 
 public class ResponseAssert {

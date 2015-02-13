@@ -22,7 +22,7 @@ public class ResourceLocator {
 
     public File locate(String resource) {
         URL location = classLoader.getResource(resource);
-        if (location == null) throw new IllegalArgumentException("Cannot find " + resource);
+        if (location == null) throw new IllegalArgumentException("Cannot find resource " + resource);
         try {
             return new File(location.toURI());
         } catch (URISyntaxException e) {
