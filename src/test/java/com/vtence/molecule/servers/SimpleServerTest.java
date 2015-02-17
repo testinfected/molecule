@@ -95,7 +95,7 @@ public class SimpleServerTest {
     }
 
     @Test public void
-    doesNoChunkResponsesWithContentLengthHeader() throws IOException {
+    doesNotChunkResponsesWithContentLengthHeader() throws IOException {
         server.run(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 response.contentLength(16);
