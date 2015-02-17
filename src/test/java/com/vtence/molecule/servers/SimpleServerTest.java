@@ -268,7 +268,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
-                    parameters.put(part.name(), part.value());
+                    parameters.put(part.name(), part.text());
                 }
             }
         });

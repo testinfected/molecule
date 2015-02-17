@@ -1,6 +1,7 @@
 package examples.multipart;
 
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.testing.FileUpload;
 import com.vtence.molecule.testing.FormData;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 
 public class MultiPartTest {
@@ -33,9 +35,17 @@ public class MultiPartTest {
     @Test
     public void submittingFormDataParameters() throws IOException {
         response = request.body(new FormData().set("say", "Hello")
-                                              .set("to", "world")).post("/");
+                                              .set("to", "world")).post("/greeting");
 
         assertThat(response).isOK()
                             .hasBodyText("Hello world");
+    }
+
+    @Test
+    public void uploadingATextFile() throws IOException {
+        response = request.body(FileUpload.textFile(locateOnClasspath("examples/upload/evil.txt"))).post("/biography");
+
+        assertThat(response).isOK()
+                            .hasBodyText("I'm an evil minion!");
     }
 }

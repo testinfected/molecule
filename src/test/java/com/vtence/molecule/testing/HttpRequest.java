@@ -95,6 +95,12 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest body(FileUpload upload) throws IOException {
+        contentType("multipart/form-data; boundary=" + upload.boundary());
+        body(upload.encode(charset));
+        return this;
+    }
+
     public HttpRequest method(String method) {
         this.method = method;
         return this;
