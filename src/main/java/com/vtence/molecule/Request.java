@@ -37,6 +37,7 @@ public class Request {
     private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
     private final Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
+    private final List<BodyPart> parts = new ArrayList<BodyPart>();
 
     private String uri;
     private String path;
@@ -709,5 +710,20 @@ public class Request {
      */
     public List<Locale> locales() {
         return AcceptLanguage.of(this).locales();
+    }
+
+    public void addPart(BodyPart part) {
+        parts.add(part);
+    }
+
+    public List<BodyPart> parts() {
+        return parts;
+    }
+
+    public BodyPart part(String name) {
+        for (BodyPart part : parts) {
+            if (part.name().equals(name)) return part;
+        }
+        return null;
     }
 }

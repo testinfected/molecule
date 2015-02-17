@@ -89,6 +89,12 @@ public class HttpRequest {
         return this;
     }
 
+    public HttpRequest body(FormData form) {
+        contentType(form.contentType());
+        body(form.encode(charset));
+        return this;
+    }
+
     public HttpRequest method(String method) {
         this.method = method;
         return this;

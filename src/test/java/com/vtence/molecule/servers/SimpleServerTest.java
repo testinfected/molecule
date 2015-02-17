@@ -3,10 +3,12 @@ package com.vtence.molecule.servers;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
+import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.StackTrace;
+import com.vtence.molecule.testing.FormData;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
 import org.junit.After;
@@ -15,6 +17,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
@@ -255,6 +258,29 @@ public class SimpleServerTest {
                             .isSecure()
                             .isHttpOnly();
     }
+
+    @Test
+    public void
+    readsMultiPartRequests() throws IOException {
+        final Map<String, String> parameters = new HashMap<String, String>();
+        server.run(new Application() {
+            @Override
+            public void handle(Request request, Response response) throws Exception {
+                List<BodyPart> parts = request.parts();
+                for (BodyPart part : parts) {
+                    parameters.put(part.name(), part.value());
+                }
+            }
+        });
+
+        response = request.body(new FormData().set("param1", "value1")
+                                              .set("param2", "value2")).post("/");
+
+        assertNoError();
+        assertThat("form data parameters", parameters, allOf(hasEntry("param1", "value1"),
+                                                             hasEntry("param2", "value2")));
+    }
+
 
     private void assertNoError() {
         if (error != null) fail(StackTrace.of(error));

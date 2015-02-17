@@ -2,11 +2,13 @@ package com.vtence.molecule.servers;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
+import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import com.vtence.molecule.http.Cookie;
+import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+import static com.vtence.molecule.helpers.Streams.toBytes;
 import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
 
 public class SimpleServer implements Server {
@@ -83,6 +86,7 @@ public class SimpleServer implements Server {
             setHeaders(request, simple);
             setCookies(request, simple);
             setParameters(request, simple);
+            setParts(request, simple);
             setBody(request, simple);
         }
 
@@ -123,6 +127,12 @@ public class SimpleServer implements Server {
                 for (String value : values) {
                     request.addParameter(name, value);
                 }
+            }
+        }
+
+        private void setParts(Request request, org.simpleframework.http.Request simple) throws IOException {
+            for (Part part : simple.getParts()) {
+                request.addPart(new BodyPart(part.getName(), toBytes(part.getInputStream())));
             }
         }
 
