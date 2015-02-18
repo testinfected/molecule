@@ -2,8 +2,6 @@ package com.vtence.molecule.testing;
 
 import com.vtence.molecule.helpers.Joiner;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,24 +17,12 @@ public class HtmlForm {
         return this;
     }
 
-    public String contentType() {
-        return "application/x-www-form-urlencoded";
-    }
-
     public String encode(Charset charset) {
         List<String> pairs = new ArrayList<String>();
+        URLEscaper escaper = URLEscaper.to(charset);
         for (String name : data.keySet()) {
-            pairs.add(encode(name, charset) + "=" + encode(data.get(name), charset));
+            pairs.add(escaper.escape(name) + "=" + escaper.escape(data.get(name)));
         }
         return Joiner.on("&").join(pairs);
-    }
-
-    private String encode(String name, Charset charset) {
-        try {
-            return URLEncoder.encode(name, charset.name());
-        } catch (UnsupportedEncodingException impossible) {
-            // we can safely ignore this can't happen
-            return null;
-        }
     }
 }

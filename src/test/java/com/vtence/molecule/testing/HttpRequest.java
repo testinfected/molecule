@@ -84,25 +84,26 @@ public class HttpRequest {
     }
 
     public HttpRequest body(HtmlForm form) {
-        contentType(form.contentType());
+        contentType("application/x-www-form-urlencoded");
         body(form.encode(charset));
         return this;
     }
 
-    public HttpRequest body(FormData form) {
-        contentType(form.contentType());
-        body(form.encode(charset));
+    public HttpRequest body(FormData form) throws IOException {
+        String boundary = randomBoundary();
+        contentType("multipart/form-data; boundary=" + boundary);
+        body(form.encode(boundary));
         return this;
     }
 
     public HttpRequest body(FileUpload upload) throws IOException {
-        String boundary = makeBoundary();
+        String boundary = randomBoundary();
         contentType("multipart/form-data; boundary=" + boundary);
         body(upload.encode(boundary));
         return this;
     }
 
-    private static String makeBoundary() {
+    private static String randomBoundary() {
         return Long.toHexString(System.currentTimeMillis());
     }
 

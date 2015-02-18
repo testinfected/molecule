@@ -12,6 +12,8 @@ import java.io.Writer;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 
+import static com.vtence.molecule.helpers.Charsets.UTF_8;
+
 public class FileUpload {
 
     private static String CRLF = "\r\n";
@@ -53,22 +55,19 @@ public class FileUpload {
         // MIME text is always ASCII, so we can safely use the file encoding
         Writer writer = new OutputStreamWriter(buffer, charset);
 
-        writer.append("--").append(boundary).append(CRLF);
-        writer.append("Content-Disposition: form-data");
-        writer.append("; filename=\"").append(file.getName()).append("\"").append(CRLF);
-        writer.append("Content-Type: ").append(contentType);
+        writer.append("--").append(boundary).append(CRLF)
+              .append("Content-Disposition: form-data")
+              .append("; filename=\"").append(URLEscaper.to(UTF_8).escape(file.getName())).append("\"").append(CRLF)
+              .append("Content-Type: ").append(contentType);
         if (!binary) {
             writer.append("; charset=").append(charset.name().toLowerCase()).append(CRLF);
         } else {
-            writer.append(CRLF);
-            writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+            writer.append(CRLF)
+                  .append("Content-Transfer-Encoding: binary").append(CRLF);
         }
-        writer.append(CRLF);
-        writer.flush();
+        writer.append(CRLF).flush();
         writeFileContent(buffer);
-        writer.append(CRLF);
-        writer.append("--").append(boundary).append("--").append(CRLF);
-        writer.flush();
+        writer.append(CRLF).append("--").append(boundary).append("--").append(CRLF).flush();
         return buffer.toByteArray();
     }
 
