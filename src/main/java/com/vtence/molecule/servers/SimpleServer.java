@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-import static com.vtence.molecule.helpers.Streams.toBytes;
 import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
 
 public class SimpleServer implements Server {
@@ -132,14 +131,10 @@ public class SimpleServer implements Server {
 
         private void setParts(Request request, org.simpleframework.http.Request simple) throws IOException {
             for (Part part : simple.getParts()) {
-                request.addPart(new BodyPart(contentOf(part)).name(part.getName())
-                                                             .contentType(part.getContentType().toString())
-                                                             .filename(part.getFileName()));
+                request.addPart(new BodyPart(part.getInputStream()).name(part.getName())
+                                                                   .contentType(part.getContentType().toString())
+                                                                   .filename(part.getFileName()));
             }
-        }
-
-        private byte[] contentOf(Part part) throws IOException {
-            return toBytes(part.getInputStream());
         }
 
         private void setBody(Request request, org.simpleframework.http.Request simple) throws IOException {
