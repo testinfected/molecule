@@ -86,6 +86,15 @@ public class HttpResponseAssert {
         return this;
     }
 
+    public HttpResponseAssert hasBodySize(int size) {
+        return hasBodySize(is(size));
+    }
+
+    private HttpResponseAssert hasBodySize(Matcher<? super Integer> matching) {
+        Assert.assertThat("response body size", response.body().length, matching);
+        return this;
+    }
+
     public HttpResponseAssert hasContentEncodedAs(String charset) {
         return hasContentEncodedAs(equalToIgnoringCase(charset));
     }

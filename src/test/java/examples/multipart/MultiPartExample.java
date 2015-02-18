@@ -12,6 +12,13 @@ import java.util.List;
 
 public class MultiPartExample {
 
+    public static void main(String[] args) throws IOException {
+        MultiPartExample example = new MultiPartExample();
+        WebServer webServer = WebServer.create();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri());
+    }
+
     public void run(WebServer server) throws IOException {
         server.start(new DynamicRoutes() {{
             post("/greeting").to(new Application() {
@@ -32,12 +39,18 @@ public class MultiPartExample {
                     }
                 }
             });
+
+            post("/avatar").to(new Application() {
+                public void handle(Request request, Response response) throws Exception {
+                    List<BodyPart> parts = request.parts();
+                    // Ignore all but the last part. In our example we submit a single one
+                    for (BodyPart part : parts) {
+                        response.contentType(part.contentType());
+                        response.header("X-File-Name", part.filename());
+                        response.body(part.content());
+                    }
+                }
+            });
         }});
     }
-
-    public static void main(String[] args) throws IOException {
-        MultiPartExample example = new MultiPartExample();
-        WebServer webServer = WebServer.create();
-        example.run(webServer);
-        System.out.println("Access at " + webServer.uri());
-    }}
+}

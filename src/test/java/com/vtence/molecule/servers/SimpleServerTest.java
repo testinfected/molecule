@@ -1,9 +1,9 @@
 package com.vtence.molecule.servers;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.testing.FileUpload.binaryFile;
 import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -259,9 +261,8 @@ public class SimpleServerTest {
                             .isHttpOnly();
     }
 
-    @Test
-    public void
-    readsMultiPartRequests() throws IOException {
+    @Test public void
+    readsMultiPartFormParameters() throws IOException {
         final Map<String, String> parameters = new HashMap<String, String>();
         server.run(new Application() {
             @Override
@@ -281,6 +282,24 @@ public class SimpleServerTest {
                                                              hasEntry("param2", "value2")));
     }
 
+    @Test public void
+    downloadsUploadedFiles() throws IOException {
+        final Map<String, Integer> files = new HashMap<String, Integer>();
+        server.run(new Application() {
+            @Override
+            public void handle(Request request, Response response) throws Exception {
+                List<BodyPart> parts = request.parts();
+                for (BodyPart part : parts) {
+                    files.put(part.filename(), part.content().length);
+                }
+            }
+        });
+
+        response = request.body(binaryFile(locateOnClasspath("assets/images/minion.png"))).post("/");
+
+        assertNoError();
+        assertThat("uploaded files", files, hasEntry("minion.png", 21134));
+    }
 
     private void assertNoError() {
         if (error != null) fail(StackTrace.of(error));

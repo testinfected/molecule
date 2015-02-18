@@ -6,6 +6,7 @@ public class BodyPart {
     private final byte[] content;
 
     private String name;
+    private String filename;
     private String contentType;
 
     public BodyPart(byte[] content) {
@@ -19,6 +20,15 @@ public class BodyPart {
 
     public String name() {
         return name;
+    }
+
+    public BodyPart filename(String filename) {
+        this.filename = filename;
+        return this;
+    }
+
+    public String filename() {
+        return filename;
     }
 
     public byte[] content() {

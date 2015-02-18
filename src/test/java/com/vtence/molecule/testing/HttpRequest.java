@@ -96,9 +96,14 @@ public class HttpRequest {
     }
 
     public HttpRequest body(FileUpload upload) throws IOException {
-        contentType("multipart/form-data; boundary=" + upload.boundary());
-        body(upload.encode(charset));
+        String boundary = makeBoundary();
+        contentType("multipart/form-data; boundary=" + boundary);
+        body(upload.encode(boundary));
         return this;
+    }
+
+    private static String makeBoundary() {
+        return Long.toHexString(System.currentTimeMillis());
     }
 
     public HttpRequest method(String method) {

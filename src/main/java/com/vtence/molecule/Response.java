@@ -23,6 +23,7 @@ import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
+import static com.vtence.molecule.lib.BinaryBody.bytes;
 import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
@@ -459,6 +460,15 @@ public class Response {
      */
     public Response body(String text) {
         return body(text(text));
+    }
+
+    /**
+     * Sets the binary content to write back to the client as the body of this response.
+     *
+     * @param content the binary of the body to write back to the client
+     */
+    public Response body(byte[] content) {
+        return body(bytes(content));
     }
 
     /**
