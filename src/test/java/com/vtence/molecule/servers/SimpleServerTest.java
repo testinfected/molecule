@@ -283,6 +283,25 @@ public class SimpleServerTest {
     }
 
     @Test public void
+    correctlyHandlesMultiPartFormParametersWithoutContentType() throws IOException {
+        final Map<String, String> parameters = new HashMap<String, String>();
+        server.run(new Application() {
+            @Override
+            public void handle(Request request, Response response) throws Exception {
+                List<BodyPart> parts = request.parts();
+                for (BodyPart part : parts) {
+                    parameters.put(part.name(), part.text());
+                }
+            }
+        });
+
+        response = request.body(new FormData(null).set("param", "value")).post("/");
+
+        assertNoError();
+        assertThat("form data parameters", parameters, hasEntry("param", "value"));
+    }
+
+    @Test public void
     downloadsUploadedFiles() throws IOException {
         final Map<String, Integer> files = new HashMap<String, Integer>();
         server.run(new Application() {

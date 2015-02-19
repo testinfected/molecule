@@ -131,8 +131,9 @@ public class SimpleServer implements Server {
 
         private void setParts(Request request, org.simpleframework.http.Request simple) throws IOException {
             for (Part part : simple.getParts()) {
+                String contentType = part.getContentType() != null ? part.getContentType().toString() : null;
                 request.addPart(new BodyPart(part.getInputStream()).name(part.getName())
-                                                                   .contentType(part.getContentType().toString())
+                                                                   .contentType(contentType)
                                                                    .filename(part.getFileName()));
             }
         }

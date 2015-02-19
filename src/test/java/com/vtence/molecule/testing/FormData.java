@@ -36,12 +36,17 @@ public class FormData {
         Writer writer = new OutputStreamWriter(buffer, charset);
         for (String param : data.keySet()) {
             writer.append("--").append(boundary).append(CRLF)
-                  .append("Content-Disposition: form-data; name=\"").append(param).append("\"").append(CRLF)
-                  .append("Content-Type: ").append(contentType)
-                  .append("; charset=").append(charset.name().toLowerCase()).append(CRLF)
-                  .append(CRLF)
-                  .append(data.get(param)).append(CRLF);
+                  .append("Content-Disposition: form-data; name=\"").append(param).append("\"").append(CRLF);
+
+            if (contentType != null) {
+                writer.append("Content-Type: ").append(contentType)
+                      .append("; charset=").append(charset.name().toLowerCase()).append(CRLF);
+            }
+
+            writer.append(CRLF);
+            writer.append(data.get(param)).append(CRLF);
         }
+
         writer.append("--").append(boundary).append("--").append(CRLF)
               .flush();
         return buffer.toByteArray();
