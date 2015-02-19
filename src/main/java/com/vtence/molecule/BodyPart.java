@@ -2,16 +2,19 @@ package com.vtence.molecule;
 
 import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Streams;
+import com.vtence.molecule.http.ContentType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
- * Represents a part or form item that was received within a multipart/form-data POST request.
+ * Represents a body part or form item that was received within a <code>multipart/form-data</code> <code>POST</code> request.
  * <br/>
  * Typically a part represents either a text parameter or a file.
  * The contents of the part can be acquired either as an <code>InputStream</code>, a byte array or as a
- * string (which currently is expected to be UTF-8).
+ * string encoded in the encoding specified with the <code>Content-Type</code> header or in the default HTTP encoding
+ * <code>ISO-8859-1</code>.
  */
 public class BodyPart {
     private final InputStream input;
@@ -83,13 +86,14 @@ public class BodyPart {
     }
 
     /**
-     * Gets the content of the part as a string. The encoding must be UTF-8.
+     * Gets the content of the part as a string. The encoding of the string is taken from the content type.
+     * If no content type is sent the content is decoded in the standard default of ISO-8859-1.
      *
      * @return the text representation of the content
      * @throws IOException thrown if the content cannot be accessed
      */
     public String text() throws IOException {
-        return new String(content(), Charsets.UTF_8);
+        return new String(content(), charset());
     }
 
     /**
@@ -110,5 +114,13 @@ public class BodyPart {
      */
     public InputStream input() throws IOException {
         return input;
+    }
+
+    private Charset charset() {
+        ContentType contentType = ContentType.parse(contentType());
+        if (contentType == null || contentType.charset() == null) {
+            return Charsets.ISO_8859_1;
+        }
+        return contentType.charset();
     }
 }
