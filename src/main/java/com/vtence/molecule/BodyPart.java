@@ -6,6 +6,13 @@ import com.vtence.molecule.helpers.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Represents a part or form item that was received within a multipart/form-data POST request.
+ * <br/>
+ * Typically a part represents either a text parameter or a file.
+ * The contents of the part can be acquired either as an <code>InputStream</code>, a byte array or as a
+ * string (which currently is expected to be UTF-8).
+ */
 public class BodyPart {
     private final InputStream input;
 
@@ -17,38 +24,91 @@ public class BodyPart {
         this.input = input;
     }
 
+    /**
+     * Sets the name of this part.
+     *
+     * @param name the new part name
+     */
     public BodyPart name(String name) {
         this.name = name;
         return this;
     }
 
+    /**
+     * Gets the name of this part. Typically this is used when the part represents a text parameter rather
+     * than a file. However, file parts can also have a name.
+     *
+     * @return the part name or null if this part has no associated name
+     */
     public String name() {
         return name;
     }
 
+    /**
+     * Sets the file name of this part.
+     *
+     * @param filename the new file name
+     */
     public BodyPart filename(String filename) {
         this.filename = filename;
         return this;
     }
 
+    /**
+     * Gets the file name of this part. Typically this is used when the part represents a file.
+     *
+     * @return the file name of the part or null if this part has no associated file name
+     */
     public String filename() {
         return filename;
     }
 
-    public byte[] content() throws IOException {
-        return Streams.toBytes(input);
-    }
-
-    public String text() throws IOException {
-        return new String(content(), Charsets.UTF_8);
-    }
-
+    /**
+     * Sets the content type of this part.
+     *
+     * @param contentType the new content type
+     */
     public BodyPart contentType(String contentType) {
         this.contentType = contentType;
         return this;
     }
 
+    /**
+     * Gets the content type of this part.
+     *
+     * @return the part content type or null if the part has no associated content type
+     */
     public String contentType() {
         return contentType;
+    }
+
+    /**
+     * Gets the content of the part as a string. The encoding must be UTF-8.
+     *
+     * @return the text representation of the content
+     * @throws IOException thrown if the content cannot be accessed
+     */
+    public String text() throws IOException {
+        return new String(content(), Charsets.UTF_8);
+    }
+
+    /**
+     * Gets the content of the part as a byte array.
+     *
+     * @return the binary representation of the part
+     * @throws IOException thrown if the content can not be accessed
+     */
+    public byte[] content() throws IOException {
+        return Streams.toBytes(input());
+    }
+
+    /**
+     * Gets the content of the part as an input stream.
+     *
+     * @return an input stream giving access to the part content
+     * @throws IOException thrown if the content cannot be accessed
+     */
+    public InputStream input() throws IOException {
+        return input;
     }
 }

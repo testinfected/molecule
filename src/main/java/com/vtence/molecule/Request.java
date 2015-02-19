@@ -301,6 +301,49 @@ public class Request {
     }
 
     /**
+     * Ads a new body part to this request.
+     *
+     * <p>
+     * Note that this will not change the body of the request, which will still contain the original multipart
+     * encoded body.
+     * </p>
+     *
+     * @param part the additional body part
+     */
+    public void addPart(BodyPart part) {
+        parts.add(part);
+    }
+
+    /**
+     * Acquires the list of <code>BodyPart</code>s with from this request,
+     * provided that the request is of type <code>multipart/form-data</code>.
+     * <p>
+     * This is typically used in case of file uploads or multipart <code>POST</code> requests.
+     * </p>
+     *
+     * @return the (possibly empty) list of body parts
+     */
+    public List<BodyPart> parts() {
+        return parts;
+    }
+
+    /**
+     * Acquires the <code>BodyPart</code> with the specified name from this request.
+     * This is typically used in case of file uploads or multipart <code>POST</code> requests.
+     *
+     * @param name the name of the body part to acquire
+     *
+     * @return the named part or null if the part does not exist or the request
+     * is not of type <code>multipart/form-data</code>
+     */
+    public BodyPart part(String name) {
+        for (BodyPart part : parts) {
+            if (part.name().equals(name)) return part;
+        }
+        return null;
+    }
+
+    /**
      * Provides the charset used in the body of this request.
      * The charset is read from the <code>Content-Type</code> header.
      *
@@ -710,20 +753,5 @@ public class Request {
      */
     public List<Locale> locales() {
         return AcceptLanguage.of(this).locales();
-    }
-
-    public void addPart(BodyPart part) {
-        parts.add(part);
-    }
-
-    public List<BodyPart> parts() {
-        return parts;
-    }
-
-    public BodyPart part(String name) {
-        for (BodyPart part : parts) {
-            if (part.name().equals(name)) return part;
-        }
-        return null;
     }
 }
