@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class BodyPartTest {
 
     @Test
-    public void encodesTextContentAccordingToContentTypeCharset() throws IOException {
+    public void decodesTextContentAccordingToContentTypeCharset() throws IOException {
         String originalText = "Les naïfs ægithales hâtifs pondant à Noël où il gèle...";
 
         BodyPart part = new BodyPart(asUTF16(originalText));
@@ -23,7 +23,7 @@ public class BodyPartTest {
     }
 
     @Test
-    public void defaultsToUTF8EncodingWhenNoContentTypeIsSpecified() throws IOException {
+    public void defaultsToUTF8DecodingWhenNoContentTypeIsSpecified() throws IOException {
         String originalText = "sont sûrs d'être déçus...";
 
         BodyPart part = new BodyPart(asUTF8(originalText));
@@ -32,7 +32,7 @@ public class BodyPartTest {
     }
 
     @Test
-    public void defaultsToUTF8EncodingWhenNoCharsetIsSpecified() throws IOException {
+    public void defaultsToUTF8DecodingWhenNoCharsetIsSpecified() throws IOException {
         String originalText = "en voyant leurs drôles d'oeufs abîmés.";
 
         BodyPart part = new BodyPart(asUTF8(originalText));
