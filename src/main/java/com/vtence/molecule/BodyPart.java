@@ -13,8 +13,7 @@ import java.nio.charset.Charset;
  * <br/>
  * Typically a part represents either a text parameter or a file.
  * The contents of the part can be acquired either as an <code>InputStream</code>, a byte array or as a
- * string encoded in the encoding specified with the <code>Content-Type</code> header or in the default HTTP encoding
- * <code>ISO-8859-1</code>.
+ * string encoded in the encoding specified with the <code>Content-Type</code> header or in <code>UTF-8</code>.
  */
 public class BodyPart {
     private final InputStream input;
@@ -87,7 +86,7 @@ public class BodyPart {
 
     /**
      * Gets the content of the part as a string. The encoding of the string is taken from the content type.
-     * If no content type is sent the content is decoded in the standard default of ISO-8859-1.
+     * If no content type is sent the content is decoded in UTF-8.
      *
      * @return the text representation of the content
      * @throws IOException thrown if the content cannot be accessed
@@ -119,7 +118,7 @@ public class BodyPart {
     private Charset charset() {
         ContentType contentType = ContentType.parse(contentType());
         if (contentType == null || contentType.charset() == null) {
-            return Charsets.ISO_8859_1;
+            return Charsets.UTF_8;
         }
         return contentType.charset();
     }

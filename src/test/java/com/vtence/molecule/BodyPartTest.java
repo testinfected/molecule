@@ -1,12 +1,12 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Charsets;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import static com.vtence.molecule.helpers.Charsets.UTF_16;
+import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -23,19 +23,19 @@ public class BodyPartTest {
     }
 
     @Test
-    public void defaultsToISO88591EncodingWhenNoContentTypeIsSpecified() throws IOException {
+    public void defaultsToUTF8EncodingWhenNoContentTypeIsSpecified() throws IOException {
         String originalText = "sont sûrs d'être déçus...";
 
-        BodyPart part = new BodyPart(asISO88591(originalText));
+        BodyPart part = new BodyPart(asUTF8(originalText));
 
         assertThat("decoded text", part.text(), equalTo(originalText));
     }
 
     @Test
-    public void defaultsToISO88591EncodingWhenNoCharsetIsSpecified() throws IOException {
+    public void defaultsToUTF8EncodingWhenNoCharsetIsSpecified() throws IOException {
         String originalText = "en voyant leurs drôles d'oeufs abîmés.";
 
-        BodyPart part = new BodyPart(asISO88591(originalText));
+        BodyPart part = new BodyPart(asUTF8(originalText));
         part.contentType("text/plain");
 
         assertThat("decoded text", part.text(), equalTo(originalText));
@@ -45,7 +45,7 @@ public class BodyPartTest {
         return new ByteArrayInputStream(originalText.getBytes(UTF_16));
     }
 
-    private ByteArrayInputStream asISO88591(String originalText) {
-        return new ByteArrayInputStream(originalText.getBytes(Charsets.ISO_8859_1));
+    private ByteArrayInputStream asUTF8(String originalText) {
+        return new ByteArrayInputStream(originalText.getBytes(UTF_8));
     }
 }
