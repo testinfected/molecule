@@ -18,11 +18,11 @@ public class HtmlForm {
         return "application/x-www-form-urlencoded";
     }
 
-    public HtmlForm encoding(String charsetName) {
-        return encoding(Charset.forName(charsetName));
+    public HtmlForm charset(String charsetName) {
+        return charset(Charset.forName(charsetName));
     }
 
-    public HtmlForm encoding(Charset charset) {
+    public HtmlForm charset(Charset charset) {
         this.charset = charset;
         return this;
     }
