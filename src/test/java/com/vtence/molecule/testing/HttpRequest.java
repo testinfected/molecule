@@ -1,5 +1,6 @@
 package com.vtence.molecule.testing;
 
+import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.helpers.Streams;
 
@@ -28,7 +29,7 @@ public class HttpRequest {
 
     private String path = "/";
     private String method = "GET";
-    private Charset charset = Charset.forName("ISO-8859-1");
+    private Charset charset = Charsets.ISO_8859_1;
     private byte[] body = new byte[0];
     private boolean followRedirects;
     private boolean secure;
@@ -84,8 +85,8 @@ public class HttpRequest {
     }
 
     public HttpRequest body(HtmlForm form) {
-        contentType("application/x-www-form-urlencoded");
-        body(form.encode(charset));
+        contentType(form.contentType());
+        body(form.encode());
         return this;
     }
 
