@@ -7,6 +7,7 @@ import com.vtence.molecule.http.AcceptLanguage;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.lib.EmptyInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class Request {
     private int port;
     private String hostName;
     private String protocol;
-    private InputStream input;
+    private InputStream input = new EmptyInputStream();
     private HttpMethod method;
     private boolean secure;
     private long timestamp;
@@ -234,7 +235,7 @@ public class Request {
     }
 
     /**
-     * Provides the text body of this request. The body is decoded using the charset of the request.
+     * Consumes the body of this request and returns it as text. The text is decoded using the charset of the request.
      *
      * @see Request#charset()
      * @return the text that makes up the body
@@ -244,7 +245,7 @@ public class Request {
     }
 
     /**
-     * Provides the body of this request as an array of bytes.
+     * Consumes the body of this request and returns it as an array of bytes.
      *
      * @return the bytes content of the body
      */
