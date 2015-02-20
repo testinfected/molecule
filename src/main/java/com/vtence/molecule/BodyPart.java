@@ -3,7 +3,9 @@ package com.vtence.molecule;
 import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
+import com.vtence.molecule.lib.EmptyInputStream;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -16,15 +18,10 @@ import java.nio.charset.Charset;
  * string encoded in the encoding specified with the <code>Content-Type</code> header or in <code>UTF-8</code>.
  */
 public class BodyPart {
-    private final InputStream input;
-
     private String name;
     private String filename;
     private String contentType;
-
-    public BodyPart(InputStream input) {
-        this.input = input;
-    }
+    private InputStream input = new EmptyInputStream();
 
     /**
      * Sets the name of this part.
@@ -85,34 +82,64 @@ public class BodyPart {
     }
 
     /**
-     * Gets the content of the part as a string. The encoding of the string is taken from the content type.
+     * Consumes the content of this part and returns it as a string.<br/>
+     * The encoding of the string is taken from the content type.
      * If no content type is sent the content is decoded in UTF-8.
      *
      * @return the text representation of the content
      * @throws IOException thrown if the content cannot be accessed
      */
-    public String text() throws IOException {
-        return new String(content(), charset());
+    public String content() throws IOException {
+        return new String(contentBytes(), charset());
     }
 
     /**
-     * Gets the content of the part as a byte array.
+     * Consumes the content of this part and returns it as a byte array. <br/>
      *
      * @return the binary representation of the part
      * @throws IOException thrown if the content can not be accessed
      */
-    public byte[] content() throws IOException {
-        return Streams.toBytes(input());
+    public byte[] contentBytes() throws IOException {
+        return Streams.toBytes(contentStream());
     }
 
     /**
-     * Gets the content of the part as an input stream.
+     * Accesses the content of the part as an input stream.
      *
      * @return an input stream giving access to the part content
      * @throws IOException thrown if the content cannot be accessed
      */
-    public InputStream input() throws IOException {
+    public InputStream contentStream() throws IOException {
         return input;
+    }
+
+    /**
+     * Changes the content of this body part. The body is encoded using the charset of the part, or UTF-8 by default.
+     *
+     * @param content the new content as a string
+     */
+    public BodyPart content(String content) {
+        return content(content.getBytes(charset()));
+    }
+
+    /**
+     * Changes the content of this body part.
+     *
+     * @param content the new content as an array of bytes
+     */
+    public BodyPart content(byte[] content) {
+        this.input = new ByteArrayInputStream(content);
+        return this;
+    }
+
+    /**
+     * Changes the content of this body part.
+     *
+     * @param content the new content as a stream of bytes
+     */
+    public BodyPart content(InputStream content) {
+        this.input = content;
+        return this;
     }
 
     private Charset charset() {

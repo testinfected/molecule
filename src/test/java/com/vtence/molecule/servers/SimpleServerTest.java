@@ -269,7 +269,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
-                    parameters.put(part.name(), part.text());
+                    parameters.put(part.name(), part.content());
                 }
             }
         });
@@ -290,7 +290,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
-                    parameters.put(part.name(), part.text());
+                    parameters.put(part.name(), part.content());
                 }
             }
         });
@@ -309,7 +309,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
-                    files.put(part.filename(), part.content().length);
+                    files.put(part.filename(), part.contentBytes().length);
                 }
             }
         });

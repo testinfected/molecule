@@ -131,11 +131,15 @@ public class SimpleServer implements Server {
 
         private void setParts(Request request, org.simpleframework.http.Request simple) throws IOException {
             for (Part part : simple.getParts()) {
-                String contentType = part.getContentType() != null ? part.getContentType().toString() : null;
-                request.addPart(new BodyPart(part.getInputStream()).name(part.getName())
-                                                                   .contentType(contentType)
-                                                                   .filename(part.getFileName()));
+                request.addPart(new BodyPart().content(part.getInputStream())
+                                              .contentType(contentTypeOf(part))
+                                              .name(part.getName())
+                                              .filename(part.getFileName()));
             }
+        }
+
+        private String contentTypeOf(Part part) {
+            return part.getContentType() != null ? part.getContentType().toString() : null;
         }
 
         private void setBody(Request request, org.simpleframework.http.Request simple) throws IOException {

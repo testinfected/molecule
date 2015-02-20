@@ -23,8 +23,8 @@ public class MultiPartExample {
         server.start(new DynamicRoutes() {{
             post("/greeting").to(new Application() {
                 public void handle(Request request, Response response) throws Exception {
-                    String say = request.part("say").text();
-                    String to = request.part("to").text();
+                    String say = request.part("say").content();
+                    String to = request.part("to").content();
                     response.body(say + " " + to);
                 }
             });
@@ -35,7 +35,7 @@ public class MultiPartExample {
                     // Ignore all but the last part. In our example we submit a single one
                     for (BodyPart part : parts) {
                         response.contentType(part.contentType());
-                        response.body(part.text());
+                        response.body(part.content());
                     }
                 }
             });
@@ -47,7 +47,7 @@ public class MultiPartExample {
                     for (BodyPart part : parts) {
                         response.contentType(part.contentType());
                         response.header("X-File-Name", part.filename());
-                        response.body(part.content());
+                        response.body(part.contentBytes());
                     }
                 }
             });
