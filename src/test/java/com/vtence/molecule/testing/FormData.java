@@ -16,7 +16,7 @@ public class FormData {
 
     private final Map<String, String> data = new HashMap<String, String>();
     private final String contentType;
-    private final Charset charset = Charsets.ISO_8859_1;
+    private final Charset charset = Charsets.UTF_8;
 
     public FormData() {
         this("text/plain");
