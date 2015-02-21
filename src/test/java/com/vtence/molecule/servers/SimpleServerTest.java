@@ -279,18 +279,20 @@ public class SimpleServerTest {
 
         assertNoError();
         assertThat("form data parameters", parameters, allOf(hasEntry("param1", "value1"),
-                                                             hasEntry("param2", "value2")));
+                hasEntry("param2", "value2")));
     }
 
     @Test public void
     downloadsUploadedFiles() throws IOException {
         final Map<String, Integer> files = new HashMap<String, Integer>();
+        final Map<String, String> mimeTypes = new HashMap<String, String>();
         server.run(new Application() {
             @Override
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
                     files.put(part.filename(), part.contentBytes().length);
+                    mimeTypes.put(part.filename(), part.contentType());
                 }
             }
         });
@@ -299,6 +301,7 @@ public class SimpleServerTest {
 
         assertNoError();
         assertThat("filenames", files, hasEntry("minion.png", 21134));
+        assertThat("mime types", mimeTypes, hasEntry("minion.png", "image/png"));
     }
 
     private void assertNoError() {
