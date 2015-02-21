@@ -7,6 +7,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
+import com.vtence.molecule.support.ResourceLocator;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.testing.FormData;
 import com.vtence.molecule.testing.HttpRequest;
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.testing.FileUpload.binaryFile;
 import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -35,6 +34,7 @@ import static org.junit.Assert.fail;
 public class SimpleServerTest {
 
     SimpleServer server = new SimpleServer("localhost", 9999);
+    ResourceLocator resources = ResourceLocator.onClasspath();
     HttpRequest request = new HttpRequest(server.port());
     HttpResponse response;
 
@@ -274,12 +274,13 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.body(new FormData().add("param1", "value1")
-                                              .add("param2", "value2")).post("/");
+        FormData form = new FormData().addField("param1", "value1")
+                                      .addField("param2", "value2");
+        response = request.body(form).post("/");
 
         assertNoError();
-        assertThat("form data parameters", parameters, allOf(hasEntry("param1", "value1"),
-                hasEntry("param2", "value2")));
+        assertThat("form data parameters", parameters,
+                allOf(hasEntry("param1", "value1"), hasEntry("param2", "value2")));
     }
 
     @Test public void
@@ -297,7 +298,9 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.body(binaryFile(locateOnClasspath("assets/images/minion.png"))).post("/");
+
+        FormData form = new FormData().addBinaryFile("file", resources.locate("assets/images/minion.png"));
+        response = request.body(form).post("/");
 
         assertNoError();
         assertThat("filenames", files, hasEntry("minion.png", 21134));

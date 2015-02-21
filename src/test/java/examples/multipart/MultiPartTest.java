@@ -1,6 +1,7 @@
 package examples.multipart;
 
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.support.ResourceLocator;
 import com.vtence.molecule.testing.FormData;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
@@ -11,16 +12,14 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.testing.FileUpload.binaryFile;
-import static com.vtence.molecule.testing.FileUpload.textFile;
 import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
 
 public class MultiPartTest {
 
     MultiPartExample upload = new MultiPartExample();
     WebServer server = WebServer.create(9999);
+    ResourceLocator resources = ResourceLocator.onClasspath();
 
     HttpRequest request = new HttpRequest(9999);
     HttpResponse response;
@@ -37,8 +36,9 @@ public class MultiPartTest {
 
     @Test
     public void submittingFormDataParameters() throws IOException {
-        response = request.body(new FormData().add("say", "Hello")
-                                              .add("to", "world")).post("/greeting");
+        FormData form = new FormData().addField("say", "Hello")
+                                      .addField("to", "world");
+        response = request.body(form).post("/greeting");
 
         assertThat(response).isOK()
                             .hasBodyText("Hello world");
@@ -46,8 +46,9 @@ public class MultiPartTest {
 
     @Test
     public void uploadingATextFile() throws IOException {
-        File biography = locateOnClasspath("examples/upload/evil.txt");
-        response = request.body(textFile(biography).encodedAs(UTF_8)).post("/biography");
+        File biography = resources.locate("examples/upload/evil.txt");
+        FormData form = new FormData().addTextFile("biography", biography);
+        response = request.body(form).post("/biography");
 
         assertThat(response).isOK()
                             .hasBodyText("I'm an evil minion!");
@@ -56,7 +57,8 @@ public class MultiPartTest {
     @Test
     public void uploadingABinaryFile() throws IOException {
         File avatar = locateOnClasspath("examples/upload/evil.png");
-        response = request.body(binaryFile(avatar)).post("/avatar");
+        FormData form = new FormData().addBinaryFile("avatar", avatar);
+        response = request.body(form).post("/avatar");
 
         assertThat(response).isOK()
                             .hasContentType("image/png")

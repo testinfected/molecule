@@ -97,17 +97,6 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest body(FileUpload upload) throws IOException {
-        String boundary = randomBoundary();
-        contentType("multipart/form-data; boundary=" + boundary);
-        body(upload.encode(boundary));
-        return this;
-    }
-
-    private static String randomBoundary() {
-        return Long.toHexString(System.currentTimeMillis());
-    }
-
     public HttpRequest method(String method) {
         this.method = method;
         return this;
@@ -164,7 +153,7 @@ public class HttpRequest {
     }
 
     public HttpResponse send() throws IOException {
-        HttpURLConnection connection = secure ? openSecureConnection() : openUnsecureConnection();
+        HttpURLConnection connection = secure ? openSecureConnection() : openConnection();
         connection.setRequestMethod(method);
         addCookieHeader();
         setRequestHeaders(connection);
@@ -181,7 +170,7 @@ public class HttpRequest {
         return new HttpResponse(statusCode, statusMessage, headers, body);
     }
 
-    private HttpURLConnection openUnsecureConnection() throws IOException {
+    private HttpURLConnection openConnection() throws IOException {
         return (HttpURLConnection) new URL("http", host, port, path).openConnection();
     }
 

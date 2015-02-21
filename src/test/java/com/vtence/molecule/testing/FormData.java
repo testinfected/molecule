@@ -1,21 +1,26 @@
 package com.vtence.molecule.testing;
 
 import com.vtence.molecule.helpers.Charsets;
+import com.vtence.molecule.helpers.Streams;
+import com.vtence.molecule.http.ContentType;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FormData {
 
-    private static String CRLF = "\r\n";
+    public static String CRLF = "\r\n";
 
-    private final List<TextField> entries = new ArrayList<TextField>();
+    private final List<Entry> entries = new ArrayList<Entry>();
     private final String boundary =  Long.toHexString(System.currentTimeMillis());
     private final String contentType;
 
@@ -42,7 +47,7 @@ public class FormData {
         return this;
     }
 
-    public FormData add(String name, String value) {
+    public FormData addField(String name, String value) {
         entries.add(new TextField(name, value));
         return this;
     }
@@ -50,7 +55,7 @@ public class FormData {
     public byte[] encode() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         Writer writer = new OutputStreamWriter(buffer, charset);
-        for (TextField entry : entries) {
+        for (Entry entry : entries) {
             writer.append("--").append(boundary).append(CRLF);
             writer.flush();
             entry.encode(buffer, charset);
@@ -60,7 +65,85 @@ public class FormData {
         return buffer.toByteArray();
     }
 
-    public static class TextField {
+    public FormData addTextFile(String name, File file) {
+        return addTextFile(name, file, guessMimeType(file));
+    }
+
+    public FormData addTextFile(String name, File file, String contentType) {
+        entries.add(new FileUpload(name, file, contentType, false));
+        return this;
+    }
+
+    public FormData addBinaryFile(String name, File toUpload) {
+        return addBinaryFile(name, toUpload, guessMimeType(toUpload));
+    }
+
+    public FormData addBinaryFile(String name, File toUpload, String contentType) {
+        entries.add(new FileUpload(name, toUpload, contentType, true));
+        return this;
+    }
+
+    private String guessMimeType(File file) {
+        return URLConnection.guessContentTypeFromName(file.getName());
+    }
+
+    public static interface Entry {
+        void encode(OutputStream out, Charset charset) throws IOException;
+    }
+
+    static class FileUpload implements Entry {
+
+        private final String name;
+        private final File file;
+        private final String contentType;
+        private final boolean binary;
+
+        public FileUpload(String name, File file, String contentType, boolean binary) {
+            this.name = name;
+            this.file = file;
+            this.contentType = contentType;
+            this.binary = binary;
+        }
+
+        public void encode(OutputStream out, Charset charset) throws IOException {
+            Writer writer = new OutputStreamWriter(out, charset);
+            URLEscaper escaper = URLEscaper.to(charset);
+            writer.append("Content-Disposition: form-data");
+            if (name != null) {
+                writer.append("; name=\"").append(escaper.escape(name)).append("\"");
+            }
+            writer.append("; filename=\"").append(escaper.escape(file.getName())).append("\"").append(CRLF);
+            writer.append("Content-Type: ").append(contentType);
+            if (!binary) {
+                writer.append("; charset=").append(fileCharset().name().toLowerCase()).append(CRLF);
+            } else {
+                writer.append(CRLF);
+                writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+            }
+            writer.append(CRLF);
+            writer.flush();
+            writeFileContent(out);
+            writer.append(CRLF);
+            writer.flush();
+        }
+
+        private void writeFileContent(OutputStream output) throws IOException {
+            FileInputStream input = new FileInputStream(file);
+            try {
+                Streams.copy(input, output);
+            } finally {
+                Streams.close(input);
+            }
+        }
+
+        private Charset fileCharset() {
+            ContentType contentType = ContentType.parse(this.contentType);
+            if (contentType == null || contentType.charset() == null) return Charsets.UTF_8;
+            return contentType.charset();
+        }
+    }
+
+    static class TextField implements Entry {
         public final String name;
         public final String value;
 
@@ -69,6 +152,7 @@ public class FormData {
             this.value = value;
         }
 
+        @Override
         public void encode(OutputStream out, Charset charset) throws IOException {
             Writer writer = new OutputStreamWriter(out, charset);
             URLEscaper escaper = URLEscaper.to(charset);
