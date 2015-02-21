@@ -1,7 +1,6 @@
 package examples.rest;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.testing.HtmlForm;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
@@ -18,7 +17,7 @@ public class RESTTest {
     RESTExample rest = new RESTExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999).charset(Charsets.UTF_8);
+    HttpRequest request = new HttpRequest(9999);
     HttpResponse response;
 
     @Before
@@ -78,7 +77,7 @@ public class RESTTest {
                           .body(new HtmlForm().set("_method", "PUT")
                                               .set("title", "Kind of Blue")
                                               .set("artist", "Miles Davis"))
-                                  .post("/albums/1");
+                          .post("/albums/1");
         assertThat(response).isOK();
 
         response = request.but().get("/albums/1");

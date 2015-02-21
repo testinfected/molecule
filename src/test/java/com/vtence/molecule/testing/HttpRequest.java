@@ -1,8 +1,10 @@
 package com.vtence.molecule.testing;
 
 import com.vtence.molecule.helpers.Charsets;
+import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.helpers.Streams;
+import com.vtence.molecule.http.ContentType;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -13,7 +15,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,11 @@ import static java.util.Arrays.asList;
 public class HttpRequest {
     private final String host;
     private final int port;
-    private final Map<String, List<String>> headers = new HashMap<String, List<String>>();
+    private final Headers headers = new Headers();
     private final Map<String, String> cookies = new LinkedHashMap<String, String>();
 
     private String path = "/";
     private String method = "GET";
-    private Charset charset = Charsets.ISO_8859_1;
     private byte[] body = new byte[0];
     private boolean followRedirects;
     private boolean secure;
@@ -48,26 +48,20 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest charset(Charset charset) {
-        this.charset = charset;
-        return this;
-    }
-
     public HttpRequest header(String name, String... values) {
         return header(name, asList(values));
     }
 
     public HttpRequest header(String name, Iterable<String> values) {
-        List<String> headers = headers(name);
-        headers.clear();
+        headers.remove(name);
         for (String value : values) {
-            headers.add(value);
+            headers.add(name, value);
         }
         return this;
     }
 
     public HttpRequest contentType(String contentType) {
-        return header("Content-Type", contentType + "; charset=" + charset.name().toLowerCase());
+        return header("Content-Type", contentType);
     }
 
     public HttpRequest cookie(String name, String value) {
@@ -76,7 +70,14 @@ public class HttpRequest {
     }
 
     public HttpRequest body(String text) {
-        return body(text.getBytes(charset));
+        return body(text.getBytes(charset()));
+    }
+
+    private Charset charset() {
+        ContentType contentType = ContentType.parse(headers.get("Content-Type"));
+        if (contentType == null || contentType.charset() == null) return Charsets.ISO_8859_1;
+
+        return contentType.charset();
     }
 
     public HttpRequest body(byte[] content) {
@@ -150,11 +151,10 @@ public class HttpRequest {
         HttpRequest request = new HttpRequest(host, port);
         request.path(path);
         request.method(method);
-        request.charset(charset);
         request.followRedirects(followRedirects);
         request.secure(secure);
-        for (String header : headers.keySet()) {
-            request.header(header, headers.get(header));
+        for (String header : headers.names()) {
+            request.header(header, headers.list(header));
         }
         for (String cookie : cookies.keySet()) {
             request.cookie(cookie, cookies.get(cookie));
@@ -207,8 +207,8 @@ public class HttpRequest {
     }
 
     private void setRequestHeaders(HttpURLConnection connection) {
-        for (String name : headers.keySet()) {
-            for (String value: headers(name)) {
+        for (String name : headers.names()) {
+            for (String value: headers.list(name)) {
                 connection.addRequestProperty(name, value);
             }
         }
@@ -228,12 +228,5 @@ public class HttpRequest {
             connection.setDoOutput(true);
             connection.getOutputStream().write(body);
         }
-    }
-
-    private List<String> headers(String name) {
-        if (!headers.containsKey(name)) {
-            headers.put(name, new ArrayList<String>());
-        }
-        return headers.get(name);
     }
 }
