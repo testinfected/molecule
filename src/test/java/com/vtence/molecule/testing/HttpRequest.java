@@ -91,9 +91,8 @@ public class HttpRequest {
     }
 
     public HttpRequest body(FormData form) throws IOException {
-        String boundary = randomBoundary();
-        contentType("multipart/form-data; boundary=" + boundary);
-        body(form.encode(boundary));
+        contentType(form.contentType());
+        body(form.encode());
         return this;
     }
 

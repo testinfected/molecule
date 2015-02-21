@@ -37,8 +37,8 @@ public class MultiPartTest {
 
     @Test
     public void submittingFormDataParameters() throws IOException {
-        response = request.body(new FormData().set("say", "Hello")
-                                              .set("to", "world")).post("/greeting");
+        response = request.body(new FormData().add("say", "Hello")
+                                              .add("to", "world")).post("/greeting");
 
         assertThat(response).isOK()
                             .hasBodyText("Hello world");

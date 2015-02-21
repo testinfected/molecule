@@ -274,31 +274,12 @@ public class SimpleServerTest {
             }
         });
 
-        response = request.body(new FormData().set("param1", "value1")
-                                              .set("param2", "value2")).post("/");
+        response = request.body(new FormData().add("param1", "value1")
+                                              .add("param2", "value2")).post("/");
 
         assertNoError();
         assertThat("form data parameters", parameters, allOf(hasEntry("param1", "value1"),
                                                              hasEntry("param2", "value2")));
-    }
-
-    @Test public void
-    correctlyHandlesMultiPartFormParametersWithoutContentType() throws IOException {
-        final Map<String, String> parameters = new HashMap<String, String>();
-        server.run(new Application() {
-            @Override
-            public void handle(Request request, Response response) throws Exception {
-                List<BodyPart> parts = request.parts();
-                for (BodyPart part : parts) {
-                    parameters.put(part.name(), part.content());
-                }
-            }
-        });
-
-        response = request.body(new FormData(null).set("param", "value")).post("/");
-
-        assertNoError();
-        assertThat("form data parameters", parameters, hasEntry("param", "value"));
     }
 
     @Test public void
@@ -317,7 +298,7 @@ public class SimpleServerTest {
         response = request.body(binaryFile(locateOnClasspath("assets/images/minion.png"))).post("/");
 
         assertNoError();
-        assertThat("uploaded files", files, hasEntry("minion.png", 21134));
+        assertThat("filenames", files, hasEntry("minion.png", 21134));
     }
 
     private void assertNoError() {
