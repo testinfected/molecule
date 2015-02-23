@@ -57,7 +57,7 @@ public class MultiPartTest {
 
     @Test
     public void uploadingAnEncodedTextFile() throws IOException {
-        File biography = resources.locate("examples/upload/méchant.txt");
+        File biography = resources.locate("examples/upload/mechant.txt");
         MultipartForm form = Form.multipart().addTextFile("biography", biography, "text/plain; charset=utf-16");
         response = request.content(form).post("/profile");
 
