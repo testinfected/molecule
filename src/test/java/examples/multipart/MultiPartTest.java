@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class MultiPartTest {
 
@@ -36,34 +37,41 @@ public class MultiPartTest {
     }
 
     @Test
-    public void submittingFormDataParameters() throws IOException {
-        MultipartForm form = Form.multipart().addField("say", "Hello")
-                                             .addField("to", "world");
-        response = request.content(form).post("/greeting");
+    public void submittingTextParameters() throws IOException {
+        MultipartForm form = Form.multipart().addField("email", "help@evil.com");
+        response = request.content(form).post("/profile");
 
         assertThat(response).isOK()
-                            .hasBodyText("Hello world");
+                            .hasBodyText(containsString("email: help@evil.com"));
     }
 
     @Test
     public void uploadingATextFile() throws IOException {
         File biography = resources.locate("examples/upload/evil.txt");
         MultipartForm form = Form.multipart().addTextFile("biography", biography);
-        response = request.content(form).post("/biography");
+        response = request.content(form).post("/profile");
 
         assertThat(response).isOK()
-                            .hasBodyText("I'm an evil minion!");
+                            .hasBodyText(containsString("biography: I'm an evil minion!"));
+    }
+
+    @Test
+    public void uploadingAnEncodedTextFile() throws IOException {
+        File biography = resources.locate("examples/upload/méchant.txt");
+        MultipartForm form = Form.multipart().addTextFile("biography", biography, "text/plain; charset=utf-16");
+        response = request.content(form).post("/profile");
+
+        assertThat(response).isOK()
+                            .hasBodyText(containsString("biography: Je suis un méchant minion"));
     }
 
     @Test
     public void uploadingABinaryFile() throws IOException {
         File avatar = locateOnClasspath("examples/upload/evil.png");
         MultipartForm form = Form.multipart().addBinaryFile("avatar", avatar);
-        response = request.content(form).post("/avatar");
+        response = request.content(form).post("/profile");
 
         assertThat(response).isOK()
-                            .hasContentType("image/png")
-                            .hasHeader("X-File-Name", avatar.getName())
-                            .hasBodySize(32195);
+                            .hasBodyText(containsString("avatar: evil.png (image/png) - 32195 bytes"));
     }
 }

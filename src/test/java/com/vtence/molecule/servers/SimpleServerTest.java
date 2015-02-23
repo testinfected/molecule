@@ -270,7 +270,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
-                    parameters.put(part.name(), part.content());
+                    parameters.put(part.name(), part.value());
                 }
             }
         });
@@ -293,7 +293,7 @@ public class SimpleServerTest {
             public void handle(Request request, Response response) throws Exception {
                 List<BodyPart> parts = request.parts();
                 for (BodyPart part : parts) {
-                    files.put(part.filename(), part.contentBytes().length);
+                    files.put(part.filename(), part.content().length);
                     mimeTypes.put(part.filename(), part.contentType());
                 }
             }

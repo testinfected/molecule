@@ -17,7 +17,7 @@ public class BodyPartTest {
 
         BodyPart part = new BodyPart().contentType("text/plain; charset=utf-16").content(originalText.getBytes(UTF_16));
 
-        assertThat("decoded text", part.content(), equalTo(originalText));
+        assertThat("decoded text", part.value(), equalTo(originalText));
     }
 
     @Test
@@ -26,7 +26,7 @@ public class BodyPartTest {
 
         BodyPart part = new BodyPart().content(originalText.getBytes(UTF_8));
 
-        assertThat("decoded text", part.content(), equalTo(originalText));
+        assertThat("decoded text", part.value(), equalTo(originalText));
     }
 
     @Test
@@ -35,6 +35,6 @@ public class BodyPartTest {
 
         BodyPart part = new BodyPart().contentType("text/plain").content(originalText.getBytes(UTF_8));
 
-        assertThat("decoded text", part.content(), equalTo(originalText));
+        assertThat("decoded text", part.value(), equalTo(originalText));
     }
 }

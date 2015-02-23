@@ -89,8 +89,8 @@ public class BodyPart {
      * @return the text representation of the content
      * @throws IOException thrown if the content cannot be accessed
      */
-    public String content() throws IOException {
-        return new String(contentBytes(), charset());
+    public String value() throws IOException {
+        return new String(content(), charset());
     }
 
     /**
@@ -99,8 +99,8 @@ public class BodyPart {
      * @return the binary representation of the part
      * @throws IOException thrown if the content can not be accessed
      */
-    public byte[] contentBytes() throws IOException {
-        return Streams.toBytes(contentStream());
+    public byte[] content() throws IOException {
+        return Streams.toBytes(stream());
     }
 
     /**
@@ -109,7 +109,7 @@ public class BodyPart {
      * @return an input stream giving access to the part content
      * @throws IOException thrown if the content cannot be accessed
      */
-    public InputStream contentStream() throws IOException {
+    public InputStream stream() throws IOException {
         return input;
     }
 
