@@ -1,4 +1,4 @@
-package com.vtence.molecule.testing;
+package com.vtence.molecule.testing.http;
 
 import java.io.IOException;
 import java.io.OutputStream;

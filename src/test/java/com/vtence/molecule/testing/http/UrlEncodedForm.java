@@ -1,4 +1,4 @@
-package com.vtence.molecule.testing;
+package com.vtence.molecule.testing.http;
 
 import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Joiner;

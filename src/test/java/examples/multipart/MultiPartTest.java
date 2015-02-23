@@ -2,10 +2,10 @@ package examples.multipart;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.ResourceLocator;
-import com.vtence.molecule.testing.Form;
-import com.vtence.molecule.testing.HttpRequest;
-import com.vtence.molecule.testing.HttpResponse;
-import com.vtence.molecule.testing.MultipartForm;
+import com.vtence.molecule.testing.http.Form;
+import com.vtence.molecule.testing.http.HttpRequest;
+import com.vtence.molecule.testing.http.HttpResponse;
+import com.vtence.molecule.testing.http.MultipartForm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 
 public class MultiPartTest {
 

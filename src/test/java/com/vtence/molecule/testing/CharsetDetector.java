@@ -3,7 +3,7 @@ package com.vtence.molecule.testing;
 import org.mozilla.universalchardet.CharsetListener;
 import org.mozilla.universalchardet.UniversalDetector;
 
-class CharsetDetector {
+public class CharsetDetector {
 
     public static String detectCharsetOf(byte[] data) {
         UniversalDetector charsetDetector = new UniversalDetector(new CharsetListener() {

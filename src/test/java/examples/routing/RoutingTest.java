@@ -1,16 +1,16 @@
 package examples.routing;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.Form;
-import com.vtence.molecule.testing.HttpRequest;
-import com.vtence.molecule.testing.HttpResponse;
+import com.vtence.molecule.testing.http.Form;
+import com.vtence.molecule.testing.http.HttpRequest;
+import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.testing.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 
 public class RoutingTest {
 
