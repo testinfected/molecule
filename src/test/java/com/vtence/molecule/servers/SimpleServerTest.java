@@ -9,9 +9,10 @@ import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.ResourceLocator;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.testing.FormData;
+import com.vtence.molecule.testing.Form;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
+import com.vtence.molecule.testing.MultipartForm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -274,9 +275,9 @@ public class SimpleServerTest {
             }
         });
 
-        FormData form = new FormData().addField("param1", "value1")
+        Form form = new MultipartForm().addField("param1", "value1")
                                       .addField("param2", "value2");
-        response = request.body(form).post("/");
+        response = request.content(form).post("/");
 
         assertNoError();
         assertThat("form data parameters", parameters,
@@ -299,8 +300,8 @@ public class SimpleServerTest {
         });
 
 
-        FormData form = new FormData().addBinaryFile("file", resources.locate("assets/images/minion.png"));
-        response = request.body(form).post("/");
+        Form form = new MultipartForm().addBinaryFile("file", resources.locate("assets/images/minion.png"));
+        response = request.content(form).post("/");
 
         assertNoError();
         assertThat("filenames", files, hasEntry("minion.png", 21134));

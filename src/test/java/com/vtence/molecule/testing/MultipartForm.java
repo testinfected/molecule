@@ -16,69 +16,71 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FormData {
+public class MultipartForm extends Form {
 
     public static String CRLF = "\r\n";
 
     private final List<Entry> entries = new ArrayList<Entry>();
     private final String boundary =  Long.toHexString(System.currentTimeMillis());
-    private final String contentType;
 
     private Charset charset = Charsets.UTF_8;
 
-    public FormData() {
-        this("multipart/form-data");
-    }
-
-    public FormData(String contentType) {
-        this.contentType = contentType;
+    @Override
+    public long contentLength() throws IOException {
+        ByteCountingOutputStream out = new ByteCountingOutputStream();
+        writeTo(out);
+        return out.byteCount();
     }
 
     public String contentType() {
-        return contentType + "; boundary=" + boundary;
+        return "multipart/form-data" + "; boundary=" + boundary;
     }
 
-    public FormData charset(String charsetName) {
+    public MultipartForm charset(String charsetName) {
         return charset(Charset.forName(charsetName));
     }
 
-    public FormData charset(Charset charset) {
+    public MultipartForm charset(Charset charset) {
         this.charset = charset;
         return this;
     }
 
-    public FormData addField(String name, String value) {
+    public MultipartForm addField(String name, String value) {
         entries.add(new TextField(name, value));
         return this;
     }
 
     public byte[] encode() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        Writer writer = new OutputStreamWriter(buffer, charset);
-        for (Entry entry : entries) {
-            writer.append("--").append(boundary).append(CRLF);
-            writer.flush();
-            entry.encode(buffer, charset);
-        }
-        writer.append("--").append(boundary).append("--").append(CRLF);
-        writer.flush();
+        writeTo(buffer);
         return buffer.toByteArray();
     }
 
-    public FormData addTextFile(String name, File file) {
+    public void writeTo(OutputStream out) throws IOException {
+        Writer writer = new OutputStreamWriter(out, charset);
+        for (Entry entry : entries) {
+            writer.append("--").append(boundary).append(CRLF);
+            writer.flush();
+            entry.encode(out, charset);
+        }
+        writer.append("--").append(boundary).append("--").append(CRLF);
+        writer.flush();
+    }
+
+    public MultipartForm addTextFile(String name, File file) {
         return addTextFile(name, file, guessMimeType(file));
     }
 
-    public FormData addTextFile(String name, File file, String contentType) {
+    public MultipartForm addTextFile(String name, File file, String contentType) {
         entries.add(new FileUpload(name, file, contentType, false));
         return this;
     }
 
-    public FormData addBinaryFile(String name, File toUpload) {
+    public MultipartForm addBinaryFile(String name, File toUpload) {
         return addBinaryFile(name, toUpload, guessMimeType(toUpload));
     }
 
-    public FormData addBinaryFile(String name, File toUpload, String contentType) {
+    public MultipartForm addBinaryFile(String name, File toUpload, String contentType) {
         entries.add(new FileUpload(name, toUpload, contentType, true));
         return this;
     }

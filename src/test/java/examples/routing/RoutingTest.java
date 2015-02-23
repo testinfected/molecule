@@ -1,7 +1,7 @@
 package examples.routing;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.HtmlForm;
+import com.vtence.molecule.testing.Form;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
 import org.junit.After;
@@ -39,7 +39,7 @@ public class RoutingTest {
 
     @Test
     public void restrictingARouteToASpecificVerb() throws IOException {
-        response = request.body(new HtmlForm().addField("username", "Vincent")).post("/login");
+        response = request.content(Form.urlEncoded().addField("username", "Vincent")).post("/login");
         assertThat(response).hasStatusCode(303);
     }
 

@@ -1,10 +1,8 @@
 package com.vtence.molecule.testing;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.helpers.Streams;
-import com.vtence.molecule.http.ContentType;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -12,7 +10,6 @@ import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,7 +27,7 @@ public class HttpRequest {
 
     private String path = "/";
     private String method = "GET";
-    private byte[] body = new byte[0];
+    private HttpContent content = new EmptyContent();
     private boolean followRedirects;
     private boolean secure;
 
@@ -69,31 +66,23 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest body(String text) {
-        return body(text.getBytes(charset()));
+    private String contentType() {
+        return headers.get("Content-Type");
     }
 
-    private Charset charset() {
-        ContentType contentType = ContentType.parse(headers.get("Content-Type"));
-        if (contentType == null || contentType.charset() == null) return Charsets.ISO_8859_1;
-
-        return contentType.charset();
+    public HttpRequest body(String text) {
+        this.content = new TextContent(text, contentType());
+        return body(text.getBytes());
     }
 
     public HttpRequest body(byte[] content) {
-        body = content;
+        this.content = new BinaryContent(content, contentType());
         return this;
     }
 
-    public HttpRequest body(HtmlForm form) {
-        contentType(form.contentType());
-        body(form.encode());
-        return this;
-    }
-
-    public HttpRequest body(FormData form) throws IOException {
-        contentType(form.contentType());
-        body(form.encode());
+    public HttpRequest content(HttpContent content) {
+        this.content = content;
+        contentType(content.contentType());
         return this;
     }
 
@@ -148,7 +137,7 @@ public class HttpRequest {
         for (String cookie : cookies.keySet()) {
             request.cookie(cookie, cookies.get(cookie));
         }
-        request.body(body);
+        request.content(content);
         return request;
     }
 
@@ -157,7 +146,7 @@ public class HttpRequest {
         connection.setRequestMethod(method);
         addCookieHeader();
         setRequestHeaders(connection);
-        writeBody(connection);
+        writeContent(connection);
         connection.setInstanceFollowRedirects(followRedirects);
         connection.connect();
 
@@ -212,10 +201,11 @@ public class HttpRequest {
         header("Cookie", Joiner.on("; ").join(pairs));
     }
 
-    private void writeBody(HttpURLConnection connection) throws IOException {
-        if (body.length > 0) {
+    private void writeContent(HttpURLConnection connection) throws IOException {
+        if (content.contentLength() > 0) {
             connection.setDoOutput(true);
-            connection.getOutputStream().write(body);
+            content.writeTo(connection.getOutputStream());
+//            connection.getOutputStream().write(body);
         }
     }
 }

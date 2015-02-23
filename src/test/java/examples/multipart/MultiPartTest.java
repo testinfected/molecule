@@ -2,9 +2,10 @@ package examples.multipart;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.ResourceLocator;
-import com.vtence.molecule.testing.FormData;
+import com.vtence.molecule.testing.Form;
 import com.vtence.molecule.testing.HttpRequest;
 import com.vtence.molecule.testing.HttpResponse;
+import com.vtence.molecule.testing.MultipartForm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +37,9 @@ public class MultiPartTest {
 
     @Test
     public void submittingFormDataParameters() throws IOException {
-        FormData form = new FormData().addField("say", "Hello")
-                                      .addField("to", "world");
-        response = request.body(form).post("/greeting");
+        MultipartForm form = Form.multipart().addField("say", "Hello")
+                                             .addField("to", "world");
+        response = request.content(form).post("/greeting");
 
         assertThat(response).isOK()
                             .hasBodyText("Hello world");
@@ -47,8 +48,8 @@ public class MultiPartTest {
     @Test
     public void uploadingATextFile() throws IOException {
         File biography = resources.locate("examples/upload/evil.txt");
-        FormData form = new FormData().addTextFile("biography", biography);
-        response = request.body(form).post("/biography");
+        MultipartForm form = Form.multipart().addTextFile("biography", biography);
+        response = request.content(form).post("/biography");
 
         assertThat(response).isOK()
                             .hasBodyText("I'm an evil minion!");
@@ -57,8 +58,8 @@ public class MultiPartTest {
     @Test
     public void uploadingABinaryFile() throws IOException {
         File avatar = locateOnClasspath("examples/upload/evil.png");
-        FormData form = new FormData().addBinaryFile("avatar", avatar);
-        response = request.body(form).post("/avatar");
+        MultipartForm form = Form.multipart().addBinaryFile("avatar", avatar);
+        response = request.content(form).post("/avatar");
 
         assertThat(response).isOK()
                             .hasContentType("image/png")
