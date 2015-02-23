@@ -5,13 +5,11 @@ import com.vtence.molecule.helpers.Joiner;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HtmlForm {
 
-    private final Map<String, String> data = new HashMap<String, String>();
+    private final List<Field> fields = new ArrayList<Field>();
     private Charset charset = Charsets.UTF_8;
 
     public String contentType() {
@@ -27,17 +25,31 @@ public class HtmlForm {
         return this;
     }
 
-    public HtmlForm set(String name, String value) {
-        data.put(name, value);
+    public HtmlForm addField(String name, String value) {
+        fields.add(new Field(name, value));
         return this;
     }
 
     public String encode() {
         List<String> pairs = new ArrayList<String>();
-        URLEscaper escaper = URLEscaper.to(charset);
-        for (String name : data.keySet()) {
-            pairs.add(escaper.escape(name) + "=" + escaper.escape(data.get(name)));
+        for (Field field : fields) {
+            pairs.add(field.encode(charset));
         }
         return Joiner.on("&").join(pairs);
+    }
+
+    static class Field {
+        private final String name;
+        private final String value;
+
+        public Field(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String encode(Charset charset) {
+            URLEscaper escaper = URLEscaper.to(charset);
+            return escaper.escape(name) + "=" + escaper.escape(value);
+        }
     }
 }

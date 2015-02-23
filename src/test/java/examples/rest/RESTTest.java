@@ -32,8 +32,8 @@ public class RESTTest {
 
     @Test
     public void managingAlbumResources() throws IOException {
-        response = request.but().body(new HtmlForm().set("title", "My Favorite Things")
-                                                    .set("artist", "John Coltrane"))
+        response = request.but().body(new HtmlForm().addField("title", "My Favorite Things")
+                                                    .addField("artist", "John Coltrane"))
                                 .post("/albums");
         assertThat(response).hasStatusCode(201);
 
@@ -41,8 +41,8 @@ public class RESTTest {
         assertThat(response).isOK()
                             .hasBodyText("Title: My Favorite Things, Artist: John Coltrane");
 
-        response = request.but().body(new HtmlForm().set("title", "Blue Train")
-                                                    .set("artist", "John Coltrane"))
+        response = request.but().body(new HtmlForm().addField("title", "Blue Train")
+                                                    .addField("artist", "John Coltrane"))
                                 .post("/albums");
         assertThat(response).hasStatusCode(201);
 
@@ -51,8 +51,8 @@ public class RESTTest {
                             .hasBodyText("1: Title: My Favorite Things, Artist: John Coltrane\n" +
                                          "2: Title: Blue Train, Artist: John Coltrane\n");
 
-        response = request.but().body(new HtmlForm().set("title", "Kind of Blue")
-                                                    .set("artist", "Miles Davis"))
+        response = request.but().body(new HtmlForm().addField("title", "Kind of Blue")
+                                                    .addField("artist", "Miles Davis"))
                                 .put("/albums/2");
         assertThat(response).isOK()
                             .hasBodyText("Title: Kind of Blue, Artist: Miles Davis");
@@ -68,15 +68,15 @@ public class RESTTest {
     @Test
     public void makingAPostActLikeAnUpdateOrDelete() throws IOException {
         response = request.but()
-                          .body(new HtmlForm().set("title", "My Favorite Things")
-                                              .set("artist", "John Coltrane"))
+                          .body(new HtmlForm().addField("title", "My Favorite Things")
+                                              .addField("artist", "John Coltrane"))
                           .post("/albums");
         assertThat(response).hasStatusCode(201);
 
         response = request.but()
-                          .body(new HtmlForm().set("_method", "PUT")
-                                              .set("title", "Kind of Blue")
-                                              .set("artist", "Miles Davis"))
+                          .body(new HtmlForm().addField("_method", "PUT")
+                                              .addField("title", "Kind of Blue")
+                                              .addField("artist", "Miles Davis"))
                           .post("/albums/1");
         assertThat(response).isOK();
 
@@ -84,7 +84,7 @@ public class RESTTest {
         assertThat(response).isOK()
                             .hasBodyText("Title: Kind of Blue, Artist: Miles Davis");
 
-        response = request.but().body(new HtmlForm().set("_method", "DELETE"))
+        response = request.but().body(new HtmlForm().addField("_method", "DELETE"))
                                 .post("/albums/1");
         assertThat(response).isOK();
 

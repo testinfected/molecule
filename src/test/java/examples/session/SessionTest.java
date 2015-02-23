@@ -56,14 +56,14 @@ public class SessionTest {
 
     @Test
     public void creatingAPersistentSession() throws IOException {
-        response = request.body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
     }
 
     @Test
     public void noteThatPersistentSessionCookiesAreNotRefreshed() throws IOException {
-        response = request.body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
@@ -78,7 +78,7 @@ public class SessionTest {
     public void creatingASessionWhichExpires() throws IOException {
         sessions.expireAfter(FIVE_MIN);
 
-        response = request.body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(FIVE_MIN);
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
@@ -92,7 +92,7 @@ public class SessionTest {
 
     @Test
     public void trackingASessionAcrossRequests() throws IOException {
-        response = request.but().body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.but().body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
@@ -103,7 +103,7 @@ public class SessionTest {
 
     @Test
     public void deletingASession() throws IOException {
-        response = request.but().body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.but().body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE);
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
@@ -123,7 +123,7 @@ public class SessionTest {
     attemptingToUseAnExpiredSession() throws Exception {
         sessions.expireAfter(FIVE_MIN);
 
-        response = request.but().body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.but().body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertNoError();
 
         delorean.travelInTime(SECONDS.toMillis(FIVE_MIN));

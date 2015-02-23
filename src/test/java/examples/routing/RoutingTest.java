@@ -39,7 +39,7 @@ public class RoutingTest {
 
     @Test
     public void restrictingARouteToASpecificVerb() throws IOException {
-        response = request.body(new HtmlForm().set("username", "Vincent")).post("/login");
+        response = request.body(new HtmlForm().addField("username", "Vincent")).post("/login");
         assertThat(response).hasStatusCode(303);
     }
 
