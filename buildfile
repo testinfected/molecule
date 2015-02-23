@@ -19,7 +19,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   package :jar
   package :javadoc
   package :sources
-  package :test_jar
+  package(:test_jar).clean.path('com/vtence/molecule').include(_('target/test/classes/**/testing'))
 
   pom.name = 'Molecule'
   pom.description = 'A web micro-framework for Java'
