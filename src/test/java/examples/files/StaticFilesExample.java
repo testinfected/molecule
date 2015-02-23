@@ -8,7 +8,7 @@ import com.vtence.molecule.middlewares.StaticAssets;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 public class StaticFilesExample {
 

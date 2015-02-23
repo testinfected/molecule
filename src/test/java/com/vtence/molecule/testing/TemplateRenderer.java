@@ -1,4 +1,4 @@
-package com.vtence.molecule.support;
+package com.vtence.molecule.testing;
 
 import com.vtence.molecule.templating.RenderingEngine;
 

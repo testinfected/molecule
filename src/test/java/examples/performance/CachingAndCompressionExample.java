@@ -12,7 +12,7 @@ import com.vtence.molecule.middlewares.ContentLengthHeader;
 import com.vtence.molecule.middlewares.ETag;
 import com.vtence.molecule.middlewares.FileServer;
 import com.vtence.molecule.middlewares.StaticAssets;
-import com.vtence.molecule.support.ResourceLocator;
+import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.templating.JMustacheRenderer;
 import com.vtence.molecule.templating.Template;
 import com.vtence.molecule.templating.Templates;

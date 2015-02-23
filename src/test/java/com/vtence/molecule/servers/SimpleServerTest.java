@@ -7,7 +7,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.support.ResourceLocator;
+import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.testing.http.Form;
 import com.vtence.molecule.testing.http.HttpRequest;

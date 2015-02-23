@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

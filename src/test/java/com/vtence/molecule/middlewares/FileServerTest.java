@@ -16,7 +16,7 @@ import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.HttpStatus.OK;
-import static com.vtence.molecule.support.ResourceLocator.onClasspath;
+import static com.vtence.molecule.testing.ResourceLocator.onClasspath;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.lang.String.valueOf;
 

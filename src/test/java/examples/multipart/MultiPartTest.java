@@ -1,7 +1,7 @@
 package examples.multipart;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.support.ResourceLocator;
+import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.testing.http.Form;
 import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
@@ -13,7 +13,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 
 public class MultiPartTest {

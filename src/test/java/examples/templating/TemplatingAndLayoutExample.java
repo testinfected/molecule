@@ -12,7 +12,7 @@ import com.vtence.molecule.templating.Templates;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 public class TemplatingAndLayoutExample {
 

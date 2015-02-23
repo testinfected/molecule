@@ -1,4 +1,4 @@
-package com.vtence.molecule.support;
+package com.vtence.molecule.testing;
 
 import java.io.File;
 import java.net.URISyntaxException;

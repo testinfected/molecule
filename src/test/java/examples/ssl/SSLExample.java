@@ -8,7 +8,7 @@ import com.vtence.molecule.WebServer;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import static com.vtence.molecule.support.ResourceLocator.locateOnClasspath;
+import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 public class SSLExample {
 
