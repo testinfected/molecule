@@ -169,6 +169,29 @@ public class RequestTest {
         assertThat("charset", request.charset(), equalTo(Charsets.UTF_8));
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void maintainsAnOrderedListOfBodyParts() {
+        request.addPart(new BodyPart().name("a"));
+        request.addPart(new BodyPart().name("b"));
+        request.addPart(new BodyPart().name("c"));
+        request.addPart(new BodyPart().name("a"));
+
+        assertThat("body parts", request.parts(),
+                contains(partWithName("a"), partWithName("b"), partWithName("c"), partWithName("a")));
+    }
+
+    @Test
+    public void removesBodyPartsByName() {
+        request.addPart(new BodyPart().name("a"));
+        request.addPart(new BodyPart().name("b"));
+        request.addPart(new BodyPart().name("c"));
+        request.addPart(new BodyPart().name("b"));
+        request.removePart("b");
+
+        assertThat("body parts", request.parts(), contains(partWithName("a"), partWithName("c")));
+    }
+
     private Matcher<Cookie> cookieNamed(String name) {
         return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
             protected String featureValueOf(Cookie cookie) {
@@ -177,11 +200,21 @@ public class RequestTest {
         };
     }
 
+
     private Matcher<Iterable<?>> containsKeys(Object... keys) {
         return Matchers.containsInAnyOrder(keys);
     }
 
     private Matcher<Map<?, ?>> containsEntry(Object key, Object value) {
         return Matchers.hasEntry(equalTo(key), equalTo(value));
+    }
+
+    private Matcher<? super BodyPart> partWithName(String name) {
+        return new FeatureMatcher<BodyPart, String>(equalTo(name), "part named", "name") {
+            @Override
+            protected String featureValueOf(BodyPart actual) {
+                return actual.name();
+            }
+        };
     }
 }

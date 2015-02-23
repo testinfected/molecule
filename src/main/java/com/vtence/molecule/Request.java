@@ -321,11 +321,14 @@ public class Request {
      * <p>
      * This is typically used in case of file uploads or multipart <code>POST</code> requests.
      * </p>
+     * <p>
+     *     Note that the list is a copy, modifications to the returned list will not change the request.
+     * </p>
      *
      * @return the (possibly empty) list of body parts
      */
     public List<BodyPart> parts() {
-        return parts;
+        return new ArrayList<BodyPart>(parts);
     }
 
     /**
@@ -342,6 +345,33 @@ public class Request {
             if (part.name().equals(name)) return part;
         }
         return null;
+    }
+
+    /**
+     * Removes the body part with the specified name from this request.
+     *
+     * <p>
+     * In case there are multiple body parts with that name, they are all removed.
+     * </p>
+     *
+     * @param name the name of the part(s) to remove
+     */
+    public Request removePart(String name) {
+        BodyPart[] copy = parts.toArray(new BodyPart[parts.size()]);
+        for (BodyPart part : copy) {
+            if (part.name().equals(name)) removePart(part);
+        }
+        return this;
+    }
+
+    /**
+     * Removes the given body part from this request.
+     *
+     * @param part the body part to remove
+     */
+    public Request removePart(BodyPart part) {
+        parts.remove(part);
+        return this;
     }
 
     /**
@@ -446,7 +476,7 @@ public class Request {
      * In case there are multiple headers with that name, all values are removed.
      * </p>
      *
-     * @param name the name of the header to remove
+     * @param name the name of the header(s) to remove
      */
     public Request removeHeader(String name) {
         headers.remove(name);
@@ -496,7 +526,7 @@ public class Request {
     /**
      * Retrieves the list of all cookies sent with this request.
      *
-     * Note that the list is safe for modification, it will not affect the request.
+     * Note that the list is safe for modification, changing the list will not change the request.
      *
      * @return the list of cookies sent
      */
