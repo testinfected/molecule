@@ -1,20 +1,16 @@
 package com.vtence.molecule.testing.http;
 
 import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.helpers.Joiner;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 public class UrlEncodedForm extends Form {
 
-    private final List<Field> fields = new ArrayList<Field>();
     private Charset charset = Charsets.UTF_8;
 
     @Override
@@ -38,39 +34,44 @@ public class UrlEncodedForm extends Form {
         return this;
     }
 
-    public UrlEncodedForm addField(String name, String value) {
-        fields.add(new Field(name, value));
+    public UrlEncodedForm addField(Field field) {
+        super.addField(field);
         return this;
     }
 
-    public byte[] encode() throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeTo(out);
-        return out.toByteArray();
+    public UrlEncodedForm addField(String name, String value) {
+        return addField(new TextField(name, value));
     }
 
     public void writeTo(OutputStream out) throws IOException {
-        Writer writer = new OutputStreamWriter(out, charset);
-        List<String> pairs = new ArrayList<String>();
-        for (Field field : fields) {
-            pairs.add(field.encode(charset));
+        Iterator<Field> fields = this.fields.iterator();
+        if (!fields.hasNext()) return;
+
+        Field first = fields.next();
+        first.encode(out, charset);
+
+        while (fields.hasNext()) {
+            // this is safe
+            out.write("&".getBytes());
+            fields.next().encode(out, charset);
         }
-        writer.write(Joiner.on("&").join(pairs));
-        writer.flush();
     }
 
-    static class Field {
+     static class TextField implements Field {
         private final String name;
         private final String value;
 
-        public Field(String name, String value) {
+        public TextField(String name, String value) {
             this.name = name;
             this.value = value;
         }
 
-        public String encode(Charset charset) {
+        @Override
+        public void encode(OutputStream out, Charset charset) throws IOException {
             URLEscaper escaper = URLEscaper.to(charset);
-            return escaper.escape(name) + "=" + escaper.escape(value);
+            Writer writer = new OutputStreamWriter(out, charset);
+            writer.append(escaper.escape(name)).append("=").append(escaper.escape(value));
+            writer.flush();
         }
     }
 }

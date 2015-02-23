@@ -4,7 +4,6 @@ import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,14 +12,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MultipartForm extends Form {
 
     public static String CRLF = "\r\n";
 
-    private final List<Entry> entries = new ArrayList<Entry>();
     private final String boundary =  Long.toHexString(System.currentTimeMillis());
 
     private Charset charset = Charsets.UTF_8;
@@ -45,26 +41,13 @@ public class MultipartForm extends Form {
         return this;
     }
 
-    public MultipartForm addField(String name, String value) {
-        entries.add(new TextField(name, value));
+    public MultipartForm addField(Field field) {
+        super.addField(field);
         return this;
     }
 
-    public byte[] encode() throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        writeTo(buffer);
-        return buffer.toByteArray();
-    }
-
-    public void writeTo(OutputStream out) throws IOException {
-        Writer writer = new OutputStreamWriter(out, charset);
-        for (Entry entry : entries) {
-            writer.append("--").append(boundary).append(CRLF);
-            writer.flush();
-            entry.encode(out, charset);
-        }
-        writer.append("--").append(boundary).append("--").append(CRLF);
-        writer.flush();
+    public MultipartForm addField(String name, String value) {
+        return addField(new TextField(name, value));
     }
 
     public MultipartForm addTextFile(String name, File file) {
@@ -72,8 +55,7 @@ public class MultipartForm extends Form {
     }
 
     public MultipartForm addTextFile(String name, File file, String contentType) {
-        entries.add(new FileUpload(name, file, contentType, false));
-        return this;
+        return addField(new FileUpload(name, file, contentType, false));
     }
 
     public MultipartForm addBinaryFile(String name, File toUpload) {
@@ -81,19 +63,46 @@ public class MultipartForm extends Form {
     }
 
     public MultipartForm addBinaryFile(String name, File toUpload, String contentType) {
-        entries.add(new FileUpload(name, toUpload, contentType, true));
-        return this;
+        return addField(new FileUpload(name, toUpload, contentType, true));
+    }
+
+    public void writeTo(OutputStream out) throws IOException {
+        Writer writer = new OutputStreamWriter(out, charset);
+        for (Field field : fields) {
+            writer.append("--").append(boundary).append(CRLF);
+            writer.flush();
+            field.encode(out, charset);
+        }
+        writer.append("--").append(boundary).append("--").append(CRLF);
+        writer.flush();
     }
 
     private String guessMimeType(File file) {
         return URLConnection.guessContentTypeFromName(file.getName());
     }
 
-    public static interface Entry {
-        void encode(OutputStream out, Charset charset) throws IOException;
+    static class TextField implements Field {
+
+        public final String name;
+        public final String value;
+
+        public TextField(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public void encode(OutputStream out, Charset charset) throws IOException {
+            Writer writer = new OutputStreamWriter(out, charset);
+            URLEscaper escaper = URLEscaper.to(charset);
+            writer.append("Content-Disposition: form-data; name=\"").append(escaper.escape(name)).append("\"").append(CRLF);
+            writer.append(CRLF);
+            writer.append(value).append(CRLF);
+            writer.flush();
+        }
     }
 
-    static class FileUpload implements Entry {
+    static class FileUpload implements Field {
 
         private final String name;
         private final File file;
@@ -142,26 +151,6 @@ public class MultipartForm extends Form {
             ContentType contentType = ContentType.parse(this.contentType);
             if (contentType == null || contentType.charset() == null) return Charsets.UTF_8;
             return contentType.charset();
-        }
-    }
-
-    static class TextField implements Entry {
-        public final String name;
-        public final String value;
-
-        public TextField(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        @Override
-        public void encode(OutputStream out, Charset charset) throws IOException {
-            Writer writer = new OutputStreamWriter(out, charset);
-            URLEscaper escaper = URLEscaper.to(charset);
-            writer.append("Content-Disposition: form-data; name=\"").append(escaper.escape(name)).append("\"").append(CRLF);
-            writer.append(CRLF);
-            writer.append(value).append(CRLF);
-            writer.flush();
         }
     }
 }
