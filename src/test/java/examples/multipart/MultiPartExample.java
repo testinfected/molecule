@@ -19,7 +19,7 @@ public class MultiPartExample {
                     response.contentType("text/html");
                     response.body("<html>" +
                             "<body>" +
-                            "<form class='pure-form' enctype='multipart/form-data' action='/profile' method='post'>\n" +
+                            "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
                             "<p>" +
                             "  <label>Email: <input type=\"email\" name=\"email\"></label>\n" +
                             "</p>" +
