@@ -17,9 +17,9 @@ import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class MultiPartTest {
+public class MultipartTest {
 
-    MultiPartExample upload = new MultiPartExample();
+    MultipartExample upload = new MultipartExample();
     WebServer server = WebServer.create(9999);
     ResourceLocator resources = ResourceLocator.onClasspath();
 

@@ -10,7 +10,7 @@ import com.vtence.molecule.routing.DynamicRoutes;
 
 import java.io.IOException;
 
-public class MultiPartExample {
+public class MultipartExample {
 
     public void run(WebServer server) throws IOException {
         server.start(new DynamicRoutes() {{
@@ -61,7 +61,7 @@ public class MultiPartExample {
     }
 
     public static void main(String[] args) throws IOException {
-        MultiPartExample example = new MultiPartExample();
+        MultipartExample example = new MultipartExample();
         WebServer webServer = WebServer.create();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri() + "/profile");
