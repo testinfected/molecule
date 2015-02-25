@@ -6,7 +6,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
-import static com.vtence.molecule.testing.TemplateRenderer.render;
+import static com.vtence.molecule.support.TemplateRenderer.render;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
