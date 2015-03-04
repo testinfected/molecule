@@ -54,7 +54,6 @@ public class RESTExample {
                         response.body(album.info());
                     } else {
                         response.statusCode(404);
-                        response.body("No such album");
                     }
                 }
             });
@@ -72,7 +71,6 @@ public class RESTExample {
                         response.body(album.info());
                     } else {
                         response.statusCode(404);
-                        response.body("No such album");
                     }
                 }
             });
@@ -86,7 +84,6 @@ public class RESTExample {
                         response.body(album.info());
                     } else {
                         response.statusCode(404);
-                        response.body("No such album");
                     }
                 }
             });
