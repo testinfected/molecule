@@ -92,4 +92,10 @@ public class RESTTest {
         assertThat(response).isOK()
                             .hasBodyText("Your music library is empty");
     }
+
+    @Test
+    public void askingForAMissingAlbum() throws IOException {
+        response = new HttpRequest(9999).get("/albums/9999");
+        assertThat(response).hasStatusCode(404);
+    }
 }

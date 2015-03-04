@@ -8,6 +8,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -177,7 +178,8 @@ public class HttpRequest {
     }
 
     private byte[] readResponseBody(HttpURLConnection connection) throws IOException {
-        return Streams.toBytes(successful(connection) ? connection.getInputStream() : connection.getErrorStream());
+        InputStream streamToUse = successful(connection) ? connection.getInputStream() : connection.getErrorStream();
+        return streamToUse != null ? Streams.toBytes(streamToUse) : null;
     }
 
     private boolean successful(HttpURLConnection connection) throws IOException {
