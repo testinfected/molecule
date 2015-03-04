@@ -95,7 +95,7 @@ public class RESTTest {
 
     @Test
     public void askingForAMissingAlbum() throws IOException {
-        response = new HttpRequest(9999).get("/albums/9999");
+        response = request.get("/albums/9999");
         assertThat(response).hasStatusCode(404);
     }
 }
