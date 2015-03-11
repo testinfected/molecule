@@ -60,4 +60,5 @@ public interface HeaderNames {
     static final String SERVER = "Server";
 
     static final String SET_COOKIE = "Set-Cookie";
+    static final String COOKIE = "Cookie";
 }
