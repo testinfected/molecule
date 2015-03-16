@@ -11,10 +11,11 @@ import java.util.Map;
 public class CookieJar {
     private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
     private final Map<String, Cookie> fresh = new LinkedHashMap<String, Cookie>();
+    private final Map<String, Cookie> discarded = new LinkedHashMap<String, Cookie>();
 
     public CookieJar(Iterable<Cookie> cookies) {
         for (Cookie cookie : cookies) {
-            set(cookie);
+            store(cookie);
         }
     }
 
@@ -42,18 +43,24 @@ public class CookieJar {
         return cookies.get(name);
     }
 
+    public CookieJar add(String name, String value) {
+        return add(new Cookie(name, value));
+    }
+
     public CookieJar add(Cookie cookie) {
-        set(cookie);
+        store(cookie);
         fresh.put(cookie.name(), cookie);
         return this;
     }
 
-    private void set(Cookie cookie) {
-        cookies.put(cookie.name(), cookie);
+    public CookieJar discard(String name) {
+        return discard(new Cookie(name, ""));
     }
 
-    public CookieJar add(String name, String value) {
-        return add(new Cookie(name, value));
+    private CookieJar discard(Cookie cookie) {
+        cookies.remove(cookie.name());
+        discarded.put(cookie.name(), cookie);
+        return this;
     }
 
     public List<Cookie> list() {
@@ -62,5 +69,13 @@ public class CookieJar {
 
     public List<Cookie> fresh() {
         return new ArrayList<Cookie>(fresh.values());
+    }
+
+    public List<Cookie> discarded() {
+        return new ArrayList<Cookie>(discarded.values());
+    }
+
+    private void store(Cookie cookie) {
+        cookies.put(cookie.name(), cookie);
     }
 }

@@ -38,6 +38,12 @@ public class CookieJarTest {
         assertThat("holds eaten cookie", jar.has("eaten cookie"), is(false));
     }
 
+    @Test
+    public void dropsDiscardedCookies() {
+        jar.discard("petit ecolier");
+        assertThat("holds rotten cookie", jar.has("petit ecolier"), is(false));
+    }
+
     private Matcher<Cookie> cookieNamed(String name) {
         return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
             protected String featureValueOf(Cookie cookie) {

@@ -46,5 +46,20 @@ public class CookiesTest {
         assertThat(response).hasHeaders("Set-Cookie", contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
     }
 
+    @Test
+    public void expiresDiscardedCookies() throws Exception {
+        cookies.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                CookieJar jar = CookieJar.get(request);
+                jar.discard("foo");
+            }
+        });
+
+        request.addHeader("Cookie", "foo=bar; baz=qux");
+        cookies.handle(request, response);
+
+        assertThat(response).hasHeaders("Set-Cookie", contains("foo=; version=1; path=/; max-age=0"));
+    }
+
     public void unbindsCookieJarAfterwards() {}
 }

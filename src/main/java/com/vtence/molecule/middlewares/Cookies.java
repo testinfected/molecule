@@ -30,6 +30,9 @@ public class Cookies extends AbstractMiddleware {
         for (Cookie cookie : cookies.fresh()) {
             response.addHeader(SET_COOKIE, cookie.toString());
         }
+        for (Cookie cookie : cookies.discarded()) {
+            response.addHeader(SET_COOKIE, cookie.maxAge(0).toString());
+        }
     }
 
     private List<Cookie> clientCookiesFrom(Request request) {
