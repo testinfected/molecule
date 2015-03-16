@@ -16,6 +16,15 @@ public class Cookie {
         this.value = value;
     }
 
+    public int version() {
+        return version;
+    }
+
+    public Cookie version(int version) {
+        this.version = version;
+        return this;
+    }
+
     public String name() {
         return name;
     }
