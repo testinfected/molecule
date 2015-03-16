@@ -3,6 +3,7 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.lib.CookieJar;
 import com.vtence.molecule.session.Session;
 import com.vtence.molecule.session.SessionStore;
 import org.hamcrest.FeatureMatcher;
@@ -70,8 +71,7 @@ public class CookieSessionTrackerTest {
         Session clientSession = store.load("existing");
         clientSession.put("counter", 1);
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithId("existing")));
-            will(returnValue("existing"));
+            oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
         tracker.handle(request.cookie(SESSION_COOKIE, "existing"), response);
@@ -164,7 +164,7 @@ public class CookieSessionTrackerTest {
     }
 
     @Test public void
-    unsetsSessionAfterwards() throws Exception {
+    unbindsSessionAfterwards() throws Exception {
         tracker.connectTo(nothing());
         tracker.handle(request, response);
         assertThat(request).hasAttribute(Session.class, nullValue());

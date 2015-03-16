@@ -35,14 +35,14 @@ public class CookieSessionTracker extends AbstractMiddleware {
             forward(request, response);
             commitSession(request, response, session);
         } finally {
-            Session.unset(request);
+            session.unbind(request);
         }
     }
 
     private Session prepareSession(Request request) {
         Session session = acquireSession(request);
         session.maxAge(expireAfter);
-        Session.set(request, session);
+        session.bind(request);
         return session;
     }
 
@@ -58,7 +58,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private void commitSession(Request request, Response response, Session session) {
-        if (!shouldCommit(session)) {
+        if (shouldDiscard(session)) {
             return;
         }
         if (session.invalid()) {
@@ -77,8 +77,8 @@ public class CookieSessionTracker extends AbstractMiddleware {
         }
     }
 
-    private boolean shouldCommit(Session session) {
-        return session.exists() || !session.isEmpty();
+    private boolean shouldDiscard(Session session) {
+        return !session.exists() && session.isEmpty();
     }
 
     private boolean newSession(Request request, String sid) {

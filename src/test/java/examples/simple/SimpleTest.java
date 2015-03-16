@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.containsString;
 
 public class SimpleTest {
 
-    SimpleExample basic = new SimpleExample();
+    SimpleExample example = new SimpleExample();
     WebServer server = WebServer.create(9999);
 
     HttpRequest request = new HttpRequest(9999);
@@ -22,7 +22,7 @@ public class SimpleTest {
 
     @Before
     public void startServer() throws IOException {
-        basic.run(server);
+        example.run(server);
     }
 
     @After

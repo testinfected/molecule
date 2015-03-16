@@ -32,11 +32,11 @@ public class Session {
         return request.attribute(Session.class);
     }
 
-    public static void set(Request request, Session session) {
-        request.attribute(Session.class, session);
+    public void bind(Request request) {
+        request.attribute(Session.class, this);
     }
 
-    public static void unset(Request request) {
+    public void unbind(Request request) {
         request.removeAttribute(Session.class);
     }
 
