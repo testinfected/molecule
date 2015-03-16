@@ -27,6 +27,10 @@ public class CookieJar {
         request.attribute(CookieJar.class, this);
     }
 
+    public void unbind(Request request) {
+        request.removeAttribute(CookieJar.class);
+    }
+
     public int size() {
         return cookies.size();
     }

@@ -7,7 +7,9 @@ import com.vtence.molecule.lib.CookieJar;
 import org.junit.Test;
 
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.nullValue;
 
 public class CookiesTest {
 
@@ -61,5 +63,10 @@ public class CookiesTest {
         assertThat(response).hasHeaders("Set-Cookie", contains("foo=; version=1; path=/; max-age=0"));
     }
 
-    public void unbindsCookieJarAfterwards() {}
+    @Test public void
+    unbindsCookieJarOnceDone() throws Exception {
+        cookies.handle(request, response);
+
+        assertThat("bound jar", CookieJar.get(request), nullValue());
+    }
 }

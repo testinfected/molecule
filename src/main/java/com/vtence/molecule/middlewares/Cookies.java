@@ -23,6 +23,7 @@ public class Cookies extends AbstractMiddleware {
             forward(request, response);
         } finally {
             setCookies(response, cookies);
+            cookies.unbind(request);
         }
     }
 
