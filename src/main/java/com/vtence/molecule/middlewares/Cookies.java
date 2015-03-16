@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.vtence.molecule.http.HeaderNames.COOKIE;
+import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
 
 public class Cookies extends AbstractMiddleware {
 
@@ -18,7 +19,17 @@ public class Cookies extends AbstractMiddleware {
     public void handle(Request request, Response response) throws Exception {
         CookieJar cookies = new CookieJar(clientCookiesFrom(request));
         cookies.bind(request);
-        forward(request, response);
+        try {
+            forward(request, response);
+        } finally {
+            setCookies(response, cookies);
+        }
+    }
+
+    private void setCookies(Response response, CookieJar cookies) {
+        for (Cookie cookie : cookies.fresh()) {
+            response.addHeader(SET_COOKIE, cookie.toString());
+        }
     }
 
     private List<Cookie> clientCookiesFrom(Request request) {

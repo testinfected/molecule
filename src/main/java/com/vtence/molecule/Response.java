@@ -132,6 +132,16 @@ public class Response {
     }
 
     /**
+     * Gets the list of values of the specified header of this response. The name is case insensitive.
+     *
+     * @param name the name of the header to retrieve
+     * @return the (possibly empty) list of header values
+     */
+    public List<String> headers(String name) {
+        return headers.list(name);
+    }
+
+    /**
      * Gets the value of the specified header of this response. The name is case insensitive.
      *
      * <p>
@@ -256,7 +266,7 @@ public class Response {
      * <p>Note that setting the content type can also be done explicitly using {@link Response#header}.
      *  This is a convenient method for doing so.</p>
      *
-     * @see Response#charset(String) 
+     * @see Response#charset(String)
      * @param contentType the new content type value to set
      */
     public Response contentType(String contentType) {

@@ -76,6 +76,11 @@ public class ResponseAssert {
         return this;
     }
 
+    public ResponseAssert hasHeaders(String name, Matcher<Iterable<? extends String>> matchingValues) {
+        Assert.assertThat("response '" + name + "' headers", response.headers(name), matchingValues);
+        return this;
+    }
+
     public ResponseAssert hasNoHeader(String named) {
         hasHeader(named, nullValue());
         return this;

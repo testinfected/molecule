@@ -19,15 +19,14 @@ public class CookieTest {
     }
 
     @Test
-    public void handlesAbsenceOfPath() {
+    public void usesRootPathAsDefault() {
         Cookie cookie = new Cookie("name", "value").domain("domain")
                                                    .maxAge(1200)
                                                    .httpOnly(true)
                                                    .secure(true);
 
-        assertThat("Set-Cookie value", cookie.toString(), equalTo(
-                "name=value; version=1; domain=domain; max-age=1200; secure; httponly"
-        ));
+        assertThat("Set-Cookie value", cookie.toString(),
+                equalTo("name=value; version=1; path=/; domain=domain; max-age=1200; secure; httponly"));
     }
 
     @Test
@@ -36,26 +35,21 @@ public class CookieTest {
                                                    .httpOnly(true)
                                                    .secure(true);
 
-        assertThat("Set-Cookie value", cookie.toString(), equalTo(
-                "name=value; version=1; max-age=1200; secure; httponly"
-        ));
+        assertThat("Set-Cookie value", cookie.toString(),
+                equalTo("name=value; version=1; path=/; max-age=1200; secure; httponly"));
     }
 
     @Test
     public void formatsSecureCookies() {
         Cookie cookie = new Cookie("name", "value").secure(true);
 
-        assertThat("Set-Cookie value", cookie.toString(), equalTo(
-                "name=value; version=1; secure"
-        ));
+        assertThat("Set-Cookie value", cookie.toString(), equalTo("name=value; version=1; path=/; secure"));
     }
 
     @Test
     public void formatsProtectedCookies() {
         Cookie cookie = new Cookie("name", "value").httpOnly(true);
 
-        assertThat("Set-Cookie value", cookie.toString(), equalTo(
-                "name=value; version=1; httponly"
-        ));
+        assertThat("Set-Cookie value", cookie.toString(), equalTo("name=value; version=1; path=/; httponly"));
     }
 }

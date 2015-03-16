@@ -7,7 +7,7 @@ public class Cookie {
     private String value;
     private int maxAge = -1;
     private String domain;
-    private String path;
+    private String path = "/";
     private boolean secure;
     private boolean httpOnly;
 

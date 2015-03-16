@@ -7,6 +7,7 @@ import com.vtence.molecule.lib.CookieJar;
 import org.junit.Test;
 
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 
 public class CookiesTest {
 
@@ -27,6 +28,22 @@ public class CookiesTest {
         request.addHeader("Cookie", "foo=bar; baz=qux");
         cookies.handle(request, response);
         assertThat(response).hasBodyText("foo: bar, baz: qux");
+    }
+
+    @Test
+    public void poursNewCookiesFromJar() throws Exception {
+        cookies.connectTo(new Application() {
+            public void handle(Request request, Response response) throws Exception {
+                CookieJar jar = CookieJar.get(request);
+                jar.add("oogle", "foogle")
+                   .add("gorp", "mumble");
+            }
+        });
+
+        request.addHeader("Cookie", "foo=bar; baz=qux");
+        cookies.handle(request, response);
+
+        assertThat(response).hasHeaders("Set-Cookie", contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
     }
 
     public void unbindsCookieJarAfterwards() {}
