@@ -120,7 +120,7 @@ public class CookieDecoderTest {
                 "Part_Number=\"Riding_Rocket_0023\"; $Path=\"/acme/ammo\", " +
                 "Part_Number=\"Rocket_Launcher_0001\"; $Path=\"/acme\"";
 
-        List<Cookie> cookies = decoder.decode(cookieHeader);
+        List<Cookie> cookies = decodeAll(cookieHeader);
 
         Cookie rocket = cookies.get(0);
         assertThat("cookie name", rocket.name(), equalTo("Part_Number"));

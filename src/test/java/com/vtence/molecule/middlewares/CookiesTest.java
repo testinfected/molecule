@@ -6,7 +6,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.CookieJar;
 import org.junit.Test;
 
-import static com.vtence.molecule.http.HeaderNames.COOKIE;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class CookiesTest {
@@ -17,7 +16,7 @@ public class CookiesTest {
     Cookies cookies = new Cookies();
 
     @Test
-    public void readsRequestCookies() throws Exception {
+    public void fillsCookieJarWithClientCookies() throws Exception {
         cookies.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 CookieJar jar = CookieJar.get(request);
@@ -25,7 +24,7 @@ public class CookiesTest {
             }
         });
 
-        request.addHeader(COOKIE, "foo=bar; baz=qux");
+        request.addHeader("Cookie", "foo=bar; baz=qux");
         cookies.handle(request, response);
         assertThat(response).hasBodyText("foo: bar, baz: qux");
     }
