@@ -3,14 +3,15 @@ package examples.session;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.session.Session;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.CookieSessionTracker;
-import com.vtence.molecule.routing.DynamicRoutes;
-import com.vtence.molecule.session.SecureIdentifierPolicy;
-import com.vtence.molecule.session.SessionPool;
 import com.vtence.molecule.lib.Clock;
 import com.vtence.molecule.lib.SystemClock;
+import com.vtence.molecule.middlewares.CookieSessionTracker;
+import com.vtence.molecule.middlewares.Cookies;
+import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.session.SecureIdentifierPolicy;
+import com.vtence.molecule.session.Session;
+import com.vtence.molecule.session.SessionPool;
 
 import java.io.IOException;
 
@@ -24,6 +25,14 @@ public class SessionExample {
         this.clock = clock;
     }
 
+    public static void main(String[] args) throws IOException {
+        SessionExample example = new SessionExample(new SystemClock());
+        // Run the default web server
+        WebServer webServer = WebServer.create();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri());
+    }
+
     public void expireAfter(int seconds) {
         this.sessionTracker.expireAfter(seconds);
     }
@@ -31,7 +40,9 @@ public class SessionExample {
     public void run(WebServer server) throws IOException {
         // Track sessions using a cookie strategy and an in-memory session pool
         sessionTracker = new CookieSessionTracker(new SessionPool(new SecureIdentifierPolicy(), clock));
-        server.add(sessionTracker)
+        // Enable cookie support
+        server.add(new Cookies())
+              .add(sessionTracker)
               .start(new DynamicRoutes() {{
                          map("/").to(new Application() {
                              public void handle(Request request, Response response) throws Exception {
@@ -59,13 +70,5 @@ public class SessionExample {
                          });
                      }}
               );
-    }
-
-    public static void main(String[] args) throws IOException {
-        SessionExample example = new SessionExample(new SystemClock());
-        // Run the default web server
-        WebServer webServer = WebServer.create();
-        example.run(webServer);
-        System.out.println("Access at " + webServer.uri());
     }
 }

@@ -17,21 +17,21 @@ public class Cookies extends AbstractMiddleware {
     private final CookieDecoder cookieDecoder = new CookieDecoder();
 
     public void handle(Request request, Response response) throws Exception {
-        CookieJar cookies = new CookieJar(clientCookiesFrom(request));
-        cookies.bind(request);
+        CookieJar cookieJar = new CookieJar(clientCookiesFrom(request));
+        cookieJar.bind(request);
         try {
             forward(request, response);
         } finally {
-            setCookies(response, cookies);
-            cookies.unbind(request);
+            setCookies(response, cookieJar);
+            cookieJar.unbind(request);
         }
     }
 
-    private void setCookies(Response response, CookieJar cookies) {
-        for (Cookie cookie : cookies.fresh()) {
+    private void setCookies(Response response, CookieJar jar) {
+        for (Cookie cookie : jar.fresh()) {
             response.addHeader(SET_COOKIE, cookie.toString());
         }
-        for (Cookie cookie : cookies.discarded()) {
+        for (Cookie cookie : jar.discarded()) {
             response.addHeader(SET_COOKIE, cookie.maxAge(0).toString());
         }
     }

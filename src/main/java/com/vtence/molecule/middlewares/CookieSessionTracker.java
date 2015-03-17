@@ -1,8 +1,9 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Cookie;
+import com.vtence.molecule.lib.CookieJar;
 import com.vtence.molecule.session.Session;
 import com.vtence.molecule.session.SessionStore;
 
@@ -19,7 +20,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
         this.store = store;
     }
 
-    public CookieSessionTracker cookie(String name) {
+    public CookieSessionTracker usingCookieName(String name) {
         this.name = name;
         return this;
     }
@@ -30,50 +31,50 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        Session session = prepareSession(request);
+        CookieJar cookieJar = CookieJar.get(request);
+        if (cookieJar == null) throw new IllegalStateException("No cookie jar bound to request");
+        Session session = openSession(cookieJar);
+        session.bind(request);
         try {
             forward(request, response);
-            commitSession(request, response, session);
+            commitSession(session, cookieJar);
         } finally {
             session.unbind(request);
         }
     }
 
-    private Session prepareSession(Request request) {
-        Session session = acquireSession(request);
+    private Session openSession(CookieJar cookieJar) {
+        Session session = acquireSession(cookieJar);
         session.maxAge(expireAfter);
-        session.bind(request);
         return session;
     }
 
-    private Session acquireSession(Request request) {
-        String id = sessionId(request);
+    private Session acquireSession(CookieJar cookieJar) {
+        String id = sessionId(cookieJar);
         if (id == null) return new Session();
         Session session = store.load(id);
         return session != null ? session : new Session();
     }
 
-    private String sessionId(Request request) {
-        return request.cookieValue(name);
+    private String sessionId(CookieJar cookieJar) {
+        Cookie sessionCookie = cookieJar.get(name);
+        return sessionCookie != null ? sessionCookie.value() : null;
     }
 
-    private void commitSession(Request request, Response response, Session session) {
+    private void commitSession(Session session, CookieJar cookieJar) {
         if (shouldDiscard(session)) {
             return;
         }
+
         if (session.invalid()) {
             destroy(session);
-            Cookie cookie = new Cookie(name, session.id()).maxAge(0);
-            response.cookie(cookie);
+            cookieJar.discard(name);
             return;
         }
 
         String sid = save(session);
-        if (newSession(request, sid) || expires(session)) {
-            Cookie cookie = new Cookie(name, sid)
-                    .httpOnly(true)
-                    .maxAge(session.maxAge());
-            response.cookie(cookie);
+        if (newSession(sid, cookieJar) || expires(session)) {
+            cookieJar.add(new Cookie(name, sid).httpOnly(true).maxAge(session.maxAge()));
         }
     }
 
@@ -81,8 +82,8 @@ public class CookieSessionTracker extends AbstractMiddleware {
         return !session.exists() && session.isEmpty();
     }
 
-    private boolean newSession(Request request, String sid) {
-        return !sid.equals(sessionId(request));
+    private boolean newSession(String sid, CookieJar cookieJar) {
+        return !sid.equals(sessionId(cookieJar));
     }
 
     private boolean expires(Session session) {

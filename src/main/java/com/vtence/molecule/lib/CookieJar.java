@@ -4,6 +4,7 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.http.Cookie;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,10 @@ public class CookieJar {
     private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
     private final Map<String, Cookie> fresh = new LinkedHashMap<String, Cookie>();
     private final Map<String, Cookie> discarded = new LinkedHashMap<String, Cookie>();
+
+    public CookieJar(Cookie... cookies) {
+        this(Arrays.asList(cookies));
+    }
 
     public CookieJar(Iterable<Cookie> cookies) {
         for (Cookie cookie : cookies) {
@@ -67,7 +72,7 @@ public class CookieJar {
         return this;
     }
 
-    public List<Cookie> list() {
+    public List<Cookie> all() {
         return new ArrayList<Cookie>(cookies.values());
     }
 
@@ -77,6 +82,14 @@ public class CookieJar {
 
     public List<Cookie> discarded() {
         return new ArrayList<Cookie>(discarded.values());
+    }
+
+    public boolean fresh(String name) {
+        return fresh.containsKey(name);
+    }
+
+    public boolean discarded(String name) {
+        return discarded.containsKey(name);
     }
 
     private void store(Cookie cookie) {

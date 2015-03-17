@@ -28,7 +28,7 @@ public class CookieJarTest {
     public void addsNewCookiesInOrder() {
         jar.add("delicious", "chocolat au lait");
 
-        assertThat("cookies in jar", jar.list(), contains(
+        assertThat("cookies in jar", jar.all(), contains(
                 cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
     }
 
