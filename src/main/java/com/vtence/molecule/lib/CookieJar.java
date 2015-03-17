@@ -52,24 +52,24 @@ public class CookieJar {
         return cookies.get(name);
     }
 
-    public CookieJar add(String name, String value) {
+    public Cookie add(String name, String value) {
         return add(new Cookie(name, value));
     }
 
-    public CookieJar add(Cookie cookie) {
+    public Cookie add(Cookie cookie) {
         store(cookie);
         fresh.put(cookie.name(), cookie);
-        return this;
+        return cookie;
     }
 
-    public CookieJar discard(String name) {
+    public Cookie discard(String name) {
         return discard(new Cookie(name, ""));
     }
 
-    private CookieJar discard(Cookie cookie) {
+    private Cookie discard(Cookie cookie) {
         cookies.remove(cookie.name());
         discarded.put(cookie.name(), cookie);
-        return this;
+        return cookie;
     }
 
     public List<Cookie> all() {

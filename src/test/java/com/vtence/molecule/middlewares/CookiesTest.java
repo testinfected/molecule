@@ -37,8 +37,8 @@ public class CookiesTest {
         cookies.connectTo(new Application() {
             public void handle(Request request, Response response) throws Exception {
                 CookieJar jar = CookieJar.get(request);
-                jar.add("oogle", "foogle")
-                   .add("gorp", "mumble");
+                jar.add("oogle", "foogle");
+                jar.add("gorp", "mumble");
             }
         });
 

@@ -19,6 +19,15 @@ public class HttpCookieAssert {
         return new HttpCookieAssert(cookie);
     }
 
+    public HttpCookieAssert hasValue(String value) {
+        return hasValue(equalTo(value));
+    }
+
+    public HttpCookieAssert hasValue(Matcher<String> matching) {
+        Assert.assertThat(message("value"), cookie.getValue(), matching);
+        return this;
+    }
+
     private HttpCookieAssert hasPath(Matcher<? super String> matching) {
         Assert.assertThat(message("path"), cookie.getPath(), matching);
         return this;
