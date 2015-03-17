@@ -7,7 +7,6 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.http.Cookie;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
@@ -18,8 +17,6 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
-
-import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
 
 public class SimpleServer implements Server {
 
@@ -83,7 +80,6 @@ public class SimpleServer implements Server {
         private void build(Request request, org.simpleframework.http.Request simple) throws IOException {
             setRequestDetails(request, simple);
             setHeaders(request, simple);
-            setCookies(request, simple);
             setParameters(request, simple);
             setParts(request, simple);
             setBody(request, simple);
@@ -111,12 +107,6 @@ public class SimpleServer implements Server {
                     request.addHeader(header, simple.getValue(header, index));
                     index++;
                 }
-            }
-        }
-
-        private void setCookies(Request request, org.simpleframework.http.Request simple) {
-            for (org.simpleframework.http.Cookie cookie : simple.getCookies()) {
-                request.cookie(cookie.getName(), cookie.getValue());
             }
         }
 
@@ -148,7 +138,6 @@ public class SimpleServer implements Server {
 
         private void commit(org.simpleframework.http.Response simple, Response response) throws IOException {
             setStatusLine(simple, response);
-            setCookieHeaders(response);
             setHeaders(simple, response);
             writeBody(simple, response);
         }
@@ -161,13 +150,6 @@ public class SimpleServer implements Server {
         private void setHeaders(org.simpleframework.http.Response simple, Response response) {
             for (String name : response.headerNames()) {
                 simple.setValue(name, response.header(name));
-            }
-        }
-
-        private void setCookieHeaders(Response response) {
-            for (String name : response.cookieNames()) {
-                Cookie cookie = response.cookie(name);
-                response.header(SET_COOKIE, cookie.toString());
             }
         }
 

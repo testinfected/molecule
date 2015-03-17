@@ -13,7 +13,6 @@ import static java.util.Locale.US;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
 
 public class ResponseTest {
@@ -54,26 +53,6 @@ public class ResponseTest {
         assertThat("still there?", response.hasHeader("Accept"), equalTo(false));
 
         assertThat("header names", response.headerNames(), contains("Accept-Encoding"));
-    }
-
-    @Test
-    public void maintainsAListOfCookies() {
-        response.cookie("mr christie", "peanuts");
-        response.cookie("petit ecolier", "chocolat noir");
-        response.cookie("delicious", "chocolat au lait");
-
-        assertThat("cookies", response.cookieNames(), containsInAnyOrder("mr christie", "petit ecolier", "delicious"));
-    }
-
-    @Test
-    public void canRemoveCookies() {
-        response.cookie("mr christie", "peanuts");
-        response.cookie("petit ecolier", "chocolat noir");
-        assertThat("cookie?", response.hasCookie("mr christie"), equalTo(true));
-        response.removeCookie("mr christie");
-        assertThat("still there?", response.hasCookie("mr christie"), equalTo(false));
-
-        assertThat("cookies", response.cookieNames(), contains("petit ecolier"));
     }
 
     @Test

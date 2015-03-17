@@ -96,28 +96,6 @@ public class RequestTest {
         assertThat("header names", request.headerNames(), contains("Accept-Encoding"));
     }
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void maintainsAListOfCookies() {
-        request.cookie("mr christie", "peanuts");
-        request.cookie("petit ecolier", "chocolat noir");
-        request.cookie("delicious", "chocolat au lait");
-
-        assertThat("cookies", request.cookies(), contains(
-                cookieNamed("mr christie"), cookieNamed("petit ecolier"), cookieNamed("delicious")));
-    }
-
-    @Test
-    public void removesCookies() {
-        request.cookie("mr christie", "peanuts");
-        request.cookie("petit ecolier", "chocolat noir");
-        assertThat("cookie?", request.hasCookie("mr christie"), equalTo(true));
-        request.removeCookie("mr christie");
-        assertThat("still there?", request.hasCookie("mr christie"), equalTo(false));
-
-        assertThat("cookies", request.cookies(), contains(cookieNamed("petit ecolier")));
-    }
-
     @Test
     public void hasNoPreferredLocaleInAbsenceOfAcceptLanguageHeader() {
         assertThat("no preference", request.locales(), empty());
@@ -181,6 +159,7 @@ public class RequestTest {
                 contains(partWithName("a"), partWithName("b"), partWithName("c"), partWithName("a")));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void removesBodyPartsByName() {
         request.addPart(new BodyPart().name("a"));
@@ -199,7 +178,6 @@ public class RequestTest {
             }
         };
     }
-
 
     private Matcher<Iterable<?>> containsKeys(Object... keys) {
         return Matchers.containsInAnyOrder(keys);

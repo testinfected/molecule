@@ -5,7 +5,6 @@ import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.AcceptLanguage;
 import com.vtence.molecule.http.ContentType;
-import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.lib.EmptyInputStream;
 
@@ -35,7 +34,6 @@ import static java.lang.Long.parseLong;
 public class Request {
 
     private final Headers headers = new Headers();
-    private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
     private final Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
     private final Map<Object, Object> attributes = new HashMap<Object, Object>();
     private final List<BodyPart> parts = new ArrayList<BodyPart>();
@@ -480,95 +478,6 @@ public class Request {
      */
     public Request removeHeader(String name) {
         headers.remove(name);
-        return this;
-    }
-
-    /**
-     * Checks if a cookie with a specific name was sent with this request.
-     *
-     * Note that changing the Cookie header of the request will not cause the cookies to change. To change the cookies,
-     * use {@link Request#cookie(String, String)} and {@link Request#removeCookie(String)}.
-     *
-     * @see Request#cookie(com.vtence.molecule.http.Cookie)
-     * @param name the name of the cookie to check
-     * @return true if the cookie was sent
-     */
-    public boolean hasCookie(String name) {
-        return cookies.containsKey(name);
-    }
-
-    /**
-     * Retrieves the value of a cookie sent with this request under a specific name.
-     *
-     * If the cookie exists as an HTTP header then it's value is returned, otherwise a null value is returned.
-     *
-     * @param name name of the cookie to acquire
-     * @return the value of the cookie with that name or null
-     */
-    public String cookieValue(String name) {
-        Cookie cookie = cookie(name);
-        return cookie != null ? cookie.value() : null;
-    }
-
-    /**
-     * Retrieves a cookie sent with this request under a specific name.
-     *
-     * If the cookie exists as an HTTP header then it is returned
-     * as a <code>Cookie</code> object - with the name, value, path as well as the optional domain part.
-     *
-     * @param name the name of the cookie to acquire
-     * @return the cookie with that name or null
-     */
-    public Cookie cookie(String name) {
-        return cookies.get(name);
-    }
-
-    /**
-     * Retrieves the list of all cookies sent with this request.
-     *
-     * Note that the list is safe for modification, changing the list will not change the request.
-     *
-     * @return the list of cookies sent
-     */
-    public List<Cookie> cookies() {
-        return new ArrayList<Cookie>(cookies.values());
-    }
-
-    /**
-     * Sets a cookie with a specific name and value on this request. If a cookie with that name already exists,
-     * it is replaced by the new value.
-     *
-     * Note that this will not affect the <code>Cookie</code> header that has been set with the request.
-     *
-     * @param name the name of the cookie to set
-     * @param value the value of the cookie to set
-     */
-    public Request cookie(String name, String value) {
-        return cookie(new Cookie(name, value));
-    }
-
-    /**
-     * Sets a cookie on this request. If a cookie with the same name already exists, it is replaced by the new cookie.
-     *
-     * Note that this will not affect the <code>Cookie</code> header that has been set with the request.
-     *
-     * @param cookie the cookie to set
-     */
-    public Request cookie(Cookie cookie) {
-        cookies.put(cookie.name(), cookie);
-        return this;
-    }
-
-    /**
-     * Removes a cookie with a specific name from this request. If no cookie with that name exists, the operation
-     * does nothing.
-     *
-     * Note that this will not affect the Cookie header that has been set with the request.
-     *
-     * @param name the name of the cookie to remove
-     */
-    public Request removeCookie(String name) {
-        cookies.remove(name);
         return this;
     }
 

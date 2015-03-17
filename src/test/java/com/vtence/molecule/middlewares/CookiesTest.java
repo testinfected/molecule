@@ -67,6 +67,6 @@ public class CookiesTest {
     unbindsCookieJarOnceDone() throws Exception {
         cookies.handle(request, response);
 
-        assertThat("bound jar", CookieJar.get(request), nullValue());
+        assertThat("bound jar", request.attribute(CookieJar.class), nullValue());
     }
 }

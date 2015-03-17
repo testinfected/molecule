@@ -5,10 +5,9 @@ import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.support.StackTrace;
+import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.testing.http.Form;
 import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
@@ -218,48 +217,6 @@ public class SimpleServerTest {
         assertThat("request content", content, allOf(hasEntry("contentType", "application/x-www-form-urlencoded"),
                 hasEntry("contentLength", "10"),
                 hasEntry("body", "name=value")));
-    }
-
-    @Test public void
-    readsAllRequestCookies() throws IOException {
-        final Map<String, String> cookies = new HashMap<String, String>();
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                for (Cookie cookie : request.cookies()) {
-                    cookies.put(cookie.name(), cookie.value());
-                }
-            }
-        });
-
-        request.cookie("cookie1", "value1")
-               .cookie("cookie2", "value2")
-               .send();
-        assertNoError();
-
-        assertThat("request cookies", cookies, allOf(hasEntry("cookie1", "value1"), hasEntry("cookie2", "value2")));
-    }
-
-    @Test public void
-    setsResponseCookies() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                Cookie cookie = new Cookie("name", "value").maxAge(1800)
-                                                           .domain("localhost")
-                                                           .path("/uri")
-                                                           .secure(true)
-                                                           .httpOnly(true);
-                response.cookie(cookie);
-            }
-        });
-
-        response = request.send();
-        assertNoError();
-        assertThat(response).hasCookie("name")
-                            .hasPath("/uri")
-                            .hasDomain("localhost")
-                            .hasMaxAge(1800)
-                            .isSecure()
-                            .isHttpOnly();
     }
 
     @Test public void

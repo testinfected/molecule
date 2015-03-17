@@ -1,7 +1,6 @@
 package com.vtence.molecule.testing;
 
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
@@ -11,7 +10,10 @@ import java.nio.charset.Charset;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.testing.CharsetDetector.detectCharsetOf;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.any;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 
 public class ResponseAssert {
 
@@ -93,17 +95,6 @@ public class ResponseAssert {
 
     public ResponseAssert hasContentType(Matcher<? super String> matching) {
         hasHeader(CONTENT_TYPE, matching);
-        return this;
-    }
-
-    public CookieAssert hasCookie(String named) {
-        Cookie cookie = response.cookie(named);
-        Assert.assertTrue("response is missing cookie '" + named + "'", cookie != null);
-        return new CookieAssert(cookie);
-    }
-
-    public ResponseAssert hasNoCookie(String named) {
-        Assert.assertFalse("response has unexpected cookie '" + named + "'", response.hasCookie(named));
         return this;
     }
 
