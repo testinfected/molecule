@@ -21,19 +21,28 @@ public class LocaleNegotiationTest {
     HttpRequest request = new HttpRequest(9999);
     HttpResponse response;
 
+    Locale originalDefault = Locale.getDefault();
+
     @Before
     public void startServer() throws IOException {
+        Locale.setDefault(Locale.US);
         example.run(server);
     }
 
     @After
     public void stopServer() throws IOException {
         server.stop();
+        Locale.setDefault(originalDefault);
+    }
+
+    @Test
+    public void selectingTheBestSupportedLanguage() throws IOException {
+        response = request.header("Accept-Language", "en; q=0.8, fr").send();
+        assertThat(response).hasBodyText(containsString("The best match is: fr"));
     }
 
     @Test
     public void fallingBackToTheDefaultLanguage() throws IOException {
-        Locale.setDefault(Locale.US);
         response = request.header("Accept-Language", "es-ES").send();
         assertThat(response).hasBodyText(containsString("The best match is: en_US"));
     }
