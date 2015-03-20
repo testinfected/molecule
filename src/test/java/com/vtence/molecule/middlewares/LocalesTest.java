@@ -31,7 +31,16 @@ public class LocalesTest {
     public void usesThePlatformLocaleAsTheDefault() throws Exception {
         Locales locales = new Locales();
         locales.handle(request, response);
+
         assertThat(request).hasAttribute(Locale.class, Locale.US);
+    }
+
+    @Test
+    public void usesTheRequestedLanguageIfSupported() throws Exception {
+        Locales locales = new Locales("en", "fr");
+        locales.handle(request.header("Accept-Language", "fr"), response);
+
+        assertThat(request).hasAttribute(Locale.class, Locale.FRENCH);
     }
 
 }
