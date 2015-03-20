@@ -5,6 +5,7 @@ import org.hamcrest.Matcher;
 import org.junit.Assert;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 
 public class RequestAssert {
 
@@ -20,6 +21,10 @@ public class RequestAssert {
 
     public RequestAssert hasAttribute(Object key, Object value) {
         return hasAttribute(key, equalTo(value));
+    }
+
+    public RequestAssert hasNoAttribute(Object key) {
+        return hasAttribute(key, nullValue());
     }
 
     public RequestAssert hasAttribute(Object key, Matcher<Object> matching) {

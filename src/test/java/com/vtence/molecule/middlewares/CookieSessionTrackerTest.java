@@ -20,7 +20,6 @@ import static com.vtence.molecule.testing.CookieJarAssert.assertThat;
 import static com.vtence.molecule.testing.RequestAssert.assertThat;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 
 public class CookieSessionTrackerTest {
 
@@ -205,7 +204,7 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request, response);
 
-        assertThat(request).hasAttribute(Session.class, nullValue());
+        assertThat(request).hasNoAttribute(Session.class);
     }
 
     private CookieJar fillCookieJar(Cookie... cookies) {

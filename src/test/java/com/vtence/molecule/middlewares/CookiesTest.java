@@ -6,10 +6,9 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.CookieJar;
 import org.junit.Test;
 
+import static com.vtence.molecule.testing.RequestAssert.assertThat;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.nullValue;
 
 public class CookiesTest {
 
@@ -67,6 +66,6 @@ public class CookiesTest {
     unbindsCookieJarOnceDone() throws Exception {
         cookies.handle(request, response);
 
-        assertThat("bound jar", request.attribute(CookieJar.class), nullValue());
+        assertThat(request).hasNoAttribute(CookieJar.class);
     }
 }
