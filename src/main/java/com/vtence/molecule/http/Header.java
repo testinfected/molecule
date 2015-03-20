@@ -26,7 +26,7 @@ public class Header {
     }
 
     public List<Value> all() {
-        return new ArrayList<Value>(values);
+        return Collections.unmodifiableList(values);
     }
 
     public Value first() {

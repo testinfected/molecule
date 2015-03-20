@@ -31,7 +31,7 @@ public class AcceptEncoding {
 
     public String selectBestEncoding(Collection<String> candidates) {
         List<Header.Value> contentCodings = explicitContentCodings(candidates);
-        List<String> acceptableEncodings = listAcceptable(contentCodings);
+        List<String> acceptableEncodings = filterAcceptable(contentCodings);
         for (String acceptable : acceptableEncodings) {
             if (candidates.contains(acceptable)) return acceptable;
         }
@@ -56,7 +56,7 @@ public class AcceptEncoding {
         return codings;
     }
 
-    private List<String> listAcceptable(List<Header.Value> encodings) {
+    private List<String> filterAcceptable(List<Header.Value> encodings) {
         List<String> candidates = listValues(encodings);
         if (!candidates.contains("identity")) candidates.add("identity");
 

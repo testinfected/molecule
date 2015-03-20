@@ -3,6 +3,7 @@ package com.vtence.molecule.http;
 import com.vtence.molecule.Request;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,6 +61,6 @@ public class AcceptEncodingTest {
     }
 
     public static List<String> fromCandidates(String... candidates) {
-        return Arrays.asList(candidates);
+        return new ArrayList<String>(Arrays.asList(candidates));
     }
 }
