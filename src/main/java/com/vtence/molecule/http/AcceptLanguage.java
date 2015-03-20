@@ -22,7 +22,7 @@ public class AcceptLanguage {
 
     private void parseLocales(Header header) {
         for (String locale : header.values()) {
-            if (!locale.equals("")) locales.add(LanguageTag.parse(locale));
+            if (!locale.equals("")) locales.add(Locale.forLanguageTag(locale));
         }
     }
 

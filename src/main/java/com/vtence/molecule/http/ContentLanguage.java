@@ -23,7 +23,7 @@ public class ContentLanguage {
     public static ContentLanguage from(Header header) {
         ContentLanguage languages = new ContentLanguage();
         for (String locale : header.values()) {
-            if (!locale.equals("")) languages.add(LanguageTag.parse(locale));
+            if (!locale.equals("")) languages.add(Locale.forLanguageTag(locale));
         }
         return languages;
     }
@@ -49,7 +49,7 @@ public class ContentLanguage {
     private Iterable<String> format(Iterable<Locale> locales) {
         List<String> formats = new ArrayList<String>();
         for (Locale locale : locales) {
-            formats.add(LanguageTag.format(locale));
+            formats.add(locale.toLanguageTag());
         }
         return formats;
     }

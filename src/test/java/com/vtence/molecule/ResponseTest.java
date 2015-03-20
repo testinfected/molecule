@@ -92,7 +92,7 @@ public class ResponseTest {
         response.addLocale(US);
         response.addLocale(FRENCH);
         assertThat("locales", response.locales(), contains(CANADA_FRENCH, US, FRENCH));
-        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("fr-ca, en-us, fr"));
+        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("fr-CA, en-US, fr"));
     }
 
     @Test
