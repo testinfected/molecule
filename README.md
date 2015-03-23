@@ -61,8 +61,8 @@ To use the default web server, you also need to add [Simple](http://www.simplefr
 ```xml
 <dependency>
       <groupId>org.simpleframework</groupId>
-      <artifactId>simple</artifactId>
-      <version>5.1.6</version>
+      <artifactId>simple-http</artifactId>
+      <version>6.0.1</version>
 </dependency>
 ```
 
