@@ -9,7 +9,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
-import org.simpleframework.http.core.ContainerServer;
+import org.simpleframework.http.core.ContainerSocketProcessor;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
@@ -19,6 +19,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public class SimpleServer implements Server {
+    private static final int THREAD_POOL_SIZE = 2;
 
     private final String host;
     private final int port;
@@ -48,7 +49,7 @@ public class SimpleServer implements Server {
     }
 
     public void run(final Application app, SSLContext context) throws IOException {
-        connection = new SocketConnection(new ContainerServer(new ApplicationContainer(app)));
+        connection = new SocketConnection(new ContainerSocketProcessor(new ApplicationContainer(app), THREAD_POOL_SIZE));
         connection.connect(new InetSocketAddress(host, port), context);
     }
 
