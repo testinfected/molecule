@@ -9,7 +9,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
-import org.simpleframework.http.core.ContainerServer;
+import org.simpleframework.http.core.ContainerSocketProcessor;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
@@ -48,7 +48,7 @@ public class SimpleServer implements Server {
     }
 
     public void run(final Application app, SSLContext context) throws IOException {
-        connection = new SocketConnection(new ContainerServer(new ApplicationContainer(app)));
+        connection = new SocketConnection(new ContainerSocketProcessor(new ApplicationContainer(app)));
         connection.connect(new InetSocketAddress(host, port), context);
     }
 
