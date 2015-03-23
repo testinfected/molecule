@@ -12,8 +12,6 @@ import static org.hamcrest.Matchers.containsString;
 
 public class JMustacheRendererTest {
 
-    private static final String encodedAe = "\u00E6";
-
     JMustacheRenderer mustache = new JMustacheRenderer().fromDir(locateOnClasspath(("views")));
 
     @Test public void
@@ -47,14 +45,14 @@ public class JMustacheRendererTest {
     @Test public void
     assumesUtf8EncodingByDefault() throws IOException,SAXException {
         String view = render("utf-8").asString(mustache);
-        assertThat("view", view, containsString(encodedAe + "githales"));
+        assertThat("view", view, containsString("\u00E6githales"));
     }
 
     @Test public void
     makesTemplateEncodingConfigurable() throws IOException, SAXException {
         mustache.encoding("utf-16be");
         String view = render("utf-16be").asString(mustache);
-        assertThat("view", view, containsString(encodedAe + "githales"));
+        assertThat("view", view, containsString("\u00E6githales"));
     }
 
     @Test public void
