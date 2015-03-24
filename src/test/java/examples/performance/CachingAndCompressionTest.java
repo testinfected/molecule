@@ -13,8 +13,10 @@ import java.io.IOException;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 public class CachingAndCompressionTest {
+    String GZIP_HEADER = new String(new char[]{0x1f, 0x8b, 0x08});
     Delorean delorean = new Delorean();
     CachingAndCompressionExample caching = new CachingAndCompressionExample(delorean);
     WebServer server = WebServer.create(9999);
@@ -34,15 +36,11 @@ public class CachingAndCompressionTest {
 
     @Test
     public void compressingResponses() throws IOException {
-        String contentLengthUnderJvm16 = "170";
-        String contentLengthUnderJvm18 = "173";
-
-        response = request.header("Accept-Encoding", "gzip; q=0.9, deflate").get("/");
-
+        response = request.header("Accept-Encoding", "deflate; q=0.9, gzip").get("/");
         assertThat(response).isOK()
-                            // We expect deflate compression, which is preferred by the client
-                            .hasHeader("Content-Encoding", "deflate")
-                            .hasHeader("Content-Length", anyOf(equalTo(contentLengthUnderJvm16), equalTo(contentLengthUnderJvm18)));
+                // We expect gzip compression, which is preferred by the client
+                .hasHeader("Content-Encoding", "gzip")
+                .hasBodyText(startsWith(GZIP_HEADER));
     }
 
     @Test
