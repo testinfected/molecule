@@ -62,7 +62,7 @@ public class MultipartTest {
         response = request.content(form).post("/profile");
 
         assertThat(response).isOK()
-                            .hasBodyText(containsString("biography: Je suis un méchant minion"));
+                            .hasBodyText(containsString("biography: Je suis un m\u00E9chant minion"));
     }
 
     @Test

@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 
 /**
  * Represents a body part or form item that was received within a <code>multipart/form-data</code> <code>POST</code> request.
- * <br/>
+ * <br>
  * Typically a part represents either a text parameter or a file.
  * The contents of the part can be acquired either as an <code>InputStream</code>, a byte array or as a
  * string encoded in the encoding specified with the <code>Content-Type</code> header or in <code>UTF-8</code>.
@@ -82,7 +82,7 @@ public class BodyPart {
     }
 
     /**
-     * Consumes the content of this part and returns it as a string.<br/>
+     * Consumes the content of this part and returns it as a string.<br>
      * The encoding of the string is taken from the content type.
      * If no content type is sent the content is decoded in UTF-8.
      *
@@ -94,7 +94,7 @@ public class BodyPart {
     }
 
     /**
-     * Consumes the content of this part and returns it as a byte array. <br/>
+     * Consumes the content of this part and returns it as a byte array. <br>
      *
      * @return the binary representation of the part
      * @throws IOException thrown if the content can not be accessed

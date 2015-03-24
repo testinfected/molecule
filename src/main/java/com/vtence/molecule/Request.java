@@ -615,7 +615,7 @@ public class Request {
      *
      * @see Request#attribute(Object, Object)
      * @param key the key of the attribute to retrieve
-     * @return <T> the value of the attribute, or null if the attribute does not exist
+     * @return the value of the attribute, or null if the attribute does not exist
      * @throws java.lang.ClassCastException if the attribute value is not an instance of the type parameter
      */
     @SuppressWarnings("unchecked")
