@@ -66,7 +66,7 @@ To use the default web server, you also need to add [Simple](http://www.simplefr
 </dependency>
 ```
 
-(note that starting with version ```0-8-SNAPSHOT```, you need to use Simple 6, i.e.: 
+Note that starting with version ```0-8-SNAPSHOT```, Molecule uses Simple 6: 
 
 ```xml
 <dependency>
@@ -75,7 +75,6 @@ To use the default web server, you also need to add [Simple](http://www.simplefr
       <version>6.0.1</version>
 </dependency>
 ```
-)
 
 ## Want to start with some code?
 
