@@ -5,6 +5,7 @@ import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class LocaleNegotiationTest {
         Locale.setDefault(originalDefault);
     }
 
-    @Test
+    @Test @Ignore("wip")
     public void selectingTheBestSupportedLanguage() throws IOException {
         response = request.header("Accept-Language", "en; q=0.8, fr").send();
         assertThat(response).hasBodyText(containsString("The best match is: fr"));
