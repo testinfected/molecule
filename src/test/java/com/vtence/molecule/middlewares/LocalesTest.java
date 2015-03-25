@@ -12,6 +12,7 @@ import static com.vtence.molecule.testing.RequestAssert.assertThat;
 
 public class LocalesTest {
 
+    Locale DEFAULT_LOCALE = Locale.US;
     Locale originalDefault = Locale.getDefault();
 
     Request request = new Request();
@@ -19,7 +20,7 @@ public class LocalesTest {
 
     @Before
     public void setPlatformDefaultLocale() {
-        Locale.setDefault(Locale.US);
+        Locale.setDefault(DEFAULT_LOCALE);
     }
 
     @After
@@ -32,7 +33,7 @@ public class LocalesTest {
         Locales locales = new Locales();
         locales.handle(request, response);
 
-        assertThat(request).hasAttribute(Locale.class, Locale.US);
+        assertThat(request).hasAttribute(Locale.class, DEFAULT_LOCALE);
     }
 
     @Test
@@ -43,4 +44,19 @@ public class LocalesTest {
         assertThat(request).hasAttribute(Locale.class, Locale.FRENCH);
     }
 
+    @Test
+    public void fallsBackToPlatformDefaultForUnsupportedLanguages() throws Exception {
+        Locales locales = new Locales("en", "fr");
+        locales.handle(request.header("Accept-Language", "es-ES"), response);
+
+        assertThat(request).hasAttribute(Locale.class, DEFAULT_LOCALE);
+    }
+
+    @Test
+    public void ignoresMalformedLanguageTags() throws Exception {
+        Locales locales = new Locales("en", "fr");
+        locales.handle(request.header("Accept-Language", "-fr-"), response);
+
+        assertThat(request).hasAttribute(Locale.class, DEFAULT_LOCALE);
+    }
 }
