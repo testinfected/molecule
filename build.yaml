@@ -5,7 +5,9 @@ repositories:
     - http://repo1.maven.org/maven2
 
 artifacts:
-  simple: org.simpleframework:simple:jar:5.1.6
+  simple_common: org.simpleframework:simple-common:jar:6.0.1
+  simple_transport: org.simpleframework:simple-transport:jar:6.0.1
+  simple_http: org.simpleframework:simple-http:jar:6.0.1
   mustache: com.samskivert:jmustache:jar:1.9
 
   # -- test dependencies
