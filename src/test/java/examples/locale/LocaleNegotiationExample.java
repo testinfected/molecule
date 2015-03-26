@@ -23,12 +23,13 @@ public class LocaleNegotiationExample {
         server.add(new Locales(supportedLanguages))
               .start(new Application() {
                   public void handle(Request request, Response response) throws Exception {
+                      Locale locale = request.attribute(Locale.class);
                       response.contentType("text/plain");
                       response.body(
                               "You asked for: " + request.header("accept-language") + "\n" +
                               "We support: " + Arrays.asList(supportedLanguages) + "\n" +
                               "Our default is: " + Locale.getDefault() + "\n" +
-                              "The best match is: " + request.attribute(Locale.class) + "\n"
+                              "The best match is: " + locale.toLanguageTag() + "\n"
                       );
                   }
               });

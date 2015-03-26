@@ -45,6 +45,14 @@ public class LocalesTest {
     }
 
     @Test
+    public void usesTheHighestQualityLanguageSupported() throws Exception {
+        Locales locales = new Locales("en", "fr");
+        locales.handle(request.header("Accept-Language", "en; q=0.8, fr"), response);
+
+        assertThat(request).hasAttribute(Locale.class, Locale.FRENCH);
+    }
+
+    @Test
     public void fallsBackToPlatformDefaultForUnsupportedLanguages() throws Exception {
         Locales locales = new Locales("en", "fr");
         locales.handle(request.header("Accept-Language", "es-ES"), response);

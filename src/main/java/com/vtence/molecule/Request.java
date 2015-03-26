@@ -692,6 +692,6 @@ public class Request {
      * @return all the locales accepted by the client
      */
     public List<Locale> locales() {
-        return AcceptLanguage.of(this).locales();
+        return AcceptLanguage.of(this).list();
     }
 }

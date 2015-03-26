@@ -11,24 +11,49 @@ public class AcceptLanguageTest {
     @Test public void
     prefersNoLocaleWhenEmpty() {
         AcceptLanguage acceptLanguage = new AcceptLanguage("");
-        assertThat("no locale", acceptLanguage.locales(), empty());
+        assertThat("no locale", acceptLanguage.list(), empty());
     }
 
     @Test public void
-    prefersSpecifiedNaturalLanguage() {
+    parsesNaturalLanguage() {
         AcceptLanguage acceptLanguage = new AcceptLanguage("fr");
-        assertThat("locales", acceptLanguage.locales(), contains(FRENCH));
+        assertThat("locales", acceptLanguage.list(), contains(FRENCH));
     }
 
     @Test public void
-    prefersSpecifiedNaturalLanguageAndCountry() {
+    parsesNaturalLanguageAndCountry() {
         AcceptLanguage acceptLanguage = new AcceptLanguage("fr-ca");
-        assertThat("locales", acceptLanguage.locales(), contains(CANADA_FRENCH));
+        assertThat("locales", acceptLanguage.list(), contains(CANADA_FRENCH));
     }
 
     @Test public void
-    canSpecifySeveralLocales() {
-        AcceptLanguage acceptLanguage = new AcceptLanguage("fr-ca, en");
-        assertThat("locales", acceptLanguage.locales(), contains(CANADA_FRENCH, ENGLISH));
+    listsAcceptableLocalesInPreferenceOrder() {
+        AcceptLanguage acceptLanguage = new AcceptLanguage("en; q=0.8, fr-ca");
+        assertThat("locales", acceptLanguage.list(), contains(CANADA_FRENCH, ENGLISH));
+    }
+
+    @Test public void
+    selectsNoLanguageWhenThereIsNoCandidate() {
+        AcceptLanguage acceptLanguage = new AcceptLanguage("en");
+        assertThat("best locale", acceptLanguage.selectBest(), nullValue());
+    }
+
+    @Test
+    public void
+    selectsAcceptableLanguageWithHighestQuality() {
+        AcceptLanguage acceptLanguage = new AcceptLanguage("en; q=0.8, fr-ca");
+        assertThat("selected locale", acceptLanguage.selectBest("en", "fr-CA"), equalTo(CANADA_FRENCH));
+    }
+
+    @Test public void
+    selectsFirstAmongstSupportedLocalesOfSameQuality() {
+        AcceptLanguage acceptLanguage = new AcceptLanguage("en; q=0.8, fr-ca, es-es");
+        assertThat("selected locale", acceptLanguage.selectBest("fr-CA", "es-ES"), equalTo(CANADA_FRENCH));
+    }
+
+    @Test public void
+    selectsNoLocaleWhenCandidatesAreNotAcceptable() {
+        AcceptLanguage acceptLanguage = new AcceptLanguage("en; q=0, fr-ca");
+        assertThat("selected locale", acceptLanguage.selectBest("en"), nullValue());
     }
 }

@@ -3,6 +3,9 @@ package com.vtence.molecule.http;
 import com.vtence.molecule.Request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +19,10 @@ public class AcceptLanguage {
         return header != null ? new AcceptLanguage(header) : new AcceptLanguage("");
     }
 
+    public AcceptLanguage(String header) {
+        this(new Header(header));
+    }
+
     public AcceptLanguage(Header header) {
         parseLocales(header);
     }
@@ -26,11 +33,20 @@ public class AcceptLanguage {
         }
     }
 
-    public AcceptLanguage(String header) {
-        this(new Header(header));
+    public List<Locale> list() {
+        return Collections.unmodifiableList(locales);
     }
 
-    public List<Locale> locales() {
-        return new ArrayList<Locale>(locales);
+    public Locale selectBest(String... supported) {
+        return selectBest(Arrays.asList(supported));
+    }
+
+    public Locale selectBest(Collection<String> supported) {
+        for (Locale candidate : list()) {
+            if (supported.contains(candidate.toLanguageTag())) {
+                return candidate;
+            }
+        }
+        return null;
     }
 }
