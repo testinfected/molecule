@@ -247,6 +247,8 @@ Molecule comes with a number of middlewares (more are coming), that you can use 
 * Static Assets 
 * File Server
 * Access Log
+* Cookies
+* Locale Negotiation
 * Compression
 * ETag
 * Conditional Get
