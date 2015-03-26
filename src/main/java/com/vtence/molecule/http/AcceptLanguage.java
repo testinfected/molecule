@@ -46,6 +46,9 @@ public class AcceptLanguage {
             if (supported.contains(candidate.toLanguageTag())) {
                 return candidate;
             }
+            if (supported.contains(candidate.getLanguage())) {
+                return new Locale(candidate.getLanguage());
+            }
         }
         return null;
     }
