@@ -2,12 +2,7 @@ package com.vtence.molecule.http;
 
 import com.vtence.molecule.Request;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static com.vtence.molecule.http.HeaderNames.ACCEPT_LANGUAGE;
 
@@ -37,19 +32,26 @@ public class AcceptLanguage {
         return Collections.unmodifiableList(locales);
     }
 
-    public Locale selectBest(String... supported) {
-        return selectBest(Arrays.asList(supported));
+    public Locale selectBest(Locale... candidates) {
+        return selectBest(Arrays.asList(candidates));
     }
 
-    public Locale selectBest(Collection<String> supported) {
-        for (Locale candidate : list()) {
-            if (supported.contains(candidate.toLanguageTag())) {
-                return candidate;
-            }
-            if (supported.contains(candidate.getLanguage())) {
-                return new Locale(candidate.getLanguage());
+    public Locale selectBest(Collection<Locale> candidates) {
+        for (Locale accepted : list()) {
+            if (candidates.contains(accepted)) return accepted;
+            if (candidates.contains(languageOf(accepted))) return languageOf(accepted);
+            for (Locale candidate : candidates) {
+                if (sameLanguage(accepted, candidate)) return candidate;
             }
         }
         return null;
+    }
+
+    private boolean sameLanguage(Locale accepted, Locale candidate) {
+        return candidate.getLanguage().equals(accepted.getLanguage());
+    }
+
+    private Locale languageOf(Locale accepted) {
+        return new Locale(accepted.getLanguage());
     }
 }

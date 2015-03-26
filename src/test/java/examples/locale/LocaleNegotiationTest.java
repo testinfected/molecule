@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.containsString;
 
 public class LocaleNegotiationTest {
 
-    LocaleNegotiationExample example = new LocaleNegotiationExample("en", "en-US", "fr");
+    LocaleNegotiationExample example = new LocaleNegotiationExample("en", "en-US", "fr", "da-DK");
     WebServer server = WebServer.create(9999);
 
     HttpRequest request = new HttpRequest(9999);
@@ -51,5 +51,11 @@ public class LocaleNegotiationTest {
     public void fallingBackToAMoreGeneralLanguage() throws IOException {
         response = request.header("Accept-Language", "en-GB").send();
         assertThat(response).hasBodyText(containsString("The best match is: en\n"));
+    }
+
+    @Test
+    public void usingACountrySpecificLanguageWhenTheGeneralOneIsNotSupported() throws IOException {
+        response = request.header("Accept-Language", "da").send();
+        assertThat(response).hasBodyText(containsString("The best match is: da-DK\n"));
     }
 }
