@@ -5,7 +5,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.http.AcceptLanguage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -13,12 +12,8 @@ public class Locales extends AbstractMiddleware {
 
     private final List<Locale> supported;
 
-    public Locales(String... supportedLanguageTags) {
-        this.supported = fromLanguageTags(supportedLanguageTags);
-    }
-
-    public Locales(Locale... supported) {
-        this.supported = Arrays.asList(supported);
+    public Locales(String... supported) {
+        this.supported = fromLanguageTags(supported);
     }
 
     private static List<Locale> fromLanguageTags(String... languageTags) {
