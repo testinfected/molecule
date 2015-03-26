@@ -67,4 +67,12 @@ public class LocalesTest {
 
         assertThat(request).hasAttribute(Locale.class, DEFAULT_LOCALE);
     }
+
+    @Test public void
+    unbindsPreferredLocaleDone() throws Exception {
+        Locales locales = new Locales();
+        locales.handle(request, response);
+
+        assertThat(request).hasNoAttribute(Locale.class);
+    }
 }
