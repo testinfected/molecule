@@ -41,7 +41,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.7</version>
+      <version>0.8</version>
 </dependency>
 ```
  
@@ -52,21 +52,11 @@ If you want the development version, grab the latest snapshot from Sonatype snap
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.8-SNAPSHOT</version>
+      <version>0.9-SNAPSHOT</version>
 </dependency>
 ```
 
 To use the default web server, you also need to add [Simple](http://www.simpleframework.org) as a dependency:
-
-```xml
-<dependency>
-      <groupId>org.simpleframework</groupId>
-      <artifactId>simple</artifactId>
-      <version>5.1.6</version>
-</dependency>
-```
-
-Note that starting with version ```0-8-SNAPSHOT```, Molecule uses Simple 6: 
 
 ```xml
 <dependency>
