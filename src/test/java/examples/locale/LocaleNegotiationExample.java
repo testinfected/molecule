@@ -28,7 +28,7 @@ public class LocaleNegotiationExample {
                       response.body(
                               "You asked for: " + request.header("accept-language") + "\n" +
                               "We support: " + Arrays.asList(supportedLanguages) + "\n" +
-                              "Our default is: " + Locale.getDefault() + "\n" +
+                              "Our default is: " + Locale.getDefault().toLanguageTag() + "\n" +
                               "The best match is: " + locale.toLanguageTag() + "\n"
                       );
                   }

@@ -24,7 +24,7 @@ public class LocalesTest {
     }
 
     @After
-    public void restPlatformDefaultLocale() {
+    public void restoreDefaultPlatformLocale() {
         Locale.setDefault(originalDefault);
     }
 
