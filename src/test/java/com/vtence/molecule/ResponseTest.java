@@ -5,15 +5,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
-import static java.util.Locale.CANADA_FRENCH;
-import static java.util.Locale.ENGLISH;
-import static java.util.Locale.FRENCH;
-import static java.util.Locale.US;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.nullValue;
 
 public class ResponseTest {
 
@@ -79,35 +73,5 @@ public class ResponseTest {
         response.charset("utf-8");
         response.contentType("text/html");
         assertThat("charset", response.contentType(), equalTo("text/html"));
-    }
-
-    @Test
-    public void hasNoLocaleByDefault() {
-        assertThat("default locale", response.locale(), nullValue());
-    }
-
-    @Test
-    public void maintainsAnOrderedListOfLocales() {
-        response.addLocale(CANADA_FRENCH);
-        response.addLocale(US);
-        response.addLocale(FRENCH);
-        assertThat("locales", response.locales(), contains(CANADA_FRENCH, US, FRENCH));
-        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("fr-CA, en-US, fr"));
-    }
-
-    @Test
-    public void setsContentLanguageToSpecifiedLocale() {
-        response.locale(FRENCH);
-        assertThat("locale", response.locale(), equalTo(FRENCH));
-        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("fr"));
-    }
-
-    @Test
-    public void removesLocalesOnDemand() {
-        response.addLocale(CANADA_FRENCH);
-        response.addLocale(ENGLISH);
-        response.removeLocale(CANADA_FRENCH);
-        assertThat("new preferred locale", response.locale(), equalTo(ENGLISH));
-        assertThat("content-language", response.header(CONTENT_LANGUAGE), equalTo("en"));
     }
 }

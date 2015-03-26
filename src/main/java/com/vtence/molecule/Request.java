@@ -3,7 +3,6 @@ package com.vtence.molecule;
 import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Streams;
-import com.vtence.molecule.http.AcceptLanguage;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.lib.EmptyInputStream;
@@ -12,16 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static java.lang.Long.parseLong;
@@ -672,26 +662,5 @@ public class Request {
      */
     public Map<Object, Object> attributes() {
         return Collections.unmodifiableMap(attributes);
-    }
-
-    /**
-     * Acquires the preferred locale from this request <code>Accept-Language</code> header.
-     * If the client accepts more than one locale, the preferred one  - i.e. the first one - is returned.
-     *
-     * @return the locale preferred by the client
-     */
-    public Locale locale() {
-        List<Locale> locales = locales();
-        return locales.isEmpty() ? null : locales.get(0);
-    }
-
-    /**
-     * Acquires the accepted locales from this request <code>Accept-Language</code> header. The
-     * locales are provided in preference order. If the header is not present, the list will be empty.
-     *
-     * @return all the locales accepted by the client
-     */
-    public List<Locale> locales() {
-        return AcceptLanguage.of(this).list();
     }
 }

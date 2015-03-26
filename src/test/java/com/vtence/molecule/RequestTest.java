@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
-import static java.util.Locale.*;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 
 public class RequestTest {
 
@@ -94,24 +93,6 @@ public class RequestTest {
         assertThat("still there?", request.hasHeader("Accept"), equalTo(false));
 
         assertThat("header names", request.headerNames(), contains("Accept-Encoding"));
-    }
-
-    @Test
-    public void hasNoPreferredLocaleInAbsenceOfAcceptLanguageHeader() {
-        assertThat("no preference", request.locales(), empty());
-        assertThat("no preferred language", request.locale(), nullValue());
-    }
-
-    @Test
-    public void readsPreferredLocaleFromHeaders() {
-        request.header("Accept-Language", "fr, en");
-        assertThat("preferred locale", request.locale(), equalTo(FRENCH));
-    }
-
-    @Test
-    public void readsAllPossibleLocalesInPreferenceOrder() {
-        request.header("Accept-Language", "en; q=0.8, fr-ca, fr; q=0.7");
-        assertThat("locales", request.locales(), contains(CANADA_FRENCH, ENGLISH, FRENCH));
     }
 
     @Test

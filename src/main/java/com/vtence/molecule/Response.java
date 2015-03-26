@@ -1,7 +1,6 @@
 package com.vtence.molecule;
 
 import com.vtence.molecule.helpers.Headers;
-import com.vtence.molecule.http.ContentLanguage;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.lib.BinaryBody;
@@ -9,14 +8,10 @@ import com.vtence.molecule.lib.BinaryBody;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
-import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
-import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
-import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
-import static com.vtence.molecule.http.HeaderNames.LOCATION;
+import static com.vtence.molecule.http.HeaderNames.*;
 import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
 import static com.vtence.molecule.lib.BinaryBody.bytes;
@@ -326,60 +321,6 @@ public class Response {
             return ISO_8859_1;
         }
         return contentType.charset();
-    }
-
-    /**
-     * Sets the language of this response using the <code>Content-Language</code> header.
-     * If the <code>Content-Language</code> header is already set, its value is replaced by the new locale.
-     *
-     * @param locale the new language of this response
-     */
-    public Response locale(Locale locale) {
-        header(CONTENT_LANGUAGE, new ContentLanguage().add(locale));
-        return this;
-    }
-
-    /**
-     * Adds a language to the list of languages of this response. Languages are sent to the client
-     * using the <code>Content-Language</code> header.
-     *
-     * @param locale the additional language of this response
-     */
-    public Response addLocale(Locale locale) {
-        header(CONTENT_LANGUAGE, ContentLanguage.of(this).add(locale));
-        return this;
-    }
-
-    /**
-     * Gets the default locale from this response <code>Content-Language</code> header.
-     * If more than one <code>Content-Language</code> header value exists, the first one is returned.
-     *
-     * @return the default language of this response or null
-     */
-    public Locale locale() {
-        List<Locale> locales = locales();
-        return locales.isEmpty() ? null : locales.get(0);
-    }
-
-    /**
-     * Gets the list of locales from this response <code>Content-Language</code> header. The
-     * locales are provided in preference order. If the header is not present, the list will be empty.
-     *
-     * @return the list (which may be empty) of languages to send to the client
-     */
-    public List<Locale> locales() {
-        return ContentLanguage.of(this).locales();
-    }
-
-    /**
-     * Removes a specific locale from this response <code>Content-Language</code> header.
-     * If that locale is not present in the list of values of the header, this method does nothing.
-     *
-     * @param locale the locale to remove from the list of languages to send to the client
-     */
-    public Response removeLocale(Locale locale) {
-        header(CONTENT_LANGUAGE, ContentLanguage.of(this).remove(locale));
-        return this;
     }
 
     /**
