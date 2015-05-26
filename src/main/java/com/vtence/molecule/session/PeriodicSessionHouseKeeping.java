@@ -16,7 +16,7 @@ public class PeriodicSessionHouseKeeping {
     private final SessionHouse sessions;
 
     private long choresInterval;
-    private ScheduledFuture chores;
+    private ScheduledFuture<?> chores;
 
     public PeriodicSessionHouseKeeping(ScheduledExecutorService scheduler, SessionHouse sessions) {
         this(scheduler, sessions, EVERY_HOUR, SECONDS);
