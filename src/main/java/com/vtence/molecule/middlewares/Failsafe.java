@@ -33,15 +33,27 @@ public class Failsafe extends AbstractMiddleware {
         PrintWriter buffer = new PrintWriter(html);
         buffer.println("<h1>Oups!</h1>");
         buffer.println("<h2>Sorry, an internal error occurred</h2>");
+        startPrintingError(buffer, error);
+
+        return html.toString();
+    }
+
+    private void startPrintingError(PrintWriter buffer, Throwable error) {
+        printErrorAndCause(buffer, error, false);
+    }
+
+    private void printErrorAndCause(PrintWriter buffer, Throwable error, boolean addCausedBy) {
         buffer.println("<p>");
-        buffer.println("  <strong>" + error.toString() + "</strong>");
+        buffer.printf("  <strong>%s%s</strong>", addCausedBy ? "Caused by: " : "", error).println();
         buffer.println("  <ul>");
         for (StackTraceElement stackTraceElement : error.getStackTrace()) {
             buffer.println("    <li>" + stackTraceElement.toString() + "</li>");
         }
         buffer.println("  </ul>");
         buffer.println("</p>");
-
-        return html.toString();
+        if (error.getCause() != null) {
+            buffer.println();
+            printErrorAndCause(buffer, error.getCause(), true);
+        }
     }
 }
