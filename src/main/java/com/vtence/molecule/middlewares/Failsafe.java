@@ -31,26 +31,30 @@ public class Failsafe extends AbstractMiddleware {
     private String formatAsHtml(Throwable error) {
         StringWriter html = new StringWriter();
         PrintWriter buffer = new PrintWriter(html);
+        buffer.println("<html>");
+        buffer.println("<body>");
         buffer.println("<h1>Oups!</h1>");
         buffer.println("<h2>Sorry, an internal error occurred</h2>");
-        startPrintingError(buffer, error);
+        printFullStackTrace(buffer, error);
+        buffer.println("</body>");
+        buffer.println("</html>");
 
         return html.toString();
     }
 
-    private void startPrintingError(PrintWriter buffer, Throwable error) {
+    private void printFullStackTrace(PrintWriter buffer, Throwable error) {
         printErrorAndCause(buffer, error, false);
     }
 
-    private void printErrorAndCause(PrintWriter buffer, Throwable error, boolean addCausedBy) {
+    private void printErrorAndCause(PrintWriter buffer, Throwable error, boolean isCause) {
         buffer.println("<p>");
-        buffer.printf("  <strong>%s%s</strong>", addCausedBy ? "Caused by: " : "", error).println();
-        buffer.println("  <ul>");
-        for (StackTraceElement stackTraceElement : error.getStackTrace()) {
-            buffer.println("    <li>" + stackTraceElement.toString() + "</li>");
-        }
-        buffer.println("  </ul>");
+        buffer.printf("  <strong>%s%s</strong>", isCause ? "Caused by: " : "", error).println();
         buffer.println("</p>");
+        buffer.println("<ul>");
+        for (StackTraceElement stackTraceElement : error.getStackTrace()) {
+            buffer.println("  <li>" + stackTraceElement.toString() + "</li>");
+        }
+        buffer.println("</ul>");
         if (error.getCause() != null) {
             buffer.println();
             printErrorAndCause(buffer, error.getCause(), true);
