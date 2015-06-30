@@ -20,15 +20,23 @@ import java.util.List;
 
 public class SimpleServer implements Server {
 
+    private static final int DEFAULT_NUMBER_OF_THREADS = 8;
+
     private final String host;
     private final int port;
+    private final int numberOfThreads;
 
     private FailureReporter failureReporter = FailureReporter.IGNORE;
     private Connection connection;
 
     public SimpleServer(String host, int port) {
+        this(host, port, DEFAULT_NUMBER_OF_THREADS);
+    }
+
+    public SimpleServer(String host, int port, int numberOfThreads) {
         this.host = host;
         this.port = port;
+        this.numberOfThreads = numberOfThreads;
     }
 
     public void reportErrorsTo(FailureReporter reporter) {
@@ -48,7 +56,7 @@ public class SimpleServer implements Server {
     }
 
     public void run(final Application app, SSLContext context) throws IOException {
-        connection = new SocketConnection(new ContainerSocketProcessor(new ApplicationContainer(app)));
+        connection = new SocketConnection(new ContainerSocketProcessor(new ApplicationContainer(app), numberOfThreads));
         connection.connect(new InetSocketAddress(host, port), context);
     }
 
