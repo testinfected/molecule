@@ -18,7 +18,7 @@ apply from: 'gradle/publish.gradle'
 defaultTasks 'build'
 
 group = 'com.vtence.molecule'
-version = '0.9-SNAPSHOT'
+version = '0.8.1'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
