@@ -90,7 +90,7 @@ public class HttpResponseAssert {
         return hasBodySize(is(size));
     }
 
-    private HttpResponseAssert hasBodySize(Matcher<? super Integer> matching) {
+    public HttpResponseAssert hasBodySize(Matcher<? super Integer> matching) {
         Assert.assertThat("response body size", response.body().length, matching);
         return this;
     }
@@ -120,7 +120,7 @@ public class HttpResponseAssert {
         return hasContentType(equalTo(contentType));
     }
 
-    private HttpResponseAssert hasContentType(Matcher<? super String> matching) {
+    public HttpResponseAssert hasContentType(Matcher<? super String> matching) {
         return hasHeader("Content-Type", matching);
     }
 }
