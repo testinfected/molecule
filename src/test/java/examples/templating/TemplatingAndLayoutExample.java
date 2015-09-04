@@ -11,6 +11,7 @@ import com.vtence.molecule.templating.Template;
 import com.vtence.molecule.templating.Templates;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
@@ -20,8 +21,8 @@ public class TemplatingAndLayoutExample {
         // We use Mustache templates with an .html extension
         Templates templates = new Templates(
                 new JMustacheRenderer().fromDir(locateOnClasspath("examples/templates")).extension("html"));
-        final Template layout = templates.named("layout");
-        final Template greeting = templates.named("greeting");
+        final Template<Map<String, String>> layout = templates.named("layout");
+        final Template<User> greeting = templates.named("greeting");
 
         // Apply a common layout to all rendered pages
         server.filter("/", Layout.html(layout))
