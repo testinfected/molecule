@@ -191,9 +191,24 @@ public class CompressorTest {
             }
         });
         request.header("Accept-Encoding", "gzip");
-        compressor.compressibleTypes("application/json", "text/*");
+        compressor.compressibleTypes("...", "text/*");
         compressor.handle(request, response);
         assertThat("body", unzip(response), equalTo("uncompressed body"));
+    }
+
+    @Test public void
+    ignoresContentTypeCharsetToDecideIfContentShouldBeCompressed() throws Exception {
+        compressor.connectTo(new Application() {
+            @Override
+            public void handle(Request request, Response response) throws Exception {
+                response.contentType("text/html; utf-8");
+                response.body("<html>uncompressed</html>");
+            }
+        });
+        request.header("Accept-Encoding", "gzip");
+        compressor.compressibleTypes("text/html");
+        compressor.handle(request, response);
+        assertThat("body", unzip(response), equalTo("<html>uncompressed</html>"));
     }
 
     private String inflate(Response response) throws IOException {

@@ -4,6 +4,7 @@ import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.AcceptEncoding;
+import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.MimeTypes;
 import com.vtence.molecule.lib.ChunkedBody;
 
@@ -141,7 +142,7 @@ public class Compressor extends AbstractMiddleware {
     }
 
     private boolean compressible(Response response) {
-        return compressibleTypes.isEmpty() || compressible(response.contentType());
+        return compressibleTypes.isEmpty() || compressible(ContentType.of(response).mediaType());
     }
 
     private boolean compressible(String contentType) {
