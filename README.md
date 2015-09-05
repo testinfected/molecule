@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/testinfected/molecule.svg?branch=master)](https://travis-ci.org/testinfected/molecule)
 [![Coverage Status](https://img.shields.io/coveralls/testinfected/molecule.svg?style=flat)](https://coveralls.io/r/testinfected/molecule)
 [![Maven Central](https://img.shields.io/maven-central/v/com.vtence.molecule/molecule.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule)
+[![License](http://img.shields.io/:license-mit-blue.svg?style=flat)](http://vtence.mit-license.org)
+
 [![Issues In Progress](https://badge.waffle.io/testinfected/molecule.svg?label=In%20Progress&title=Started)](https://waffle.io/testinfected/molecule)
 
 ## Quick Start
