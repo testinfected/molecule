@@ -34,6 +34,11 @@ public class NotFoundTest {
 
     @Test public void
     setsContentTypeToPlainText() {
-       assertThat(response).hasContentType("text/plain");
+        assertThat(response).hasContentType("text/plain");
+    }
+
+    @Test public void
+    completesResponse() {
+        assertThat(response).isDone();
     }
 }
