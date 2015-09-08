@@ -11,8 +11,8 @@ Release.tag_name = lambda { |version| "v#{version}" }
 SIMPLE = [:simple_common, :simple_transport, :simple_http]
 
 define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER do
-  compile.options.source = '1.6'
-  compile.options.target = '1.6'
+  compile.options.source = '1.8'
+  compile.options.target = '1.8'
 
   compile.with SIMPLE, :mustache
   test.with :hamcrest, :jmock, :juniversalchardet
