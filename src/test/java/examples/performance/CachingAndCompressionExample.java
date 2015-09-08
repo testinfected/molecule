@@ -1,32 +1,20 @@
 package examples.performance;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.lib.Clock;
 import com.vtence.molecule.lib.SystemClock;
-import com.vtence.molecule.middlewares.Compressor;
-import com.vtence.molecule.middlewares.ConditionalGet;
-import com.vtence.molecule.middlewares.ContentLengthHeader;
-import com.vtence.molecule.middlewares.ETag;
-import com.vtence.molecule.middlewares.FileServer;
-import com.vtence.molecule.middlewares.StaticAssets;
-import com.vtence.molecule.testing.ResourceLocator;
+import com.vtence.molecule.middlewares.*;
 import com.vtence.molecule.templating.JMustacheRenderer;
 import com.vtence.molecule.templating.Template;
 import com.vtence.molecule.templating.Templates;
+import com.vtence.molecule.testing.ResourceLocator;
 
 import java.io.File;
 import java.io.IOException;
 
-import static com.vtence.molecule.http.HeaderNames.CACHE_CONTROL;
-import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
-import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
+import static com.vtence.molecule.http.HeaderNames.*;
 import static com.vtence.molecule.http.HttpDate.httpDate;
-import static com.vtence.molecule.http.MimeTypes.CSS;
-import static com.vtence.molecule.http.MimeTypes.HTML;
-import static com.vtence.molecule.http.MimeTypes.JAVASCRIPT;
+import static com.vtence.molecule.http.MimeTypes.*;
 
 public class CachingAndCompressionExample {
     private static final Object NO_CONTEXT = null;
@@ -44,7 +32,7 @@ public class CachingAndCompressionExample {
         StaticAssets assets = new StaticAssets(files).serve("/css", "/js", "/images");
         // We use Mustache templates with an .html extension
         Templates templates = new Templates(new JMustacheRenderer().fromDir(content).extension("html"));
-        final Template index = templates.named("index");
+        final Template<Object> index = templates.named("index");
 
               // Add content length header when size of content is known
         server.add(new ContentLengthHeader())
@@ -55,15 +43,14 @@ public class CachingAndCompressionExample {
               // Compress bodies that are not images
               .add(new Compressor().compressibleTypes(JAVASCRIPT, CSS, HTML))
               .add(assets)
-              .start(new Application() {
-                  public void handle(Request request, Response response) throws Exception {
-                      response.header(CONTENT_TYPE, HTML);
-                      // Add freshness information only when conditional parameter is set
-                      if (request.parameter("conditional") != null) {
-                          response.header(LAST_MODIFIED, httpDate(clock.now()));
-                      }
-                      response.body(index.render(NO_CONTEXT));
+              .start((request, response) -> {
+                  response.header(CONTENT_TYPE, HTML);
+                  // Add freshness information only when conditional parameter is set
+                  if (request.parameter("conditional") != null) {
+                      response.header(LAST_MODIFIED, httpDate(clock.now()));
                   }
+                  response.body(index.render(NO_CONTEXT))
+                          .done();
               });
     }
 

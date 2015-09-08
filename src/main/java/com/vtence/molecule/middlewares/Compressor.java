@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
@@ -29,10 +30,10 @@ public class Compressor extends AbstractMiddleware {
 
     private final Collection<String> compressibleTypes = new ArrayList<String>();
 
-    static enum Codings {
+    enum Codings {
 
         gzip {
-            public void encode(Response response) throws IOException {
+            public void encode(Response response) {
                 response.removeHeader(CONTENT_LENGTH);
                 response.header(CONTENT_ENCODING, name());
                 response.body(new GZipStream(response.body()));
@@ -40,7 +41,7 @@ public class Compressor extends AbstractMiddleware {
         },
 
         deflate {
-            public void encode(Response response) throws IOException {
+            public void encode(Response response) {
                 response.removeHeader(CONTENT_LENGTH);
                 response.header(CONTENT_ENCODING, name());
                 response.body(new DeflateStream(response.body()));
@@ -48,11 +49,11 @@ public class Compressor extends AbstractMiddleware {
         },
 
         identity {
-            public void encode(Response response) throws IOException {
+            public void encode(Response response) {
             }
         };
 
-        public abstract void encode(Response response) throws IOException;
+        public abstract void encode(Response response);
 
         public static String[] all() {
             List<String> all = new ArrayList<String>();
@@ -112,20 +113,23 @@ public class Compressor extends AbstractMiddleware {
         return this;
     }
 
-    public void handle(Request request, final Response response) throws Exception {
-        forward(request, response);
+    public void handle(Request request, Response response) throws Exception {
+        forward(request, response).whenSuccessful(compressResponse(selectBestAvailableEncodingFor(request)));
+    }
 
-        if (unqualified(response)) {
-            return;
-        }
+    private Consumer<Response> compressResponse(String bestEncoding) {
+        return response -> {
+            if (unqualified(response)) {
+                return;
+            }
 
-        String encoding = selectBestAvailableEncodingFor(request);
-        if (encoding != null) {
-            Codings coding = Codings.valueOf(encoding);
-            coding.encode(response);
-        } else {
-            notAcceptable(response);
-        }
+            if (bestEncoding != null) {
+                Codings coding = Codings.valueOf(bestEncoding);
+                coding.encode(response);
+            } else {
+                notAcceptable(response);
+            }
+        };
     }
 
     private boolean unqualified(Response response) {
@@ -165,7 +169,7 @@ public class Compressor extends AbstractMiddleware {
         return acceptEncoding.selectBestEncoding(Codings.all());
     }
 
-    private void notAcceptable(Response response) throws IOException {
+    private void notAcceptable(Response response) {
         response.status(NOT_ACCEPTABLE);
         response.contentType(TEXT);
         response.body("An acceptable encoding could not be found");
