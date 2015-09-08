@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
 import static com.vtence.molecule.http.HeaderNames.*;
@@ -27,6 +29,7 @@ public class Response {
     private final CompletableFuture<Response> done = new CompletableFuture<>();
     private final Headers headers = new Headers();
 
+    private CompletableFuture<Response> postProcessing = done;
     private int statusCode = HttpStatus.OK.code;
     private String statusText = HttpStatus.OK.text;
     private Body body = BinaryBody.empty();
@@ -386,10 +389,21 @@ public class Response {
         return size() == 0;
     }
 
+    public Response whenSuccessful(Consumer<Response> action) {
+        postProcessing = postProcessing.whenComplete((response, error) -> {
+            if (response != null) action.accept(response);
+        });
+        return this;
+    }
+
     public void done() {
         this.done.complete(this);
     }
 
+    public Response await() throws ExecutionException, InterruptedException {
+        return postProcessing.get();
+    }
+        
     public boolean isDone() {
         return done.isDone();
     }

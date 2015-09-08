@@ -26,7 +26,8 @@ public abstract class AbstractMiddleware implements Middleware {
         this.successor = successor;
     }
 
-    protected void forward(Request request, Response response) throws Exception {
+    protected Response forward(Request request, Response response) throws Exception {
         successor.handle(request, response);
+        return response;
     }
 }

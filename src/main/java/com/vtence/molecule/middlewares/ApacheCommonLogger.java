@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class ApacheCommonLogger extends AbstractMiddleware {
@@ -37,17 +38,22 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response);
-        String msg = String.format(COMMON_LOG_FORMAT,
-                request.remoteIp(),
-                "-",
-                currentTime(),
-                request.method(),
-                request.uri(),
-                request.protocol(),
-                response.statusCode(),
-                contentLengthOrHyphen(response));
-        logger.info(msg);
+        forward(request, response).whenSuccessful(logAccess(request));
+    }
+
+    private Consumer<Response> logAccess(Request request) {
+        return response -> {
+            String msg = String.format(COMMON_LOG_FORMAT,
+                    request.remoteIp(),
+                    "-",
+                    currentTime(),
+                    request.method(),
+                    request.uri(),
+                    request.protocol(),
+                    response.statusCode(),
+                    contentLengthOrHyphen(response));
+            logger.info(msg);
+        };
     }
 
     private String currentTime() {
