@@ -383,4 +383,7 @@ public class Response {
     public boolean empty() {
         return size() == 0;
     }
+
+    public void done() {
+    }
 }
