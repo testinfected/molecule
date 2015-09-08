@@ -37,7 +37,8 @@ public class FileServerTest {
         assertThat(response).hasStatus(OK)
                             .hasHeader("Content-Length", valueOf(file.length()))
                             .hasBodySize(file.length())
-                            .hasBodyContent(contentOf(file));
+                            .hasBodyContent(contentOf(file))
+                            .isDone();
     }
 
     @Test public void
@@ -68,7 +69,8 @@ public class FileServerTest {
 
         assertThat(response).hasStatus(NOT_FOUND)
                             .hasContentType("text/plain")
-                            .hasBodyText("File not found: /images/missing.png");
+                            .hasBodyText("File not found: /images/missing.png")
+                            .isDone();
     }
 
     @Test public void
@@ -83,7 +85,7 @@ public class FileServerTest {
         request.header("If-Modified-Since", HttpDate.format(file.lastModified()));
         fileServer.handle(request, response);
 
-        assertThat(response).hasStatus(NOT_MODIFIED);
+        assertThat(response).hasStatus(NOT_MODIFIED).isDone();
     }
 
     @Test public void
@@ -102,7 +104,8 @@ public class FileServerTest {
 
         assertThat(response).hasStatus(OK)
                             .hasHeader("Content-Length", valueOf(file.length()))
-                            .hasBodySize(0);
+                            .hasBodySize(0)
+                            .isDone();
     }
 
     @Test public void
@@ -111,7 +114,8 @@ public class FileServerTest {
 
         assertThat(response).hasStatus(METHOD_NOT_ALLOWED)
                             .hasHeader("Allow", "GET, HEAD")
-                            .hasNoHeader("Last-Modified");
+                            .hasNoHeader("Last-Modified")
+                            .isDone();
     }
 
     private byte[] contentOf(final File file) throws IOException {

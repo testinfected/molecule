@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
 import static com.vtence.molecule.http.HeaderNames.*;
@@ -23,6 +24,7 @@ import static java.lang.String.valueOf;
  * The HTTP response to write back to the client.
  */
 public class Response {
+    private final CompletableFuture<Response> done = new CompletableFuture<>();
     private final Headers headers = new Headers();
 
     private int statusCode = HttpStatus.OK.code;
@@ -385,5 +387,10 @@ public class Response {
     }
 
     public void done() {
+        this.done.complete(this);
+    }
+
+    public boolean isDone() {
+        return done.isDone();
     }
 }

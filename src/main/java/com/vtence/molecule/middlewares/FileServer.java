@@ -52,6 +52,7 @@ public class FileServer implements Application {
         if (!methodAllowed(request)) {
             response.header(ALLOW, ALLOW_HEADER);
             response.status(METHOD_NOT_ALLOWED);
+            response.done();
             return;
         }
 
@@ -60,11 +61,13 @@ public class FileServer implements Application {
             response.status(HttpStatus.NOT_FOUND);
             response.contentType(TEXT);
             response.body("File not found: " + request.path());
+            response.done();
             return;
         }
 
         if (notModifiedSince(lastTimeSeen(request), file)) {
             response.status(NOT_MODIFIED);
+            response.done();
             return;
         }
 
@@ -72,9 +75,13 @@ public class FileServer implements Application {
         addCustomHeaders(response);
 
         response.status(HttpStatus.OK);
-        if (head(request)) return;
+        if (head(request)) {
+            response.done();
+            return;
+        }
 
         response.body(new FileBody(file));
+        response.done();
     }
 
     private boolean canServe(File file) {
