@@ -9,10 +9,11 @@ import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 public class ContentLengthHeader extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response);
-        if (requiresContentLengthHeader(response)) {
-            response.contentLength(response.size());
-        }
+        forward(request, response).whenSuccessful(this::addContentLengthHeader);
+    }
+
+    private void addContentLengthHeader(Response response) {
+        if (requiresContentLengthHeader(response)) response.contentLength(response.size());
     }
 
     public boolean requiresContentLengthHeader(Response response) {

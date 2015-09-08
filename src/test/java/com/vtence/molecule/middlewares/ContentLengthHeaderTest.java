@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.ChunkedBody;
@@ -22,68 +21,60 @@ public class ContentLengthHeaderTest {
 
     @Test public void
     setsContentLengthOnFixedLengthBodiesIfNoneSet() throws Exception {
-        contentLengthHeader.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("This body has a size of 32 bytes");
-            }
-        });
-
         contentLengthHeader.handle(request, response);
+        response.body("This body has a size of 32 bytes")
+                .done();
+
+        response.await();
         assertThat(response).hasHeader("Content-Length", "32");
     }
 
     @Test public void
     doesNotSetContentLengthOnVariableLengthBodies() throws Exception {
-        contentLengthHeader.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body(new ChunkedBody() {
-                    public void writeTo(OutputStream out, Charset charset) throws IOException {
-                        out.write("A variable length body".getBytes(charset));
-                    }
-
-                    public void close() throws IOException {}
-                });
-            }
-        });
-
         contentLengthHeader.handle(request, response);
+        response.body(new VariableLengthBody()).done();
+
+        response.await();
         assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
     doesNotSetContentLengthOnEmptyBodies() throws Exception {
-        contentLengthHeader.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-            }
-        });
-
         contentLengthHeader.handle(request, response);
+        response.done();
+
+        response.await();
         assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
     doesNotSetContentLengthIfAlreadySet() throws Exception {
-        contentLengthHeader.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.contentLength(1);
-                response.body("This body is definitely larger than 1 byte");
-            }
-        });
-
         contentLengthHeader.handle(request, response);
+        response.contentLength(1)
+                .body("This body is definitely larger than 1 byte")
+                .done();
+
+        response.await();
         assertThat(response).hasHeader("Content-Length", "1");
     }
 
     @Test public void
     doesNotSetContentLengthForChunkedTransferEncoding() throws Exception {
-        contentLengthHeader.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header(TRANSFER_ENCODING, "chunked");
-                response.body("This body is chunked encoded");
-            }
-        });
-
         contentLengthHeader.handle(request, response);
+        response.header(TRANSFER_ENCODING, "chunked")
+                .body("This body is chunked encoded")
+                .done();
+
+        response.await();
         assertThat(response).hasNoHeader("Content-Length");
+    }
+
+    private static class VariableLengthBody extends ChunkedBody {
+        public void writeTo(OutputStream out, Charset charset) throws IOException {
+            out.write("A variable length body".getBytes(charset));
+        }
+
+        public void close() throws IOException {
+        }
     }
 }
