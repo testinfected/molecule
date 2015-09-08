@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.Dates;
@@ -9,15 +8,9 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
-import static com.vtence.molecule.http.HttpMethod.GET;
-import static com.vtence.molecule.http.HttpMethod.HEAD;
-import static com.vtence.molecule.http.HttpMethod.POST;
-import static com.vtence.molecule.http.HttpStatus.CREATED;
-import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
-import static com.vtence.molecule.http.HttpStatus.OK;
-import static com.vtence.molecule.support.Dates.aDate;
-import static com.vtence.molecule.support.Dates.instant;
-import static com.vtence.molecule.support.Dates.now;
+import static com.vtence.molecule.http.HttpMethod.*;
+import static com.vtence.molecule.http.HttpStatus.*;
+import static com.vtence.molecule.support.Dates.*;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class ConditionalGetTest {
@@ -31,79 +24,61 @@ public class ConditionalGetTest {
     @Test
     public void
     sendsNotModifiedWithoutMessageBodyWhenGettingEntityWhoseRepresentationHasNotChanged() throws Exception {
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("ETag", "12345678")
-                        .contentType("text/plain").contentLength(32).body("response content");
-            }
-        });
-
         request.header("If-None-Match", "12345678");
         conditional.handle(request, response);
 
+        response.header("ETag", "12345678")
+                .contentType("text/plain").contentLength(32).body("response content")
+                .done();
+
+        response.await();
         assertThat(response).hasStatus(NOT_MODIFIED)
-                .hasBodySize(0)
-                .hasNoHeader("Content-Type")
-                .hasNoHeader("Content-Length");
+                            .hasBodySize(0)
+                            .hasNoHeader("Content-Type")
+                            .hasNoHeader("Content-Length");
     }
 
     @Test
     public void
     leavesResponseUnchangedOnGetWhenCacheValidatorsAreMissing() throws Exception {
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("response content");
-            }
-        });
-
         conditional.handle(request, response);
+        response.body("response content").done();
 
+        response.await();
         assertThat(response).hasStatus(OK)
-                .hasBodyText("response content");
+                            .hasBodyText("response content");
     }
 
     @Test
     public void
     ignoresCacheValidatorsOnGetIfResponseNotOK() throws Exception {
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.status(CREATED).header("ETag", "12345678");
-            }
-        });
-
         request.header("If-None-Match", "12345678");
         conditional.handle(request, response);
+        response.status(CREATED).header("ETag", "12345678").done();
 
+        response.await();
         assertThat(response).hasStatus(CREATED);
     }
 
     @Test
     public void
     appliesConditionalLogicToHeadRequestsAsWell() throws Exception {
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("ETag", "12345678");
-            }
-        });
-
         request.method(HEAD).header("If-None-Match", "12345678");
         conditional.handle(request, response);
+        response.header("ETag", "12345678").done();
 
+        response.await();
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
     @Test
     public void
     ignoresNonGetOrHeadRequests() throws Exception {
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("ETag", "12345678");
-            }
-        });
-
         request.method(POST).header("If-None-Match", "12345678");
         conditional.handle(request, response);
+        response.header("ETag", "12345678").done();
 
+        response.await();
         assertThat(response).hasStatus(OK);
     }
 
@@ -111,15 +86,11 @@ public class ConditionalGetTest {
     public void
     sendsNotModifiedWhenGettingEntityWhichHasNotBeenModifiedSinceLastServed() throws Exception {
         final String lastModification = httpDate(now().toDate());
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("Last-Modified", lastModification);
-            }
-        });
-
         request.header("If-Modified-Since", lastModification);
         conditional.handle(request, response);
+        response.header("Last-Modified", lastModification).done();
 
+        response.await();
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
@@ -127,33 +98,26 @@ public class ConditionalGetTest {
     public void
     leavesResponseUnchangedWhenEntityHasNotBeenModifiedButETagIndicatesItIsNotCurrent() throws Exception {
         final String lastModification = httpDate(aDate().toDate());
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("ETag", "12345678").header("Last-Modified", lastModification);
-            }
-        });
 
         request.header("If-None-Match", "87654321")
-                .header("If-Modified-Since", lastModification);
+               .header("If-Modified-Since", lastModification);
         conditional.handle(request, response);
+        response.header("ETag", "12345678").header("Last-Modified", lastModification).done();
 
+        response.await();
         assertThat(response).hasStatus(OK);
     }
 
     @Test
     public void
     leavesResponseUnchangedWhenEntityWasModifiedButETagIndicatesItIsCurrent() throws Exception {
-        conditional.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("ETag", "12345678")
-                        .header("Last-Modified", httpDate(now().toDate()));
-            }
-        });
-
         request.header("If-None-Match", "12345678")
-                .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
+               .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
         conditional.handle(request, response);
+        response.header("ETag", "12345678")
+                .header("Last-Modified", httpDate(now().toDate())).done();
 
+        response.await();
         assertThat(response).hasStatus(OK);
     }
 

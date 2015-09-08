@@ -4,12 +4,9 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpMethod;
 
-import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
-import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
-import static com.vtence.molecule.http.HeaderNames.ETAG;
-import static com.vtence.molecule.http.HeaderNames.IF_MODIFIED_SINCE;
-import static com.vtence.molecule.http.HeaderNames.IF_NONE_MATCH;
-import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
+import java.util.function.Consumer;
+
+import static com.vtence.molecule.http.HeaderNames.*;
 import static com.vtence.molecule.http.HttpDate.toDate;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
@@ -20,14 +17,18 @@ import static com.vtence.molecule.lib.BinaryBody.empty;
 public class ConditionalGet extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response);
+        forward(request, response).whenSuccessful(conditionalGet(request));
+    }
 
-        if (supported(request.method()) && ok(response) && stillFresh(request, response)) {
-            response.body(empty());
-            response.removeHeader(CONTENT_TYPE);
-            response.removeHeader(CONTENT_LENGTH);
-            response.status(NOT_MODIFIED);
-        }
+    private Consumer<Response> conditionalGet(Request request) {
+        return response -> {
+            if (supported(request.method()) && ok(response) && stillFresh(request, response)) {
+                response.body(empty());
+                response.removeHeader(CONTENT_TYPE);
+                response.removeHeader(CONTENT_LENGTH);
+                response.status(NOT_MODIFIED);
+            }
+        };
     }
 
     private boolean supported(HttpMethod method) {
