@@ -21,15 +21,23 @@ public class ConnectionScope extends AbstractMiddleware {
 
         ref.set(connection);
         try {
-            forward(request, response);
-        } finally {
-            ref.unset();
-            close(connection);
+            forward(request, response).whenComplete((result, error) -> dispose(ref));
+        } catch (Throwable e) {
+            dispose(ref);
+            throw e;
         }
     }
 
-    private void close(Connection connection) throws SQLException {
-        try { connection.close(); } catch (SQLException ignored) {}
+    private void dispose(Reference ref) {
+        close(ref.get());
+        ref.unset();
+    }
+
+    private void close(Connection connection) {
+        try {
+            connection.close();
+        } catch (SQLException ignored) {
+        }
     }
 
     public static class Reference {

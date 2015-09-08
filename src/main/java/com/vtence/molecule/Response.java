@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
@@ -396,15 +397,26 @@ public class Response {
         return this;
     }
 
+    public Response whenComplete(BiConsumer<Response, Throwable> action) {
+        postProcessing = postProcessing.whenComplete((response, error) -> {
+            action.accept(Response.this, error);
+        });
+        return this;
+    }
+
     public void done() {
-        this.done.complete(this);
+        done.complete(this);
+    }
+
+    public void done(Throwable error) {
+        done.completeExceptionally(error);
+    }
+
+    public boolean isDone() {
+        return done.isDone();
     }
 
     public Response await() throws ExecutionException, InterruptedException {
         return postProcessing.get();
-    }
-        
-    public boolean isDone() {
-        return done.isDone();
     }
 }
