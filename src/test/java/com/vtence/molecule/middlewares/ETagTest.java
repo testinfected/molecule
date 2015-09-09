@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
@@ -21,106 +20,81 @@ public class ETagTest {
 
     @Test public void
     setsETagByComputingMD5HashOfResponseBody() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.body("response body").done();
+
         assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
     @Test public void
     willNotSetETagIfBodyIsEmpty() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("");
-            }
-        });
         etag.handle(request, response);
+        response.body("").done();
+
+        response.await();
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     willNotSetETagIfStatusIsNotCacheable() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.status(NOT_FOUND);
-                response.body("Not found: resource");
-            }
-        });
         etag.handle(request, response);
+        response.status(NOT_FOUND).body("Not found: resource").done();
+
+        response.await();
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     willSetETagIfStatusIsCreated() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.status(CREATED);
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.status(CREATED).body("response body").done();
+
+        response.await();
         assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
     @Test public void
     willNotOverwriteETagIfAlreadySet() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("ETag", "already set");
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.header("ETag", "already set").body("response body").done();
+
+        response.await();
         assertThat(response).hasHeader("ETag", "already set");
     }
 
     @Test public void
     willNotSetETagIfLastModifiedHeaderSet() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("Last-Modified", httpDate(new Date()));
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.header("Last-Modified", httpDate(new Date())).body("response body").done();
+
+        response.await();
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     willNotSetETagIfCacheControlSetToNoCache() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("Cache-Control", "private; no-cache");
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.header("Cache-Control", "private; no-cache").body("response body").done();
+
+        response.await();
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     setsCacheControlDirectiveToNoCachingIfNoneSet() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.body("response body").done();
+
+        response.await();
         assertThat(response).hasHeader("Cache-Control", "max-age=0; private; no-cache");
     }
 
     @Test public void
     willNoOverwriteCacheControlDirectiveIfAlreadySet() throws Exception {
-        etag.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("Cache-Control", "public");
-                response.body("response body");
-            }
-        });
         etag.handle(request, response);
+        response.header("Cache-Control", "public").body("response body").done();
+
+        response.await();
         assertThat(response).hasHeader("Cache-Control", "public");
     }
 }
