@@ -404,6 +404,14 @@ public class Response {
         return this;
     }
 
+    public Response rescue(BiConsumer<Response, Throwable> action) {
+        postProcessing = postProcessing.handle((response, error) -> {
+            if (error != null) action.accept(Response.this, error);
+            return this;
+        });
+        return this;
+    }
+
     public void done() {
         done.complete(this);
     }

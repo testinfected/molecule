@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
@@ -19,52 +18,68 @@ public class FailsafeTest {
     Request request = new Request();
     Response response = new Response();
 
-    @Test public void
+    @Test
+    public void
     setsStatusToInternalServerError() throws Exception {
-        respondWithError(failsafe, error);
+        failsafe.connectTo((request, response) -> {
+            throw error;
+        });
+        failsafe.handle(request, response);
 
         assertThat(response).hasStatus(INTERNAL_SERVER_ERROR);
     }
 
-    @Test public void
+    @Test
+    public void
     rendersErrorStackTrace() throws Exception {
-        respondWithError(failsafe, error);
+        failsafe.connectTo((request, response) -> {
+            throw error;
+        });
+        failsafe.handle(request, response);
 
         assertThat(response).hasBodyText(containsString(errorMessage))
-                .hasBodyText(containsString("stack.trace(line:1)"))
-                .hasBodyText(containsString("stack.trace(line:2)"))
-                .hasBodyText(not(containsString("Caused by:")));
+                            .hasBodyText(containsString("stack.trace(line:1)"))
+                            .hasBodyText(containsString("stack.trace(line:2)"))
+                            .hasBodyText(not(containsString("Caused by:")));
     }
 
-    @Test public void
+    @Test
+    public void
     rendersChainOfErrorCauses() throws Exception {
         Error rootCause = newError("root cause of error", null, stackFrame("root.cause.stack", 1));
         Error cause = newError("cause of error", rootCause, stackFrame("cause.of.error.stack", 1));
         Error errorWithCause = newError("this error has a cause", cause);
 
-        respondWithError(failsafe, errorWithCause);
+        failsafe.connectTo((request, response) -> {
+            throw errorWithCause;
+        });
+        failsafe.handle(request, response);
 
         assertThat(response).hasBodyText(containsString("Caused by: java.lang.Error: cause of error"))
-                .hasBodyText(containsString("cause.of.error.stack.trace(line:1)"))
-                .hasBodyText(containsString("Caused by: java.lang.Error: root cause"))
-                .hasBodyText(containsString("root.cause.stack.trace(line:1)"));
+                            .hasBodyText(containsString("cause.of.error.stack.trace(line:1)"))
+                            .hasBodyText(containsString("Caused by: java.lang.Error: root cause"))
+                            .hasBodyText(containsString("root.cause.stack.trace(line:1)"));
     }
 
-    @Test public void
+    @Test
+    public void
     respondsWithHtmlContentUtf8Encoded() throws Exception {
-        respondWithError(failsafe, error);
+        failsafe.connectTo((request, response) -> {
+            throw error;
+        });
+        failsafe.handle(request, response);
 
         assertThat(response).hasContentType("text/html; charset=utf-8");
     }
 
-    private void
-    respondWithError(final Failsafe failsafe, final Error error) throws Exception {
-        failsafe.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                throw error;
-            }
-        });
+    @Test
+    public void recoversFromErrorsOccurringLater() throws Exception {
         failsafe.handle(request, response);
+        response.done(error);
+
+        response.await();
+        assertThat(response).hasStatus(INTERNAL_SERVER_ERROR)
+                            .hasBodyText(containsString(errorMessage));
     }
 
     private Error newError(String errorMessage) {
