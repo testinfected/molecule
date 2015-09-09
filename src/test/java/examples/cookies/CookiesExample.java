@@ -1,8 +1,5 @@
 package examples.cookies;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.lib.CookieJar;
@@ -18,37 +15,32 @@ public class CookiesExample {
         server.add(new Cookies())
               .start(new DynamicRoutes() {{
 
-                  get("/").to(new Application() {
-                      public void handle(Request request, Response response) throws Exception {
-                          CookieJar cookies = CookieJar.get(request);
-                          // Read client cookie
-                          Cookie customer = cookies.get("customer");
-                          response.body("Welcome, " + valueOf(customer));
-                      }
+                  get("/").to((request, response) -> {
+                      CookieJar cookies = CookieJar.get(request);
+                      // Read client cookie
+                      Cookie customer = cookies.get("customer");
+                      response.body("Welcome, " + valueOf(customer)).done();
                   });
 
-                  get("/weapon").to(new Application() {
-                      public void handle(Request request, Response response) throws Exception {
-                          CookieJar cookies = CookieJar.get(request);
-                          // Send back a cookie to the client
-                          cookies.add("weapon", "rocket launcher").path("/ammo");
-                      }
+                  get("/weapon").to((request, response) -> {
+                      CookieJar cookies = CookieJar.get(request);
+                      // Send back a cookie to the client
+                      cookies.add("weapon", "rocket launcher").path("/ammo");
+                      response.done();
                   });
 
-                  get("/ammo").to(new Application() {
-                      public void handle(Request request, Response response) throws Exception {
-                          CookieJar cookies = CookieJar.get(request);
-                          // Refresh client cookies max age
-                          cookies.add("ammo", "riding rocket").path("/ammo").maxAge(30);
-                      }
+                  get("/ammo").to((request, response) -> {
+                      CookieJar cookies = CookieJar.get(request);
+                      // Refresh client cookies max age
+                      cookies.add("ammo", "riding rocket").path("/ammo").maxAge(30);
+                      response.done();
                   });
 
-                  get("/backfire").to(new Application() {
-                      public void handle(Request request, Response response) throws Exception {
-                          CookieJar cookies = CookieJar.get(request);
-                          // Expire client cookie
-                          cookies.discard("weapon").path("/ammo");
-                      }
+                  get("/backfire").to((request, response) -> {
+                      CookieJar cookies = CookieJar.get(request);
+                      // Expire client cookie
+                      cookies.discard("weapon").path("/ammo");
+                      response.done();
                   });
               }});
     }

@@ -8,6 +8,7 @@ import com.vtence.molecule.lib.CookieJar;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.vtence.molecule.http.HeaderNames.COOKIE;
 import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
@@ -20,20 +21,24 @@ public class Cookies extends AbstractMiddleware {
         CookieJar cookieJar = new CookieJar(clientCookiesFrom(request));
         cookieJar.bind(request);
         try {
-            forward(request, response);
-        } finally {
-            setCookies(response, cookieJar);
+            forward(request, response).whenSuccessful(commitCookies(cookieJar))
+                                      .whenComplete((result, error) -> cookieJar.unbind(request));
+        } catch (Throwable error) {
             cookieJar.unbind(request);
+            throw error;
         }
     }
 
-    private void setCookies(Response response, CookieJar jar) {
-        for (Cookie cookie : jar.fresh()) {
-            response.addHeader(SET_COOKIE, cookie.toString());
-        }
-        for (Cookie cookie : jar.discarded()) {
-            response.addHeader(SET_COOKIE, cookie.maxAge(0).toString());
-        }
+    private Consumer<Response> commitCookies(CookieJar cookies) {
+        return response -> {
+            for (Cookie cookie : cookies.fresh()) {
+                response.addHeader(SET_COOKIE, cookie.toString());
+            }
+
+            for (Cookie cookie : cookies.discarded()) {
+                response.addHeader(SET_COOKIE, cookie.maxAge(0).toString());
+            }
+        };
     }
 
     private List<Cookie> clientCookiesFrom(Request request) {

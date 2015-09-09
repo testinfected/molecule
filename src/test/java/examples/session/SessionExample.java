@@ -1,8 +1,5 @@
 package examples.session;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.lib.Clock;
 import com.vtence.molecule.lib.SystemClock;
@@ -44,29 +41,23 @@ public class SessionExample {
         server.add(new Cookies())
               .add(sessionTracker)
               .start(new DynamicRoutes() {{
-                         map("/").to(new Application() {
-                             public void handle(Request request, Response response) throws Exception {
-                                 Session session = Session.get(request);
-                                 String username = session.contains("username") ? session.<String>get("username") : "Guest";
-                                 response.body("Hello, " + username);
-                             }
+                         map("/").to((request, response) -> {
+                             Session session = Session.get(request);
+                             String username = session.contains("username") ? session.<String>get("username") : "Guest";
+                             response.body("Hello, " + username).done();
                          });
 
-                         post("/login").to(new Application() {
-                             public void handle(Request request, Response response) throws Exception {
-                                 String username = request.parameter("username");
-                                 Session session = Session.get(request);
-                                 session.put("username", username);
-                                 response.redirectTo("/");
-                             }
+                         post("/login").to((request, response) -> {
+                             String username = request.parameter("username");
+                             Session session = Session.get(request);
+                             session.put("username", username);
+                             response.redirectTo("/").done();
                          });
 
-                         delete("/logout").to(new Application() {
-                             public void handle(Request request, Response response) throws Exception {
-                                 Session session = Session.get(request);
-                                 session.invalidate();
-                                 response.redirectTo("/");
-                             }
+                         delete("/logout").to((request, response) -> {
+                             Session session = Session.get(request);
+                             session.invalidate();
+                             response.redirectTo("/").done();
                          });
                      }}
               );
