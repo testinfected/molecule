@@ -397,6 +397,13 @@ public class Response {
         return this;
     }
 
+    public Response whenFailed(BiConsumer<Response, Throwable> action) {
+        postProcessing = postProcessing.whenComplete((response, error) -> {
+            if (error != null) action.accept(Response.this, error);
+        });
+        return this;
+    }
+
     public Response whenComplete(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.whenComplete((response, error) -> {
             action.accept(Response.this, error);
