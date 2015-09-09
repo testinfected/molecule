@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.support.BrokenClock;
@@ -19,13 +18,22 @@ public class DateHeaderTest {
     Response response = new Response();
 
     @Test public void
-    setsDateHeaderFromClockTime() throws Exception {
-        dateHeader.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body(response.header("Date"));
-            }
-        });
+    setsDateHeaderFromClockTimeOnceDoneIfMissing() throws Exception {
         dateHeader.handle(request, response);
-        assertThat(response).hasBodyText("Fri, 08 Jun 2012 04:00:00 GMT");
+        assertThat(response).hasNoHeader("Date");
+
+        response.done();
+        assertThat(response).hasHeader("Date", "Fri, 08 Jun 2012 04:00:00 GMT");
+
+        response.await();
+    }
+
+    @Test public void
+    wontOverrideExistingDateHeader() throws Exception {
+        dateHeader.handle(request, response);
+        response.header("Date", "now").done();
+
+        assertThat(response).hasHeader("Date", "now");
+        response.await();
     }
 }

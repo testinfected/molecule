@@ -20,8 +20,12 @@ public class DateHeader extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        response.header(DATE, clock.now());
+        forward(request, response).whenSuccessful(this::setDateHeaderIfMissing);
+    }
 
-        forward(request, response);
+    private void setDateHeaderIfMissing(Response response) {
+        if (!response.hasHeader(DATE)) {
+            response.header(DATE, clock.now());
+        }
     }
 }
