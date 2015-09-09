@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.testing.RequestAssert.assertThat;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
@@ -36,10 +37,13 @@ public class ConnectionScopeTest {
     @Before
     public void expectConnectionToBeReleasedAfterwards() throws Exception {
         context.checking(new Expectations() {{
-            allowing(dataSource).getConnection(); will(returnValue(connection));
-                when(connectionStatus.is("closed")); then(connectionStatus.is("opened"));
+            allowing(dataSource).getConnection();
+            will(returnValue(connection));
+            when(connectionStatus.is("closed"));
+            then(connectionStatus.is("opened"));
             oneOf(connection).close();
-                when(connectionStatus.is("opened")); then(connectionStatus.is("closed"));
+            when(connectionStatus.is("opened"));
+            then(connectionStatus.is("closed"));
         }});
     }
 
@@ -51,7 +55,7 @@ public class ConnectionScopeTest {
         connectionScope.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasBodyText("opened");
     }
 
@@ -62,7 +66,8 @@ public class ConnectionScopeTest {
         assertThat(request).hasAttribute(Connection.class, notNullValue());
 
         response.done();
-        response.await();
+
+        assertNoExecutionError();
         assertThat(request).hasNoAttribute(Connection.class);
     }
 
@@ -89,8 +94,9 @@ public class ConnectionScopeTest {
 
         response.done(new Exception("Boom!"));
         assertThat(request).hasNoAttribute(Connection.class);
+    }
 
-        error.expectMessage("Boom!");
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
         response.await();
     }
 }

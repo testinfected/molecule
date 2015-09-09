@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
@@ -25,7 +26,7 @@ public class ContentLengthHeaderTest {
         response.body("This body has a size of 32 bytes")
                 .done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Length", "32");
     }
 
@@ -34,7 +35,7 @@ public class ContentLengthHeaderTest {
         contentLengthHeader.handle(request, response);
         response.body(new VariableLengthBody()).done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Length");
     }
 
@@ -43,7 +44,7 @@ public class ContentLengthHeaderTest {
         contentLengthHeader.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Length");
     }
 
@@ -54,7 +55,7 @@ public class ContentLengthHeaderTest {
                 .body("This body is definitely larger than 1 byte")
                 .done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Length", "1");
     }
 
@@ -65,8 +66,12 @@ public class ContentLengthHeaderTest {
                 .body("This body is chunked encoded")
                 .done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Length");
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 
     private static class VariableLengthBody extends ChunkedBody {

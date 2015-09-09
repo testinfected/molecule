@@ -5,6 +5,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.support.Dates;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
@@ -31,7 +32,7 @@ public class ConditionalGetTest {
                 .contentType("text/plain").contentLength(32).body("response content")
                 .done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(NOT_MODIFIED)
                             .hasBodySize(0)
                             .hasNoHeader("Content-Type")
@@ -44,7 +45,7 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
         response.body("response content").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(OK)
                             .hasBodyText("response content");
     }
@@ -56,7 +57,7 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
         response.status(CREATED).header("ETag", "12345678").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(CREATED);
     }
 
@@ -67,7 +68,7 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
         response.header("ETag", "12345678").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
@@ -78,7 +79,7 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
         response.header("ETag", "12345678").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(OK);
     }
 
@@ -90,7 +91,7 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
         response.header("Last-Modified", lastModification).done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
@@ -104,7 +105,7 @@ public class ConditionalGetTest {
         conditional.handle(request, response);
         response.header("ETag", "12345678").header("Last-Modified", lastModification).done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(OK);
     }
 
@@ -117,11 +118,15 @@ public class ConditionalGetTest {
         response.header("ETag", "12345678")
                 .header("Last-Modified", httpDate(now().toDate())).done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(OK);
     }
 
     private Dates oneHourAgo() {
         return instant(System.currentTimeMillis() - ONE_HOUR);
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 }

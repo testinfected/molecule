@@ -5,6 +5,7 @@ import com.vtence.molecule.Response;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
@@ -31,7 +32,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.body("").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("ETag");
     }
 
@@ -40,7 +41,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.status(NOT_FOUND).body("Not found: resource").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("ETag");
     }
 
@@ -49,7 +50,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.status(CREATED).body("response body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
@@ -58,7 +59,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.header("ETag", "already set").body("response body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("ETag", "already set");
     }
 
@@ -67,7 +68,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.header("Last-Modified", httpDate(new Date())).body("response body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("ETag");
     }
 
@@ -76,7 +77,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.header("Cache-Control", "private; no-cache").body("response body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("ETag");
     }
 
@@ -85,7 +86,7 @@ public class ETagTest {
         etag.handle(request, response);
         response.body("response body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Cache-Control", "max-age=0; private; no-cache");
     }
 
@@ -94,7 +95,11 @@ public class ETagTest {
         etag.handle(request, response);
         response.header("Cache-Control", "public").body("response body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Cache-Control", "public");
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 }

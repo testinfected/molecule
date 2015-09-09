@@ -7,6 +7,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.concurrent.ExecutionException;
+
 import static com.vtence.molecule.testing.RequestAssert.assertThat;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -32,7 +34,7 @@ public class CookiesTest {
         cookies.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasBodyText("foo: bar, baz: qux");
     }
 
@@ -48,7 +50,7 @@ public class CookiesTest {
         cookies.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeaders("Set-Cookie",
                 contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
     }
@@ -64,21 +66,24 @@ public class CookiesTest {
         cookies.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeaders("Set-Cookie", contains("foo=; version=1; path=/; max-age=0"));
     }
 
-    @Test public void
+    @Test
+    public void
     unbindsCookieJarOnceDone() throws Exception {
         cookies.handle(request, response);
         assertThat(request).hasAttribute(CookieJar.class, notNullValue());
 
         response.done();
-        response.await();
+
+        assertNoExecutionError();
         assertThat(request).hasNoAttribute(CookieJar.class);
     }
 
-    @Test public void
+    @Test
+    public void
     unbindsCookieJarWhenAnErrorOccurs() throws Exception {
         cookies.connectTo((request, response) -> {
             throw new Exception("Error!");
@@ -92,15 +97,16 @@ public class CookiesTest {
         }
     }
 
-    @Test public void
+    @Test
+    public void
     unbindsCookieJarWhenAnErrorOccursLater() throws Throwable {
         cookies.handle(request, response);
 
         response.done(new Exception("Error!"));
-
-        error.expectMessage("Error!");
         assertThat(request).hasNoAttribute(CookieJar.class);
+    }
 
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
         response.await();
     }
 }

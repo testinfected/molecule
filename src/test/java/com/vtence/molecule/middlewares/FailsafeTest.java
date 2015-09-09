@@ -4,6 +4,8 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
+
 import static com.vtence.molecule.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -25,7 +27,9 @@ public class FailsafeTest {
             throw error;
         });
         failsafe.handle(request, response);
+        response.done();
 
+        assertNoExecutionError();
         assertThat(response).hasStatus(INTERNAL_SERVER_ERROR);
     }
 
@@ -36,7 +40,9 @@ public class FailsafeTest {
             throw error;
         });
         failsafe.handle(request, response);
+        response.done();
 
+        assertNoExecutionError();
         assertThat(response).hasBodyText(containsString(errorMessage))
                             .hasBodyText(containsString("stack.trace(line:1)"))
                             .hasBodyText(containsString("stack.trace(line:2)"))
@@ -54,7 +60,9 @@ public class FailsafeTest {
             throw errorWithCause;
         });
         failsafe.handle(request, response);
+        response.done();
 
+        assertNoExecutionError();
         assertThat(response).hasBodyText(containsString("Caused by: java.lang.Error: cause of error"))
                             .hasBodyText(containsString("cause.of.error.stack.trace(line:1)"))
                             .hasBodyText(containsString("Caused by: java.lang.Error: root cause"))
@@ -68,6 +76,7 @@ public class FailsafeTest {
             throw error;
         });
         failsafe.handle(request, response);
+        response.done();
 
         assertThat(response).hasContentType("text/html; charset=utf-8");
     }
@@ -77,7 +86,7 @@ public class FailsafeTest {
         failsafe.handle(request, response);
         response.done(error);
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(INTERNAL_SERVER_ERROR)
                             .hasBodyText(containsString(errorMessage));
     }
@@ -98,5 +107,9 @@ public class FailsafeTest {
 
     private StackTraceElement stackFrame(String className, int lineNumber) {
         return new StackTraceElement(className, "trace", "line", lineNumber);
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 }

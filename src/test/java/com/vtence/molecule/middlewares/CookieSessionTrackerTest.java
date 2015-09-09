@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.vtence.molecule.testing.CookieJarAssert.assertThat;
@@ -60,7 +61,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasBodyText("Session: null");
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
@@ -71,15 +72,15 @@ public class CookieSessionTrackerTest {
         tracker.connectTo(incrementCounter());
 
         context.checking(new Expectations() {{
-            oneOf(store).save(with(newSession()));
-            will(returnValue("new"));
+            oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
         tracker.handle(request, response);
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
 
         response.done();
-        response.await();
+
+        assertNoExecutionError();
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasValue("new").isHttpOnly();
     }
 
@@ -95,7 +96,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasBodyText("Counter: 1");
     }
 
@@ -113,7 +114,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasBodyText("Counter: 2");
     }
 
@@ -127,7 +128,7 @@ public class CookieSessionTrackerTest {
 
         tracker.handle(request, response);
         response.done();
-        response.await();
+        assertNoExecutionError();
     }
 
     @Test public void
@@ -142,7 +143,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasBodyText("Counter: 1");
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasValue("new");
     }
@@ -158,7 +159,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
 
@@ -174,7 +175,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(cookieJar).hasDiscardedCookie(SESSION_COOKIE);
     }
 
@@ -190,7 +191,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
     }
 
@@ -206,7 +207,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
@@ -221,7 +222,7 @@ public class CookieSessionTrackerTest {
         }});
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         tracker.handle(request, response);
     }
 
@@ -237,7 +238,7 @@ public class CookieSessionTrackerTest {
         tracker.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
@@ -248,7 +249,7 @@ public class CookieSessionTrackerTest {
         assertThat(request).hasAttribute(Session.class, notNullValue());
 
         response.done();
-        response.await();
+        assertNoExecutionError();
         assertThat(request).hasNoAttribute(Session.class);
     }
 
@@ -259,6 +260,10 @@ public class CookieSessionTrackerTest {
 
         response.done(new Exception("Error!"));
         assertThat(request).hasNoAttribute(Session.class);
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 
     private CookieJar fillCookieJar(Cookie... cookies) {

@@ -6,6 +6,7 @@ import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
@@ -29,7 +30,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Encoding", "deflate");
         assertThat("body", inflate(response), equalTo("uncompressed body"));
     }
@@ -40,7 +41,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Encoding", "gzip");
         assertThat("response body", unzip(response), equalTo("uncompressed body"));
     }
@@ -52,7 +53,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Encoding", "gzip");
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
@@ -63,7 +64,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Encoding");
     }
 
@@ -73,7 +74,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.contentLength(128).body("uncompressed body...").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Length");
     }
 
@@ -83,7 +84,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Encoding")
                             .hasBodyText("uncompressed body");
     }
@@ -94,7 +95,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.contentLength(128).body("uncompressed body...").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Length", "128");
     }
 
@@ -104,7 +105,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.header("Content-Encoding", "deflate").body("<compressed body>").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasHeader("Content-Encoding", "deflate")
                             .hasBodyText("<compressed body>");
     }
@@ -115,7 +116,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.header("Content-Encoding", "identity").body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
@@ -125,7 +126,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasStatus(NOT_ACCEPTABLE)
                             .hasContentType("text/plain")
                             .hasBodyText("An acceptable encoding could not be found");
@@ -138,7 +139,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.contentType("text/plain").body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Encoding")
                             .hasBodyText("uncompressed body");
     }
@@ -150,7 +151,7 @@ public class CompressorTest {
         compressor.handle(request, response);
         response.contentType("text/plain").body("uncompressed body").done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat("body", unzip(response), equalTo("uncompressed body"));
     }
 
@@ -163,7 +164,7 @@ public class CompressorTest {
                 .body("<html>uncompressed</html>")
                 .done();
 
-        response.await();
+        assertNoExecutionError();
         assertThat("body", unzip(response), equalTo("<html>uncompressed</html>"));
     }
 
@@ -173,5 +174,9 @@ public class CompressorTest {
 
     private String unzip(Response response) throws IOException {
         return response.empty() ? "" : Streams.toString(new GZIPInputStream(asStream(response)));
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 }
