@@ -25,6 +25,7 @@ public class Failsafe extends AbstractMiddleware {
         response.status(INTERNAL_SERVER_ERROR);
         response.contentType(HTML + "; charset=utf-8");
         response.body(formatAsHtml(error));
+        response.done();
     }
 
     private String formatAsHtml(Throwable error) {

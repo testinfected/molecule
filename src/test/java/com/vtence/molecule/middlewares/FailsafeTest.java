@@ -76,9 +76,8 @@ public class FailsafeTest {
             throw error;
         });
         failsafe.handle(request, response);
-        response.done();
 
-        assertThat(response).hasContentType("text/html; charset=utf-8");
+        assertThat(response).hasContentType("text/html; charset=utf-8").isDone();
     }
 
     @Test
