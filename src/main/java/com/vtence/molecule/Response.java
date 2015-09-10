@@ -9,8 +9,7 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -399,24 +398,28 @@ public class Response {
 
     public Response whenFailed(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.whenComplete((response, error) -> {
-            if (error != null) action.accept(Response.this, error);
+            if (error != null) action.accept(Response.this, unwrap(error));
         });
         return this;
     }
 
     public Response whenComplete(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.whenComplete((response, error) -> {
-            action.accept(Response.this, error);
+            action.accept(Response.this, unwrap(error));
         });
         return this;
     }
 
     public Response rescue(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.handle((response, error) -> {
-            if (error != null) action.accept(Response.this, error);
+            if (error != null) action.accept(Response.this, unwrap(error));
             return this;
         });
         return this;
+    }
+
+    private Throwable unwrap(Throwable error) {
+        return error instanceof CompletionException ? error.getCause() : error;
     }
 
     public void done() {
@@ -433,5 +436,9 @@ public class Response {
 
     public Response await() throws ExecutionException, InterruptedException {
         return postProcessing.get();
+    }
+
+    public Response await(long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
+        return postProcessing.get(timeout, unit);
     }
 }

@@ -31,6 +31,7 @@ public class MultipartExample {
                         "</form>" +
                         "</body>" +
                         "</html>");
+                response.done();
             });
 
             post("/profile").to((request, response) -> {
@@ -48,7 +49,8 @@ public class MultipartExample {
                     echo.append("avatar: ")
                         .append(avatar.filename()).append(" (").append(avatar.contentType()).append(")")
                         .append(" - ").append(String.valueOf(avatar.content().length)).append(" bytes");
-                response.body(echo);
+                response.body(echo)
+                        .done();
             });
         }});
     }

@@ -37,19 +37,15 @@ public class RouterTest {
     }
 
     private Application route(final String name) {
-        return new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body(name);
-            }
-        };
+        return (request, response) -> response.body(name);
     }
 
     public static Matcher<Request> all() {
-        return new Anything<Request>();
+        return new Anything<>();
     }
 
     public static Matcher<Request> none() {
-        return new Nothing<Request>();
+        return new Nothing<>();
     }
 
     private class StaticRoute implements Route {

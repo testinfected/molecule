@@ -14,7 +14,7 @@ public class SSLExample {
         // keytool -genkey -keyalg RSA -alias <key alias> -keystore <keystore file> -storepass <store password> -keysize 2048
         server.enableSSL(locateOnClasspath("ssl/keystore"), "password", "password")
               .start((request, response) -> {
-                  response.body("You are on a secure channel");
+                  response.body("You are on a secure channel").done();
               });
     }
 

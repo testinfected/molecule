@@ -5,7 +5,6 @@ import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ public class AsyncTest {
         server.stop();
     }
 
-    @Ignore("work in progress")
     @Test
     public void servingContentFromADifferentThreadAfterALongRunningOperation() throws IOException {
         response = request.get("/");

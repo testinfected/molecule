@@ -13,9 +13,7 @@ public class FailureMonitor extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
         try {
-            forward(request, response).whenFailed((result, error) -> {
-                reporter.errorOccurred(error);
-            });
+            forward(request, response).whenFailed((result, error) -> reporter.errorOccurred(error));
         } catch (Throwable error) {
             reporter.errorOccurred(error);
             throw error;

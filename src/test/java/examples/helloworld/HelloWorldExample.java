@@ -8,7 +8,8 @@ public class HelloWorldExample {
 
     public void run(WebServer server) throws IOException {
         server.start((request, response) -> {
-            response.body("Hello, World!");
+            response.body("Hello, World!")
+                    .done();
         });
     }
 

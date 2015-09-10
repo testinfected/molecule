@@ -4,7 +4,6 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
@@ -13,7 +12,8 @@ import org.junit.rules.ExpectedException;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 
 public class FailureMonitorTest {
 
@@ -69,6 +69,6 @@ public class FailureMonitorTest {
     }
 
     private Matcher<Exception> exceptionWithMessage(String message) {
-        return Matchers.<Exception>hasToString(containsString(message));
+        return hasProperty("message", equalTo(message));
     }
 }

@@ -10,11 +10,12 @@ public class RoutingExample {
     public void run(WebServer server) throws IOException {
         server.start(new DynamicRoutes() {{
 
-            map("/").to((request, response) -> response.body("Welcome!"));
+            map("/").to((request, response) -> response.body("Welcome!").done());
 
             post("/login").to((request, response) -> {
                 String username = request.parameter("username");
-                response.redirectTo("/users/" + username);
+                response.redirectTo("/users/" + username)
+                        .done();
             });
 
             get("/hello/:username").to((request, response) -> {
@@ -26,6 +27,7 @@ public class RoutingExample {
                         "</body>" +
                         "</html>"
                 );
+                response.done();
             });
         }});
     }

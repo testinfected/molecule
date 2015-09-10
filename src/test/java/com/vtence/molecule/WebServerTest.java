@@ -28,11 +28,8 @@ public class WebServerTest {
     @Test
     public void runsServerOnPort8080ByDefault() throws IOException, GeneralSecurityException {
         server = WebServer.create();
-        server.start(new Application() {
-            @Override
-            public void handle(Request request, Response response) throws Exception {
-                response.body("It works!");
-            }
+        server.start((request, response) -> {
+            response.body("It works!").done();
         });
 
         response = request.get("/");

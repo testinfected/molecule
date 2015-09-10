@@ -14,6 +14,7 @@ public class AsyncExample {
         // Capture internal server errors and display a 500 page
         server.add(new Failsafe());
         server.start((request, response) -> {
+            // Serve response from a separate thread, simulating an async long running process
             runAsync(() -> {
                 aLongRunningProcess(500);
 

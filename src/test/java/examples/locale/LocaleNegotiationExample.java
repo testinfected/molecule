@@ -27,6 +27,7 @@ public class LocaleNegotiationExample {
                           "Our default is: " + Locale.getDefault().toLanguageTag() + "\n" +
                           "The best match is: " + locale.toLanguageTag() + "\n"
                   );
+                  response.done();
               });
     }
 

@@ -15,7 +15,7 @@ public class RESTExample {
         // Support HTTP method override via the _method request parameter
         server.add(new HttpMethodOverride());
 
-        final Map<Integer, Album> albums = new TreeMap<Integer, Album>();
+        final Map<Integer, Album> albums = new TreeMap<>();
         final Sequence sequence = new Sequence();
 
         server.start((new DynamicRoutes() {{
@@ -28,24 +28,27 @@ public class RESTExample {
                 if (body.text().isEmpty()) {
                     body.append("Your music library is empty");
                 }
-                response.body(body);
+                response.body(body)
+                        .done();
             });
 
             post("/albums").to((request, response) -> {
                 int id = sequence.next();
                 Album album = new Album(request.parameter("title"), request.parameter("artist"));
                 albums.put(id, album);
-                response.statusCode(201);
-                response.body(album.info());
+                response.statusCode(201)
+                        .body(album.info())
+                        .done();
             });
 
             get("/albums/:id").to((request, response) -> {
                 int id = Integer.parseInt(request.parameter("id"));
                 if (albums.containsKey(id)) {
                     Album album = albums.get(id);
-                    response.body(album.info());
+                    response.body(album.info())
+                            .done();
                 } else {
-                    response.statusCode(404);
+                    response.statusCode(404).done();
                 }
             });
 
@@ -58,9 +61,10 @@ public class RESTExample {
                     if (title != null) album.title = title;
                     String artist = request.parameter("artist");
                     if (artist != null) album.artist = artist;
-                    response.body(album.info());
+                    response.body(album.info())
+                            .done();
                 } else {
-                    response.statusCode(404);
+                    response.statusCode(404).done();
                 }
             });
 
@@ -69,9 +73,10 @@ public class RESTExample {
                 int id = Integer.parseInt(request.parameter("id"));
                 Album album = albums.remove(id);
                 if (album != null) {
-                    response.body(album.info());
+                    response.body(album.info())
+                            .done();
                 } else {
-                    response.statusCode(404);
+                    response.statusCode(404).done();
                 }
             });
         }}));

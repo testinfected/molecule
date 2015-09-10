@@ -35,7 +35,9 @@ public class FilteringExample {
                     forward(request, response);
                 } else {
                     // Halt request processing
-                    response.status(UNAUTHORIZED).body("Get away!");
+                    response.status(UNAUTHORIZED)
+                            .body("Get away!")
+                            .done();
                 }
             }
         };
@@ -45,10 +47,13 @@ public class FilteringExample {
               .start(new DynamicRoutes() {{
                   // This route is private thus requires authentication
                   get("/private/area").to((request, response) ->
-                          response.body("Hello, " + request.attribute("user") + "!"));
+                          response.body("Hello, " + request.attribute("user") + "!")
+                                  .done());
 
                   // This route is public
-                  get("/hello").to((request, response) -> response.body("Welcome, Guest!"));
+                  get("/hello").to((request, response) ->
+                          response.body("Welcome, Guest!")
+                                  .done());
               }});
     }
 

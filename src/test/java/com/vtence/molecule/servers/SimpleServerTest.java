@@ -1,10 +1,6 @@
 package com.vtence.molecule.servers;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.BodyPart;
-import com.vtence.molecule.FailureReporter;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.testing.ResourceLocator;
@@ -24,11 +20,15 @@ import java.util.Map;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.fail;
 
 public class SimpleServerTest {
@@ -42,11 +42,7 @@ public class SimpleServerTest {
 
     @Before public void
     configureServer() {
-        server.reportErrorsTo(new FailureReporter() {
-            public void errorOccurred(Throwable error) {
-                SimpleServerTest.this.error = error;
-            }
-        });
+        server.reportErrorsTo(error -> SimpleServerTest.this.error = error);
     }
 
     @After public void
@@ -61,10 +57,18 @@ public class SimpleServerTest {
 
     @Test public void
     notifiesReportersOfFailures() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                throw new RuntimeException("Crash!");
-            }
+        server.run((request, response) -> {
+            throw new Exception("Crash!");
+        });
+        request.send();
+        assertThat("error", error, notNullValue());
+        assertThat("error message", error.getMessage(), equalTo("Crash!"));
+    }
+
+    @Test public void
+    notifiesReportersOfErrorsOccurringAsync() throws IOException {
+        server.run((request, response) -> {
+            response.done(new Exception("Crash!"));
         });
         request.send();
         assertThat("error", error, notNullValue());
@@ -73,10 +77,18 @@ public class SimpleServerTest {
 
     @Test public void
     respondsToRequests() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.status(CREATED);
-            }
+        server.run((request, response) -> response.status(CREATED).done());
+
+        response = request.send();
+        assertNoError();
+        assertThat(response).hasStatusCode(201)
+                            .hasStatusMessage("Created");
+    }
+
+    @Test public void
+    respondsToRequestsAsynchronously() throws IOException {
+        server.run((request, response) -> {
+            runAsync(() -> response.status(CREATED).done());
         });
 
         response = request.send();
@@ -87,11 +99,7 @@ public class SimpleServerTest {
 
     @Test public void
     chunksResponseWhenContentLengthUnknown() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("<html>...</html>");
-            }
-        });
+        server.run((request, response) -> response.body("<html>...</html>").done());
 
         response = request.send();
         assertNoError();
@@ -101,11 +109,10 @@ public class SimpleServerTest {
 
     @Test public void
     doesNotChunkResponsesWithContentLengthHeader() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.contentLength(16);
-                response.body("<html>...</html>");
-            }
+        server.run((request, response) -> {
+            response.contentLength(16);
+            response.body("<html>...</html>");
+            response.done();
         });
 
         response = request.send();
@@ -117,12 +124,11 @@ public class SimpleServerTest {
 
     @Test public void
     encodesResponsesAccordingToContentType() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.contentType("text/plain; charset=utf-16");
-                response.body("This content requires encoding &âçüè!");
-                response.status(HttpStatus.OK);
-            }
+        server.run((request, response) -> {
+            response.contentType("text/plain; charset=utf-16");
+            response.body("This content requires encoding &âçüè!");
+            response.status(HttpStatus.OK);
+            response.done();
         });
 
         response = request.send();
@@ -133,11 +139,7 @@ public class SimpleServerTest {
 
     @Test public void
     supportsRequestArrayParameters() throws IOException {
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body(request.parameters("names").toString());
-            }
-        });
+        server.run((request, response) -> response.body(request.parameters("names").toString()).done());
 
         response = request.get("/?names=Alice&names=Bob&names=Charles");
         assertNoError();
@@ -148,17 +150,16 @@ public class SimpleServerTest {
     @Test public void
     providesGeneralRequestInformation() throws IOException {
         final Map<String, String> info = new HashMap<String, String>();
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                info.put("uri", request.uri());
-                info.put("path", request.path());
-                info.put("ip", request.remoteIp());
-                info.put("hostname", request.remoteHost());
-                info.put("port", valueOf(request.remotePort()));
-                info.put("protocol", request.protocol());
-                info.put("secure", valueOf(request.secure()));
-                info.put("timestamp", valueOf(request.timestamp()));
-            }
+        server.run((request, response) -> {
+            info.put("uri", request.uri());
+            info.put("path", request.path());
+            info.put("ip", request.remoteIp());
+            info.put("hostname", request.remoteHost());
+            info.put("port", valueOf(request.remotePort()));
+            info.put("protocol", request.protocol());
+            info.put("secure", valueOf(request.secure()));
+            info.put("timestamp", valueOf(request.timestamp()));
+            response.done();
         });
 
         request.get("/path?query");
@@ -179,11 +180,10 @@ public class SimpleServerTest {
     @Test public void
     readsRequestHeaders() throws IOException {
         final Map<String, Iterable<String>> headers = new HashMap<String, Iterable<String>>();
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                headers.put("names", request.headerNames());
-                headers.put("encoding", request.headers("Accept-Encoding"));
-            }
+        server.run((request, response) -> {
+            headers.put("names", request.headerNames());
+            headers.put("encoding", request.headers("Accept-Encoding"));
+            response.done();
         });
 
         request.header("Accept", "text/html")
@@ -200,12 +200,11 @@ public class SimpleServerTest {
     @Test public void
     detailsRequestContent() throws IOException {
         final Map<String, String> content = new HashMap<String, String>();
-        server.run(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                content.put("contentType", valueOf(request.contentType()));
-                content.put("contentLength", valueOf(request.contentLength()));
-                content.put("body", request.body());
-            }
+        server.run((request, response) -> {
+            content.put("contentType", valueOf(request.contentType()));
+            content.put("contentLength", valueOf(request.contentLength()));
+            content.put("body", request.body());
+            response.done();
         });
 
         request.header("Accept", "text/html")
@@ -222,14 +221,12 @@ public class SimpleServerTest {
     @Test public void
     readsMultiPartFormParameters() throws IOException {
         final Map<String, String> parameters = new HashMap<String, String>();
-        server.run(new Application() {
-            @Override
-            public void handle(Request request, Response response) throws Exception {
-                List<BodyPart> parts = request.parts();
-                for (BodyPart part : parts) {
-                    parameters.put(part.name(), part.value());
-                }
+        server.run((request, response) -> {
+            List<BodyPart> parts = request.parts();
+            for (BodyPart part : parts) {
+                parameters.put(part.name(), part.value());
             }
+            response.done();
         });
 
         Form form = new MultipartForm().addField("param1", "value1")
@@ -245,15 +242,13 @@ public class SimpleServerTest {
     downloadsUploadedFiles() throws IOException {
         final Map<String, Integer> files = new HashMap<String, Integer>();
         final Map<String, String> mimeTypes = new HashMap<String, String>();
-        server.run(new Application() {
-            @Override
-            public void handle(Request request, Response response) throws Exception {
-                List<BodyPart> parts = request.parts();
-                for (BodyPart part : parts) {
-                    files.put(part.filename(), part.content().length);
-                    mimeTypes.put(part.filename(), part.contentType());
-                }
+        server.run((request, response) -> {
+            List<BodyPart> parts = request.parts();
+            for (BodyPart part : parts) {
+                files.put(part.filename(), part.content().length);
+                mimeTypes.put(part.filename(), part.contentType());
             }
+            response.done();
         });
 
 

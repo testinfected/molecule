@@ -1,12 +1,6 @@
 package com.vtence.molecule.servers;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Body;
-import com.vtence.molecule.BodyPart;
-import com.vtence.molecule.FailureReporter;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
-import com.vtence.molecule.Server;
+import com.vtence.molecule.*;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerSocketProcessor;
@@ -17,6 +11,8 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
 
 public class SimpleServer implements Server {
 
@@ -71,17 +67,18 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(org.simpleframework.http.Request simpleRequest, org.simpleframework.http.Response simpleResponse) {
+        public void handle(org.simpleframework.http.Request httpRequest, org.simpleframework.http.Response httpResponse) {
+            Request request = new Request();
+            Response response = new Response();
             try {
-                Request request = new Request();
-                Response response = new Response();
-                build(request, simpleRequest);
+                build(request, httpRequest);
                 app.handle(request, response);
-                commit(simpleResponse, response);
+                response.whenSuccessful(commitTo(httpResponse))
+                        .whenFailed((result, error) -> failureReporter.errorOccurred(error))
+                        .whenComplete((result, error) -> close(httpResponse));
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
-            } finally {
-                close(simpleResponse);
+                close(httpResponse);
             }
         }
 
@@ -93,7 +90,7 @@ public class SimpleServer implements Server {
             setBody(request, simple);
         }
 
-        private void setRequestDetails(Request request, org.simpleframework.http.Request simple) throws IOException {
+        private void setRequestDetails(Request request, org.simpleframework.http.Request simple) {
             request.uri(simple.getTarget());
             request.path(simple.getPath().getPath());
             request.remoteIp(simple.getClientAddress().getAddress().getHostAddress());
@@ -142,6 +139,16 @@ public class SimpleServer implements Server {
 
         private void setBody(Request request, org.simpleframework.http.Request simple) throws IOException {
             request.body(simple.getInputStream());
+        }
+
+        private Consumer<Response> commitTo(org.simpleframework.http.Response simple) {
+            return response -> {
+                try {
+                    commit(simple, response);
+                } catch (IOException e) {
+                    throw new CompletionException(e);
+                }
+            };
         }
 
         private void commit(org.simpleframework.http.Response simple, Response response) throws IOException {
