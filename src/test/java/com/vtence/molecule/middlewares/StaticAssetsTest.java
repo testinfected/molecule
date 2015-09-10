@@ -25,11 +25,7 @@ public class StaticAssetsTest {
 
     @Before public void
     setUpResponseChain() {
-        assets.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("Forwarded");
-            }
-        });
+        assets.connectTo((request, response) -> response.body("Forwarded"));
     }
 
     @Test public void

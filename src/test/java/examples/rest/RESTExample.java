@@ -1,10 +1,7 @@
 package examples.rest;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
 import com.vtence.molecule.routing.DynamicRoutes;
 
@@ -22,69 +19,59 @@ public class RESTExample {
         final Sequence sequence = new Sequence();
 
         server.start((new DynamicRoutes() {{
-            get("/albums").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    TextBody body = new TextBody();
-                    for (int id : albums.keySet()) {
-                        Album album = albums.get(id);
-                        body.append(String.format("%d: %s\n", id, album.info()));
-                    }
-                    if (body.text().isEmpty()) {
-                        body.append("Your music library is empty");
-                    }
-                    response.body(body);
+            get("/albums").to((request, response) -> {
+                TextBody body = new TextBody();
+                for (int id : albums.keySet()) {
+                    Album album = albums.get(id);
+                    body.append(String.format("%d: %s\n", id, album.info()));
                 }
+                if (body.text().isEmpty()) {
+                    body.append("Your music library is empty");
+                }
+                response.body(body);
             });
 
-            post("/albums").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    int id = sequence.next();
-                    Album album = new Album(request.parameter("title"), request.parameter("artist"));
-                    albums.put(id, album);
-                    response.statusCode(201);
+            post("/albums").to((request, response) -> {
+                int id = sequence.next();
+                Album album = new Album(request.parameter("title"), request.parameter("artist"));
+                albums.put(id, album);
+                response.statusCode(201);
+                response.body(album.info());
+            });
+
+            get("/albums/:id").to((request, response) -> {
+                int id = Integer.parseInt(request.parameter("id"));
+                if (albums.containsKey(id)) {
+                    Album album = albums.get(id);
                     response.body(album.info());
-                }
-            });
-
-            get("/albums/:id").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    int id = Integer.parseInt(request.parameter("id"));
-                    if (albums.containsKey(id)) {
-                        Album album = albums.get(id);
-                        response.body(album.info());
-                    } else {
-                        response.statusCode(404);
-                    }
+                } else {
+                    response.statusCode(404);
                 }
             });
 
             // Access with either a PUT or a POST with _method=PUT
-            put("/albums/:id").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    int id = Integer.parseInt(request.parameter("id"));
-                    Album album = albums.get(id);
-                    if (album != null) {
-                        String title = request.parameter("title");
-                        if (title != null) album.title = title;
-                        String artist = request.parameter("artist");
-                        if (artist != null) album.artist = artist;
-                        response.body(album.info());
-                    } else {
-                        response.statusCode(404);
-                    }
+            put("/albums/:id").to((request, response) -> {
+                int id = Integer.parseInt(request.parameter("id"));
+                Album album = albums.get(id);
+                if (album != null) {
+                    String title = request.parameter("title");
+                    if (title != null) album.title = title;
+                    String artist = request.parameter("artist");
+                    if (artist != null) album.artist = artist;
+                    response.body(album.info());
+                } else {
+                    response.statusCode(404);
                 }
             });
 
             // Access with either a DELETE or a POST with _method=DELETE
-            delete("/albums/:id").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    int id = Integer.parseInt(request.parameter("id"));
-                    Album album = albums.remove(id);
-                    if (album != null) {
-                        response.body(album.info());
-                    } else {
-                        response.statusCode(404);
-                    }
+            delete("/albums/:id").to((request, response) -> {
+                int id = Integer.parseInt(request.parameter("id"));
+                Album album = albums.remove(id);
+                if (album != null) {
+                    response.body(album.info());
+                } else {
+                    response.statusCode(404);
                 }
             });
         }}));

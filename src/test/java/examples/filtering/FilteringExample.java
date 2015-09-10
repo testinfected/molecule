@@ -1,11 +1,10 @@
 package examples.filtering;
 
-import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
-import com.vtence.molecule.Middleware;
 import com.vtence.molecule.routing.DynamicRoutes;
 
 import java.io.IOException;
@@ -45,18 +44,11 @@ public class FilteringExample {
         server.filter("/private", authenticate)
               .start(new DynamicRoutes() {{
                   // This route is private thus requires authentication
-                  get("/private/area").to(new Application() {
-                      public void handle(Request request, Response response) throws Exception {
-                          response.body("Hello, " + request.attribute("user") + "!");
-                      }
-                  });
+                  get("/private/area").to((request, response) ->
+                          response.body("Hello, " + request.attribute("user") + "!"));
 
                   // This route is public
-                  get("/hello").to(new Application() {
-                      public void handle(Request request, Response response) throws Exception {
-                          response.body("Welcome, Guest!");
-                      }
-                  });
+                  get("/hello").to((request, response) -> response.body("Welcome, Guest!"));
               }});
     }
 
