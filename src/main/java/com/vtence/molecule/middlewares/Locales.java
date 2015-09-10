@@ -28,10 +28,16 @@ public class Locales extends AbstractMiddleware {
         AcceptLanguage acceptedLanguages = AcceptLanguage.of(request);
         Locale best = acceptedLanguages.selectBest(supported);
         request.attribute(Locale.class, best != null ? best : Locale.getDefault());
+
         try {
-            forward(request, response);
-        } finally {
-            request.removeAttribute(Locale.class);
+            forward(request, response).whenComplete((result, error) -> unbindLocale(request));
+        } catch(Throwable error) {
+            unbindLocale(request);
+            throw error;
         }
+    }
+
+    private Request unbindLocale(Request request) {
+        return request.removeAttribute(Locale.class);
     }
 }
