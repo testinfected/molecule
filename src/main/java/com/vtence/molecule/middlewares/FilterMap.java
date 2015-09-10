@@ -13,7 +13,7 @@ import static com.vtence.molecule.lib.matchers.Matchers.withPath;
 
 public class FilterMap extends AbstractMiddleware {
 
-    private final Map<Matcher<? super Request>, Middleware> filters = new LinkedHashMap<Matcher<? super Request>, Middleware>();
+    private final Map<Matcher<? super Request>, Middleware> filters = new LinkedHashMap<>();
 
     public void handle(Request request, Response response) throws Exception {
         Middleware filter = filterMappedTo(request);

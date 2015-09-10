@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.matchers.Matcher;
@@ -20,11 +19,7 @@ public class FilterMapTest {
 
     @Before public void
     stubApplication() {
-        filters.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("content", "content");
-            }
-        });
+        filters.connectTo((request, response) -> response.header("content", "content"));
     }
 
     @Test public void

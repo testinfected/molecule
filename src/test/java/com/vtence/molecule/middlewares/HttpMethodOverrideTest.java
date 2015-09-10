@@ -50,11 +50,7 @@ public class HttpMethodOverrideTest {
     }
 
     private Application echoMethodName() {
-        return new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body(request.method().name());
-            }
-        };
+        return (request, response) -> response.body(request.method().name());
     }
 
     private void assertMethod(String method) {

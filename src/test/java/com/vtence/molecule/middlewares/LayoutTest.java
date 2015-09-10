@@ -1,6 +1,5 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -17,13 +16,15 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class LayoutTest {
-    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
+    @Rule public
+    JUnitRuleMockery context = new JUnitRuleMockery();
     Selector selector = context.mock(Selector.class);
     Layout layout = new Layout(selector, new StubProcessor(), new StubDecorator());
 
@@ -42,13 +43,10 @@ public class LayoutTest {
 
     @Test public void
     runsContentThroughDecoratorWhenPageIsSelected() throws Exception {
-        layout.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("raw content");
-            }
-        });
-
         layout.handle(request, response);
+        response.body("raw content").done();
+
+        assertNoExecutionError();
         assertThat(response).hasBodyText("<decorated>raw content</decorated>");
     }
 
@@ -56,40 +54,45 @@ public class LayoutTest {
     removesContentLengthHeaderIfDecorating() throws Exception {
         response.header("Content-Length", 140);
         layout.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
         assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
     leavesContentUntouchedIfNoDecorationOccurs() throws Exception {
-        layout.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("original content");
-            }
-        });
+        layout.connectTo((request, response) -> response.body("original content"));
+
         page.become("unselected");
         layout.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
         assertThat(response).hasBodyText("original content");
     }
 
     @Test public void
     preservesOriginalResponseEncodingWhenDecorating() throws Exception {
-        layout.connectTo(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("encoded content (éçëœ)");
-            }
-        });
+        layout.connectTo((request, response) -> response.body("encoded content (éçëœ)"));
 
         response.contentType("text/html; charset=utf-8");
         layout.handle(request, response);
+        response.done();
 
+        assertNoExecutionError();
         assertThat(response).hasContentType("text/html; charset=utf-8")
                             .hasBodyEncoding(UTF_8)
                             .hasBodyText(containsString("éçëœ"));
     }
 
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
+    }
+
     private class StubProcessor implements ContentProcessor {
         public Map<String, String> process(String content) {
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, String> data = new HashMap<>();
             data.put("content", content);
             return data;
         }
