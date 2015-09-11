@@ -17,7 +17,7 @@ public enum KeyStoreType {
     private final String type;
     private final String algorithm;
 
-    private KeyStoreType(String type, String algorithm) {
+    KeyStoreType(String type, String algorithm) {
         this.type = type;
         this.algorithm = algorithm;
     }

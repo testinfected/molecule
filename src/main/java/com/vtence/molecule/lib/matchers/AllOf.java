@@ -20,6 +20,6 @@ public class AllOf<T> implements Matcher<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> Matcher<T> allOf(Matcher<? super T>... matchers) {
-        return new AllOf<T>(Arrays.asList(matchers));
+        return new AllOf<>(Arrays.asList(matchers));
     }
 }

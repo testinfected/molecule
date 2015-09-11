@@ -17,7 +17,7 @@ public class Locales extends AbstractMiddleware {
     }
 
     private static List<Locale> fromLanguageTags(String... languageTags) {
-        List<Locale> locales = new ArrayList<Locale>();
+        List<Locale> locales = new ArrayList<>();
         for (String tag : languageTags) {
             locales.add(Locale.forLanguageTag(tag));
         }

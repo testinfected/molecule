@@ -1,6 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.http.Cookie;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -150,14 +149,6 @@ public class RequestTest {
         request.removePart("b");
 
         assertThat("body parts", request.parts(), contains(partWithName("a"), partWithName("c")));
-    }
-
-    private Matcher<Cookie> cookieNamed(String name) {
-        return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
-            protected String featureValueOf(Cookie cookie) {
-                return cookie.name();
-            }
-        };
     }
 
     private Matcher<Iterable<?>> containsKeys(Object... keys) {

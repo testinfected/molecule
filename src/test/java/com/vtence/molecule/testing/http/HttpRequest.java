@@ -12,19 +12,19 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.vtence.molecule.lib.SecureProtocol.TLS;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 public class HttpRequest {
     private final String host;
     private final int port;
     private final Headers headers = new Headers();
-    private final Map<String, String> cookies = new LinkedHashMap<String, String>();
+    private final Map<String, String> cookies = new LinkedHashMap<>();
 
     private String path = "/";
     private String method = "GET";
@@ -196,10 +196,7 @@ public class HttpRequest {
 
     private void addCookieHeader() {
         if (cookies.isEmpty()) return;
-        List<String> pairs = new ArrayList<String>();
-        for (String name : cookies.keySet()) {
-            pairs.add(name + "=" + cookies.get(name));
-        }
+        List<String> pairs = cookies.keySet().stream().map(name -> name + "=" + cookies.get(name)).collect(toList());
         header("Cookie", Joiner.on("; ").join(pairs));
     }
 

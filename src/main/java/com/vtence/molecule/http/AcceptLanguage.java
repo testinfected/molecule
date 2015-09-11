@@ -2,12 +2,18 @@ package com.vtence.molecule.http;
 
 import com.vtence.molecule.Request;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 import static com.vtence.molecule.http.HeaderNames.ACCEPT_LANGUAGE;
+import static java.util.stream.Collectors.toList;
 
 public class AcceptLanguage {
-    private final List<Locale> locales = new ArrayList<Locale>();
+    private final List<Locale> locales = new ArrayList<>();
 
     public static AcceptLanguage of(Request request) {
         String header = request.header(ACCEPT_LANGUAGE);
@@ -23,9 +29,8 @@ public class AcceptLanguage {
     }
 
     private void parseLocales(Header header) {
-        for (String locale : header.values()) {
-            if (!locale.equals("")) locales.add(Locale.forLanguageTag(locale));
-        }
+        locales.addAll(header.values().stream().filter(locale -> !locale.equals(""))
+                             .map(Locale::forLanguageTag).collect(toList()));
     }
 
     public List<Locale> list() {

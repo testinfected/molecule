@@ -7,11 +7,12 @@ import com.vtence.molecule.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class StaticAssets extends AbstractMiddleware {
 
     private final Application fileServer;
-    private final List<String> urls = new ArrayList<String>();
+    private final List<String> urls = new ArrayList<>();
 
     private String indexFile = "index.html";
 
@@ -50,13 +51,10 @@ public class StaticAssets extends AbstractMiddleware {
     }
 
     private boolean canServe(String path) throws Exception {
-        return routeDefinedFor(path);
+        return routeDefinedFor(path).isPresent();
     }
 
-    private boolean routeDefinedFor(String path) {
-        for (String url : urls) {
-            if (path.startsWith(url)) return true;
-        }
-        return false;
+    private Optional<String> routeDefinedFor(String path) {
+        return urls.stream().filter(path::startsWith).findFirst();
     }
 }

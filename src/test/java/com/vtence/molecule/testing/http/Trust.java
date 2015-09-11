@@ -1,7 +1,6 @@
 package com.vtence.molecule.testing.http;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
@@ -27,11 +26,6 @@ class Trust {
     }
 
     public static HostnameVerifier allHostNames() {
-        return new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession sslSession) {
-                return true;
-            }
-        };
+        return (hostname, sslSession) -> true;
     }
 }

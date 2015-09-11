@@ -13,11 +13,7 @@ import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 public class StaticAssetsTest {
 
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
-    Application fileServer = new Application() {
-        public void handle(Request request, Response response) throws Exception {
-            response.body(request.path());
-        }
-    };
+    Application fileServer = (request, response) -> response.body(request.path());
     StaticAssets assets = new StaticAssets(fileServer, "/favicon.ico");
 
     Request request = new Request();

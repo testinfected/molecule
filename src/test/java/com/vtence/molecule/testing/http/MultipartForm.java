@@ -139,11 +139,8 @@ public class MultipartForm extends Form {
         }
 
         private void writeFileContent(OutputStream output) throws IOException {
-            FileInputStream input = new FileInputStream(file);
-            try {
+            try (FileInputStream input = new FileInputStream(file)) {
                 Streams.copy(input, output);
-            } finally {
-                Streams.close(input);
             }
         }
 

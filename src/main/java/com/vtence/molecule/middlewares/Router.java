@@ -9,6 +9,7 @@ import com.vtence.molecule.routing.RouteSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Router extends AbstractMiddleware implements RouteSet {
 
@@ -18,7 +19,7 @@ public class Router extends AbstractMiddleware implements RouteSet {
         return router;
     }
 
-    private final List<Route> routingTable = new ArrayList<Route>();
+    private final List<Route> routingTable = new ArrayList<>();
 
     public Router() {
         this(new NotFound());
@@ -37,17 +38,14 @@ public class Router extends AbstractMiddleware implements RouteSet {
         routingTable.add(route);
     }
 
-    private Route routeFor(Request request) {
-        for (Route route : routingTable) {
-            if (route.matches(request)) return route;
-        }
-        return null;
+    private Optional<Route> routeFor(Request request) {
+        return routingTable.stream().filter(route -> route.matches(request)).findFirst();
     }
 
     public void handle(Request request, Response response) throws Exception {
-        Route route = routeFor(request);
-        if (route != null)
-            route.handle(request, response);
+        Optional<Route> route = routeFor(request);
+        if (route.isPresent())
+            route.get().handle(request, response);
         else
             forward(request, response);
     }

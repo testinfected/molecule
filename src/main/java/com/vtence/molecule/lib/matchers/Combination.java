@@ -13,7 +13,7 @@ public class Combination<T> implements Matcher<T> {
     }
 
     public static <LHS> Combination<LHS> both(Matcher<? super LHS> matcher) {
-        return new Combination<LHS>(matcher);
+        return new Combination<>(matcher);
     }
 
     @SuppressWarnings("unchecked")

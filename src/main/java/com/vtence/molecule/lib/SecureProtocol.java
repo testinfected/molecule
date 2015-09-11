@@ -11,7 +11,7 @@ public enum SecureProtocol {
 
     private final String protocol;
 
-    private SecureProtocol(String protocol) {
+    SecureProtocol(String protocol) {
             this.protocol = protocol;
         }
 

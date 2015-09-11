@@ -20,11 +20,11 @@ public class AnyOf<T> implements Matcher<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> Matcher<T> anyOf(Matcher<? super T>... matchers) {
-        return new AnyOf<T>(Arrays.asList(matchers));
+        return new AnyOf<>(Arrays.asList(matchers));
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Matcher<T> anyOf(Iterable<Matcher<? super T>> matchers) {
-        return new AnyOf<T>(matchers);
+        return new AnyOf<>(matchers);
     }
 }

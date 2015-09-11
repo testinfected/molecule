@@ -67,9 +67,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     public void houseKeeping() {
-        for (Session session : sessions.values()) {
-            if (!validate(session)) destroy(session.id());
-        }
+        sessions.values().stream().filter(session -> !validate(session)).forEach(session -> destroy(session.id()));
     }
 
     private String sessionId(Session data) {

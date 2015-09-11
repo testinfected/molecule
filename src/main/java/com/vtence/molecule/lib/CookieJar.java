@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 public class CookieJar {
-    private final Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
-    private final Map<String, Cookie> fresh = new LinkedHashMap<String, Cookie>();
-    private final Map<String, Cookie> discarded = new LinkedHashMap<String, Cookie>();
+    private final Map<String, Cookie> cookies = new LinkedHashMap<>();
+    private final Map<String, Cookie> fresh = new LinkedHashMap<>();
+    private final Map<String, Cookie> discarded = new LinkedHashMap<>();
 
     public CookieJar(Cookie... cookies) {
         this(Arrays.asList(cookies));
@@ -73,15 +73,15 @@ public class CookieJar {
     }
 
     public List<Cookie> all() {
-        return new ArrayList<Cookie>(cookies.values());
+        return new ArrayList<>(cookies.values());
     }
 
     public List<Cookie> fresh() {
-        return new ArrayList<Cookie>(fresh.values());
+        return new ArrayList<>(fresh.values());
     }
 
     public List<Cookie> discarded() {
-        return new ArrayList<Cookie>(discarded.values());
+        return new ArrayList<>(discarded.values());
     }
 
     public boolean fresh(String name) {

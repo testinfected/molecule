@@ -40,7 +40,7 @@ public class HttpResponse {
 
     public List<String> headers(String name) {
         List<String> values = headers.get(name);
-        return values != null ? values : new ArrayList<String>();
+        return values != null ? values : new ArrayList<>();
     }
 
     public String contentType() {
@@ -56,7 +56,7 @@ public class HttpResponse {
     }
 
     public Map<String, HttpCookie> cookies() {
-        Map<String, HttpCookie> cookies = new HashMap<String, HttpCookie>();
+        Map<String, HttpCookie> cookies = new HashMap<>();
         for (String header : headers("Set-Cookie")) {
             for (HttpCookie cookie : HttpCookie.parse(header)) {
                 cookies.put(cookie.getName(), cookie);

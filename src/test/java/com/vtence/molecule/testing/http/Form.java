@@ -16,7 +16,7 @@ public abstract class Form implements HttpContent {
         return new MultipartForm();
     }
 
-    protected final List<Field> fields = new ArrayList<Field>();
+    protected final List<Field> fields = new ArrayList<>();
 
     public abstract Form addField(String name, String value);
 
@@ -25,7 +25,7 @@ public abstract class Form implements HttpContent {
         return this;
     }
 
-    public static interface Field {
+    public interface Field {
         void encode(OutputStream out, Charset charset) throws IOException;
     }
 }

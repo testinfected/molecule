@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.vtence.molecule.http.HeaderNames.ACCEPT_ENCODING;
+import static java.util.stream.Collectors.toList;
 
 public class AcceptEncoding {
     private final List<Header.Value> values;
@@ -39,11 +40,11 @@ public class AcceptEncoding {
     }
 
     private List<Header.Value> explicitContentCodings(Collection<String> availableEncodings) {
-        List<Header.Value> codings = new ArrayList<Header.Value>();
+        List<Header.Value> codings = new ArrayList<>();
 
         for (Header.Value accept: values) {
             if (accept.is("*")) {
-                List<String> others = new ArrayList<String>(availableEncodings);
+                List<String> others = new ArrayList<>(availableEncodings);
                 others.removeAll(listValues(values));
                 for (String other : others) {
                     codings.add(new Header.Value(other, accept.parameters()));
@@ -67,10 +68,6 @@ public class AcceptEncoding {
     }
 
     private List<String> listValues(List<Header.Value> entries) {
-        List<String> values = new ArrayList<String>();
-        for (Header.Value entry: entries) {
-            values.add(entry.value());
-        }
-        return values;
+        return entries.stream().map(Header.Value::value).collect(toList());
     }
 }

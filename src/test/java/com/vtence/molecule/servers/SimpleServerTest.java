@@ -67,9 +67,7 @@ public class SimpleServerTest {
 
     @Test public void
     notifiesReportersOfErrorsOccurringAsync() throws IOException {
-        server.run((request, response) -> {
-            response.done(new Exception("Crash!"));
-        });
+        server.run((request, response) -> response.done(new Exception("Crash!")));
         request.send();
         assertThat("error", error, notNullValue());
         assertThat("error message", error.getMessage(), equalTo("Crash!"));
@@ -87,9 +85,7 @@ public class SimpleServerTest {
 
     @Test public void
     respondsToRequestsAsynchronously() throws IOException {
-        server.run((request, response) -> {
-            runAsync(() -> response.status(CREATED).done());
-        });
+        server.run((request, response) -> runAsync(() -> response.status(CREATED).done()));
 
         response = request.send();
         assertNoError();
@@ -149,7 +145,7 @@ public class SimpleServerTest {
     @SuppressWarnings("unchecked")
     @Test public void
     providesGeneralRequestInformation() throws IOException {
-        final Map<String, String> info = new HashMap<String, String>();
+        final Map<String, String> info = new HashMap<>();
         server.run((request, response) -> {
             info.put("uri", request.uri());
             info.put("path", request.path());
@@ -179,7 +175,7 @@ public class SimpleServerTest {
     @SuppressWarnings("unchecked")
     @Test public void
     readsRequestHeaders() throws IOException {
-        final Map<String, Iterable<String>> headers = new HashMap<String, Iterable<String>>();
+        final Map<String, Iterable<String>> headers = new HashMap<>();
         server.run((request, response) -> {
             headers.put("names", request.headerNames());
             headers.put("encoding", request.headers("Accept-Encoding"));
@@ -199,7 +195,7 @@ public class SimpleServerTest {
     @SuppressWarnings("unchecked")
     @Test public void
     detailsRequestContent() throws IOException {
-        final Map<String, String> content = new HashMap<String, String>();
+        final Map<String, String> content = new HashMap<>();
         server.run((request, response) -> {
             content.put("contentType", valueOf(request.contentType()));
             content.put("contentLength", valueOf(request.contentLength()));
@@ -220,7 +216,7 @@ public class SimpleServerTest {
 
     @Test public void
     readsMultiPartFormParameters() throws IOException {
-        final Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters = new HashMap<>();
         server.run((request, response) -> {
             List<BodyPart> parts = request.parts();
             for (BodyPart part : parts) {
@@ -240,8 +236,8 @@ public class SimpleServerTest {
 
     @Test public void
     downloadsUploadedFiles() throws IOException {
-        final Map<String, Integer> files = new HashMap<String, Integer>();
-        final Map<String, String> mimeTypes = new HashMap<String, String>();
+        final Map<String, Integer> files = new HashMap<>();
+        final Map<String, String> mimeTypes = new HashMap<>();
         server.run((request, response) -> {
             List<BodyPart> parts = request.parts();
             for (BodyPart part : parts) {

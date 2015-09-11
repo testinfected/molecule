@@ -28,7 +28,7 @@ import static com.vtence.molecule.middlewares.Compressor.Codings.identity;
 
 public class Compressor extends AbstractMiddleware {
 
-    private final Collection<String> compressibleTypes = new ArrayList<String>();
+    private final Collection<String> compressibleTypes = new ArrayList<>();
 
     enum Codings {
 
@@ -56,7 +56,7 @@ public class Compressor extends AbstractMiddleware {
         public abstract void encode(Response response);
 
         public static String[] all() {
-            List<String> all = new ArrayList<String>();
+            List<String> all = new ArrayList<>();
             for (Codings coding : values()) {
                 all.add(coding.name());
             }

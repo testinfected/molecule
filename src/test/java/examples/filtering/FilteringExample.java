@@ -15,7 +15,7 @@ import static com.vtence.molecule.http.HttpStatus.UNAUTHORIZED;
 
 public class FilteringExample {
 
-    private final Map<String, String> users = new HashMap<String, String>();
+    private final Map<String, String> users = new HashMap<>();
 
     public FilteringExample() {
         users.put("admin", "admin");

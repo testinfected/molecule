@@ -12,6 +12,6 @@ public class IsEqual<T> implements Matcher<T> {
     }
 
     public static <T> IsEqual<T> equalTo(T other) {
-        return new IsEqual<T>(other);
+        return new IsEqual<>(other);
     }
 }

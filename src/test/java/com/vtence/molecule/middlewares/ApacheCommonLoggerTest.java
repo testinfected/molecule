@@ -21,6 +21,7 @@ import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpStatus.NO_CONTENT;
 import static com.vtence.molecule.http.HttpStatus.OK;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -66,7 +67,7 @@ public class ApacheCommonLoggerTest {
     }
 
     public static class LogRecordingHandler extends Handler {
-        private final List<LogRecord> records = new ArrayList<LogRecord>();
+        private final List<LogRecord> records = new ArrayList<>();
 
         @Override
         public void publish(LogRecord record) {
@@ -82,11 +83,7 @@ public class ApacheCommonLoggerTest {
         }
 
         public List<String> messages() {
-            List<String> result = new ArrayList<String>();
-            for (LogRecord record : records) {
-                result.add(record.getMessage());
-            }
-            return result;
+            return records.stream().map(LogRecord::getMessage).collect(toList());
         }
 
         public void assertEntries(Matcher<? super List<String>> matching) {

@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 public class MiddlewareStack implements Application {
 
-    private final Deque<Middleware> stack = new ArrayDeque<Middleware>();
+    private final Deque<Middleware> stack = new ArrayDeque<>();
     private Application pipeline;
 
     public MiddlewareStack() {}

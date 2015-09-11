@@ -10,15 +10,15 @@ import java.util.Set;
 
 public class Headers {
 
-    private final Map<String, List<String>> values = new HashMap<String, List<String>>();
-    private final Map<String, String> names = new LinkedHashMap<String, String>();
+    private final Map<String, List<String>> values = new HashMap<>();
+    private final Map<String, String> names = new LinkedHashMap<>();
 
     public String get(String name) {
         return has(name) ? Joiner.on(", ").join(values(name)) : null;
     }
 
     public List<String> list(String name) {
-        return new ArrayList<String>(values(name));
+        return new ArrayList<>(values(name));
     }
 
     public boolean has(String name) {
@@ -31,11 +31,11 @@ public class Headers {
     }
 
     public Set<String> names() {
-        return new LinkedHashSet<String>(names.values());
+        return new LinkedHashSet<>(names.values());
     }
 
     public Map<String, String> all() {
-        Map<String, String> headers = new LinkedHashMap<String, String>();
+        Map<String, String> headers = new LinkedHashMap<>();
         for (String name : names()) {
             headers.put(name, get(name));
         }
@@ -74,7 +74,7 @@ public class Headers {
 
     private List<String> values(String name) {
         if (!values.containsKey(canonicalForm(name))) {
-            values.put(canonicalForm(name), new ArrayList<String>());
+            values.put(canonicalForm(name), new ArrayList<>());
         }
         return values.get(canonicalForm(name));
     }

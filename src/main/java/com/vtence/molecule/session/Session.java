@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Session {
 
     private final String id;
-    private final Map<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();
+    private final Map<Object, Object> attributes = new ConcurrentHashMap<>();
 
     private Instant createdAt;
     private Instant updatedAt;

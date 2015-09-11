@@ -32,7 +32,7 @@ public class DynamicPath implements Matcher<String>, WithBoundParameters {
 
     public Map<String, String> parametersBoundTo(String path) {
         Path p = new Path(path);
-        Map<String, String> boundParameters = new HashMap<String, String>();
+        Map<String, String> boundParameters = new HashMap<>();
 
         for (int i = 0; i < pattern.segmentCount(); i++) {
             String segment = pattern.segment(i);
@@ -59,7 +59,7 @@ public class DynamicPath implements Matcher<String>, WithBoundParameters {
         }
 
         private static String[] removeEmptyParts(String[] parts) {
-            List<String> segments = new ArrayList<String>();
+            List<String> segments = new ArrayList<>();
             for (String part : parts) {
                 if (!part.isEmpty()) segments.add(part);
             }

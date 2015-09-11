@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.toList;
+
 public class Header {
 
     private static final String ZERO_OR_EVEN_NUMBER_OF_QUOTES_AHEAD = "(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
@@ -34,15 +36,11 @@ public class Header {
     }
 
     public List<String> values() {
-        List<String> values = new ArrayList<String>();
-        for (Value entry : this.values) {
-            if (entry.acceptable()) values.add(entry.value());
-        }
-        return values;
+        return values.stream().filter(Value::acceptable).map(Value::value).collect(toList());
     }
 
     private List<Value> parseValues(String header) {
-        List<Value> values = new ArrayList<Value>();
+        List<Value> values = new ArrayList<>();
         for (String value : VALUES_DELIMITER.split(header)) {
             String[] tokens = TOKENS_DELIMITER.split(value);
             values.add(new Value(value(tokens), parameters(tokens)));
@@ -55,7 +53,7 @@ public class Header {
     }
 
     private List<Parameter> parameters(String[] tokens) {
-        List<Parameter> pairs = new ArrayList<Parameter>();
+        List<Parameter> pairs = new ArrayList<>();
         for (int i = 1; i < tokens.length; i++) {
             String token = tokens[i];
             String[] parts = NAME_VALUE_DELIMITER.split(token);

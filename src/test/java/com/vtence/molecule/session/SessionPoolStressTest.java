@@ -17,11 +17,9 @@ public class SessionPoolStressTest {
 
     @Test public void
     supportsStoringAndRetrievingSessionsFromMultipleThreadsSimultaneously() throws InterruptedException {
-        blitzer.blitz(new Runnable() {
-            public void run() {
-                String sid = pool.save(new Session());
-                if (pool.load(sid) == null) errorCount.incrementAndGet();
-            }
+        blitzer.blitz(() -> {
+            String sid = pool.save(new Session());
+            if (pool.load(sid) == null) errorCount.incrementAndGet();
         });
         blitzer.shutdown();
         assertThat("errors count", errorCount.intValue(), equalTo(0));

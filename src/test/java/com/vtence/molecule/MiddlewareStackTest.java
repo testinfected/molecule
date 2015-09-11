@@ -41,11 +41,7 @@ public class MiddlewareStackTest {
     }
 
     private Application application(final String app) {
-        return new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.header("chain", app);
-            }
-        };
+        return (request, response) -> response.header("chain", app);
     }
 
     private void assertChain(org.hamcrest.Matcher<? super String> chaining) {
