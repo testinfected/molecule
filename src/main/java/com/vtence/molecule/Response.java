@@ -6,7 +6,7 @@ import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.lib.BinaryBody;
 
 import java.nio.charset.Charset;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -216,7 +216,7 @@ public class Response {
      * @param name the name of the header to send
      * @param value the new date value for that header
      */
-    public Response header(String name, Date value) {
+    public Response header(String name, Instant value) {
         return header(name, httpDate(value));
     }
 

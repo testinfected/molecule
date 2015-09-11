@@ -2,15 +2,17 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.support.BrokenClock;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -19,23 +21,21 @@ import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpStatus.NO_CONTENT;
 import static com.vtence.molecule.http.HttpStatus.OK;
-import static com.vtence.molecule.support.Dates.calendarDate;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 public class ApacheCommonLoggerTest {
     LogRecordingHandler logRecords = new LogRecordingHandler();
-    Date currentTime = calendarDate(2012, 6, 27).atTime(12, 4, 0).inZone("GMT-05:00").toDate();
-    ApacheCommonLogger apacheCommonLogger =
-            new ApacheCommonLogger(anonymousLogger(logRecords),
-                    BrokenClock.stoppedAt(currentTime),
-                    Locale.US, TimeZone.getTimeZone("GMT+01:00"));
+    Instant currentTime = LocalDateTime.of(2012, 6, 27, 12, 4, 0).toInstant(ZoneOffset.of("-05:00"));
+    ApacheCommonLogger apacheCommonLogger = new ApacheCommonLogger(anonymousLogger(logRecords),
+            Clock.fixed(currentTime, ZoneId.of("GMT+01:00")), Locale.US);
 
     Request request = new Request().protocol("HTTP/1.1").remoteIp("192.168.0.1");
     Response response = new Response();
 
-    @Test public void
+    @Test
+    public void
     logsRequestsServedInApacheCommonLogFormat() throws Exception {
         request.method(GET).uri("/products?keyword=dogs");
 

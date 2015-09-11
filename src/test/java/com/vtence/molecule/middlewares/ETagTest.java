@@ -4,10 +4,9 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 
-import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
@@ -66,7 +65,7 @@ public class ETagTest {
     @Test public void
     willNotSetETagIfLastModifiedHeaderSet() throws Exception {
         etag.handle(request, response);
-        response.header("Last-Modified", httpDate(new Date())).body("response body").done();
+        response.header("Last-Modified", Instant.now()).body("response body").done();
 
         assertNoExecutionError();
         assertThat(response).hasNoHeader("ETag");

@@ -1,15 +1,13 @@
 package com.vtence.molecule.session;
 
-import com.vtence.molecule.lib.Clock;
-import com.vtence.molecule.lib.SystemClock;
-
-import java.util.Date;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionPool implements SessionStore, SessionHouse {
 
-    private final Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
+    private final Map<String, Session> sessions = new ConcurrentHashMap<>();
     private final SessionIdentifierPolicy policy;
     private final Clock clock;
 
@@ -20,7 +18,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     public SessionPool(SessionIdentifierPolicy policy) {
-        this(policy, new SystemClock());
+        this(policy, Clock.systemDefaultZone());
     }
 
     public SessionPool(SessionIdentifierPolicy policy, Clock clock) {
@@ -48,7 +46,7 @@ public class SessionPool implements SessionStore, SessionHouse {
         if (data.invalid()) throw new IllegalStateException("Session invalidated");
         String sid = sessionId(data);
         Session session = makeSession(sid, data);
-        Date now = clock.now();
+        Instant now = clock.instant();
         session.updatedAt(now);
         sessions.put(sid, session);
         if (sid.equals(data.id())) {
@@ -97,6 +95,6 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private boolean expired(Session session) {
-        return session.expirationTime() != null && !clock.now().before(session.expirationTime());
+        return session.expirationTime() != null && !clock.instant().isBefore(session.expirationTime());
     }
 }

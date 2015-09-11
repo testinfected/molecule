@@ -1,9 +1,12 @@
 package examples.performance;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.lib.Clock;
-import com.vtence.molecule.lib.SystemClock;
-import com.vtence.molecule.middlewares.*;
+import com.vtence.molecule.middlewares.Compressor;
+import com.vtence.molecule.middlewares.ConditionalGet;
+import com.vtence.molecule.middlewares.ContentLengthHeader;
+import com.vtence.molecule.middlewares.ETag;
+import com.vtence.molecule.middlewares.FileServer;
+import com.vtence.molecule.middlewares.StaticAssets;
 import com.vtence.molecule.templating.JMustacheRenderer;
 import com.vtence.molecule.templating.Template;
 import com.vtence.molecule.templating.Templates;
@@ -11,10 +14,14 @@ import com.vtence.molecule.testing.ResourceLocator;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Clock;
 
-import static com.vtence.molecule.http.HeaderNames.*;
-import static com.vtence.molecule.http.HttpDate.httpDate;
-import static com.vtence.molecule.http.MimeTypes.*;
+import static com.vtence.molecule.http.HeaderNames.CACHE_CONTROL;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
+import static com.vtence.molecule.http.MimeTypes.CSS;
+import static com.vtence.molecule.http.MimeTypes.HTML;
+import static com.vtence.molecule.http.MimeTypes.JAVASCRIPT;
 
 public class CachingAndCompressionExample {
     private static final Object NO_CONTEXT = null;
@@ -47,7 +54,7 @@ public class CachingAndCompressionExample {
                   response.header(CONTENT_TYPE, HTML);
                   // Add freshness information only when conditional parameter is set
                   if (request.parameter("conditional") != null) {
-                      response.header(LAST_MODIFIED, httpDate(clock.now()));
+                      response.header(LAST_MODIFIED, clock.instant());
                   }
                   response.body(index.render(NO_CONTEXT))
                           .done();
@@ -55,7 +62,7 @@ public class CachingAndCompressionExample {
     }
 
     public static void main(String[] args) throws IOException {
-        CachingAndCompressionExample example = new CachingAndCompressionExample(new SystemClock());
+        CachingAndCompressionExample example = new CachingAndCompressionExample(Clock.systemDefaultZone());
         WebServer webServer = WebServer.create();
         example.run(webServer);
         System.out.println("Access at " + webServer.uri());

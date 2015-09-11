@@ -1,8 +1,6 @@
 package examples.session;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.lib.Clock;
-import com.vtence.molecule.lib.SystemClock;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.middlewares.Cookies;
 import com.vtence.molecule.routing.DynamicRoutes;
@@ -11,6 +9,7 @@ import com.vtence.molecule.session.Session;
 import com.vtence.molecule.session.SessionPool;
 
 import java.io.IOException;
+import java.time.Clock;
 
 public class SessionExample {
 
@@ -20,14 +19,6 @@ public class SessionExample {
 
     public SessionExample(Clock clock) {
         this.clock = clock;
-    }
-
-    public static void main(String[] args) throws IOException {
-        SessionExample example = new SessionExample(new SystemClock());
-        // Run the default web server
-        WebServer webServer = WebServer.create();
-        example.run(webServer);
-        System.out.println("Access at " + webServer.uri());
     }
 
     public void expireAfter(int seconds) {
@@ -61,5 +52,13 @@ public class SessionExample {
                          });
                      }}
               );
+    }
+
+    public static void main(String[] args) throws IOException {
+        SessionExample example = new SessionExample(Clock.systemDefaultZone());
+        // Run the default web server
+        WebServer webServer = WebServer.create();
+        example.run(webServer);
+        System.out.println("Access at " + webServer.uri());
     }
 }

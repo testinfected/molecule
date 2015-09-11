@@ -2,21 +2,20 @@ package com.vtence.molecule.session;
 
 import com.vtence.molecule.Request;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class Session {
 
     private final String id;
     private final Map<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();
 
-    private Date createdAt;
-    private Date updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private boolean invalid;
     private int maxAge = -1;
 
@@ -48,20 +47,20 @@ public class Session {
         return id != null;
     }
 
-    public Date createdAt() {
+    public Instant createdAt() {
         return createdAt;
     }
 
-    public void createdAt(Date time) {
-        createdAt = time;
+    public void createdAt(Instant pointInTime) {
+        createdAt = pointInTime;
     }
 
-    public Date updatedAt() {
+    public Instant updatedAt() {
         return updatedAt;
     }
 
-    public void updatedAt(Date time) {
-        updatedAt = time;
+    public void updatedAt(Instant pointInTime) {
+        updatedAt = pointInTime;
     }
 
     public int maxAge() {
@@ -72,8 +71,8 @@ public class Session {
         maxAge = seconds;
     }
 
-    public Date expirationTime() {
-        return expires() ? new Date(updatedAt.getTime() + TimeUnit.SECONDS.toMillis(maxAge)) : null;
+    public Instant expirationTime() {
+        return expires() ? updatedAt.plusSeconds(maxAge) : null;
     }
 
     private boolean expires() {

@@ -1,10 +1,12 @@
 package com.vtence.molecule.http;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Parsing and formatting of HTTP dates as used in cookies and other headers.
@@ -13,42 +15,43 @@ import java.util.TimeZone;
  */
 public final class HttpDate {
 
-    public static final String RFC_1123_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
-    public static final String RFC_1036_FORMAT = "EEE, dd-MMM-yy HH:mm:ss zzz";
-    public static final String ANSI_ASCTIME_FORMAT = "EEE MMM d HH:mm:ss yyyy";
+    private static final DateTimeFormatter RFC_1123_FORMAT =
+            DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US);
+    private static final DateTimeFormatter RFC_1036_FORMAT =
+            DateTimeFormatter.ofPattern("EEE, dd-MMM-yy HH:mm:ss zzz", Locale.US);
+    private static final DateTimeFormatter ANSI_ASCTIME_FORMAT =
+            DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy", Locale.US);
 
-    private static final String[] POSSIBLE_FORMATS = new String[] {
-            RFC_1123_FORMAT, RFC_1036_FORMAT, ANSI_ASCTIME_FORMAT
+    private static final DateTimeFormatter[] POSSIBLE_FORMATS = new DateTimeFormatter[] {
+            RFC_1123_FORMAT,
+            RFC_1036_FORMAT,
+            ANSI_ASCTIME_FORMAT
     };
-    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    private static final ZoneId GMT = ZoneId.of("GMT");
 
-    public static Date toDate(String httpDate) {
-        for (String format : POSSIBLE_FORMATS) {
-            Date date = parse(httpDate, format);
-            if (date != null) return date;
+    public static Instant parse(String httpDate) {
+        for (DateTimeFormatter format : POSSIBLE_FORMATS) {
+            try {
+                // Ignore timezone component as all HTTP dates should be represented in UTC
+                return LocalDateTime.parse(httpDate, format).atZone(GMT).toInstant();
+            } catch (DateTimeParseException skip) {
+                // try next
+            }
 
         }
         throw new IllegalArgumentException("Invalid date format: " + httpDate);
     }
 
-    private static Date parse(String date, String format) {
-        SimpleDateFormat httpDate = new SimpleDateFormat(format, Locale.US);
-        httpDate.setTimeZone(GMT);
-        return httpDate.parse(date, new ParsePosition(0));
+    public static String format(long epochMillis) {
+        return httpDate(Instant.ofEpochMilli(epochMillis));
     }
 
-    public static String format(long date) {
-        return httpDate(new Date(date));
+    public static String httpDate(Instant pointInTime) {
+        return rfc1123(pointInTime);
     }
 
-    public static String httpDate(Date date) {
-        return rfc1123(date);
-    }
-
-    public static String rfc1123(Date date) {
-        SimpleDateFormat httpDate = new SimpleDateFormat(RFC_1123_FORMAT, Locale.US);
-        httpDate.setTimeZone(GMT);
-        return httpDate.format(date);
+    public static String rfc1123(Instant pointInTime) {
+        return RFC_1123_FORMAT.format(ZonedDateTime.ofInstant(pointInTime, GMT));
     }
 
     HttpDate() {}

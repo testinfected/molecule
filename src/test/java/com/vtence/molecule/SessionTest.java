@@ -4,10 +4,10 @@ import com.vtence.molecule.session.Session;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
-import static com.vtence.molecule.support.Dates.namedDate;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.emptyIterable;
@@ -16,10 +16,11 @@ import static org.hamcrest.Matchers.nullValue;
 
 public class SessionTest {
 
-    int TIMEOUT = (int) TimeUnit.MINUTES.toSeconds(30);
-    Date updateTime = namedDate("last update time").toDate();
+    int timeoutInSeconds = (int) TimeUnit.MINUTES.toSeconds(30);
+    Instant updateTime = Instant.now();
 
-    @Test public void
+    @Test
+    public void
     needsAnIdToExist() {
         Session fresh = new Session();
         assertThat("exists when fresh?", fresh.exists(), equalTo(false));
@@ -30,7 +31,8 @@ public class SessionTest {
         assertThat("exists id", existing.id(), equalTo("exists"));
     }
 
-    @Test public void
+    @Test
+    public void
     isInitiallyEmptyAndValid() {
         Session session = new Session();
         assertThat("initially valid?", !session.invalid(), equalTo(true));
@@ -38,7 +40,8 @@ public class SessionTest {
         assertThat("initial values", session.values(), emptyIterable());
     }
 
-    @Test public void
+    @Test
+    public void
     storesMultipleAttributes() {
         Session session = new Session();
         session.put("A", "Alice");
@@ -49,7 +52,8 @@ public class SessionTest {
         assertThat("C(hris)", session.<String>get("C"), equalTo("Chris"));
     }
 
-    @Test public void
+    @Test
+    public void
     allowsOverridingAttributes() {
         Session session = new Session();
         session.put("key", "original");
@@ -57,7 +61,8 @@ public class SessionTest {
         assertThat("overridden value", session.<String>get("key"), equalTo("override"));
     }
 
-    @Test public void
+    @Test
+    public void
     allowsRemovingAttributes() {
         Session session = new Session();
         session.put("A", "Alice");
@@ -67,7 +72,8 @@ public class SessionTest {
         assertThat("values", session.values(), containsItems("Alice", "Chris"));
     }
 
-    @Test public void
+    @Test
+    public void
     knowsItsContent() {
         Session session = new Session();
         session.put("A", "Alice");
@@ -81,7 +87,8 @@ public class SessionTest {
         assertThat("known values", session.values(), containsItems("Alice", "Bob", "Chris"));
     }
 
-    @Test public void
+    @Test
+    public void
     updatesContentFromOtherSession() {
         Session session = new Session();
         session.put("A", "Albert");
@@ -95,7 +102,8 @@ public class SessionTest {
         assertThat("merged values", session.values(), containsItems("Alice", "Bob", "Chris"));
     }
 
-    @Test public void
+    @Test
+    public void
     dropsContentWhenInvalidated() {
         Session session = new Session();
 
@@ -110,30 +118,33 @@ public class SessionTest {
         assertThat("values once invalid", session.values(), emptyIterable());
     }
 
-    @Test public void
+    @Test
+    public void
     isInitiallySetToNeverExpires() {
         Session session = new Session();
         assertThat("initial max age", session.maxAge(), equalTo(-1));
         assertThat("initial expiration time", session.expirationTime(), nullValue());
     }
 
-    @Test public void
+    @Test
+    public void
     expiresAtSpecifiedTime() {
         Session session = new Session();
         session.updatedAt(updateTime);
-        session.maxAge(TIMEOUT);
+        session.maxAge(timeoutInSeconds);
         assertThat("expiration time", session.expirationTime(), equalTo(whenTimeoutOccurs(updateTime)));
     }
 
-    @Test(expected = IllegalStateException.class) public void
+    @Test(expected = IllegalStateException.class)
+    public void
     canNoLongerBeWrittenOnceInvalidated() {
         Session session = new Session();
         session.invalidate();
         session.put("A", "Alice");
     }
 
-    private Date whenTimeoutOccurs(Date pointInTime) {
-        return new Date(pointInTime.getTime() + TimeUnit.SECONDS.toMillis(TIMEOUT));
+    private Instant whenTimeoutOccurs(Instant pointInTime) {
+        return pointInTime.plus(timeoutInSeconds, ChronoUnit.SECONDS);
     }
 
     private Matcher<Iterable<?>> containsItems(Object... items) {

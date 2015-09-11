@@ -2,21 +2,23 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.support.Dates;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
-import static com.vtence.molecule.http.HttpMethod.*;
-import static com.vtence.molecule.http.HttpStatus.*;
-import static com.vtence.molecule.support.Dates.*;
+import static com.vtence.molecule.http.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpMethod.HEAD;
+import static com.vtence.molecule.http.HttpMethod.POST;
+import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
+import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class ConditionalGetTest {
 
-    long ONE_HOUR = TimeUnit.HOURS.toMillis(1);
     ConditionalGet conditional = new ConditionalGet();
 
     Request request = new Request().method(GET);
@@ -86,7 +88,7 @@ public class ConditionalGetTest {
     @Test
     public void
     sendsNotModifiedWhenGettingEntityWhichHasNotBeenModifiedSinceLastServed() throws Exception {
-        final String lastModification = httpDate(now().toDate());
+        final String lastModification = httpDate(Instant.now());
         request.header("If-Modified-Since", lastModification);
         conditional.handle(request, response);
         response.header("Last-Modified", lastModification).done();
@@ -98,7 +100,7 @@ public class ConditionalGetTest {
     @Test
     public void
     leavesResponseUnchangedWhenEntityHasNotBeenModifiedButETagIndicatesItIsNotCurrent() throws Exception {
-        final String lastModification = httpDate(aDate().toDate());
+        final String lastModification = httpDate(Instant.now());
 
         request.header("If-None-Match", "87654321")
                .header("If-Modified-Since", lastModification);
@@ -113,17 +115,17 @@ public class ConditionalGetTest {
     public void
     leavesResponseUnchangedWhenEntityWasModifiedButETagIndicatesItIsCurrent() throws Exception {
         request.header("If-None-Match", "12345678")
-               .header("If-Modified-Since", httpDate(oneHourAgo().toDate()));
+               .header("If-Modified-Since", httpDate(oneHourAgo()));
         conditional.handle(request, response);
         response.header("ETag", "12345678")
-                .header("Last-Modified", httpDate(now().toDate())).done();
+                .header("Last-Modified", httpDate(Instant.now())).done();
 
         assertNoExecutionError();
         assertThat(response).hasStatus(OK);
     }
 
-    private Dates oneHourAgo() {
-        return instant(System.currentTimeMillis() - ONE_HOUR);
+    private Instant oneHourAgo() {
+        return Instant.now().minus(1, ChronoUnit.HOURS);
     }
 
     private void assertNoExecutionError() throws ExecutionException, InterruptedException {
