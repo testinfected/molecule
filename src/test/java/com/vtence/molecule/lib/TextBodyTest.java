@@ -5,9 +5,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
-import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TextBodyTest {
 

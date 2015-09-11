@@ -1,6 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
@@ -11,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
@@ -371,7 +371,7 @@ public class Request {
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
         if (contentType == null || contentType.charset() == null) {
-            return Charsets.ISO_8859_1;
+            return StandardCharsets.ISO_8859_1;
         }
         return contentType.charset();
     }

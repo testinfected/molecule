@@ -2,7 +2,6 @@ package com.vtence.molecule.templating;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Streams;
 
 import java.io.File;
@@ -12,12 +11,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class JMustacheRenderer implements RenderingEngine {
 
     private Mustache.Compiler mustache;
     private File path = new File(".");
-    private Charset encoding = Charsets.UTF_8;
+    private Charset encoding = StandardCharsets.UTF_8;
     private String extension = "mustache";
 
     public JMustacheRenderer() {

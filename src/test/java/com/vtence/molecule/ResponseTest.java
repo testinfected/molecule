@@ -1,9 +1,9 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Charsets;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,13 +51,13 @@ public class ResponseTest {
 
     @Test
     public void usesISO8859AsDefaultCharset() {
-        assertThat("default charset", response.charset(), equalTo(Charsets.ISO_8859_1));
+        assertThat("default charset", response.charset(), equalTo(StandardCharsets.ISO_8859_1));
     }
 
     @Test
     public void readsCharsetFromContentType() {
         response.contentType("text/html; charset=utf-8");
-        assertThat("charset", response.charset(), equalTo(Charsets.UTF_8));
+        assertThat("charset", response.charset(), equalTo(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ResponseTest {
         response.contentType("text/html; charset=iso-8859-1");
         response.charset("utf-8");
         assertThat("charset", response.contentType(), equalTo("text/html; charset=utf-8"));
-        assertThat("charset", response.charset(), equalTo(Charsets.UTF_8));
+        assertThat("charset", response.charset(), equalTo(StandardCharsets.UTF_8));
     }
 
     @Test

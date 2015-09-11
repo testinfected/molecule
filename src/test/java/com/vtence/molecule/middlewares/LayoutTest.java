@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.vtence.molecule.helpers.Charsets.UTF_8;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class LayoutTest {
-    @Rule public
+    @Rule
+    public
     JUnitRuleMockery context = new JUnitRuleMockery();
     Selector selector = context.mock(Selector.class);
     Layout layout = new Layout(selector, new StubProcessor(), new StubDecorator());
@@ -33,15 +34,21 @@ public class LayoutTest {
     Request request = new Request();
     Response response = new Response();
 
-    @Before public void
+    @Before
+    public void
     selectPage() throws Exception {
         context.checking(new Expectations() {{
-            allowing(selector).selected(with(any(Response.class))); will(returnValue(true)); when(page.is("selected"));
-            allowing(selector).selected(with(any(Response.class))); will(returnValue(false)); when(page.isNot("selected"));
+            allowing(selector).selected(with(any(Response.class)));
+            will(returnValue(true));
+            when(page.is("selected"));
+            allowing(selector).selected(with(any(Response.class)));
+            will(returnValue(false));
+            when(page.isNot("selected"));
         }});
     }
 
-    @Test public void
+    @Test
+    public void
     runsContentThroughDecoratorWhenPageIsSelected() throws Exception {
         layout.handle(request, response);
         response.body("raw content").done();
@@ -50,7 +57,8 @@ public class LayoutTest {
         assertThat(response).hasBodyText("<decorated>raw content</decorated>");
     }
 
-    @Test public void
+    @Test
+    public void
     removesContentLengthHeaderIfDecorating() throws Exception {
         response.header("Content-Length", 140);
         layout.handle(request, response);
@@ -60,7 +68,8 @@ public class LayoutTest {
         assertThat(response).hasNoHeader("Content-Length");
     }
 
-    @Test public void
+    @Test
+    public void
     leavesContentUntouchedIfNoDecorationOccurs() throws Exception {
         layout.connectTo((request, response) -> response.body("original content"));
 
@@ -72,7 +81,8 @@ public class LayoutTest {
         assertThat(response).hasBodyText("original content");
     }
 
-    @Test public void
+    @Test
+    public void
     preservesOriginalResponseEncodingWhenDecorating() throws Exception {
         layout.connectTo((request, response) -> response.body("encoded content (éçëœ)"));
 

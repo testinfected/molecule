@@ -9,18 +9,24 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
-import static com.vtence.molecule.http.HeaderNames.*;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
 import static com.vtence.molecule.lib.BinaryBody.bytes;
 import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 /**
  * The HTTP response to write back to the client.

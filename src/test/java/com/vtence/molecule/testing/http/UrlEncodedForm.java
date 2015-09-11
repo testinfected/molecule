@@ -1,17 +1,16 @@
 package com.vtence.molecule.testing.http;
 
-import com.vtence.molecule.helpers.Charsets;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 public class UrlEncodedForm extends Form {
 
-    private Charset charset = Charsets.UTF_8;
+    private Charset charset = StandardCharsets.UTF_8;
 
     @Override
     public long contentLength() throws IOException {
