@@ -395,6 +395,41 @@ public class Response {
         return size() == 0;
     }
 
+    /**
+     * If not already completed, triggers a normal (i.e successful) completion of this response.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     **/
+    public void done() {
+        done.complete(this);
+    }
+
+    /**
+     * If not already completed, triggers an abnormal (i.e failed) completion of this response with the
+     * given exception.
+     *
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     **/
+    public void done(Throwable error) {
+        done.completeExceptionally(error);
+    }
+
+    /**
+     * When this response completes normally (i.e. without an exception),
+     * executes the given action, with this response.
+     * <p>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * <br/>
+     * To trigger normal completion of this response, call {@link #done()} .
+     * </p>
+     *
+     * @param action the action to perform when this response completes successfully
+     */
     public Response whenSuccessful(Consumer<Response> action) {
         postProcessing = postProcessing.whenComplete((response, error) -> {
             if (response != null) action.accept(response);
@@ -402,6 +437,17 @@ public class Response {
         return this;
     }
 
+    /**
+     * When this response completes abnormally (i.e. with an exception),
+     * executes the given action, with this response.
+     * <p>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * <br/>
+     * To trigger abnormal completion of this response, call {@link #done(Throwable)} .
+     * </p>
+     *
+     * @param action the action to perform when this response completes abnormally
+     */
     public Response whenFailed(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.whenComplete((response, error) -> {
             if (error != null) action.accept(Response.this, unwrap(error));
@@ -409,11 +455,38 @@ public class Response {
         return this;
     }
 
+    /**
+     * When this response completes either normally or abnormally (i.e. with or without an exception),
+     * executes the given action with this response and the
+     * exception (or {@code null} if the response completed normally).
+     * <p>
+     * Note that this method allows injection of an action regardless of outcome,
+     * otherwise preserving the outcome in its completion, unlike {@link #rescue}.
+     * <br/>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * </p>
+     * <p>
+     * To trigger completion of this response, call either forms of {@link #done}.
+     * </p>
+     * @param action the action to perform when this response completes
+     */
     public Response whenComplete(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.whenComplete((response, error) -> action.accept(Response.this, unwrap(error)));
         return this;
     }
 
+    /**
+     * When this response completes abnormally (i.e. with an exception),
+     * executes the given action with this response and the exception, then continue processing this response
+     * normally.
+     * <p>
+     * Note that this method replaces the failed result with this response before triggering the next action,
+     * as if the response had completed normally.
+     * <br/>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * </p>
+     * @param action the action to perform when this response completes abnormally
+     */
     public Response rescue(BiConsumer<Response, Throwable> action) {
         postProcessing = postProcessing.handle((response, error) -> {
             if (error != null) action.accept(Response.this, unwrap(error));
@@ -422,27 +495,46 @@ public class Response {
         return this;
     }
 
-    private Throwable unwrap(Throwable error) {
-        return error instanceof CompletionException ? error.getCause() : error;
-    }
-
-    public void done() {
-        done.complete(this);
-    }
-
-    public void done(Throwable error) {
-        done.completeExceptionally(error);
-    }
-
+    /**
+     * Returns {@code true} if this response completed.
+     *
+     * Completion may be due to normal termination or an exception -- in all of these cases, this method will return
+     * {@code true}.
+     *
+     * @return {@code true} if this response completed, false otherwise
+     */
     public boolean isDone() {
         return done.isDone();
     }
 
+    /**
+     * Waits if necessary for this response to complete, and then
+     * retrieves its result.
+     *
+     * @return this response if it completed normally
+     * @throws ExecutionException if this response completed with an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     */
     public Response await() throws ExecutionException, InterruptedException {
         return postProcessing.get();
     }
 
+    /**
+     * Waits if necessary for at most the given time for this response
+     * to complete, and then retrieves its result, if available.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return this response if it completed normally
+     * @throws ExecutionException if this response completed with an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException if the wait timed out
+     */
     public Response await(long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
         return postProcessing.get(timeout, unit);
+    }
+
+    private Throwable unwrap(Throwable error) {
+        return error instanceof CompletionException ? error.getCause() : error;
     }
 }
