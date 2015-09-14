@@ -1,14 +1,14 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.lib.matchers.Matcher;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.matchers.Matchers;
-import com.vtence.molecule.Middleware;
+import com.vtence.molecule.lib.matchers.Matcher;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.vtence.molecule.lib.matchers.Matchers.startingWith;
 import static com.vtence.molecule.lib.matchers.Matchers.withPath;
 
 public class FilterMap extends AbstractMiddleware {
@@ -30,7 +30,7 @@ public class FilterMap extends AbstractMiddleware {
     }
 
     public FilterMap map(String pathPrefix, Middleware filter) {
-        return map(withPath(Matchers.startingWith(pathPrefix)), filter);
+        return map(withPath(startingWith(pathPrefix)), filter);
     }
 
     public FilterMap map(Matcher<? super Request> requestMatcher, Middleware filter) {
