@@ -424,7 +424,7 @@ public class Response {
      * executes the given action, with this response.
      * <p>
      * Actions supplied will be executed in the order they are registered on this response.
-     * <br/>
+     * <br>
      * To trigger normal completion of this response, call {@link #done()} .
      * </p>
      *
@@ -442,7 +442,7 @@ public class Response {
      * executes the given action, with this response.
      * <p>
      * Actions supplied will be executed in the order they are registered on this response.
-     * <br/>
+     * <br>
      * To trigger abnormal completion of this response, call {@link #done(Throwable)} .
      * </p>
      *
@@ -462,7 +462,7 @@ public class Response {
      * <p>
      * Note that this method allows injection of an action regardless of outcome,
      * otherwise preserving the outcome in its completion, unlike {@link #rescue}.
-     * <br/>
+     * <br>
      * Actions supplied will be executed in the order they are registered on this response.
      * </p>
      * <p>
@@ -482,7 +482,7 @@ public class Response {
      * <p>
      * Note that this method replaces the failed result with this response before triggering the next action,
      * as if the response had completed normally.
-     * <br/>
+     * <br>
      * Actions supplied will be executed in the order they are registered on this response.
      * </p>
      * @param action the action to perform when this response completes abnormally
