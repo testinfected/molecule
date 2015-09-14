@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.http.HttpStatus.NO_CONTENT;
 import static com.vtence.molecule.http.HttpStatus.OK;
 import static java.util.stream.Collectors.toList;
@@ -54,6 +55,19 @@ public class ApacheCommonLoggerTest {
 
         apacheCommonLogger.handle(request, response);
         response.status(NO_CONTENT).body("").done();
+
+        response.await();
+        logRecords.assertEntries(contains(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));
+    }
+
+    @Test
+    public void
+    usesOriginalRequestValues() throws Exception {
+        request.remoteIp("192.168.0.1").method(DELETE).uri("/logout");
+
+        apacheCommonLogger.handle(request, response);
+        request.uri("/changed").method(POST).remoteIp("100.100.100.1").protocol("HTTPS");
+        response.status(NO_CONTENT).done();
 
         response.await();
         logRecords.assertEntries(contains(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));

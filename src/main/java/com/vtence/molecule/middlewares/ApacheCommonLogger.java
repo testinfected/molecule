@@ -2,6 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.HttpMethod;
 
 import java.time.Clock;
 import java.time.ZonedDateTime;
@@ -38,14 +39,19 @@ public class ApacheCommonLogger extends AbstractMiddleware {
     }
 
     private Consumer<Response> logAccess(Request request) {
+        String remoteIp = request.remoteIp();
+        HttpMethod method = request.method();
+        String uri = request.uri();
+        String protocol = request.protocol().toUpperCase();
+
         return response -> {
             String msg = String.format(COMMON_LOG_FORMAT,
-                    request.remoteIp(),
+                    remoteIp,
                     "-",
                     currentTime(),
-                    request.method(),
-                    request.uri(),
-                    request.protocol(),
+                    method,
+                    uri,
+                    protocol,
                     response.statusCode(),
                     contentLengthOf(response));
             logger.info(msg);
