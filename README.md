@@ -43,7 +43,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.8.1</version>
+      <version>0.8.2</version>
 </dependency>
 ```
  
@@ -187,8 +187,6 @@ To do this, use the route definition methods that accept a _Matcher_ rather than
 
 ### Attributes
 
-### Cookies
-
 ## Working with the Response
 
 ### Response Object
@@ -196,6 +194,8 @@ To do this, use the route definition methods that accept a _Matcher_ rather than
 ### Bodies
 
 ### Redirection and Errors
+
+## Cookies
 
 ## Sessions
 
