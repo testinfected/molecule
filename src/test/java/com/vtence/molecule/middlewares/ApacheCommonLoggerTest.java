@@ -2,30 +2,18 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import org.hamcrest.Matcher;
+import com.vtence.molecule.support.LoggingSupport.LogRecordingHandler;
 import org.junit.Test;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.*;
 import java.util.Locale;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
-import static com.vtence.molecule.http.HttpMethod.DELETE;
-import static com.vtence.molecule.http.HttpMethod.GET;
-import static com.vtence.molecule.http.HttpMethod.POST;
+import static com.vtence.molecule.http.HttpMethod.*;
 import static com.vtence.molecule.http.HttpStatus.NO_CONTENT;
 import static com.vtence.molecule.http.HttpStatus.OK;
-import static java.util.stream.Collectors.toList;
+import static com.vtence.molecule.support.LoggingSupport.anonymousLogger;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 public class ApacheCommonLoggerTest {
     LogRecordingHandler logRecords = new LogRecordingHandler();
@@ -73,35 +61,4 @@ public class ApacheCommonLoggerTest {
         logRecords.assertEntries(contains(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));
     }
 
-    private Logger anonymousLogger(Handler handler) {
-        Logger logger = Logger.getAnonymousLogger();
-        logger.setUseParentHandlers(false);
-        logger.addHandler(handler);
-        return logger;
-    }
-
-    public static class LogRecordingHandler extends Handler {
-        private final List<LogRecord> records = new ArrayList<>();
-
-        @Override
-        public void publish(LogRecord record) {
-            records.add(record);
-        }
-
-        @Override
-        public void flush() {
-        }
-
-        @Override
-        public void close() throws SecurityException {
-        }
-
-        public List<String> messages() {
-            return records.stream().map(LogRecord::getMessage).collect(toList());
-        }
-
-        public void assertEntries(Matcher<? super List<String>> matching) {
-            assertThat("log messages", messages(), matching);
-        }
-    }
 }
