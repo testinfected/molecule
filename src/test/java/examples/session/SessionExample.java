@@ -35,7 +35,7 @@ public class SessionExample {
                          map("/").to((request, response) -> {
                              Session session = Session.get(request);
                              String username = session.contains("username") ? session.<String>get("username") : "Guest";
-                             response.body("Hello, " + username).done();
+                             response.done("Hello, " + username);
                          });
 
                          post("/login").to((request, response) -> {

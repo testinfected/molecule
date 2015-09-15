@@ -13,7 +13,7 @@ public class MultipartExample {
         server.start(new DynamicRoutes() {{
             get("/profile").to((request, response) -> {
                 response.contentType("text/html");
-                response.body("<html>" +
+                response.done("<html>" +
                         "<body>" +
                         "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
                         "<p>" +
@@ -31,7 +31,6 @@ public class MultipartExample {
                         "</form>" +
                         "</body>" +
                         "</html>");
-                response.done();
             });
 
             post("/profile").to((request, response) -> {

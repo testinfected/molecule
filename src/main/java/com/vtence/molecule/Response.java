@@ -396,6 +396,33 @@ public class Response {
     }
 
     /**
+     * Sets the text content to write back to the client as the body of this response
+     * then triggers a normal (i.e successful) completion of this response if not already completed.
+     * The text content will be encoded using the charset of the response.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     * @param text the body text to write back to the client
+     **/
+    public void done(String text) {
+        done(text(text));
+    }
+
+    /**
+     * Sets the body to write back to the client then triggers a normal (i.e successful) completion of this response
+     * if not already completed.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     * @param body the body to write back to the client
+     **/
+    public void done(Body body) {
+        body(body).done();
+    }
+
+    /**
      * If not already completed, triggers a normal (i.e successful) completion of this response.
      * <p>
      * A call to <code>done</code> has no effect if this response has already completed, whether normally or

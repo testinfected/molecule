@@ -28,8 +28,7 @@ public class TemplatingAndLayoutExample {
                       response.contentType("text/html; charset=utf-8");
                       String name = request.parameter("name") != null ? request.parameter("name") : "World";
                       // Mustache can use any object or a Map as a rendering context
-                      response.body(greeting.render(new User(name)))
-                              .done();
+                      response.done(greeting.render(new User(name)));
                   });
               }});
     }

@@ -18,15 +18,14 @@ public class SimpleExample {
             // The specified charset will be used automatically to encode the response
             response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
 
-            response.body( "<html>" +
+            response.done("<html>" +
                             "<body>" +
                                 "<p>" +
                                 "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
                                 "d'être déçus en voyant leurs drôles d'œufs abîmés." +
-                            "</p>" +
+                                "</p>" +
                             "</body>" +
-                        "</html>")
-                    .done();
+                          "</html>");
         });
     }
 

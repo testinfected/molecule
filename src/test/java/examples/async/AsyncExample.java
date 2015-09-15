@@ -18,8 +18,7 @@ public class AsyncExample {
             runAsync(() -> {
                 aLongRunningProcess(500);
 
-                response.body("After waiting for a long time...")
-                        .done();
+                response.done("After waiting for a long time...");
             });
         });
     }

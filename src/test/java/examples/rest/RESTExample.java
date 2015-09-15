@@ -28,8 +28,7 @@ public class RESTExample {
                 if (body.text().isEmpty()) {
                     body.append("Your music library is empty");
                 }
-                response.body(body)
-                        .done();
+                response.done(body);
             });
 
             post("/albums").to((request, response) -> {
@@ -37,16 +36,14 @@ public class RESTExample {
                 Album album = new Album(request.parameter("title"), request.parameter("artist"));
                 albums.put(id, album);
                 response.statusCode(201)
-                        .body(album.info())
-                        .done();
+                        .done(album.info());
             });
 
             get("/albums/:id").to((request, response) -> {
                 int id = Integer.parseInt(request.parameter("id"));
                 if (albums.containsKey(id)) {
                     Album album = albums.get(id);
-                    response.body(album.info())
-                            .done();
+                    response.done(album.info());
                 } else {
                     response.statusCode(404).done();
                 }
@@ -61,8 +58,7 @@ public class RESTExample {
                     if (title != null) album.title = title;
                     String artist = request.parameter("artist");
                     if (artist != null) album.artist = artist;
-                    response.body(album.info())
-                            .done();
+                    response.done(album.info());
                 } else {
                     response.statusCode(404).done();
                 }
@@ -73,8 +69,7 @@ public class RESTExample {
                 int id = Integer.parseInt(request.parameter("id"));
                 Album album = albums.remove(id);
                 if (album != null) {
-                    response.body(album.info())
-                            .done();
+                    response.done(album.info());
                 } else {
                     response.statusCode(404).done();
                 }

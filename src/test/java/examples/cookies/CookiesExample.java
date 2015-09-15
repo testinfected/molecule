@@ -19,7 +19,7 @@ public class CookiesExample {
                       CookieJar cookies = CookieJar.get(request);
                       // Read client cookie
                       Cookie customer = cookies.get("customer");
-                      response.body("Welcome, " + valueOf(customer)).done();
+                      response.done("Welcome, " + valueOf(customer));
                   });
 
                   get("/weapon").to((request, response) -> {

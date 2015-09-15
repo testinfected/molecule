@@ -36,8 +36,7 @@ public class CustomMiddlewareExample {
 
         // A simple hello world application
         Application helloWorld = (request, response) ->
-                response.contentType("text/html").body("<html><body>Hello, World</body></html>")
-                        .done();
+                response.contentType("text/html").done("<html><body>Hello, World</body></html>");
 
         // Deploy middlewares first, followed by our application
         server.add(getFirefox)

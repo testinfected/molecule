@@ -56,8 +56,7 @@ public class CachingAndCompressionExample {
                   if (request.parameter("conditional") != null) {
                       response.header(LAST_MODIFIED, clock.instant());
                   }
-                  response.body(index.render(NO_CONTEXT))
-                          .done();
+                  response.done(index.render(NO_CONTEXT));
               });
     }
 

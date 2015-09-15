@@ -20,14 +20,13 @@ public class RoutingExample {
 
             get("/hello/:username").to((request, response) -> {
                 response.contentType("text/html");
-                response.body(
+                response.done(
                         "<html>" +
                         "<body>" +
                             "<h3>Hello, " + request.parameter("username") + "</h3>" +
                         "</body>" +
                         "</html>"
                 );
-                response.done();
             });
         }});
     }

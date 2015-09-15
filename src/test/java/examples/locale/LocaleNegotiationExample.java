@@ -21,13 +21,12 @@ public class LocaleNegotiationExample {
               .start((request, response) -> {
                   Locale locale = request.attribute(Locale.class);
                   response.contentType("text/plain");
-                  response.body(
+                  response.done(
                           "You asked for: " + request.header("accept-language") + "\n" +
                           "We support: " + Arrays.asList(supportedLanguages) + "\n" +
                           "Our default is: " + Locale.getDefault().toLanguageTag() + "\n" +
                           "The best match is: " + locale.toLanguageTag() + "\n"
                   );
-                  response.done();
               });
     }
 
