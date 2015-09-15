@@ -133,4 +133,9 @@ public class ResponseAssert {
         Assert.assertThat("response body encoding", detectCharsetOf(BodyContent.asBytes(response)), matching);
         return this;
     }
+
+    public ResponseAssert isDone() {
+        Assert.assertThat("response completed", response.isDone(), is(true));
+        return this;
+    }
 }

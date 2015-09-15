@@ -1,6 +1,5 @@
 package com.vtence.molecule.testing.http;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 
@@ -12,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class MultipartForm extends Form {
 
@@ -19,7 +19,7 @@ public class MultipartForm extends Form {
 
     private final String boundary =  Long.toHexString(System.currentTimeMillis());
 
-    private Charset charset = Charsets.UTF_8;
+    private Charset charset = StandardCharsets.UTF_8;
 
     @Override
     public long contentLength() throws IOException {
@@ -139,17 +139,14 @@ public class MultipartForm extends Form {
         }
 
         private void writeFileContent(OutputStream output) throws IOException {
-            FileInputStream input = new FileInputStream(file);
-            try {
+            try (FileInputStream input = new FileInputStream(file)) {
                 Streams.copy(input, output);
-            } finally {
-                Streams.close(input);
             }
         }
 
         private Charset fileCharset() {
             ContentType contentType = ContentType.parse(this.contentType);
-            if (contentType == null || contentType.charset() == null) return Charsets.UTF_8;
+            if (contentType == null || contentType.charset() == null) return StandardCharsets.UTF_8;
             return contentType.charset();
         }
     }

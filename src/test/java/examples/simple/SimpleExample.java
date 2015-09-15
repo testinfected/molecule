@@ -1,8 +1,5 @@
 package examples.simple;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.Failsafe;
 
@@ -14,25 +11,21 @@ public class SimpleExample {
     public void run(WebServer server) throws IOException {
         // Capture internal server errors and display a 500 page
         server.add(new Failsafe());
-        server.start(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                // An unsupported charset will cause an exception, which will cause the FailSafe middleware
-                // to render a 500 page
-                Charset encoding = Charset.forName(request.parameter("encoding"));
-                // The specified charset will be used automatically to encode the response
-                response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
+        server.start((request, response) -> {
+            // An unsupported charset will cause an exception, which will cause the FailSafe middleware
+            // to render a 500 page
+            Charset encoding = Charset.forName(request.parameter("encoding"));
+            // The specified charset will be used automatically to encode the response
+            response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
 
-                response.body(
-                        "<html>" +
+            response.done("<html>" +
                             "<body>" +
                                 "<p>" +
                                 "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
                                 "d'être déçus en voyant leurs drôles d'œufs abîmés." +
                                 "</p>" +
                             "</body>" +
-                        "</html>"
-                );
-            }
+                          "</html>");
         });
     }
 

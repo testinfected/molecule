@@ -7,10 +7,7 @@ import com.vtence.molecule.Response;
 
 public abstract class AbstractMiddleware implements Middleware {
 
-    protected static final Application NO_SUCCESSOR = new Application() {
-        public void handle(Request request, Response response) throws Exception {
-        }
-    };
+    protected static final Application NO_SUCCESSOR = (request, response) -> {};
 
     protected Application successor;
 
@@ -26,7 +23,8 @@ public abstract class AbstractMiddleware implements Middleware {
         this.successor = successor;
     }
 
-    protected void forward(Request request, Response response) throws Exception {
+    protected Response forward(Request request, Response response) throws Exception {
         successor.handle(request, response);
+        return response;
     }
 }

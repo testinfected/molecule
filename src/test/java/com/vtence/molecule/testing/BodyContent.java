@@ -20,10 +20,10 @@ public class BodyContent {
     }
 
     public static String asText(Response response) {
-        return new String(BodyContent.asBytes(response), response.charset());
+        return new String(asBytes(response), response.charset());
     }
 
-    public static InputStream stream(Response response) {
+    public static InputStream asStream(Response response) {
         return new ByteArrayInputStream(asBytes(response));
     }
 

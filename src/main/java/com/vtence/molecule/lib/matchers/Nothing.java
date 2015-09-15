@@ -6,6 +6,6 @@ public class Nothing<T> implements Matcher<T> {
     }
 
     public static <T> Nothing<T> nothing() {
-        return new Nothing<T>();
+        return new Nothing<>();
     }
 }

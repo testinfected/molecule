@@ -61,6 +61,6 @@ public class AcceptEncodingTest {
     }
 
     public static List<String> fromCandidates(String... candidates) {
-        return new ArrayList<String>(Arrays.asList(candidates));
+        return new ArrayList<>(Arrays.asList(candidates));
     }
 }

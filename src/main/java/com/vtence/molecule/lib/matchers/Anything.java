@@ -6,6 +6,6 @@ public class Anything<T> implements Matcher<T> {
     }
 
     public static <T> Anything<T> anything() {
-        return new Anything<T>();
+        return new Anything<>();
     }
 }

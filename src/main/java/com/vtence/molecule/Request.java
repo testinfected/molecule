@@ -1,6 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
@@ -11,7 +10,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static java.lang.Long.parseLong;
@@ -24,9 +32,9 @@ import static java.lang.Long.parseLong;
 public class Request {
 
     private final Headers headers = new Headers();
-    private final Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-    private final Map<Object, Object> attributes = new HashMap<Object, Object>();
-    private final List<BodyPart> parts = new ArrayList<BodyPart>();
+    private final Map<String, List<String>> parameters = new LinkedHashMap<>();
+    private final Map<Object, Object> attributes = new HashMap<>();
+    private final List<BodyPart> parts = new ArrayList<>();
 
     private String uri;
     private String path;
@@ -316,7 +324,7 @@ public class Request {
      * @return the (possibly empty) list of body parts
      */
     public List<BodyPart> parts() {
-        return new ArrayList<BodyPart>(parts);
+        return new ArrayList<>(parts);
     }
 
     /**
@@ -371,7 +379,7 @@ public class Request {
     public Charset charset() {
         ContentType contentType = ContentType.of(this);
         if (contentType == null || contentType.charset() == null) {
-            return Charsets.ISO_8859_1;
+            return StandardCharsets.ISO_8859_1;
         }
         return contentType.charset();
     }
@@ -528,7 +536,7 @@ public class Request {
      * @return the list of that parameter's values
      */
     public List<String> parameters(String name) {
-        return parameters.containsKey(name) ? new ArrayList<String>(parameters.get(name)) : new ArrayList<String>();
+        return parameters.containsKey(name) ? new ArrayList<>(parameters.get(name)) : new ArrayList<>();
     }
 
     /**
@@ -548,7 +556,7 @@ public class Request {
      * @return the set of parameter names
      */
     public Set<String> parameterNames() {
-        return new LinkedHashSet<String>(parameters.keySet());
+        return new LinkedHashSet<>(parameters.keySet());
     }
 
     /**
@@ -579,7 +587,7 @@ public class Request {
      */
     public Request addParameter(String name, String value) {
         if (!parameters.containsKey(name)) {
-            parameters.put(name, new ArrayList<String>());
+            parameters.put(name, new ArrayList<>());
         }
         parameters.get(name).add(value);
         return this;
@@ -638,7 +646,7 @@ public class Request {
      * @return the set of attribute keys
      */
     public Set<Object> attributeKeys() {
-        return new HashSet<Object>(attributes.keySet());
+        return new HashSet<>(attributes.keySet());
     }
 
     /**

@@ -1,18 +1,18 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.lib.FileBody;
-import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.helpers.Joiner;
+import com.vtence.molecule.http.HttpDate;
+import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.http.MimeTypes;
+import com.vtence.molecule.lib.FileBody;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class FileServer implements Application {
 
     private final File root;
     private final MimeTypes mediaTypes = MimeTypes.defaults();
-    private final Map<String, String> headers = new HashMap<String, String>();
+    private final Map<String, String> headers = new HashMap<>();
 
     private static final List<HttpMethod> ALLOWED_METHODS = Arrays.asList(GET, HEAD);
     private static final String ALLOW_HEADER = Joiner.on(", ").join(ALLOWED_METHODS);
@@ -52,6 +52,7 @@ public class FileServer implements Application {
         if (!methodAllowed(request)) {
             response.header(ALLOW, ALLOW_HEADER);
             response.status(METHOD_NOT_ALLOWED);
+            response.done();
             return;
         }
 
@@ -60,11 +61,13 @@ public class FileServer implements Application {
             response.status(HttpStatus.NOT_FOUND);
             response.contentType(TEXT);
             response.body("File not found: " + request.path());
+            response.done();
             return;
         }
 
         if (notModifiedSince(lastTimeSeen(request), file)) {
             response.status(NOT_MODIFIED);
+            response.done();
             return;
         }
 
@@ -72,9 +75,13 @@ public class FileServer implements Application {
         addCustomHeaders(response);
 
         response.status(HttpStatus.OK);
-        if (head(request)) return;
+        if (head(request)) {
+            response.done();
+            return;
+        }
 
         response.body(new FileBody(file));
+        response.done();
     }
 
     private boolean canServe(File file) {
@@ -95,7 +102,7 @@ public class FileServer implements Application {
 
     private void addFileHeaders(Response response, File file) {
         response.contentType(mediaTypes.guessFrom(file.getName()));
-        response.header(LAST_MODIFIED, new Date(file.lastModified()));
+        response.header(LAST_MODIFIED, Instant.ofEpochMilli(file.lastModified()));
         response.contentLength(file.length());
     }
 

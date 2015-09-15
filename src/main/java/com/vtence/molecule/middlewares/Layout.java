@@ -15,6 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 
@@ -39,11 +41,19 @@ public class Layout extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response);
+        forward(request, response).whenSuccessful(decorate(request));
+    }
 
-        if (selectForDecoration(response)) {
-            applyDecoration(request, response);
-        }
+    private Consumer<Response> decorate(Request request) {
+        return response -> {
+            if (selectForDecoration(response)) {
+                try {
+                    applyDecoration(request, response);
+                } catch (IOException wontHappen) {
+                    throw new CompletionException(wontHappen);
+                }
+            }
+        };
     }
 
     private boolean selectForDecoration(Response response) {

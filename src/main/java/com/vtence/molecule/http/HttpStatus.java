@@ -236,7 +236,7 @@ public enum HttpStatus {
      * @param code this is the code that is used for this status
      * @param reason this is the description used for the status
      */
-    private HttpStatus(int code, String reason) {
+    HttpStatus(int code, String reason) {
         this.text = reason;
         this.code = code;
     }

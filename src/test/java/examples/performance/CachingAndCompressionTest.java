@@ -11,8 +11,6 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 public class CachingAndCompressionTest {
@@ -37,6 +35,7 @@ public class CachingAndCompressionTest {
     @Test
     public void compressingResponses() throws IOException {
         response = request.header("Accept-Encoding", "deflate; q=0.9, gzip").get("/");
+
         assertThat(response).isOK()
                 // We expect gzip compression, which is preferred by the client
                 .hasHeader("Content-Encoding", "gzip")

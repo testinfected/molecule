@@ -3,7 +3,6 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -16,16 +15,17 @@ public class Failsafe extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
         try {
-            forward(request, response);
+            forward(request, response).rescue(this::failsafeResponse);
         } catch (Throwable error) {
-            failsafeResponse(error, response);
+            failsafeResponse(response, error);
         }
     }
 
-    private void failsafeResponse(Throwable error, Response response) throws IOException {
+    private void failsafeResponse(Response response, Throwable error) {
         response.status(INTERNAL_SERVER_ERROR);
         response.contentType(HTML + "; charset=utf-8");
         response.body(formatAsHtml(error));
+        response.done();
     }
 
     private String formatAsHtml(Throwable error) {

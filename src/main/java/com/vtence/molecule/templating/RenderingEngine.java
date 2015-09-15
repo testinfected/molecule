@@ -5,5 +5,5 @@ import java.io.Writer;
 
 public interface RenderingEngine {
 
-    void render(Writer out, String view, Object context) throws IOException;
+    void render(Writer out, String templateName, Object context) throws IOException;
 }

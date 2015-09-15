@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MimeTypesTest {
 
-    Map<String, String> knownTypes = new HashMap<String, String>();
+    Map<String, String> knownTypes = new HashMap<>();
 
     @Before public void
     defaultKnownTypes() {

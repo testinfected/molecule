@@ -35,11 +35,8 @@ public class FileBody implements Body {
     }
 
     public void writeTo(OutputStream out, Charset charset) throws IOException {
-        InputStream in = new BufferedInputStream(new FileInputStream(file));
-        try {
+        try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
             Streams.copy(in, out, chunkSize);
-        } finally {
-            Streams.close(in);
         }
     }
 

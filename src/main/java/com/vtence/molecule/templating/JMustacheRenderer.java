@@ -2,8 +2,6 @@ package com.vtence.molecule.templating;
 
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
-import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.helpers.Streams;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,12 +10,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class JMustacheRenderer implements RenderingEngine {
 
     private Mustache.Compiler mustache;
     private File path = new File(".");
-    private Charset encoding = Charsets.UTF_8;
+    private Charset encoding = StandardCharsets.UTF_8;
     private String extension = "mustache";
 
     public JMustacheRenderer() {
@@ -25,11 +24,7 @@ public class JMustacheRenderer implements RenderingEngine {
     }
 
     public JMustacheRenderer(Mustache.Compiler compiler) {
-        this.mustache = compiler.withLoader(new Mustache.TemplateLoader() {
-            public Reader getTemplate(String name) throws Exception {
-                return load(name);
-            }
-        });
+        this.mustache = compiler.withLoader(this::loadTemplate);
     }
 
     public JMustacheRenderer fromDir(File dir) {
@@ -62,18 +57,14 @@ public class JMustacheRenderer implements RenderingEngine {
         return this;
     }
 
-    public void render(Writer out, String view, Object context) throws IOException {
-        Reader source = null;
-        try {
-            source = load(view);
+    public void render(Writer out, String templateName, Object context) throws IOException {
+        try (Reader source = loadTemplate(templateName)) {
             Template template = mustache.compile(source);
             template.execute(context, out);
-        } finally {
-            Streams.close(source);
         }
     }
 
-    private Reader load(String name) throws IOException {
+    private Reader loadTemplate(String name) throws IOException {
         return new InputStreamReader(new FileInputStream(templateFile(name)), encoding);
     }
 

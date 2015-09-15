@@ -35,12 +35,10 @@ public class CookieSessionTracker extends AbstractMiddleware {
         if (cookieJar == null) throw new IllegalStateException("No cookie jar bound to request");
         Session session = openSession(cookieJar);
         session.bind(request);
-        try {
-            forward(request, response);
-            commitSession(session, cookieJar);
-        } finally {
-            session.unbind(request);
-        }
+
+        forward(request, response)
+                .whenSuccessful(result -> commitSession(session, cookieJar))
+                .whenComplete((error, action) -> session.unbind(request));
     }
 
     private Session openSession(CookieJar cookieJar) {

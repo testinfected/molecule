@@ -1,12 +1,11 @@
 package examples.session;
 
-import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.Delorean;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.testing.http.UrlEncodedForm;
 import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
+import com.vtence.molecule.testing.http.UrlEncodedForm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,11 +32,7 @@ public class SessionTest {
     @Before
     public void startServer() throws IOException {
         sessions.run(server);
-        server.failureReporter(new FailureReporter() {
-            public void errorOccurred(Throwable e) {
-                error = e;
-            }
-        });
+        server.failureReporter(e -> error = e);
     }
 
     @After

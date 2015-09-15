@@ -11,7 +11,7 @@
 public class HelloWorld {
     public static void main(String[] args) throws IOException {
         WebServer server = WebServer.create();
-        server.start((request, response) -> response.body("Hello, World"));
+        server.start((request, response) -> response.done("Hello, World"));
     }
 }
 ```
@@ -19,21 +19,6 @@ public class HelloWorld {
 Access your application at:
 
 `http://localhost:8080`
-
-If you don't use Java 8, it's almost as good:
-
-```java
-public class HelloWorld {
-    public static void main(String[] args) throws IOException {
-        WebServer server = WebServer.create();
-        server.start(new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body("Hello, World");
-            }
-        });
-    }
-}
-```
 
 ## Download 
 
@@ -77,6 +62,7 @@ Try out the following examples (Java 6 language level):
 * [Dynamic Routes](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java)
 * [Static Files](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/files/StaticFilesExample.java)
 * [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
+* [Asynchronous Processing](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/async/AsyncExample.java)
 * [Cookies](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/cookies/CookiesExample.java)
 * [Locale Negotiation](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/locale/LocaleNegotiationExample.java)
 * [Multipart Forms](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/multipart/MultipartExample.java)
@@ -102,7 +88,7 @@ to run locally on port 8080.
 To start the server, give it an app:
 
 ```java
-server.start((request, response) -> response.body("Hello, World!"));
+server.start((request, response) -> response.done("Hello, World!"));
 ```
 
 To stop the server, call the _stop_ method:
@@ -116,6 +102,23 @@ You can optionally specify the interface and port to bound to when creating the 
 ```java
 WebServer server = WebServer.create("0.0.0.0", 8088);
 ```
+
+## Asynchronous Processing
+
+Molecule, uses [Simple](http://www.simpleframework.org) as a default webserver. Both are fully asynchronous and non-blocking. 
+This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending 
+on a high latency external resource.
+         
+What this means is you can serve your response content from a thread separate to the original servicing thread. For instance your application 
+might need to wait for some remote process that takes some time to complete, such as an HTTP or SOAP request to an external server. You can simply 
+call this external resource from a different thread, and complete the response when you get the result.
+
+To tell the server that you're ready to serve the response, call the _done_ method on the response 
+(see [Asynchronous Processing](#asynchronous-processing)).
+
+Look at the [Asynchronous example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/async/AsyncExample.java)
+to see how to serve content from a separate thread.
+
 
 ## Routing
 
@@ -170,7 +173,7 @@ Route patterns can be matched exactly - they are said to be static - or can incl
 // matches "GET /photos/18" and "GET /photos/25"
 // request.parameter("id") is either '18' or '25'
 get("/photos/:id", (request, response) -> {
-    response.body("Photo #" + request.parameter("id"));
+    response.done("Photo #" + request.parameter("id"));
 });
 ```
 
@@ -235,7 +238,7 @@ For example you could have the following separate stages of the pipeline doing:
 
 Molecule comes with a number of middlewares (more are coming), that you can use to build your processing pipeline:
 
-* Router (See [Routing](http://https://github.com/testinfected/molecule#routing))
+* Router (See [Routing](#routing))
 * Static Assets 
 * File Server
 * Access Log

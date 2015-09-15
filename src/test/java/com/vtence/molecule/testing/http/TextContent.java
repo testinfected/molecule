@@ -1,11 +1,11 @@
 package com.vtence.molecule.testing.http;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.http.ContentType;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class TextContent implements HttpContent {
 
@@ -37,7 +37,7 @@ public class TextContent implements HttpContent {
 
     private Charset charset() {
         ContentType contentType = ContentType.parse(contentType());
-        if (contentType == null || contentType.charset() == null) return Charsets.ISO_8859_1;
+        if (contentType == null || contentType.charset() == null) return StandardCharsets.ISO_8859_1;
 
         return contentType.charset();
     }

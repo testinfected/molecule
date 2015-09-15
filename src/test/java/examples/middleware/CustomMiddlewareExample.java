@@ -1,11 +1,7 @@
 package examples.middleware;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
-import com.vtence.molecule.WebServer;
+import com.vtence.molecule.*;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
-import com.vtence.molecule.Middleware;
 
 import java.io.IOException;
 
@@ -19,7 +15,7 @@ public class CustomMiddlewareExample {
                 // Tell IE users to get Firefox
                 String userAgent = request.header("User-Agent");
                 if (userAgent != null && userAgent.contains("MSIE")) {
-                    response.redirectTo("http://www.mozilla.org");
+                    response.redirectTo("http://www.mozilla.org").done();
                 } else {
                     // Hand over control to next application in the stack
                     forward(request, response);
@@ -39,11 +35,8 @@ public class CustomMiddlewareExample {
 
 
         // A simple hello world application
-        Application helloWorld = new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.contentType("text/html").body("<html><body>Hello, World</body></html>");
-            }
-        };
+        Application helloWorld = (request, response) ->
+                response.contentType("text/html").done("<html><body>Hello, World</body></html>");
 
         // Deploy middlewares first, followed by our application
         server.add(getFirefox)

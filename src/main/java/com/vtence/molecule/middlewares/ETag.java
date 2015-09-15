@@ -2,32 +2,39 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.helpers.Hex;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
-import com.vtence.molecule.lib.BinaryBody;
-import com.vtence.molecule.helpers.Hex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.CompletionException;
 
 import static com.vtence.molecule.http.HeaderNames.CACHE_CONTROL;
 import static com.vtence.molecule.http.HeaderNames.ETAG;
+import static com.vtence.molecule.lib.BinaryBody.bytes;
 
 public class ETag extends AbstractMiddleware {
 
     private static final String REVALIDATE = "max-age=0; private; no-cache";
 
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response);
+        forward(request, response).whenSuccessful(this::computeETag);
+    }
 
+    private void computeETag(Response response) {
         if (!isCacheable(response)) return;
         if (!hasCachingDirective(response)) response.header(CACHE_CONTROL, REVALIDATE);
 
-        byte[] output = render(response);
-        response.header(ETAG, etagOf(output));
-        response.body(new BinaryBody(output));
+        try {
+            byte[] output = render(response);
+            response.header(ETAG, etagOf(output));
+            response.body(bytes(output));
+        } catch (Exception wontHappen) {
+            throw new CompletionException(wontHappen);
+        }
     }
 
     private String etagOf(byte[] output) throws NoSuchAlgorithmException {
@@ -35,10 +42,10 @@ public class ETag extends AbstractMiddleware {
     }
 
     private byte[] render(Response response) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        response.body().writeTo(out, response.charset());
-        out.close();
-        return out.toByteArray();
+        try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            response.body().writeTo(out, response.charset());
+            return out.toByteArray();
+        }
     }
 
     private boolean isCacheable(Response response) {

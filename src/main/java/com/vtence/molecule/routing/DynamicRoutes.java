@@ -15,7 +15,7 @@ import static com.vtence.molecule.lib.matchers.Matchers.equalTo;
 
 public class DynamicRoutes implements RouteBuilder {
 
-    private final Collection<Definition> routes = new ArrayList<Definition>();
+    private final Collection<Definition> routes = new ArrayList<>();
 
     public void build(RouteSet routeSet) {
         for (Definition definition : this.routes) {
@@ -123,7 +123,7 @@ public class DynamicRoutes implements RouteBuilder {
         }
 
         private Matcher<? super HttpMethod> oneOf(HttpMethod... methods) {
-            List<Matcher<? super HttpMethod>> matchMethods = new ArrayList<Matcher<? super HttpMethod>>();
+            List<Matcher<? super HttpMethod>> matchMethods = new ArrayList<>();
             for (HttpMethod httpMethod : methods) {
                 matchMethods.add(equalTo(httpMethod));
             }

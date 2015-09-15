@@ -1,8 +1,5 @@
 package examples.routing;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.routing.DynamicRoutes;
 
@@ -13,30 +10,23 @@ public class RoutingExample {
     public void run(WebServer server) throws IOException {
         server.start(new DynamicRoutes() {{
 
-            map("/").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    response.body("Welcome!");
-                }
+            map("/").to((request, response) -> response.body("Welcome!").done());
+
+            post("/login").to((request, response) -> {
+                String username = request.parameter("username");
+                response.redirectTo("/users/" + username)
+                        .done();
             });
 
-            post("/login").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    String username = request.parameter("username");
-                    response.redirectTo("/users/" + username);
-                }
-            });
-
-            get("/hello/:username").to(new Application() {
-                public void handle(Request request, Response response) throws Exception {
-                    response.contentType("text/html");
-                    response.body(
-                            "<html>" +
-                            "<body>" +
-                                "<h3>Hello, " + request.parameter("username") + "</h3>" +
-                            "</body>" +
-                            "</html>"
-                    );
-                }
+            get("/hello/:username").to((request, response) -> {
+                response.contentType("text/html");
+                response.done(
+                        "<html>" +
+                        "<body>" +
+                            "<h3>Hello, " + request.parameter("username") + "</h3>" +
+                        "</body>" +
+                        "</html>"
+                );
             });
         }});
     }

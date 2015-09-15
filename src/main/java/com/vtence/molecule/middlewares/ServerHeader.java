@@ -14,8 +14,12 @@ public class ServerHeader extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        response.header(SERVER, serverName);
+        forward(request, response).whenSuccessful(this::setServerHeaderIfMissing);
+    }
 
-        forward(request, response);
+    private void setServerHeaderIfMissing(Response response) {
+        if (!response.hasHeader(SERVER)) {
+            response.header(SERVER, serverName);
+        }
     }
 }

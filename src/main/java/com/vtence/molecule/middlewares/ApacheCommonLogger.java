@@ -2,13 +2,13 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.Clock;
-import com.vtence.molecule.lib.SystemClock;
+import com.vtence.molecule.http.HttpMethod;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Clock;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.TimeZone;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class ApacheCommonLogger extends AbstractMiddleware {
@@ -18,45 +18,51 @@ public class ApacheCommonLogger extends AbstractMiddleware {
 
     private final Logger logger;
     private final Clock clock;
-    private final Locale locale;
-    private final TimeZone timeZone;
+    private final DateTimeFormatter formatter;
 
     public ApacheCommonLogger(Logger logger) {
-        this(logger, new SystemClock());
+        this(logger, Clock.systemDefaultZone());
     }
 
     public ApacheCommonLogger(Logger logger, Clock clock) {
-        this(logger, clock, Locale.getDefault(), TimeZone.getDefault());
+        this(logger, clock, Locale.getDefault());
     }
 
-    public ApacheCommonLogger(Logger logger, Clock clock, Locale locale, TimeZone timeZone) {
+    public ApacheCommonLogger(Logger logger, Clock clock, Locale locale) {
         this.logger = logger;
         this.clock = clock;
-        this.locale = locale;
-        this.timeZone = timeZone;
+        this.formatter = DateTimeFormatter.ofPattern(DATE_FORMAT, locale).withZone(clock.getZone());
     }
 
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response);
-        String msg = String.format(COMMON_LOG_FORMAT,
-                request.remoteIp(),
-                "-",
-                currentTime(),
-                request.method(),
-                request.uri(),
-                request.protocol(),
-                response.statusCode(),
-                contentLengthOrHyphen(response));
-        logger.info(msg);
+        forward(request, response).whenSuccessful(logAccess(request));
+    }
+
+    private Consumer<Response> logAccess(Request request) {
+        String remoteIp = request.remoteIp();
+        HttpMethod method = request.method();
+        String uri = request.uri();
+        String protocol = request.protocol().toUpperCase();
+
+        return response -> {
+            String msg = String.format(COMMON_LOG_FORMAT,
+                    remoteIp,
+                    "-",
+                    currentTime(),
+                    method,
+                    uri,
+                    protocol,
+                    response.statusCode(),
+                    contentLengthOf(response));
+            logger.info(msg);
+        };
     }
 
     private String currentTime() {
-        DateFormat formatter = new SimpleDateFormat(DATE_FORMAT, locale);
-        formatter.setTimeZone(timeZone);
-        return formatter.format(clock.now());
+        return ZonedDateTime.now(clock).format(formatter);
     }
 
-    private Object contentLengthOrHyphen(Response response) {
+    private Object contentLengthOf(Response response) {
         return response.size() > 0 ? response.size() : "-";
     }
 }

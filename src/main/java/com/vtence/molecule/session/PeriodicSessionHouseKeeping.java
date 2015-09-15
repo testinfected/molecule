@@ -30,11 +30,7 @@ public class PeriodicSessionHouseKeeping {
     }
 
     public void start() {
-        chores = scheduler.scheduleWithFixedDelay(new Runnable() {
-            public void run() {
-                sessions.houseKeeping();
-            }
-        }, choresInterval, choresInterval, MILLISECONDS);
+        chores = scheduler.scheduleWithFixedDelay(sessions::houseKeeping, choresInterval, choresInterval, MILLISECONDS);
     }
 
     public void stop() {

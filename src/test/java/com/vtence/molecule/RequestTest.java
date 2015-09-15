@@ -1,13 +1,12 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Charsets;
-import com.vtence.molecule.http.Cookie;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
@@ -119,13 +118,13 @@ public class RequestTest {
 
     @Test
     public void usesISO8859AsDefaultCharset() {
-        assertThat("default charset", request.charset(), equalTo(Charsets.ISO_8859_1));
+        assertThat("default charset", request.charset(), equalTo(StandardCharsets.ISO_8859_1));
     }
 
     @Test
     public void readsCharsetFromContentType() {
         request.header(CONTENT_TYPE, "text/html; charset=utf-8");
-        assertThat("charset", request.charset(), equalTo(Charsets.UTF_8));
+        assertThat("charset", request.charset(), equalTo(StandardCharsets.UTF_8));
     }
 
     @SuppressWarnings("unchecked")
@@ -150,14 +149,6 @@ public class RequestTest {
         request.removePart("b");
 
         assertThat("body parts", request.parts(), contains(partWithName("a"), partWithName("c")));
-    }
-
-    private Matcher<Cookie> cookieNamed(String name) {
-        return new FeatureMatcher<Cookie, String>(equalTo(name), "cookie named", "cookie") {
-            protected String featureValueOf(Cookie cookie) {
-                return cookie.name();
-            }
-        };
     }
 
     private Matcher<Iterable<?>> containsKeys(Object... keys) {

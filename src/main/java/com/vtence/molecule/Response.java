@@ -6,25 +6,36 @@ import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.lib.BinaryBody;
 
 import java.nio.charset.Charset;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import static com.vtence.molecule.helpers.Charsets.ISO_8859_1;
-import static com.vtence.molecule.http.HeaderNames.*;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.http.HttpDate.httpDate;
 import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
 import static com.vtence.molecule.lib.BinaryBody.bytes;
 import static com.vtence.molecule.lib.TextBody.text;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 /**
  * The HTTP response to write back to the client.
  */
 public class Response {
+    private final CompletableFuture<Response> done = new CompletableFuture<>();
     private final Headers headers = new Headers();
 
+    private CompletableFuture<Response> postProcessing = done;
     private int statusCode = HttpStatus.OK.code;
     private String statusText = HttpStatus.OK.text;
     private Body body = BinaryBody.empty();
@@ -205,7 +216,7 @@ public class Response {
      * @param name the name of the header to send
      * @param value the new date value for that header
      */
-    public Response header(String name, Date value) {
+    public Response header(String name, Instant value) {
         return header(name, httpDate(value));
     }
 
@@ -382,5 +393,175 @@ public class Response {
      */
     public boolean empty() {
         return size() == 0;
+    }
+
+    /**
+     * Sets the text content to write back to the client as the body of this response
+     * then triggers a normal (i.e successful) completion of this response if not already completed.
+     * The text content will be encoded using the charset of the response.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     * @param text the body text to write back to the client
+     **/
+    public void done(String text) {
+        done(text(text));
+    }
+
+    /**
+     * Sets the body to write back to the client then triggers a normal (i.e successful) completion of this response
+     * if not already completed.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     * @param body the body to write back to the client
+     **/
+    public void done(Body body) {
+        body(body).done();
+    }
+
+    /**
+     * If not already completed, triggers a normal (i.e successful) completion of this response.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     **/
+    public void done() {
+        done.complete(this);
+    }
+
+    /**
+     * If not already completed, triggers an abnormal (i.e failed) completion of this response with the
+     * given exception.
+     *
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     **/
+    public void done(Throwable error) {
+        done.completeExceptionally(error);
+    }
+
+    /**
+     * When this response completes normally (i.e. without an exception),
+     * executes the given action, with this response.
+     * <p>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * <br>
+     * To trigger normal completion of this response, call {@link #done()} .
+     * </p>
+     *
+     * @param action the action to perform when this response completes successfully
+     */
+    public Response whenSuccessful(Consumer<Response> action) {
+        postProcessing = postProcessing.whenComplete((response, error) -> {
+            if (response != null) action.accept(response);
+        });
+        return this;
+    }
+
+    /**
+     * When this response completes abnormally (i.e. with an exception),
+     * executes the given action, with this response.
+     * <p>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * <br>
+     * To trigger abnormal completion of this response, call {@link #done(Throwable)} .
+     * </p>
+     *
+     * @param action the action to perform when this response completes abnormally
+     */
+    public Response whenFailed(BiConsumer<Response, Throwable> action) {
+        postProcessing = postProcessing.whenComplete((response, error) -> {
+            if (error != null) action.accept(Response.this, unwrap(error));
+        });
+        return this;
+    }
+
+    /**
+     * When this response completes either normally or abnormally (i.e. with or without an exception),
+     * executes the given action with this response and the
+     * exception (or {@code null} if the response completed normally).
+     * <p>
+     * Note that this method allows injection of an action regardless of outcome,
+     * otherwise preserving the outcome in its completion, unlike {@link #rescue}.
+     * <br>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * </p>
+     * <p>
+     * To trigger completion of this response, call either forms of {@link #done}.
+     * </p>
+     * @param action the action to perform when this response completes
+     */
+    public Response whenComplete(BiConsumer<Response, Throwable> action) {
+        postProcessing = postProcessing.whenComplete((response, error) -> action.accept(Response.this, unwrap(error)));
+        return this;
+    }
+
+    /**
+     * When this response completes abnormally (i.e. with an exception),
+     * executes the given action with this response and the exception, then continue processing this response
+     * normally.
+     * <p>
+     * Note that this method replaces the failed result with this response before triggering the next action,
+     * as if the response had completed normally.
+     * <br>
+     * Actions supplied will be executed in the order they are registered on this response.
+     * </p>
+     * @param action the action to perform when this response completes abnormally
+     */
+    public Response rescue(BiConsumer<Response, Throwable> action) {
+        postProcessing = postProcessing.handle((response, error) -> {
+            if (error != null) action.accept(Response.this, unwrap(error));
+            return this;
+        });
+        return this;
+    }
+
+    /**
+     * Returns {@code true} if this response completed.
+     *
+     * Completion may be due to normal termination or an exception -- in all of these cases, this method will return
+     * {@code true}.
+     *
+     * @return {@code true} if this response completed, false otherwise
+     */
+    public boolean isDone() {
+        return done.isDone();
+    }
+
+    /**
+     * Waits if necessary for this response to complete, and then
+     * retrieves its result.
+     *
+     * @return this response if it completed normally
+     * @throws ExecutionException if this response completed with an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     */
+    public Response await() throws ExecutionException, InterruptedException {
+        return postProcessing.get();
+    }
+
+    /**
+     * Waits if necessary for at most the given time for this response
+     * to complete, and then retrieves its result, if available.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return this response if it completed normally
+     * @throws ExecutionException if this response completed with an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws TimeoutException if the wait timed out
+     */
+    public Response await(long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
+        return postProcessing.get(timeout, unit);
+    }
+
+    private Throwable unwrap(Throwable error) {
+        return error instanceof CompletionException ? error.getCause() : error;
     }
 }

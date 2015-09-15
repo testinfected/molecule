@@ -17,7 +17,7 @@ public class CookieDecoder {
     private static final String DOMAIN = "$Domain";
 
     public List<Cookie> decode(String header) {
-        List<Cookie> cookies = new ArrayList<Cookie>();
+        List<Cookie> cookies = new ArrayList<>();
 
         Matcher pair = NAME_VALUE_PAIR.matcher(header);
 

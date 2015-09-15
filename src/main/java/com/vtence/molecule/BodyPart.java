@@ -1,6 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.lib.EmptyInputStream;
@@ -9,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Represents a body part or form item that was received within a <code>multipart/form-data</code> <code>POST</code> request.
@@ -145,7 +145,7 @@ public class BodyPart {
     private Charset charset() {
         ContentType contentType = ContentType.parse(contentType());
         if (contentType == null || contentType.charset() == null) {
-            return Charsets.UTF_8;
+            return StandardCharsets.UTF_8;
         }
         return contentType.charset();
     }

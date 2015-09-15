@@ -1,59 +1,74 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import org.hamcrest.Matcher;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import java.util.concurrent.ExecutionException;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 
 public class FailureMonitorTest {
 
-    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
     FailureReporter failureReporter = context.mock(FailureReporter.class);
     FailureMonitor monitor = new FailureMonitor(failureReporter);
 
-    Exception error = new Exception("An internal error occurred!");
+    @Rule
+    public ExpectedException error = ExpectedException.none();
 
     Request request = new Request();
     Response response = new Response();
 
-    @Test public void
-    notifiesFailureReporterAndRethrowsExceptionInCaseOfError() throws Exception {
-        monitor.connectTo(crashWith(error));
+    @Test
+    public void notifiesFailureReporterAndRethrowsExceptionInCaseOfError() throws Exception {
+        monitor.connectTo((request, response) -> {
+            throw new Exception("Crash!");
+        });
 
         context.checking(new Expectations() {{
-            oneOf(failureReporter).errorOccurred(with(same(error)));
+            oneOf(failureReporter).errorOccurred(with(exceptionWithMessage("Crash!")));
         }});
 
-        try {
-            monitor.handle(request, response);
-            fail("Exception did not bubble up");
-        } catch (Exception e) {
-            assertThat("error", e, sameInstance(error));
-        }
+        error.expectMessage("Crash!");
+        monitor.handle(request, response);
     }
 
-    @Test public void
-    doesNothingWhenEverythingGoesFine() throws Exception {
+    @Test
+    public void doesNothingWhenResponseCompletesNormally() throws Exception {
         context.checking(new Expectations() {{
             never(failureReporter);
         }});
 
         monitor.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
     }
 
-    private Application crashWith(final Exception error) {
-        return new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                throw error;
-            }
-        };
+    @Test
+    public void notifiesFailureReporterWhenErrorOccursLater() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(failureReporter).errorOccurred(with(exceptionWithMessage("Crash!")));
+        }});
+
+        monitor.handle(request, response);
+        response.done(new Exception("Crash!"));
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
+    }
+
+    private Matcher<Exception> exceptionWithMessage(String message) {
+        return hasProperty("message", equalTo(message));
     }
 }

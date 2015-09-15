@@ -16,7 +16,7 @@ public final class MimeTypes {
     public static final String ICON = "image/x-icon";
     public static final String BINARY_DATA = "application/octet-stream";
 
-    private final Map<String, String> knownTypes = new HashMap<String, String>();
+    private final Map<String, String> knownTypes = new HashMap<>();
 
     public static MimeTypes defaults() {
         MimeTypes mimeTypes = new MimeTypes();

@@ -1,11 +1,11 @@
 package com.vtence.molecule.testing.http;
 
-import com.vtence.molecule.helpers.Charsets;
 import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.http.ContentType;
 
 import java.net.HttpCookie;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class HttpResponse {
 
     public List<String> headers(String name) {
         List<String> values = headers.get(name);
-        return values != null ? values : new ArrayList<String>();
+        return values != null ? values : new ArrayList<>();
     }
 
     public String contentType() {
@@ -50,13 +50,13 @@ public class HttpResponse {
     public Charset charset() {
         ContentType contentType = ContentType.parse(contentType());
         if (contentType == null || contentType.charset() == null)
-            return Charsets.ISO_8859_1;
+            return StandardCharsets.ISO_8859_1;
 
         return contentType.charset();
     }
 
     public Map<String, HttpCookie> cookies() {
-        Map<String, HttpCookie> cookies = new HashMap<String, HttpCookie>();
+        Map<String, HttpCookie> cookies = new HashMap<>();
         for (String header : headers("Set-Cookie")) {
             for (HttpCookie cookie : HttpCookie.parse(header)) {
                 cookies.put(cookie.getName(), cookie);

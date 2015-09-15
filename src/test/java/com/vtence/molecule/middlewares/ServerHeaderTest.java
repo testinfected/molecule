@@ -1,9 +1,10 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
+
+import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
@@ -15,19 +16,28 @@ public class ServerHeaderTest {
     Request request = new Request();
     Response response = new Response();
 
-    @Test
-    public void
-    setsServerHeader() throws Exception {
-        serverHeader.connectTo(writeToBody(serverName));
+    @Test public void
+    setsServerHeaderIfNotPresentOnceDone() throws Exception {
         serverHeader.handle(request, response);
-        assertThat(response).hasBodyText(serverName);
+        assertThat(response).hasNoHeader("Server");
+
+        response.done();
+        assertThat(response).hasHeader("Server", serverName);
+
+        assertNoExecutionError();
     }
 
-    private Application writeToBody(final String text) {
-        return new Application() {
-            public void handle(Request request, Response response) throws Exception {
-                response.body(text);
-            }
-        };
+    @Test public void
+    doesNotOverrideExistingServerHeader() throws Exception {
+        serverHeader.handle(request, response);
+
+        response.header("Server", "existing").done();
+
+        assertThat(response).hasHeader("Server", "existing");
+        assertNoExecutionError();
+    }
+
+    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+        response.await();
     }
 }

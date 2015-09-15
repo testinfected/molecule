@@ -1,25 +1,50 @@
 package com.vtence.molecule.support;
 
-import com.vtence.molecule.lib.Clock;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 
-import java.util.Date;
+public class Delorean extends Clock {
 
-public class Delorean implements Clock {
+    private final Clock baseClock;
 
-    private long timeTravel = 0;
-    private Date frozenAt;
+    private Instant frozenAt;
+    private long timeTravel;
 
-    public Date now() {
-        return frozen() ? frozenAt : new Date(currentTime());
+    public Delorean() {
+        this(Clock.systemDefaultZone());
     }
 
-    public Date freeze() {
-        frozenAt = now();
+    public Delorean(Clock base) {
+        this.baseClock = base;
+    }
+
+    public Delorean withZone(ZoneId zone) {
+        Delorean delorean = new Delorean(baseClock.withZone(zone));
+        delorean.freezeAt(frozenAt);
+        delorean.travelInTime(timeTravel);
+        return delorean;
+    }
+
+    public ZoneId getZone() {
+        return baseClock.getZone();
+    }
+
+    public Instant instant() {
+        return currentTime().plusMillis(timeTravel);
+    }
+
+    public Instant freeze() {
+        return freezeAt(instant());
+    }
+
+    public Instant freezeAt(Instant pointInTime) {
+        frozenAt = pointInTime;
         return frozenAt;
     }
 
     public void unfreeze() {
-        frozenAt = null;
+        freezeAt(null);
     }
 
     public void travelInTime(long offsetInMillis) {
@@ -34,7 +59,7 @@ public class Delorean implements Clock {
         return frozenAt != null;
     }
 
-    private long currentTime() {
-        return System.currentTimeMillis() + timeTravel;
+    private Instant currentTime() {
+        return frozen() ? frozenAt : baseClock.instant();
     }
 }

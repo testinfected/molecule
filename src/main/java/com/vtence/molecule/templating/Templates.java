@@ -1,9 +1,5 @@
 package com.vtence.molecule.templating;
 
-import com.vtence.molecule.Body;
-
-import java.io.IOException;
-
 public class Templates {
     private final RenderingEngine renderer;
 
@@ -12,10 +8,6 @@ public class Templates {
     }
 
     public <T> Template<T> named(final String name) {
-        return new Template<T>() {
-            public Body render(T context) throws IOException {
-                return new TemplateBody(renderer, name, context);
-            }
-        };
+        return context -> new TemplateBody(renderer, name, context);
     }
 }

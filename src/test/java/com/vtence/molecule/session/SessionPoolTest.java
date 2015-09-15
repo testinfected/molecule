@@ -9,18 +9,23 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 public class SessionPoolTest {
 
-    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
 
     SessionIdentifierPolicy counter = new Sequence();
     Delorean delorean = new Delorean();
@@ -29,13 +34,15 @@ public class SessionPoolTest {
     SessionPool pool = new SessionPool(counter, delorean);
     SessionPoolListener listener = context.mock(SessionPoolListener.class);
 
-    @Test public void
+    @Test
+    public void
     isInitiallyEmpty() {
         assertThat("initial pool size", pool.size(), equalTo(0));
         assertThat("session not in pool", pool.load("not-in-pool"), nullValue());
     }
 
-    @Test public void
+    @Test
+    public void
     generatesIdsForNewSessions() {
         Session data = new Session();
         String id = pool.save(data);
@@ -44,7 +51,8 @@ public class SessionPoolTest {
         assertThat("generated id", id, equalTo("1"));
     }
 
-    @Test public void
+    @Test
+    public void
     preservesExistingSessionsIds() {
         Session data = new Session();
         String id = pool.save(data);
@@ -52,7 +60,8 @@ public class SessionPoolTest {
         assertThat("original id", pool.save(session), equalTo(id));
     }
 
-    @Test public void
+    @Test
+    public void
     replacesIdsOfSessionsNotInPool() {
         Session data = new Session();
         String id = pool.save(data);
@@ -62,7 +71,8 @@ public class SessionPoolTest {
         assertThat("replacement id", pool.save(session), equalTo("2"));
     }
 
-    @Test public void
+    @Test
+    public void
     savesSessionContentDefensively() {
         Session data = new Session();
         data.put("a", "Alice");
@@ -75,11 +85,12 @@ public class SessionPoolTest {
 
         assertThat("saved session", saved, not(Matchers.sameInstance(data)));
         assertThat("saved session expiration time", saved.maxAge(), equalTo(maxAge));
-        assertThat("saved session keys", saved.keys(), Matchers.<Object>contains("a", "b", "c"));
-        assertThat("saved session values", saved.values(), Matchers.<Object>contains("Alice", "Bob", "Chris"));
+        assertThat("saved session keys", saved.keys(), contains("a", "b", "c"));
+        assertThat("saved session values", saved.values(), contains("Alice", "Bob", "Chris"));
     }
 
-    @Test public void
+    @Test
+    public void
     loadsSessionContentDefensively() {
         Session data = new Session();
         data.put("a", "Alice");
@@ -91,10 +102,11 @@ public class SessionPoolTest {
 
         Session stored = pool.load(loaded.id());
         assertThat("stored session values", stored.size(), equalTo(data.size()));
-        assertThat("stored session values", stored.values(), Matchers.<Object>contains("Alice", "Bob", "Chris"));
+        assertThat("stored session values", stored.values(), contains("Alice", "Bob", "Chris"));
     }
 
-    @Test public void
+    @Test
+    public void
     storesMultipleSessions() {
         int count = 5;
         for (int i = 1; i <= count; i++) {
@@ -104,25 +116,28 @@ public class SessionPoolTest {
         assertThat("pool size", pool.size(), equalTo(count));
     }
 
-    @Test(expected = IllegalStateException.class) public void
+    @Test(expected = IllegalStateException.class)
+    public void
     forbidsSavingInvalidSessions() {
         Session data = new Session();
         data.invalidate();
         pool.save(data);
     }
 
-    @Test public void
+    @Test
+    public void
     marksSessionUpdateTime() throws InterruptedException {
         Session data = new Session();
-        Date updateTime = delorean.freeze();
+        Instant updateTime = delorean.freeze();
         Session session = save(data);
         assertThat("update time", session.updatedAt(), equalTo(updateTime));
     }
 
-    @Test public void
+    @Test
+    public void
     marksSessionCreationTime() throws InterruptedException {
         Session data = new Session();
-        Date creationTime = delorean.freeze();
+        Instant creationTime = delorean.freeze();
         Session session = save(data);
         assertThat("creation time", session.createdAt(), equalTo(creationTime));
 
@@ -133,7 +148,8 @@ public class SessionPoolTest {
         assertThat("creation time later on", laterOn.createdAt(), equalTo(creationTime));
     }
 
-    @Test public void
+    @Test
+    public void
     discardsExpiredSessions() {
         Session data = new Session();
         data.maxAge(maxAge);
@@ -142,7 +158,8 @@ public class SessionPoolTest {
         assertThat("expired session", pool.load(sid), nullValue());
     }
 
-    @Test public void
+    @Test
+    public void
     destroysExpiredSessionsDuringHouseKeeping() {
         Collection<String> persistentSessions = addSessionsToPool(10);
         Collection<String> expiringSessions = expire(addSessionsToPool(10));
@@ -155,7 +172,8 @@ public class SessionPoolTest {
         assertNoLongerInPool(expiringSessions);
     }
 
-    @Test public void
+    @Test
+    public void
     notifiesWhenSessionsAreLoaded() {
         final String sid = pool.save(new Session());
         pool.setSessionListener(listener);
@@ -165,7 +183,8 @@ public class SessionPoolTest {
         pool.load(sid);
     }
 
-    @Test public void
+    @Test
+    public void
     notifiesWhenSessionsAreSaved() {
         final String sid = pool.save(new Session());
         Session session = pool.load(sid);
@@ -177,7 +196,8 @@ public class SessionPoolTest {
         pool.save(session);
     }
 
-    @Test public void
+    @Test
+    public void
     notifiesWhenSessionsAreCreated() {
         pool.setSessionListener(listener);
         context.checking(new Expectations() {{
@@ -186,7 +206,8 @@ public class SessionPoolTest {
         pool.save(new Session());
     }
 
-    @Test public void
+    @Test
+    public void
     notifiesWhenSessionsAreDropped() {
         final String sid = pool.save(new Session());
         pool.setSessionListener(listener);
@@ -212,10 +233,9 @@ public class SessionPoolTest {
     }
 
     private Collection<String> addSessionsToPool(int count) {
-        Collection<String> sessions = new ArrayList<String>();
+        Collection<String> sessions = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            Session data = new Session();
-            sessions.add(pool.save(data));
+            sessions.add(pool.save(new Session()));
         }
         return sessions;
     }

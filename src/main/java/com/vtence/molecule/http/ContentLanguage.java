@@ -4,13 +4,15 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.helpers.Joiner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LANGUAGE;
+import static java.util.stream.Collectors.toList;
 
 public class ContentLanguage {
-    private final List<Locale> locales = new ArrayList<Locale>();
+    private final List<Locale> locales = new ArrayList<>();
 
     public static ContentLanguage of(Response response) {
         return ContentLanguage.parse(response.header(CONTENT_LANGUAGE));
@@ -22,9 +24,8 @@ public class ContentLanguage {
 
     public static ContentLanguage from(Header header) {
         ContentLanguage languages = new ContentLanguage();
-        for (String locale : header.values()) {
-            if (!locale.equals("")) languages.add(Locale.forLanguageTag(locale));
-        }
+        header.values().stream().filter(locale -> !locale.equals(""))
+              .forEach(locale -> languages.add(Locale.forLanguageTag(locale)));
         return languages;
     }
 
@@ -34,7 +35,7 @@ public class ContentLanguage {
     }
 
     public List<Locale> locales() {
-        return new ArrayList<Locale>(locales);
+        return new ArrayList<>(locales);
     }
 
     public ContentLanguage remove(Locale locale) {
@@ -46,11 +47,7 @@ public class ContentLanguage {
         return Joiner.on(", ").join(format(locales));
     }
 
-    private Iterable<String> format(Iterable<Locale> locales) {
-        List<String> formats = new ArrayList<String>();
-        for (Locale locale : locales) {
-            formats.add(locale.toLanguageTag());
-        }
-        return formats;
+    private Iterable<String> format(Collection<Locale> locales) {
+        return locales.stream().map(Locale::toLanguageTag).collect(toList());
     }
 }
