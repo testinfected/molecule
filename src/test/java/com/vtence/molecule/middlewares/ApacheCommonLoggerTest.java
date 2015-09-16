@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.containsString;
 public class ApacheCommonLoggerTest {
     LogRecordingHandler logRecords = new LogRecordingHandler();
     Instant currentTime = LocalDateTime.of(2012, 6, 27, 12, 4, 0).toInstant(ZoneOffset.of("-05:00"));
-    ApacheCommonLogger apacheCommonLogger = new ApacheCommonLogger(anonymousLogger(logRecords),
+    ApacheCommonLogger logger = new ApacheCommonLogger(anonymousLogger(logRecords),
             Clock.fixed(currentTime, ZoneId.of("GMT+01:00")), Locale.US);
 
     Request request = new Request().protocol("HTTP/1.1").remoteIp("192.168.0.1");
@@ -29,7 +29,7 @@ public class ApacheCommonLoggerTest {
     logsRequestsServedInApacheCommonLogFormat() throws Exception {
         request.method(GET).uri("/products?keyword=dogs");
 
-        apacheCommonLogger.handle(request, response);
+        logger.handle(request, response);
         response.status(OK).body("a response with a size of 28").done();
 
         response.await();
@@ -41,7 +41,7 @@ public class ApacheCommonLoggerTest {
     replacesContentSizeWithHyphenForEmptyOrChunkedResponses() throws Exception {
         request.remoteIp("192.168.0.1").method(DELETE).uri("/logout");
 
-        apacheCommonLogger.handle(request, response);
+        logger.handle(request, response);
         response.status(NO_CONTENT).body("").done();
 
         response.await();
@@ -53,12 +53,12 @@ public class ApacheCommonLoggerTest {
     usesOriginalRequestValues() throws Exception {
         request.remoteIp("192.168.0.1").method(DELETE).uri("/logout");
 
-        apacheCommonLogger.handle(request, response);
-        request.uri("/changed").method(POST).remoteIp("100.100.100.1").protocol("HTTPS");
-        response.status(NO_CONTENT).done();
+        logger.connectTo((request, response) -> {
+            request.uri("/changed").method(POST).remoteIp("100.100.100.1").protocol("HTTPS");
+            response.status(NO_CONTENT).done();
+        });
+        logger.handle(request, response);
 
-        response.await();
         logRecords.assertEntries(contains(containsString("\"DELETE /logout HTTP/1.1\" 204 -")));
     }
-
 }

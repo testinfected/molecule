@@ -17,8 +17,8 @@ public abstract class ApacheLogger extends AbstractMiddleware {
     private final Clock clock;
     private final DateTimeFormatter formatter;
 
-    protected ApacheLogger(Logger logger, Clock clock) {
-        this(logger, clock, Locale.getDefault());
+    protected ApacheLogger(Logger logger) {
+        this(logger, Clock.systemDefaultZone(), Locale.getDefault());
     }
 
     protected ApacheLogger(Logger logger, Clock clock, Locale locale) {
@@ -29,7 +29,9 @@ public abstract class ApacheLogger extends AbstractMiddleware {
 
     @Override
     public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(logAccess(request));
+        // Capture original request values
+        Consumer<Response> logAccess = logAccess(request);
+        forward(request, response).whenSuccessful(logAccess);
     }
 
     protected abstract Consumer<Response> logAccess(Request request);
@@ -45,5 +47,4 @@ public abstract class ApacheLogger extends AbstractMiddleware {
     protected Object contentLengthOf(Response response) {
         return response.size() > 0 ? response.size() : "-";
     }
-
 }

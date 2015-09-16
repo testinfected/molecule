@@ -3,36 +3,44 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HeaderNames;
+import com.vtence.molecule.http.HttpMethod;
 
 import java.time.Clock;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class ApacheCombinedFormatLogger extends ApacheLogger {
+public class ApacheCombinedLogger extends ApacheLogger {
     private static final String COMBINED_LOG_FORMAT = "%s - - [%s] \"%s %s %s\" %s %s \"%s\" \"%s\"";
 
-    public ApacheCombinedFormatLogger(Logger logger) {
-        super(logger, Clock.systemDefaultZone());
+    public ApacheCombinedLogger(Logger logger) {
+        super(logger);
     }
 
-    public ApacheCombinedFormatLogger(Logger logger, Clock clock, Locale locale) {
+    public ApacheCombinedLogger(Logger logger, Clock clock, Locale locale) {
         super(logger, clock, locale);
     }
 
     @Override
     protected Consumer<Response> logAccess(Request request) {
+        String remoteIp = request.remoteIp();
+        HttpMethod method = request.method();
+        String uri = request.uri();
+        String protocol = request.protocol();
+        String referer = request.header(HeaderNames.REFERER);
+        String userAgent = request.header(HeaderNames.USER_AGENT);
+
         return response -> {
             String msg = String.format(COMBINED_LOG_FORMAT,
-                    request.remoteIp(),
+                    remoteIp,
                     currentTime(),
-                    request.method(),
-                    request.uri(),
-                    request.protocol(),
+                    method,
+                    uri,
+                    protocol,
                     response.statusCode(),
                     contentLengthOf(response),
-                    nullToEmpty(request.header(HeaderNames.REFERER)),
-                    nullToEmpty(request.header(HeaderNames.USER_AGENT)));
+                    nullToEmpty(referer),
+                    nullToEmpty(userAgent));
             logger.info(msg);
         };
     }
