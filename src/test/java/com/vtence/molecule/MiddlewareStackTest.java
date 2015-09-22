@@ -52,12 +52,29 @@ public class MiddlewareStackTest {
     }
 
     @Test public void
-    orderOfMiddlewareAndMountsDefinitionsIsImportant() throws Exception {
+    takesIntoAccountOrderOfMiddlewareAndMountDefinitions() throws Exception {
         stack.mount("/api", application("api"));
         stack.use(middleware("won't apply"));
 
         stack.handle(request.path("/api"), response);
         assertChain(is("api"));
+    }
+
+    @Test public void
+    acceptsAnWarmUpSequence() throws Exception {
+        stack.use(middleware("ready"));
+        stack.use(middleware("set"));
+        stack.warmup(app -> {
+            try {
+                app.handle(request, response);
+            } catch (Exception e) {
+                throw new AssertionError(e);
+            }
+        });
+        stack.run(application("go!"));
+
+        stack.boot();
+        assertChain(is("ready -> set -> go!"));
     }
 
     @Test(expected = IllegalStateException.class) public void

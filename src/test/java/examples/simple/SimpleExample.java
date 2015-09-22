@@ -9,24 +9,26 @@ import java.nio.charset.Charset;
 public class SimpleExample {
 
     public void run(WebServer server) throws IOException {
-        // Capture internal server errors and display a 500 page
-        server.add(new Failsafe());
-        server.start((request, response) -> {
-            // An unsupported charset will cause an exception, which will cause the FailSafe middleware
-            // to render a 500 page
-            Charset encoding = Charset.forName(request.parameter("encoding"));
-            // The specified charset will be used automatically to encode the response
-            response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
+               // Capture internal server errors and display a 500 page
+        server.add(new Failsafe())
+               // The warmup block is executed once at startup
+              .warmup(app -> System.out.println("Application ready"))
+              .start((request, response) -> {
+                  // An unsupported charset will cause an exception, which will cause the FailSafe middleware
+                  // to render a 500 page
+                  Charset encoding = Charset.forName(request.parameter("encoding"));
+                  // The specified charset will be used automatically to encode the response
+                  response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
 
-            response.done("<html>" +
-                            "<body>" +
-                                "<p>" +
-                                "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
-                                "d'être déçus en voyant leurs drôles d'œufs abîmés." +
-                                "</p>" +
-                            "</body>" +
+                  response.done("<html>" +
+                          "<body>" +
+                          "<p>" +
+                          "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs " +
+                          "d'être déçus en voyant leurs drôles d'œufs abîmés." +
+                          "</p>" +
+                          "</body>" +
                           "</html>");
-        });
+              });
     }
 
 

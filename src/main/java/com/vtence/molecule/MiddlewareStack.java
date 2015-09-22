@@ -5,6 +5,7 @@ import com.vtence.molecule.middlewares.URLMap;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 public class MiddlewareStack implements Application {
 
@@ -13,6 +14,7 @@ public class MiddlewareStack implements Application {
     private URLMap map;
     private Application runner;
     private Application pipeline = (request, response) -> boot().handle(request, response);
+    private Consumer<Application> warmup;
 
     public MiddlewareStack() {}
 
@@ -29,6 +31,11 @@ public class MiddlewareStack implements Application {
             map = new URLMap();
         }
         map.mount(path, app);
+        return this;
+    }
+
+    public MiddlewareStack warmup(Consumer<Application> warmup) {
+        this.warmup = warmup;
         return this;
     }
 
@@ -51,6 +58,7 @@ public class MiddlewareStack implements Application {
         }
 
         pipeline = assemble();
+        if (warmup != null) warmup.accept(pipeline);
         return pipeline;
     }
 

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.util.function.Consumer;
 
 import static com.vtence.molecule.lib.KeyStoreType.DEFAULT;
 import static com.vtence.molecule.lib.SecureProtocol.TLS;
@@ -73,6 +74,11 @@ public class WebServer {
 
     public WebServer mount(String path, Application app) {
         stack.mount(path, app);
+        return this;
+    }
+
+    public WebServer warmup(Consumer<Application> warmup) {
+        stack.warmup(warmup);
         return this;
     }
 
