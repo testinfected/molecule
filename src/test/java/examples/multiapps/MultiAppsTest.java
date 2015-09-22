@@ -30,6 +30,18 @@ public class MultiAppsTest {
     }
 
     @Test
+    public void dispatchingRequestsToMultipleApplicationsDependingOnThePath() throws IOException {
+        response = request.get("/foo/quux");
+        assertThat(response).isOK().hasBodyText("/foo at /quux (/foo/quux)");
+
+        response = request.get("/foo/bar/quux");
+        assertThat(response).isOK().hasBodyText("/foo/bar at /quux (/foo/bar/quux)");
+
+        response = request.get("/baz");
+        assertThat(response).isOK().hasBodyText("/baz at / (/baz)");
+    }
+
+    @Test
     public void gettingA404OnRequestToUnmappedPath() throws IOException {
         response = request.get("/quux");
         assertThat(response).hasStatusCode(404)
