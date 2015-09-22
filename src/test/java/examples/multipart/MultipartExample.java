@@ -48,8 +48,7 @@ public class MultipartExample {
                     echo.append("avatar: ")
                         .append(avatar.filename()).append(" (").append(avatar.contentType()).append(")")
                         .append(" - ").append(String.valueOf(avatar.content().length)).append(" bytes");
-                response.body(echo)
-                        .done();
+                response.done(echo);
             });
         }});
     }

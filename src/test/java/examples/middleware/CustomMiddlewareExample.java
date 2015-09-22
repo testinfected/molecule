@@ -27,9 +27,10 @@ public class CustomMiddlewareExample {
         // (there's already a middleware for that, btw)
         Middleware contentLengthHeader = new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
-                forward(request, response);
-                // Set content length header on the response
-                response.contentLength(response.size());
+                forward(request, response).whenSuccessful(resp -> {
+                    // Set content length header on the response
+                    resp.contentLength(resp.size());
+                });
             }
         };
 

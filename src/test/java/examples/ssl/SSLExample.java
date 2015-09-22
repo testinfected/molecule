@@ -13,9 +13,7 @@ public class SSLExample {
         // To generate a self-signed certificate using an 2048 bits RSA key pair, use the following command:
         // keytool -genkey -keyalg RSA -alias <key alias> -keystore <keystore file> -storepass <store password> -keysize 2048
         server.enableSSL(locateOnClasspath("ssl/keystore"), "password", "password")
-              .start((request, response) -> {
-                  response.done("You are on a secure channel");
-              });
+              .start((request, response) -> response.done("You are on a secure channel"));
     }
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {

@@ -7,9 +7,7 @@ import java.io.IOException;
 public class HelloWorldExample {
 
     public void run(WebServer server) throws IOException {
-        server.start((request, response) -> {
-            response.done("Hello, World!");
-        });
+        server.start((request, response) -> response.done("Hello, World!"));
     }
 
     public static void main(String[] args) throws IOException {
