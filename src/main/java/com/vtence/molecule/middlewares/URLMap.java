@@ -8,17 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class URLMap implements Application {
+public class URLMap extends AbstractMiddleware {
 
     private final List<Mount> mounts = new ArrayList<>();
-    private final Application fallback;
 
     public URLMap() {
         this(new NotFound());
     }
 
     public URLMap(Application fallback) {
-        this.fallback = fallback;
+        this.connectTo(fallback);
     }
 
     public URLMap mount(String path, Application app) {
@@ -37,7 +36,7 @@ public class URLMap implements Application {
         if (mount.isPresent()) {
             mount.get().handle(request, response);
         } else {
-            fallback.handle(request, response);
+            forward(request, response);
         }
     }
 

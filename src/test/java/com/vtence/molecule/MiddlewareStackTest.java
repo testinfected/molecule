@@ -24,8 +24,44 @@ public class MiddlewareStackTest {
         assertChain(is("top -> middle -> bottom -> runner"));
     }
 
+    @Test public void
+    hasBuiltInSupportForMountPoints() throws Exception {
+        stack.mount("/api", application("api"));
+
+        stack.handle(request.path("/api"), response);
+        assertChain(is("api"));
+    }
+
+    @Test public void
+    usesRunnerAsDefaultMountPoint() throws Exception {
+        stack.mount("/api", application("api"));
+        stack.run(application("main"));
+
+        stack.handle(request.path("/"), response);
+        assertChain(is("main"));
+    }
+
+    @Test public void
+    mixesMountPointsAndMiddlewaresAccordingly() throws Exception {
+        stack.use(middleware("top"));
+        stack.mount("/api", application("api"));
+        stack.use(middleware("bottom"));
+
+        stack.handle(request.path("/api"), response);
+        assertChain(is("top -> api"));
+    }
+
+    @Test public void
+    orderOfMiddlewareAndMountsDefinitionsIsImportant() throws Exception {
+        stack.mount("/api", application("api"));
+        stack.use(middleware("won't apply"));
+
+        stack.handle(request.path("/api"), response);
+        assertChain(is("api"));
+    }
+
     @Test(expected = IllegalStateException.class) public void
-    reportsIllegalStateIfNoRunnerWasSpecified() throws Exception {
+    eitherMountOrRunnerIsRequired() throws Exception {
         stack.use(middleware("middleware"));
 
         stack.handle(request, response);

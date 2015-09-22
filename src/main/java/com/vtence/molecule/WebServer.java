@@ -71,12 +71,23 @@ public class WebServer {
         return this;
     }
 
+    public WebServer mount(String path, Application app) {
+        stack.mount(path, app);
+        return this;
+    }
+
     public Server start(RouteBuilder routes) throws IOException {
         return start(Router.draw(routes));
     }
 
     public Server start(Application application) throws IOException {
-        server.run(stack.run(application), ssl);
+        stack.run(application);
+        return start();
+    }
+
+    public Server start() throws IOException {
+        stack.boot();
+        server.run(stack, ssl);
         return server;
     }
 
