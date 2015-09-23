@@ -1,23 +1,37 @@
 package examples.async;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.Failsafe;
 
 import java.io.IOException;
 import java.util.concurrent.CompletionException;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 
+/**
+ * <p>
+ *     In this example we serve responses from a different thread than the request servicing thread.
+ *     We need to be careful not to block the request servicing thread if request processing takes some time to complete.
+ *     In this case it is better to run the time consuming process asynchronously and write the response when this
+ *     process completes.
+ * </p>
+ * <p>
+ *     This could happen for instance if we are dependent on some remote server to complete a task, or some message
+ *     to arrive. Below is a very simple and rather contrived example of how this can be implemented.
+ * </p>
+ */
 public class AsyncExample {
 
     public void run(WebServer server) throws IOException {
-        // Capture internal server errors and display a 500 page
-        server.add(new Failsafe());
         server.start((request, response) -> {
-            // Serve response from a separate thread, simulating an async long running process
+            // We can serve responses asynchronously from a separate thread, without blocking I/O. We'll use
+            // the common fork-join pool to run a task that takes 500ms to complete.
             runAsync(() -> {
+                // To simulate a long running process...
                 aLongRunningProcess(500);
 
+                // When the task completes, a call to done triggers completion of the response.
+                // Processing of the middleware pipeline resumes and then server writes the response back
+                // to the client.
                 response.done("After waiting for a long time...");
             });
         });
@@ -30,7 +44,6 @@ public class AsyncExample {
             throw new CompletionException(e);
         }
     }
-
 
     public static void main(String[] args) throws IOException {
         AsyncExample example = new AsyncExample();
