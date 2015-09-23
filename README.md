@@ -55,7 +55,7 @@ To use the default web server, you also need to add [Simple](http://www.simplefr
 
 ## Want to start with some code?
 
-Try out the following examples (Java 6 language level):
+Try out the following examples:
 
 * [Hello World](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/helloworld/HelloWorldExample.java)
 * [Rendering HTML](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/simple/SimpleExample.java)
@@ -68,6 +68,7 @@ Try out the following examples (Java 6 language level):
 * [Multipart Forms](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/multipart/MultipartExample.java)
 * [View Templates and Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java)
 * [HTTP Sessions](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java)
+* [Multiple Applications](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/multiapps/MultiAppsExample.java)
 * [Filters](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
 * [Creating a Custom Middleware](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middleware/CustomMiddlewareExample.java)
 * [Caching and Compression](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/performance/CachingAndCompressionExample.java)
