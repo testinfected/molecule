@@ -242,10 +242,11 @@ Molecule comes with a number of middlewares (more are coming), that you can use 
 * Router (See [Routing](#routing))
 * Static Assets 
 * File Server
-* Access Log
+* Apache Common Logger
+* Apache Combined Logger
 * Cookies
 * Locale Negotiation
-* Compression
+* Compressor
 * ETag
 * Conditional Get
 * Connection Scope
@@ -253,8 +254,9 @@ Molecule comes with a number of middlewares (more are coming), that you can use 
 * Date Header
 * Content-Length Header
 * Filter Map
+* URL Map
 * Cookie Session Tracker
-* Fail Safe
+* Failsafe
 * Failure Monitor
 * Not Found
 * Http Method Override
