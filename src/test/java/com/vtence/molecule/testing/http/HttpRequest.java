@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.vtence.molecule.lib.SecureProtocol.TLS;
+import static com.vtence.molecule.ssl.SecureProtocol.TLS;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 

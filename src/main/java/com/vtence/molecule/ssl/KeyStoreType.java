@@ -1,4 +1,4 @@
-package com.vtence.molecule.lib;
+package com.vtence.molecule.ssl;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -29,11 +29,8 @@ public enum KeyStoreType {
     }
 
     public KeyStore open(File keyStore, String password) throws GeneralSecurityException, IOException {
-        InputStream source = new FileInputStream(keyStore);
-        try {
+        try (InputStream source = new FileInputStream(keyStore)) {
             return open(source, password);
-        } finally {
-            source.close();
         }
     }
 

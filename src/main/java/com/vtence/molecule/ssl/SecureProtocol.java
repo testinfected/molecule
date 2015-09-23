@@ -1,4 +1,4 @@
-package com.vtence.molecule.lib;
+package com.vtence.molecule.ssl;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
