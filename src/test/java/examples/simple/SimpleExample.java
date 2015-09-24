@@ -6,20 +6,35 @@ import com.vtence.molecule.middlewares.Failsafe;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+/**
+ * <p>
+ *     In this example we run a single application that responds to all incoming requests with an HTML page,
+ *     varying the encoding.
+ * </p>
+ * <p>
+ *     We let the user change the output encoding by specifying the desired charset as a request parameter.
+ * </p>
+ * <p>
+ *     There's always the chance that we are thrown an encoding we don't support, so we use the failsafe middleware
+ *     to turn internal server errors into a 500 error page.
+ * </p>
+ */
 public class SimpleExample {
 
     public void run(WebServer server) throws IOException {
-               // Capture internal server errors and display a 500 page
+        // The failsafe middleware captures internal server errors and renders a default 500 page,
+        // showing a stack trace of the exception and its causes.
         server.add(new Failsafe())
-               // The warmup block is executed once at startup
+               // The optional warmup block is executed once at startup as a boot sequence
               .warmup(app -> System.out.println("Application ready"))
               .start((request, response) -> {
-                  // An unsupported charset will cause an exception, which will cause the FailSafe middleware
+                  // An unsupported charset will cause an exception, which will in turn cause the failsafe middleware
                   // to render a 500 page
                   Charset encoding = Charset.forName(request.parameter("encoding"));
-                  // The specified charset will be used automatically to encode the response
+                  // The content-type charset will be used automatically to encode the response
                   response.contentType("text/html; charset=" + encoding.displayName().toLowerCase());
 
+                  // Our HTML page contains characters outside the ISO-8859-1 alphabet.
                   response.done("<html>" +
                           "<body>" +
                           "<p>" +
