@@ -10,6 +10,19 @@ import java.util.logging.Logger;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
+/**
+ * <p>
+ *     In this example we setup the server to run a single application that serves static files.
+ * </p>
+ * <p>
+ *     We want to serve the files located in the <code>src/test/resources/examples/fox</code> directory.
+ *     We'd like a request to the root of the server to serve the <code>index.html</code> file under that directory.
+ * </p>
+ * <p>
+ *     To see the server's activity, we use the apache common logger middleware to log all requests and status to the
+ *     standard output.
+ * </p>
+ */
 public class StaticFilesExample {
 
     private final Logger logger;
@@ -19,22 +32,24 @@ public class StaticFilesExample {
     }
 
     public void run(WebServer server) throws IOException {
-        // Serve files in this directory, based on the path of the request.
+        // Setup the file server and tell it to serve files located under the examples/fox directory.
         FileServer files = new FileServer(locateOnClasspath("examples/fox"));
-        // Serve static assets (e.g. js files, images, css files, etc) for any request whose path starts
-        // with one of the url prefixes specified (in this example, we're serving all requests).
+        // Serve static assets (e.g. js files, images, css files, etc) for any request starting at the root path.
+        // This will in effect serve every request with static assets.
+        // Typically you would specify more specific paths to serve, such as /css, /js, /images, etc.
         StaticAssets assets = new StaticAssets(files).serve("/");
-        // If request targets a directory (i.e. request path ends with "/"),
+        // If a request targets a directory - the request path ends with "/" -
         // serve the index.html file located in that directory (the default behavior).
         assets.index("index.html");
 
-        // Log all accesses to the server in apache common log format
+        // The apache common logger logs all accesses to the server in apache common log format,
+        // so we can see what we're serving.
         server.add(new ApacheCommonLogger(logger))
               .start(assets);
     }
 
     public static void main(String[] args) throws IOException {
-        // Let's log server access to the console, so we can see content we're serving
+        // We choose to log all server accesses to the console
         StaticFilesExample example = new StaticFilesExample(Logging.toConsole());
         WebServer webServer = WebServer.create();
         example.run(webServer);
