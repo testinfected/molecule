@@ -7,12 +7,32 @@ import com.vtence.molecule.routing.DynamicRoutes;
 
 import java.io.IOException;
 
+/**
+ * <p>
+ *     This example shows how to handle multi-part file uploads.
+ * </p>
+ * <p>
+ *     We have a first endpoint to serve a very simple profile HTML form in which our user can
+ *     enter an email address, upload a text biography and a profile image.
+ *     <br>
+ *     This form is submitted encoded as <code>multipart/form-data</code>.
+ *     We process the form submission in a second endpoint.
+ * </p>
+ */
 public class MultipartExample {
 
     public void run(WebServer server) throws IOException {
+        // Start the server with a set of routes
         server.start(new DynamicRoutes() {{
+
+            // A GET request to /profile renders an HTML profile form, that will be submitted as
+            // multipart/form-data. In this form the user can enter an email address, upload a text biography
+            // and a profile image
             get("/profile").to((request, response) -> {
+                // Set the content type of the response to text/html
                 response.contentType("text/html");
+
+                // Render the profile form
                 response.done("<html>" +
                         "<body>" +
                         "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
@@ -33,20 +53,30 @@ public class MultipartExample {
                         "</html>");
             });
 
+            // A POST to /profile submits the form, then returns a plain text page with a summary of the
+            // profile.
             post("/profile").to((request, response) -> {
+                // Get the email address as a body part
                 BodyPart email = request.part("email");
+                // Get the biography as a second body part
                 BodyPart biography = request.part("biography");
+                // Get the avatar image as the last body part
                 BodyPart avatar = request.part("avatar");
 
+                // We respond with plain text content containing the profile information
                 response.contentType("text/plain");
                 TextBody echo = new TextBody();
                 if (email != null)
+                    // We read the value of the email part as text
                     echo.append("email: ").append(email.value()).append("\n");
                 if (biography != null)
+                    // We read the value of the file containing the biography as text
                     echo.append("biography: ").append(biography.value()).append("\n");
                 if (avatar != null)
                     echo.append("avatar: ")
+                        // We read the filename of the avatar and its content-type
                         .append(avatar.filename()).append(" (").append(avatar.contentType()).append(")")
+                        // We also read the content of the image as a raw stream of bytes to calculate its length
                         .append(" - ").append(String.valueOf(avatar.content().length)).append(" bytes");
                 response.done(echo);
             });
