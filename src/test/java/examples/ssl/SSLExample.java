@@ -2,17 +2,36 @@ package examples.ssl;
 
 import com.vtence.molecule.WebServer;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
+/**
+ * <p>
+ * In this example we show how to create an start an HTTPS server. We use a JKS keystore that contains our self-signed
+ * certificate.
+ * </p>
+ * <p>
+ *   To generate the self-signed certificate using an 2048 bits RSA key pair, use the following command: <br>
+ * <code>keytool -genkey -keyalg RSA -alias <i>key alias</i> -keystore <i>keystore file</i>
+ * -storepass <i>store password</i> -keysize 2048</code>
+ * </p>
+ */
 public class SSLExample {
 
     public void run(WebServer server) throws IOException, GeneralSecurityException {
-        // To generate a self-signed certificate using an 2048 bits RSA key pair, use the following command:
-        // keytool -genkey -keyalg RSA -alias <key alias> -keystore <keystore file> -storepass <store password> -keysize 2048
-        server.enableSSL(locateOnClasspath("ssl/keystore"), "password", "password")
+        // That's our JKS keystore containing our certificate
+        File keyStore = locateOnClasspath("ssl/keystore");
+        // The password to open the keystore
+        String keyStorePassword = "password";
+        // The password to use the key
+        String keyPassword = "password";
+
+        // We enable TLS with our key store file and passwords
+        server.enableSSL(keyStore, keyStorePassword, keyPassword)
+              // We a render a simple text to let our user know he/she is on a secure channel
               .start((request, response) -> response.done("You are on a secure channel"));
     }
 
