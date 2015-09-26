@@ -12,15 +12,15 @@ import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 /**
  * <p>
- *     In this example we setup the server to run a single application that serves static files.
+ * In this example we setup the server to run a single application that serves static files.
  * </p>
  * <p>
- *     We want to serve the files located in the <code>src/test/resources/examples/fox</code> directory.
- *     We'd like a request to the root of the server to serve the <code>index.html</code> file under that directory.
+ * We want to serve the files located in the <code>src/test/resources/examples/fox</code> directory.
+ * We'd like a request to the root of the server to serve the <code>index.html</code> file under that directory.
  * </p>
  * <p>
- *     To see the server's activity, we use the apache common logger middleware to log all requests and status to the
- *     standard output.
+ * To see the server's activity, we use the apache common logger middleware to log all requests and status to the
+ * standard output.
  * </p>
  */
 public class StaticFilesExample {
@@ -42,9 +42,11 @@ public class StaticFilesExample {
         // serve the index.html file located in that directory (the default behavior).
         assets.index("index.html");
 
-        // The apache common logger logs all accesses to the server in apache common log format,
-        // so we can see what we're serving.
-        server.add(new ApacheCommonLogger(logger))
+        // The optional warmup block is executed once at startup as a boot sequence
+        server.warmup(app -> logger.info("Ready to serve files"))
+              // The apache common logger logs all accesses to the server in apache common log format,
+              // so we can see what we're serving.
+              .add(new ApacheCommonLogger(logger))
               .start(assets);
     }
 

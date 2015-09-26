@@ -25,8 +25,6 @@ public class SimpleExample {
         // The failsafe middleware captures internal server errors and renders a default 500 page,
         // showing a stack trace of the exception and its causes.
         server.add(new Failsafe())
-               // The optional warmup block is executed once at startup as a boot sequence
-              .warmup(app -> System.out.println("Application ready"))
               .start((request, response) -> {
                   // An unsupported charset will cause an exception, which will in turn cause the failsafe middleware
                   // to render a 500 page
