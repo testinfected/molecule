@@ -72,7 +72,7 @@ public class URLMapTest {
     }
 
     @Test
-    public void dispatchesToMostSpecifiPath() throws Exception {
+    public void dispatchesToMostSpecificPath() throws Exception {
         map.mount("/foo", this::describeMount)
            .mount("/foo/bar", this::describeMount);
 
