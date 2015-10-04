@@ -23,6 +23,25 @@ import static com.vtence.molecule.http.MimeTypes.CSS;
 import static com.vtence.molecule.http.MimeTypes.HTML;
 import static com.vtence.molecule.http.MimeTypes.JAVASCRIPT;
 
+/**
+ * <p>
+ *     This example shows how to compress responses and do HTTP caching. We serve files files located in the
+ *     <code>src/test/resources/examples/fox</code> directory to demonstrate both the
+ *     expiration model and validation model (see <a href="http://tools.ietf.org/html/rfc2616">RFC 2616</a>).
+ * </p>
+ * <p>
+ *     We specify how long a response should be considered “fresh” by the client by including both of the
+ *     <code>Cache-Control: max-age=N</code> and <code>Expires</code> headers. A client that understands
+ *     expiration will not make the same request until the cached version reaches its expiration time
+ *     and becomes “stale”.
+ * </p>
+ * <p>
+ *     For more dynamic resources - such as web pages - where changes in resource state can occur frequently and
+ *     unpredictably, we use the <code>Last-Modified</code> and <code>ETag</code> headers. A client
+ *     that understands cache validators can validate the freshness of its stored response
+ *     without requiring our webapp to generate or transmit the response body again.
+ * </p>
+ */
 public class CachingAndCompressionExample {
     private static final Object NO_CONTEXT = null;
     private final Clock clock;
@@ -32,30 +51,39 @@ public class CachingAndCompressionExample {
     }
 
     public void run(WebServer server) throws IOException {
+        // We serve files located under the examples/fox directory.
         File content = ResourceLocator.locateOnClasspath("examples/fox");
-        // Add cache directives to the response when serving files
+        // Setup the file server with a cache directive of public; max-age=60
         FileServer files = new FileServer(content).header(CACHE_CONTROL, "public; max-age=60");
-        // Serve static assets for css, js and image files from the content dir
+        // For requests paths starting with /css, /js and /images, we serve static assets
         StaticAssets assets = new StaticAssets(files).serve("/css", "/js", "/images");
-        // We use Mustache templates with an .html extension
+
+        // For other requests, we'll serve web pages.
+        // Our web pages are Mustache templates with an .html extension
         Templates templates = new Templates(new JMustacheRenderer().fromDir(content).extension("html"));
+        // This is our index.html template
         final Template<Object> index = templates.named("index");
 
-              // Add content length header when size of content is known
+              // Add Content-Length header to the response when size of content is known
         server.add(new ContentLengthHeader())
-              // Make get and head requests conditional to freshness of client stored representation
+              // Make GET and HEAD requests conditional to freshness of client stored representation.
+              // This is the validation model
               .add(new ConditionalGet())
-              // Add ETag if response has no freshness information
+              // Add an ETag header if response has no freshness information.
+              // This is the case for dynamic content, but static files have a Last-Modified header.
               .add(new ETag())
-              // Compress bodies that are not images
+              // Compress text response bodies (js, css, html but not images)
               .add(new Compressor().compressibleTypes(JAVASCRIPT, CSS, HTML))
+              // We serve static assets with freshness information. This is the expiration model.
               .add(assets)
+              // If client is not requesting a static file, we'll serve our index.html mustache template
               .start((request, response) -> {
                   response.header(CONTENT_TYPE, HTML);
-                  // Add freshness information only when conditional parameter is set
+                  // We add freshness information only when query parameter 'conditional' is present
                   if (request.parameter("conditional") != null) {
                       response.header(LAST_MODIFIED, clock.instant());
                   }
+                  // This will render our index.html template
                   response.done(index.render(NO_CONTEXT));
               });
     }
@@ -64,6 +92,7 @@ public class CachingAndCompressionExample {
         CachingAndCompressionExample example = new CachingAndCompressionExample(Clock.systemDefaultZone());
         WebServer webServer = WebServer.create();
         example.run(webServer);
+        // Try accessing /?conditional then / to get a 304
         System.out.println("Access at " + webServer.uri());
     }
 }
