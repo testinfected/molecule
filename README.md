@@ -106,16 +106,14 @@ WebServer server = WebServer.create("0.0.0.0", 8088);
 
 ## Asynchronous Processing
 
-Molecule, uses [Simple](http://www.simpleframework.org) as a default webserver. Both are fully asynchronous and non-blocking. 
-This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending 
-on a high latency external resource.
+Molecule uses [Simple](http://www.simpleframework.org) as a default webserver.
+Both are fully asynchronous and non-blocking. This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending on a high latency external resource.
          
 What this means is you can serve your response content from a thread separate to the original servicing thread. For instance your application 
 might need to wait for some remote process that takes some time to complete, such as an HTTP or SOAP request to an external server. You can simply 
 call this external resource from a different thread, and complete the response when you get the result.
 
-To tell the server that you're ready to serve the response, call the _done_ method on the response 
-(see [Asynchronous Processing](#asynchronous-processing)).
+To tell the server that you're ready to serve the response, call the _done_ method on the response.
 
 Look at the [Asynchronous example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/async/AsyncExample.java)
 to see how to serve content from a separate thread.

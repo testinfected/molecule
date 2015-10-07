@@ -14,8 +14,8 @@ public class Session {
     private final String id;
     private final Map<Object, Object> attributes = new ConcurrentHashMap<>();
 
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
     private boolean invalid;
     private int maxAge = -1;
 
@@ -72,11 +72,15 @@ public class Session {
     }
 
     public Instant expirationTime() {
-        return expires() ? updatedAt.plusSeconds(maxAge) : null;
+        return expires() ? updatedAt.plusSeconds(maxAge) : Instant.MAX;
     }
 
-    private boolean expires() {
-        return maxAge >= 0 && updatedAt != null;
+    public boolean expires() {
+        return maxAge >= 0;
+    }
+
+    public boolean expired(Instant instant) {
+        return expires() && !instant.isBefore(expirationTime());
     }
 
     public int size() {

@@ -160,7 +160,17 @@ public class SessionPoolTest {
 
     @Test
     public void
-    destroysExpiredSessionsDuringHouseKeeping() {
+    discardsStaleSessions() {
+        pool.idleTimeout(maxAge);
+        Session data = new Session();
+        String sid = pool.save(data);
+        delorean.travelInTime(timeJump(maxAge));
+        assertThat("stale session", pool.load(sid), nullValue());
+    }
+
+    @Test
+    public void
+    destroysSessionsThatAreNoLongerValidDuringHouseKeeping() {
         Collection<String> persistentSessions = addSessionsToPool(10);
         Collection<String> expiringSessions = expire(addSessionsToPool(10));
 
@@ -176,7 +186,7 @@ public class SessionPoolTest {
     public void
     notifiesWhenSessionsAreLoaded() {
         final String sid = pool.save(new Session());
-        pool.setSessionListener(listener);
+        pool.sessionListener(listener);
         context.checking(new Expectations() {{
             oneOf(listener).sessionLoaded(with(sid));
         }});
@@ -189,7 +199,7 @@ public class SessionPoolTest {
         final String sid = pool.save(new Session());
         Session session = pool.load(sid);
 
-        pool.setSessionListener(listener);
+        pool.sessionListener(listener);
         context.checking(new Expectations() {{
             oneOf(listener).sessionSaved(with(sid));
         }});
@@ -199,7 +209,7 @@ public class SessionPoolTest {
     @Test
     public void
     notifiesWhenSessionsAreCreated() {
-        pool.setSessionListener(listener);
+        pool.sessionListener(listener);
         context.checking(new Expectations() {{
             oneOf(listener).sessionCreated(with("1"));
         }});
@@ -210,7 +220,7 @@ public class SessionPoolTest {
     public void
     notifiesWhenSessionsAreDropped() {
         final String sid = pool.save(new Session());
-        pool.setSessionListener(listener);
+        pool.sessionListener(listener);
 
         pool.destroy("not-in-pool");
         context.checking(new Expectations() {{

@@ -122,8 +122,10 @@ public class SessionTest {
     public void
     isInitiallySetToNeverExpires() {
         Session session = new Session();
-        assertThat("initial max age", session.maxAge(), equalTo(-1));
-        assertThat("initial expiration time", session.expirationTime(), nullValue());
+        assertThat("expires", session.expires(), equalTo(false));
+        assertThat("default max age", session.maxAge(), equalTo(-1));
+        assertThat("default expiration time", session.expirationTime(), equalTo(Instant.MAX));
+        assertThat("has expired", !session.expired(Instant.MAX));
     }
 
     @Test
@@ -132,7 +134,10 @@ public class SessionTest {
         Session session = new Session();
         session.updatedAt(updateTime);
         session.maxAge(timeoutInSeconds);
+        assertThat("expires", session.expires(), equalTo(true));
         assertThat("expiration time", session.expirationTime(), equalTo(whenTimeoutOccurs(updateTime)));
+        assertThat("expired too early", !session.expired(justBefore(whenTimeoutOccurs(updateTime))));
+        assertThat("expired too late", session.expired(whenTimeoutOccurs(updateTime)));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -145,6 +150,10 @@ public class SessionTest {
 
     private Instant whenTimeoutOccurs(Instant pointInTime) {
         return pointInTime.plus(timeoutInSeconds, ChronoUnit.SECONDS);
+    }
+
+    private Instant justBefore(Instant pointInTime) {
+        return pointInTime.minusNanos(1);
     }
 
     private Matcher<Iterable<?>> containsItems(Object... items) {

@@ -33,7 +33,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     public void handle(Request request, Response response) throws Exception {
         CookieJar cookieJar = CookieJar.get(request);
         if (cookieJar == null) throw new IllegalStateException("No cookie jar bound to request");
-        Session session = openSession(cookieJar);
+        Session session = acquireSession(cookieJar);
         session.bind(request);
 
         forward(request, response)
@@ -41,17 +41,17 @@ public class CookieSessionTracker extends AbstractMiddleware {
                 .whenComplete((error, action) -> session.unbind(request));
     }
 
-    private Session openSession(CookieJar cookieJar) {
-        Session session = acquireSession(cookieJar);
-        session.maxAge(expireAfter);
-        return session;
-    }
-
     private Session acquireSession(CookieJar cookieJar) {
         String id = sessionId(cookieJar);
-        if (id == null) return new Session();
+        if (id == null) return openSession();
         Session session = store.load(id);
-        return session != null ? session : new Session();
+        return session != null ? session : openSession();
+    }
+
+    private Session openSession() {
+        Session session = new Session();
+        session.maxAge(expireAfter);
+        return session;
     }
 
     private String sessionId(CookieJar cookieJar) {

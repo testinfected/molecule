@@ -12,6 +12,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     private final Clock clock;
 
     private SessionPoolListener listener = SessionPoolListener.NONE;
+    private int idleTimeout = -1;
 
     public SessionPool() {
         this(new SecureIdentifierPolicy());
@@ -26,8 +27,14 @@ public class SessionPool implements SessionStore, SessionHouse {
         this.clock = clock;
     }
 
-    public void setSessionListener(SessionPoolListener listener) {
+    public SessionPool sessionListener(SessionPoolListener listener) {
         this.listener = listener;
+        return this;
+    }
+
+    public SessionPool idleTimeout(int seconds) {
+        this.idleTimeout = seconds;
+        return this;
     }
 
     public int size() {
@@ -46,7 +53,7 @@ public class SessionPool implements SessionStore, SessionHouse {
         if (data.invalid()) throw new IllegalStateException("Session invalidated");
         String sid = sessionId(data);
         Session session = makeSession(sid, data);
-        Instant now = clock.instant();
+        Instant now = now();
         session.updatedAt(now);
         sessions.put(sid, session);
         if (sid.equals(data.id())) {
@@ -88,11 +95,23 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private boolean validate(Session session) {
-        if (expired(session)) session.invalidate();
+        if (expired(session) || stale(session)) session.invalidate();
         return !session.invalid();
     }
 
     private boolean expired(Session session) {
-        return session.expirationTime() != null && !clock.instant().isBefore(session.expirationTime());
+        return session.expires() && session.expired(now());
+    }
+
+    private boolean stale(Session session) {
+        return !session.expires() && idleTimeout >= 0 && !now().isBefore(staleTime(session));
+    }
+
+    private Instant staleTime(Session session) {
+        return session.updatedAt().plusSeconds(idleTimeout);
+    }
+
+    private Instant now() {
+        return clock.instant();
     }
 }

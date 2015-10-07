@@ -120,10 +120,11 @@ public class SessionTest {
 
         response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
         assertNoError();
+        String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
         delorean.travelInTime(SECONDS.toMillis(FIVE_MIN));
 
-        response = request.but().get("/");
+        response = request.but().cookie(SESSION_COOKIE, sessionId).get("/");
         assertNoError();
         assertThat(response).hasNoCookie(SESSION_COOKIE)
                             .hasBodyText("Hello, Guest");

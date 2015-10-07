@@ -196,12 +196,28 @@ public class CookieSessionTrackerTest {
     }
 
     @Test public void
-    setsSessionsToExpireAfterMaxAge() throws Exception {
+    setsSessionAndCookieToExpireIfExpirationPeriodSpecified() throws Exception {
+        CookieJar cookieJar = fillCookieJar();
+        tracker.expireAfter(timeout);
+        tracker.connectTo(incrementCounter());
+
+        context.checking(new Expectations() {{
+            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
+        }});
+        tracker.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
+        assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
+    }
+
+    @Test public void
+    setsCookieToExpireAfterSessionMaxAge() throws Exception {
         CookieJar cookieJar = fillCookieJar();
         tracker.connectTo(expireSessionAfter(timeout));
 
         context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
+            allowing(store).save(with(newSession())); will(returnValue("new"));
         }});
 
         tracker.handle(request, response);
@@ -212,22 +228,7 @@ public class CookieSessionTrackerTest {
     }
 
     @Test public void
-    setsNewSessionsToExpiresIfMaxAgeSpecified() throws Exception {
-        fillCookieJar();
-        tracker.expireAfter(timeout);
-        tracker.connectTo(incrementCounter());
-
-        context.checking(new Expectations() {{
-            oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
-        }});
-        response.done();
-
-        assertNoExecutionError();
-        tracker.handle(request, response);
-    }
-
-    @Test public void
-    setsCookieEvenOnExistingSessionsIfMaxAgeSpecified() throws Exception {
+    refreshesCookieForExistingSessionsIfMaxAgeSpecified() throws Exception {
         CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
         tracker.connectTo(expireSessionAfter(timeout));
 
