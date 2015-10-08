@@ -12,7 +12,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     private final Clock clock;
 
     private SessionPoolListener listener = SessionPoolListener.NONE;
-    private int idleTimeout = -1;
+    private int idleTimeout;
 
     public SessionPool() {
         this(new SecureIdentifierPolicy());
@@ -104,7 +104,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private boolean stale(Session session) {
-        return !session.expires() && idleTimeout >= 0 && !now().isBefore(staleTime(session));
+        return !session.expires() && idleTimeout > 0 && !now().isBefore(staleTime(session));
     }
 
     private Instant staleTime(Session session) {
