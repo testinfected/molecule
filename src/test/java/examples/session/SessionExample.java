@@ -13,24 +13,23 @@ import java.time.Clock;
 
 public class SessionExample {
 
-    private final Clock clock;
+    private static final int FIVE_MINUTES = 300; // in secs
+    private static final int THIRTY_MINUTES = 1800; // in secs
 
-    private CookieSessionTracker sessionTracker;
+    private final Clock clock;
 
     public SessionExample(Clock clock) {
         this.clock = clock;
     }
 
-    public void expireAfter(int seconds) {
-        this.sessionTracker.expireAfter(seconds);
-    }
-
     public void run(WebServer server) throws IOException {
-        // Track sessions using a cookie strategy and an in-memory session pool
-        sessionTracker = new CookieSessionTracker(new SessionPool(new SecureIdentifierPolicy(), clock));
-        // Enable cookie support
+        // Create an in-memory session pool which invalidates stale sessions after 30 minutes
+        SessionPool sessionPool = new SessionPool(new SecureIdentifierPolicy(), clock).idleTimeout(THIRTY_MINUTES);
+
+              // Enable cookie support
         server.add(new Cookies())
-              .add(sessionTracker)
+              // Track sessions using transient - a.k.a session - cookies by default
+              .add(new CookieSessionTracker(sessionPool))
               .start(new DynamicRoutes() {{
                          map("/").to((request, response) -> {
                              Session session = Session.get(request);
@@ -42,6 +41,13 @@ public class SessionExample {
                              String username = request.parameter("username");
                              Session session = Session.get(request);
                              session.put("username", username);
+
+                             // if remember me is checked, make session cookie persistent with a lifetime of 5 minutes
+                             boolean rememberMe = request.parameter("remember_me") != null;
+                             if (rememberMe) {
+                                 session.maxAge(FIVE_MINUTES);
+                             }
+
                              response.redirectTo("/").done();
                          });
 

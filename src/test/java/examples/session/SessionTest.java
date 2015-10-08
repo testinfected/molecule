@@ -50,7 +50,7 @@ public class SessionTest {
     }
 
     @Test
-    public void creatingAPersistentSession() throws IOException {
+    public void creatingATransientSessionCookie() throws IOException {
         response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
@@ -70,10 +70,10 @@ public class SessionTest {
     }
 
     @Test
-    public void creatingASessionWhichExpires() throws IOException {
-        sessions.expireAfter(FIVE_MIN);
-
-        response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
+    public void creatingAPersistentSessionCookieWhichExpiresAfterFiveMinutes() throws IOException {
+        response = request.content(new UrlEncodedForm().addField("username", "Vincent")
+                                                       .addField("remember_me", "true"))
+                          .post("/login");
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(FIVE_MIN);
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
@@ -114,11 +114,12 @@ public class SessionTest {
         assertThat(response).hasBodyText("Hello, Guest");
     }
 
-    @Test public void
+    @Test
+    public void
     attemptingToUseAnExpiredSession() throws Exception {
-        sessions.expireAfter(FIVE_MIN);
-
-        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
+        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")
+                                                             .addField("remember_me", "true"))
+                          .post("/login");
         assertNoError();
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
