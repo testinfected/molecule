@@ -13,6 +13,7 @@ public class SessionPool implements SessionStore, SessionHouse {
 
     private SessionPoolListener listener = SessionPoolListener.NONE;
     private int idleTimeout;
+    private int timeToLive;
 
     public SessionPool() {
         this(new SecureIdentifierPolicy());
@@ -34,6 +35,11 @@ public class SessionPool implements SessionStore, SessionHouse {
 
     public SessionPool idleTimeout(int seconds) {
         this.idleTimeout = seconds;
+        return this;
+    }
+
+    public SessionPool timeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
         return this;
     }
 
@@ -95,7 +101,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private boolean validate(Session session) {
-        if (expired(session) || stale(session)) session.invalidate();
+        if (expired(session) || stale(session) || tooOld(session)) session.invalidate();
         return !session.invalid();
     }
 
@@ -107,8 +113,16 @@ public class SessionPool implements SessionStore, SessionHouse {
         return !session.expires() && idleTimeout > 0 && !now().isBefore(staleTime(session));
     }
 
+    private boolean tooOld(Session session) {
+        return timeToLive > 0 && !now().isBefore(endOfLifeTime(session));
+    }
+
     private Instant staleTime(Session session) {
         return session.updatedAt().plusSeconds(idleTimeout);
+    }
+
+    private Instant endOfLifeTime(Session session) {
+        return session.updatedAt().plusSeconds(timeToLive);
     }
 
     private Instant now() {

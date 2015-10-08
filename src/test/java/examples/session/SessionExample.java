@@ -11,10 +11,14 @@ import com.vtence.molecule.session.SessionPool;
 import java.io.IOException;
 import java.time.Clock;
 
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 public class SessionExample {
 
-    private static final int FIVE_MINUTES = 300; // in secs
-    private static final int THIRTY_MINUTES = 1800; // in secs
+    private static final int FIVE_MINUTES = (int) MINUTES.toSeconds(5);
+    private static final int THIRTY_MINUTES = (int) MINUTES.toSeconds(30);
+    private static final int TWO_DAYS = (int) DAYS.toSeconds(2);
 
     private final Clock clock;
 
@@ -25,6 +29,8 @@ public class SessionExample {
     public void run(WebServer server) throws IOException {
         // Create an in-memory session pool which invalidates stale sessions after 30 minutes
         SessionPool sessionPool = new SessionPool(new SecureIdentifierPolicy(), clock).idleTimeout(THIRTY_MINUTES);
+        // Invalidate sessions that are over 2 days old, even if they are maintained active
+        sessionPool.timeToLive(TWO_DAYS);
 
               // Enable cookie support
         server.add(new Cookies())
@@ -42,7 +48,7 @@ public class SessionExample {
                              Session session = Session.get(request);
                              session.put("username", username);
 
-                             // if remember me is checked, make session cookie persistent with a lifetime of 5 minutes
+                             // If remember me, make session cookie persistent with a max age of 5 minutes
                              boolean rememberMe = request.parameter("remember_me") != null;
                              if (rememberMe) {
                                  session.maxAge(FIVE_MINUTES);

@@ -30,6 +30,7 @@ public class SessionPoolTest {
     SessionIdentifierPolicy counter = new Sequence();
     Delorean delorean = new Delorean();
     int maxAge = (int) TimeUnit.MINUTES.toSeconds(30);
+    int timeToLive = (int) TimeUnit.DAYS.toSeconds(2);
 
     SessionPool pool = new SessionPool(counter, delorean);
     SessionPoolListener listener = context.mock(SessionPoolListener.class);
@@ -166,6 +167,16 @@ public class SessionPoolTest {
         String sid = pool.save(data);
         delorean.travelInTime(timeJump(maxAge));
         assertThat("stale session", pool.load(sid), nullValue());
+    }
+
+    @Test
+    public void
+    limitsSessionsLifetime() {
+        pool.timeToLive(timeToLive);
+        Session data = new Session();
+        String sid = pool.save(data);
+        delorean.travelInTime(timeJump(timeToLive));
+        assertThat("dead session", pool.load(sid), nullValue());
     }
 
     @Test
