@@ -21,6 +21,7 @@ public class MiddlewareStack implements Application {
     public MiddlewareStack use(Middleware middleware) {
         if (map != null) {
             stack.add(map);
+            map = null;
         }
         stack.add(middleware);
         return this;

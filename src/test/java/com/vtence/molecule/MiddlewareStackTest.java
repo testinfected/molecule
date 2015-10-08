@@ -25,7 +25,7 @@ public class MiddlewareStackTest {
     }
 
     @Test public void
-    hasBuiltInSupportForMountPoints() throws Exception {
+    supportMountPointsInsteadOfRunners() throws Exception {
         stack.mount("/api", application("api"));
 
         stack.handle(request.path("/api"), response);
@@ -46,18 +46,22 @@ public class MiddlewareStackTest {
         stack.use(middleware("top"));
         stack.mount("/api", application("api"));
         stack.use(middleware("bottom"));
+        stack.mount("/admin", application("admin"));
+        stack.run(application("main"));
 
-        stack.handle(request.path("/api"), response);
-        assertChain(is("top -> api"));
+        stack.handle(request.path("/"), response);
+        assertChain(is("top -> bottom -> main"));
     }
 
     @Test public void
     takesIntoAccountOrderOfMiddlewareAndMountDefinitions() throws Exception {
+        stack.use(middleware("top"));
         stack.mount("/api", application("api"));
-        stack.use(middleware("won't apply"));
+        stack.use(middleware("bottom"));
+        stack.mount("/admin", application("admin"));
 
         stack.handle(request.path("/api"), response);
-        assertChain(is("api"));
+        assertChain(is("top -> api"));
     }
 
     @Test public void
