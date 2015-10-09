@@ -30,7 +30,7 @@ public class CookieSessionTrackerTest {
 
     SessionStore store = context.mock(SessionStore.class);
     int timeout = (int) TimeUnit.MINUTES.toSeconds(30);
-    String SESSION_COOKIE = "molecule.session";
+    String SESSION_COOKIE = CookieSessionTracker.STANDARD_SERVLET_SESSION_COOKIE;
     CookieSessionTracker tracker = new CookieSessionTracker(store).usingCookieName(SESSION_COOKIE);
 
     Request request = new Request();

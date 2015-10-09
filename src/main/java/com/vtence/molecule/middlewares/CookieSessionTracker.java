@@ -9,11 +9,11 @@ import com.vtence.molecule.session.SessionStore;
 
 public class CookieSessionTracker extends AbstractMiddleware {
 
-    private static final String STANDARD_SERVLET_SESSION_COOKIE = "JSESSIONID";
+    public static final String STANDARD_SERVLET_SESSION_COOKIE = "JSESSIONID";
 
     private final SessionStore store;
 
-    private String name = STANDARD_SERVLET_SESSION_COOKIE;
+    private String name = "molecule.session";
     private int expireAfter = -1;
 
     public CookieSessionTracker(SessionStore store) {

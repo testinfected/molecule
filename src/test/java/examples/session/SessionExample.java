@@ -35,7 +35,8 @@ public class SessionExample {
               // Enable cookie support
         server.add(new Cookies())
               // Track sessions using transient - a.k.a session - cookies by default
-              .add(new CookieSessionTracker(sessionPool))
+              // You decide of the cookie name to track sessions
+              .add(new CookieSessionTracker(sessionPool).usingCookieName("molecule.session"))
               .start(new DynamicRoutes() {{
                          map("/").to((request, response) -> {
                              Session session = Session.get(request);

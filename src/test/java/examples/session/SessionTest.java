@@ -26,7 +26,8 @@ public class SessionTest {
     WebServer server = WebServer.create(9999);
 
     Throwable error;
-    String SESSION_COOKIE = "JSESSIONID"; // The default session cookie name is the standard servlet cookie
+    // The default session cookie name, it can be set to something different
+    String SESSION_COOKIE = "molecule.session";
     int FIVE_MIN = 300;
 
     HttpRequest request = new HttpRequest(9999);
