@@ -54,6 +54,15 @@ public class SessionExample {
                                  session.maxAge(FIVE_MINUTES);
                              }
 
+                             // If renew, make a fresh session to avoid session fixation attack
+                             // by generating a new session id
+                             boolean renew = request.parameter("renew") != null;
+                             if (renew) {
+                                 Session freshSession = new Session();
+                                 freshSession.merge(session);
+                                 freshSession.bind(request);
+                             }
+
                              response.redirectTo("/").done();
                          });
 

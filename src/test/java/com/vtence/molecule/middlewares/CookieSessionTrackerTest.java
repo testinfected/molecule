@@ -62,7 +62,7 @@ public class CookieSessionTrackerTest {
         response.done();
 
         assertNoExecutionError();
-        assertThat(response).hasBodyText("Session: null");
+        assertThat(response).hasBodyText("Session: new");
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
 
@@ -166,7 +166,7 @@ public class CookieSessionTrackerTest {
     @Test public void
     destroysInvalidSessions() throws Exception {
         CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-        tracker.connectTo(invalidateSession());
+        tracker.connectTo(writeAndInvalidateSession());
 
         context.checking(new Expectations() {{
             oneOf(store).destroy(with("existing"));
@@ -244,6 +244,38 @@ public class CookieSessionTrackerTest {
     }
 
     @Test public void
+    ignoresDroppedSessions() throws Exception {
+        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
+        tracker.connectTo(writeAndDropSession());
+
+        context.checking(new Expectations() {{
+            never(store).save(with(any(Session.class)));
+        }});
+
+        tracker.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
+        assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
+    }
+
+    @Test public void
+    usesNewSessionIfRenewed() throws Exception {
+        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
+        tracker.connectTo(writeNewSession());
+
+        context.checking(new Expectations() {{
+            oneOf(store).save(with(newSession())); will(returnValue("new"));
+        }});
+
+        tracker.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
+        assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasValue("new");
+    }
+
+    @Test public void
     unbindsSessionAfterwards() throws Exception {
         fillCookieJar();
         tracker.handle(request, response);
@@ -296,14 +328,14 @@ public class CookieSessionTrackerTest {
     private Application echoSessionId() {
         return (request, response) -> {
             Session session = Session.get(request);
-            response.body("Session: " + session.id());
+            response.body("Session: " + (session.exists() ? session.id() : "new"));
         };
     }
 
     private Application incrementCounter() {
         return (request, response) -> {
             Session session = Session.get(request);
-            Integer counter = session.contains("counter") ? session.<Integer>get("counter") : 0;
+            Integer counter = session.contains("counter") ? session.get("counter") : 0;
             session.put("counter", counter++);
             response.body("Counter: " + counter);
         };
@@ -317,11 +349,29 @@ public class CookieSessionTrackerTest {
         };
     }
 
-    private Application invalidateSession() {
+    private Application writeAndInvalidateSession() {
         return (request, response) -> {
             Session session = Session.get(request);
             session.put("written", true);
             session.invalidate();
+        };
+    }
+
+    private Application writeAndDropSession() {
+        return (request, response) -> {
+            Session session = Session.get(request);
+            session.put("written", true);
+            Session.remove(request);
+            response.done();
+        };
+    }
+
+    private Application writeNewSession() {
+        return (request, response) -> {
+            Session session = new Session();
+            session.put("written", true);
+            session.bind(request);
+            response.done();
         };
     }
 }

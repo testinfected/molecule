@@ -31,14 +31,18 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        CookieJar cookieJar = CookieJar.get(request);
-        if (cookieJar == null) throw new IllegalStateException("No cookie jar bound to request");
-        Session session = acquireSession(cookieJar);
-        session.bind(request);
+        CookieJar cookieJar = fetchCookieJar(request);
+        Session.set(request, acquireSession(cookieJar));
 
         forward(request, response)
-                .whenSuccessful(result -> commitSession(session, cookieJar))
-                .whenComplete((error, action) -> session.unbind(request));
+                .whenSuccessful(result -> commitSession(request))
+                .whenComplete((error, action) -> Session.remove(request));
+    }
+
+    private CookieJar fetchCookieJar(Request request) {
+        CookieJar cookieJar = CookieJar.get(request);
+        if (cookieJar == null) throw new IllegalStateException("No cookie jar bound to request");
+        return cookieJar;
     }
 
     private Session acquireSession(CookieJar cookieJar) {
@@ -59,7 +63,10 @@ public class CookieSessionTracker extends AbstractMiddleware {
         return sessionCookie != null ? sessionCookie.value() : null;
     }
 
-    private void commitSession(Session session, CookieJar cookieJar) {
+    private void commitSession(Request request) {
+        CookieJar cookieJar = fetchCookieJar(request);
+        Session session = Session.get(request);
+
         if (shouldDiscard(session)) {
             return;
         }
@@ -77,7 +84,11 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private boolean shouldDiscard(Session session) {
-        return !session.exists() && session.isEmpty();
+        return session == null || !shouldUpdate(session);
+    }
+
+    private boolean shouldUpdate(Session session) {
+        return session.exists() || !session.isEmpty();
     }
 
     private boolean newSession(String sid, CookieJar cookieJar) {
@@ -85,7 +96,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private boolean expires(Session session) {
-        return session.maxAge() >= 0;
+        return session.expires();
     }
 
     private void destroy(Session session) {

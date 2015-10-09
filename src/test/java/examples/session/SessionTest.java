@@ -14,6 +14,9 @@ import java.io.IOException;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class SessionTest {
@@ -50,6 +53,17 @@ public class SessionTest {
     }
 
     @Test
+    public void trackingASessionAcrossRequests() throws IOException {
+        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
+        assertNoError();
+        String sessionId = response.cookie(SESSION_COOKIE).getValue();
+
+        response = request.but().cookie(SESSION_COOKIE, sessionId).get("/");
+        assertNoError();
+        assertThat(response).hasBodyText("Hello, Vincent");
+    }
+
+    @Test
     public void creatingATransientSessionCookie() throws IOException {
         response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
         assertNoError();
@@ -57,7 +71,7 @@ public class SessionTest {
     }
 
     @Test
-    public void noteThatPersistentSessionCookiesAreNotRefreshed() throws IOException {
+    public void noteThatTransientSessionCookiesAreNotRefreshed() throws IOException {
         response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
         assertNoError();
         String sessionId = response.cookie(SESSION_COOKIE).getValue();
@@ -83,17 +97,6 @@ public class SessionTest {
         assertNoError();
         // ... the cookie will have been refreshed
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(FIVE_MIN);
-    }
-
-    @Test
-    public void trackingASessionAcrossRequests() throws IOException {
-        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
-        assertNoError();
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
-
-        response = request.but().cookie(SESSION_COOKIE, sessionId).get("/");
-        assertNoError();
-        assertThat(response).hasBodyText("Hello, Vincent");
     }
 
     @Test
@@ -129,6 +132,26 @@ public class SessionTest {
         assertNoError();
         assertThat(response).hasNoCookie(SESSION_COOKIE)
                             .hasBodyText("Hello, Guest");
+    }
+
+    @Test
+    public void
+    renewingASessionToAvoidSessionFixation() throws Exception {
+        response = request.but().content(new UrlEncodedForm().addField("username", "attacker")).post("/login");
+        assertNoError();
+        String fixatedSession = response.cookie(SESSION_COOKIE).getValue();
+
+        response = request.but().cookie(SESSION_COOKIE, fixatedSession)
+                          .content(new UrlEncodedForm().addField("username", "Vincent")
+                                                       .addField("remember_me", "true")
+                                                       .addField("renew", "true"))
+                          .post("/login");
+        assertNoError();
+        assertThat(response).hasCookie(SESSION_COOKIE);
+
+        String sessionId = response.cookie(SESSION_COOKIE).getValue();
+
+        assertThat("new session id", sessionId, not(equalTo(fixatedSession)));
     }
 
     private void assertNoError() {
