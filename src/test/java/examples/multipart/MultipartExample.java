@@ -9,14 +9,14 @@ import java.io.IOException;
 
 /**
  * <p>
- *     This example shows how to handle multi-part file uploads.
+ * This example shows how to handle multi-part file uploads.
  * </p>
  * <p>
- *     We have a first endpoint to serve a very simple profile HTML form in which our user can
- *     enter an email address, upload a text biography and a profile image.
- *     <br>
- *     This form is submitted encoded as <code>multipart/form-data</code>.
- *     We process the form submission in a second endpoint.
+ * We have a first endpoint to serve a very simple profile HTML form in which our user can
+ * enter an email address, upload a text biography and a profile image.
+ * <br>
+ * This form is submitted encoded as <code>multipart/form-data</code>.
+ * We process the form submission in a second endpoint.
  * </p>
  */
 public class MultipartExample {
@@ -25,7 +25,7 @@ public class MultipartExample {
         // Start the server with a set of routes
         server.start(new DynamicRoutes() {{
 
-            // A GET request to /profile renders an HTML profile form, that will be submitted as
+            // A GET request to /profile renders an HTML profile form. It will be submitted as
             // multipart/form-data. In this form the user can enter an email address, upload a text biography
             // and a profile image
             get("/profile").to((request, response) -> {
@@ -34,23 +34,23 @@ public class MultipartExample {
 
                 // Render the profile form
                 response.done("<html>" +
-                        "<body>" +
-                        "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
-                        "<p>" +
-                        "  <label>Email: <input type=\"email\" name=\"email\"></label>\n" +
-                        "</p>" +
-                        "<p>" +
-                        "  <label>Biography: <input type=\"file\" name=\"biography\"></label>\n" +
-                        "</p>" +
-                        "<p>" +
-                        "  <label>Avatar: <input type=\"file\" name=\"avatar\"></label>\n" +
-                        "</p>" +
-                        "<p>" +
-                        "  <input type=\"submit\" value=\"Go\">\n" +
-                        "</p>" +
-                        "</form>" +
-                        "</body>" +
-                        "</html>");
+                              "<body>" +
+                              "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
+                              "<p>" +
+                              "  <label>Email: <input type=\"email\" name=\"email\"></label>\n" +
+                              "</p>" +
+                              "<p>" +
+                              "  <label>Biography: <input type=\"file\" name=\"biography\"></label>\n" +
+                              "</p>" +
+                              "<p>" +
+                              "  <label>Avatar: <input type=\"file\" name=\"avatar\"></label>\n" +
+                              "</p>" +
+                              "<p>" +
+                              "  <input type=\"submit\" value=\"Go\">\n" +
+                              "</p>" +
+                              "</form>" +
+                              "</body>" +
+                              "</html>");
             });
 
             // A POST to /profile submits the form, then returns a plain text page with a summary of the

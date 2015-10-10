@@ -10,13 +10,14 @@ import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 /**
  * <p>
- * In this example we show how to create an start an HTTPS server. We use a JKS keystore that contains our self-signed
- * certificate.
+ *     In this example we show how to create an start an HTTPS server. We use a JKS keystore that contains our
+ *     self-signed certificate.
  * </p>
  * <p>
- *   To generate the self-signed certificate using an 2048 bits RSA key pair, use the following command: <br>
- * <code>keytool -genkey -keyalg RSA -alias <i>key alias</i> -keystore <i>keystore file</i>
- * -storepass <i>store password</i> -keysize 2048</code>
+ *     To generate the self-signed certificate using an 2048 bits RSA key pair, use the following command:
+ *     <br>
+ *     <code>keytool -genkey -keyalg RSA -alias <i>key alias</i> -keystore <i>keystore file</i>
+ *     -storepass <i>store password</i> -keysize 2048</code>
  * </p>
  */
 public class SSLExample {
@@ -29,9 +30,9 @@ public class SSLExample {
         // The password to use the key
         String keyPassword = "password";
 
-        // We enable TLS with our key store file and passwords
+        // We enable TLS with our key store password and key password
         server.enableSSL(keyStore, keyStorePassword, keyPassword)
-              // We a render a simple text to let our user know he/she is on a secure channel
+              // We a render a simple text to let our user know she is on a secure channel
               .start((request, response) -> response.done("You are on a secure channel"));
     }
 

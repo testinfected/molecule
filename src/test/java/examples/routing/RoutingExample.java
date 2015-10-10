@@ -7,12 +7,12 @@ import java.io.IOException;
 
 /**
  * <p>
- *     This is a simple example showing how to define routes and how to use route patterns containing named
- *     parameters. Named parameters are accessible as normal request parameters.
+ * This is a simple example showing how to define routes and how to use route patterns containing named
+ * parameters. Named parameters are accessible as normal request parameters.
  * </p>
  * <p>
- *     We want to route incoming requests based their paths and verbs, so we provide route patterns as strings.
- *     If your matching logic is more sophisticated, you can also provide custom matchers.
+ * We want to route incoming requests based on their paths and verbs, so we provide route patterns as strings.
+ * If your matching logic is more sophisticated, you can also provide custom matchers.
  * </p>
  */
 public class RoutingExample {
@@ -43,7 +43,7 @@ public class RoutingExample {
                 response.done(
                         "<html>" +
                         "<body>" +
-                            "<h3>Hello, " + request.parameter("username") + "</h3>" +
+                        "<h3>Hello, " + request.parameter("username") + "</h3>" +
                         "</body>" +
                         "</html>"
                 );

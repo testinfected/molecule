@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * <p>
  *     In this example we demonstrate reading and writing cookies. We use an example adapted from
- *     the RFC 2695 (HTTP State Management mechanism - section 4).
+ *     RFC 2695 (HTTP State Management mechanism - section 4).
  * </p>
  * <p>
  *     We use the {@link Cookies} middleware to enable cookies support. This middleware creates a {@link CookieJar}

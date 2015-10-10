@@ -30,7 +30,7 @@ public class AsyncExample {
                 aLongRunningProcess(500);
 
                 // When the task completes, a call to done triggers completion of the response.
-                // Processing of the middleware pipeline resumes and then server writes the response back
+                // Processing of the middleware pipeline resumes and then the server writes the response back
                 // to the client.
                 response.done("After waiting for a long time...");
             });
