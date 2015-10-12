@@ -9,14 +9,14 @@ import java.io.IOException;
 
 /**
  * <p>
- * This example shows how to handle multi-part file uploads.
+ *     This example shows how to handle multi-part file uploads.
  * </p>
  * <p>
- * We have a first endpoint to serve a very simple profile HTML form in which our user can
- * enter an email address, upload a text biography and a profile image.
+ *     We have a first endpoint to serve a very simple profile HTML form in which our user can
+ *     enter an email address, upload a text biography and a profile image.
  * <br>
- * This form is submitted encoded as <code>multipart/form-data</code>.
- * We process the form submission in a second endpoint.
+ *     This form is submitted encoded as <code>multipart/form-data</code>.
+ *     We process the form submission in a second endpoint.
  * </p>
  */
 public class MultipartExample {

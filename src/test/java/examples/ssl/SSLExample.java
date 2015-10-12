@@ -10,7 +10,7 @@ import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 /**
  * <p>
- *     In this example we show how to create an start an HTTPS server. We use a JKS keystore that contains our
+ *     In this example we create and start an HTTPS server. We use a JKS keystore that contains our
  *     self-signed certificate.
  * </p>
  * <p>
