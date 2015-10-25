@@ -1,20 +1,40 @@
 package examples.middleware;
 
-import com.vtence.molecule.*;
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
+import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.AbstractMiddleware;
 
 import java.io.IOException;
 
+/**
+ * <p>
+ *     This example demonstrates how to write custom middlewares to add to the processing pipeline. <br>
+ *     We demonstrate both performing some work before handling control to processing pipeline
+ *     as well as performing additional work once the processing pipeline completes.
+ * </p>
+ * <p>
+ *      Our first middleware reads the <code>User-Agent</code> HTTP header value and
+ *      redirects IE users to the Mozilla web site.
+ *      <br>
+*       The second second middleware calculates the response
+ *      size to add a <code>Content-Length</code> HTTP header to the response.
+ * </p>
+ */
 public class CustomMiddlewareExample {
 
     public void run(WebServer server) throws IOException {
-
-        // An example of performing some work before handling control to the next or application
+        // To demonstrate performing some work before handling control to the processing pipeline,
+        // we read the User-Agent header and redirect IE users to the Mozilla web site.
         Middleware getFirefox = new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
                 // Tell IE users to get Firefox
                 String userAgent = request.header("User-Agent");
                 if (userAgent != null && userAgent.contains("MSIE")) {
+                    // Short-circuit the processing pipeline and redirect our user
+                    // to the Mozilla web site
                     response.redirectTo("http://www.mozilla.org").done();
                 } else {
                     // Hand over control to next application in the stack
@@ -23,12 +43,15 @@ public class CustomMiddlewareExample {
             }
         };
 
-        // An example of performing additional work after getting control back
-        // (there's already a middleware for that, btw)
+        // To demonstrate performing additional work after getting control back, we set the Content-Length
+        // header on the response
+        // (for a more capable version of this middleware, check the ContentLengthHeader middleware)
         Middleware contentLengthHeader = new AbstractMiddleware() {
             public void handle(Request request, Response response) throws Exception {
+                // Forward the request for processing, the perform additional work when the response
+                // completes
                 forward(request, response).whenSuccessful(resp -> {
-                    // Set content length header on the response
+                    // Set the content length header on the response
                     resp.contentLength(resp.size());
                 });
             }
