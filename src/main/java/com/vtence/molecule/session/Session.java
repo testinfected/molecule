@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Session {
 
     private final String id;
-    private final Map<Object, Object> attributes = new ConcurrentHashMap<>();
+    private final Map<String, Object> attributes = new ConcurrentHashMap<>();
 
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
@@ -92,31 +92,31 @@ public class Session {
     }
 
     public boolean contains(Object key) {
-        return attributes.containsKey(key);
+        return attributes.containsKey(String.valueOf(key));
     }
 
     @SuppressWarnings("unchecked")
     public <T> T get(Object key) {
-        return (T) attributes.get(key);
+        return (T) attributes.get(String.valueOf(key));
     }
 
     @SuppressWarnings("unchecked")
     public <T> T put(Object key, Object value) {
         checkValid();
-        return (T) attributes.put(key, value);
+        return (T) attributes.put(String.valueOf(key), value);
     }
 
     @SuppressWarnings("unchecked")
     public <T> T remove(Object key) {
         checkValid();
-        return (T) attributes.remove(key);
+        return (T) attributes.remove(String.valueOf(key));
     }
 
     private void checkValid() {
         if (invalid) throw new IllegalStateException("Session invalidated");
     }
 
-    public Set<Object> keys() {
+    public Set<String> keys() {
         return Collections.unmodifiableSet(attributes.keySet());
     }
 
