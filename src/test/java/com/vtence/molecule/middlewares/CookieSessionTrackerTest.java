@@ -361,7 +361,7 @@ public class CookieSessionTrackerTest {
         return (request, response) -> {
             Session session = Session.get(request);
             session.put("written", true);
-            Session.remove(request);
+            Session.unbind(request);
             response.done();
         };
     }

@@ -31,16 +31,12 @@ public class Session {
         return request.attribute(Session.class);
     }
 
-    public static void set(Request request, Session session) {
-        request.attribute(Session.class, session);
-    }
-
-    public static void remove(Request request) {
-        request.removeAttribute(Session.class);
-    }
-
     public void bind(Request request) {
-        set(request, this);
+        request.attribute(Session.class, this);
+    }
+
+    public static void unbind(Request request) {
+        request.removeAttribute(Session.class);
     }
 
     public String id() {
@@ -104,14 +100,16 @@ public class Session {
         return (T) attributes.get(key);
     }
 
-    public Object put(Object key, Object value) {
+    @SuppressWarnings("unchecked")
+    public <T> T put(Object key, Object value) {
         checkValid();
-        return attributes.put(key, value);
+        return (T) attributes.put(key, value);
     }
 
-    public Object remove(Object key) {
+    @SuppressWarnings("unchecked")
+    public <T> T remove(Object key) {
         checkValid();
-        return attributes.remove(key);
+        return (T) attributes.remove(key);
     }
 
     private void checkValid() {
