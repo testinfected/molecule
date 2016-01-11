@@ -192,6 +192,20 @@ public class SimpleServerTest {
                 contains("gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0"));
     }
 
+    @Test public void
+    writesHeadersWithMultipleValues() throws IOException {
+        server.run((request, response) -> {
+            response.addHeader("Cache-Control", "no-cache");
+            response.addHeader("Cache-Control", "no-store");
+            response.done();
+        });
+
+        response = request.send();
+
+        assertNoError();
+        assertThat("response headers", response.headers("Cache-Control"), hasItems("no-cache", "no-store"));
+    }
+
     @SuppressWarnings("unchecked")
     @Test public void
     detailsRequestContent() throws IOException {
