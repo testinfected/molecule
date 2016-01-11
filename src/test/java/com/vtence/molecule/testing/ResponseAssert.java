@@ -1,12 +1,14 @@
 package com.vtence.molecule.testing;
 
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
 import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.testing.CharsetDetector.detectCharsetOf;
@@ -136,6 +138,11 @@ public class ResponseAssert {
 
     public ResponseAssert isDone() {
         Assert.assertThat("response completed", response.isDone(), is(true));
+        return this;
+    }
+
+    public ResponseAssert hasCookies(Matcher<Iterable<? extends String>> matchingValues) {
+        Assert.assertThat("response cookies", response.cookies().stream().map(Cookie::toString).collect(Collectors.toList()), matchingValues);
         return this;
     }
 }

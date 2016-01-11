@@ -51,8 +51,8 @@ public class CookiesTest {
         response.done();
 
         assertNoExecutionError();
-        assertThat(response).hasHeaders("Set-Cookie",
-                contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
+        assertThat(response).hasCookies(contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
+        assertThat(response).hasNoHeader("Set-Cookie");
     }
 
     @Test
@@ -67,7 +67,8 @@ public class CookiesTest {
         response.done();
 
         assertNoExecutionError();
-        assertThat(response).hasHeaders("Set-Cookie", contains("foo=; version=1; path=/; max-age=0"));
+        assertThat(response).hasCookies(contains("foo=; version=1; path=/; max-age=0"));
+        assertThat(response).hasNoHeader("Set-Cookie");
     }
 
     @Test

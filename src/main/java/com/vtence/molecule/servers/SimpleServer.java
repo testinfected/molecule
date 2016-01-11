@@ -1,7 +1,10 @@
 package com.vtence.molecule.servers;
 
 import com.vtence.molecule.*;
-import org.simpleframework.http.Part;
+import com.vtence.molecule.Request;
+import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Cookie;
+import org.simpleframework.http.*;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerSocketProcessor;
 import org.simpleframework.transport.connect.Connection;
@@ -154,6 +157,7 @@ public class SimpleServer implements Server {
         private void commit(org.simpleframework.http.Response simple, Response response) throws IOException {
             setStatusLine(simple, response);
             setHeaders(simple, response);
+            setCookies(simple, response);
             writeBody(simple, response);
         }
 
@@ -165,6 +169,19 @@ public class SimpleServer implements Server {
         private void setHeaders(org.simpleframework.http.Response simple, Response response) {
             for (String name : response.headerNames()) {
                 simple.setValue(name, response.header(name));
+            }
+        }
+
+        private void setCookies(org.simpleframework.http.Response simple, Response response) {
+            for (Cookie cookie : response.cookies()) {
+                org.simpleframework.http.Cookie simpleCookie = new org.simpleframework.http.Cookie(cookie.name(), cookie.value());
+                simpleCookie.setDomain(cookie.domain());
+                simpleCookie.setExpiry(cookie.maxAge() + 1);
+                simpleCookie.setPath(cookie.path());
+                simpleCookie.setProtected(cookie.httpOnly());
+                simpleCookie.setSecure(cookie.secure());
+                simpleCookie.setVersion(cookie.version());
+                simple.setCookie(simpleCookie);
             }
         }
 

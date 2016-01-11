@@ -32,11 +32,11 @@ public class Cookies extends AbstractMiddleware {
     private Consumer<Response> commitCookies(CookieJar cookies) {
         return response -> {
             for (Cookie cookie : cookies.fresh()) {
-                response.addHeader(SET_COOKIE, cookie.toString());
+                response.addCookie(cookie);
             }
 
             for (Cookie cookie : cookies.discarded()) {
-                response.addHeader(SET_COOKIE, cookie.maxAge(0).toString());
+                response.addCookie(cookie.maxAge(0));
             }
         };
     }
