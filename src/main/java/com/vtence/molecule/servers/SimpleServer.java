@@ -164,7 +164,9 @@ public class SimpleServer implements Server {
 
         private void setHeaders(org.simpleframework.http.Response simple, Response response) {
             for (String name : response.headerNames()) {
-                simple.setValue(name, response.header(name));
+                for (String value: response.headers(name)) {
+                    simple.addValue(name, value);
+                }
             }
         }
 
