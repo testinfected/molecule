@@ -68,7 +68,7 @@ public class SessionTest {
     public void creatingATransientSessionCookie() throws IOException {
         response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
         assertNoError();
-        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
+        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(0);
     }
 
     @Test

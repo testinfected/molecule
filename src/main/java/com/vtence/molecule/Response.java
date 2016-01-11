@@ -2,11 +2,13 @@ package com.vtence.molecule;
 
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.http.ContentType;
+import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.lib.BinaryBody;
 
 import java.nio.charset.Charset;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -34,6 +36,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 public class Response {
     private final CompletableFuture<Response> done = new CompletableFuture<>();
     private final Headers headers = new Headers();
+    private final List<Cookie> cookies = new ArrayList<>();
 
     private CompletableFuture<Response> postProcessing = done;
     private int statusCode = HttpStatus.OK.code;
@@ -246,6 +249,24 @@ public class Response {
     public Response removeHeader(String name) {
         headers.remove(name);
         return this;
+    }
+
+    /**
+     * Adds a cookie to the response.
+     *
+     * @param cookie the cookie to add to the response
+     */
+    public Response addCookie(Cookie cookie) {
+        cookies.add(cookie);
+        return this;
+    }
+
+    /**
+     * Gets the list of cookies for this response
+     * @return the (possibly empty) list of cookies
+     */
+    public List<Cookie> cookies() {
+        return new ArrayList<>(cookies);
     }
 
     /**
