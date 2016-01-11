@@ -50,6 +50,8 @@ dependencies {
   testCompile libs.juniversal_chardet
 }
 
+compileJava.options.encoding = 'UTF-8'
+
 task 'version' << {
   println version
 }
