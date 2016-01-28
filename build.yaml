@@ -12,7 +12,8 @@ artifacts:
 
   # -- test dependencies
   jmock: org.jmock:jmock:jar:2.6.0
-  hamcrest: org.hamcrest:hamcrest-all:jar:1.3
+  hamcrest: org.hamcrest:java-hamcrest:jar:2.0.0.0
+  hamcrest_junit: org.hamcrest:hamcrest-junit:jar:2.0.0.0
   juniversalchardet: com.googlecode.juniversalchardet:juniversalchardet:jar:1.0.3
 
 jmock: 2.6.0

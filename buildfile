@@ -15,7 +15,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   compile.options.target = '1.8'
 
   compile.with SIMPLE, :mustache
-  test.with :hamcrest, :jmock, :juniversalchardet
+  test.with :hamcrest, :hamcrest_junit, :jmock, :juniversalchardet
 
   package :jar
   package :javadoc
