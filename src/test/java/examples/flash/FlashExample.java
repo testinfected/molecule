@@ -19,16 +19,27 @@ public class FlashExample {
               .add(new Flash())
               .start(new DynamicRoutes() {{
                   post("/accounts").to((request, response) -> {
-                      String email = request.parameter("email");
                       FlashHash flash = FlashHash.get(request);
-                      flash.notice("Account '" + email + "' successfully created");
+
+                      String email = request.parameter("email");
+                        if (email != null) {
+                          flash.notice("Account '" + email + "' successfully created");
+                      } else {
+                          flash.alert("An email is required");
+                      }
                       response.redirectTo("/account").done();
                   });
 
                   get("/account").to((request, response) -> {
                       FlashHash flash = FlashHash.get(request);
-                      String notice = flash.notice();
-                      response.done(notice != null ? notice : "");
+
+                      if (flash.notice() != null) {
+                          response.done(flash.notice());
+                      } else if (flash.alert() != null) {
+                          response.done(flash.alert());
+                      } else {
+                          response.done();
+                      }
                   });
               }});
     }

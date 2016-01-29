@@ -60,12 +60,20 @@ public class FlashHash {
         return entries.keySet();
     }
 
-    public void notice(String value) {
-        put("notice", value);
+    public void notice(String message) {
+        put("notice", message);
     }
 
     public String notice() {
         return get("notice");
+    }
+
+    public void alert(String message) {
+        put("alert", message);
+    }
+
+    public String alert() {
+        return get("alert");
     }
 
     public void clear() {

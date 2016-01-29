@@ -32,7 +32,7 @@ public class FlashTest {
     }
 
     @Test
-    public void retrievingAFlashEntryInTheNextRequest() throws IOException {
+    public void retrievingAFlashNoticeInTheNextRequest() throws IOException {
         response = request.but()
                           .content(Form.urlEncoded().addField("email", "james@gmail.com"))
                           .post("/accounts");
@@ -64,5 +64,19 @@ public class FlashTest {
                           .get(redirection);
 
         assertThat(response).hasBodyText("");
+    }
+
+    @Test
+    public void usingTheFlashToRedirectWithErrors() throws IOException {
+        response = request.but()
+                          .post("/accounts");
+
+        String redirection = response.header("Location");
+        String sessionId = response.cookie("molecule.session").getValue();
+        response = request.but()
+                          .cookie("molecule.session", sessionId)
+                          .get(redirection);
+
+        assertThat(response).hasBodyText("An email is required");
     }
 }
