@@ -72,12 +72,15 @@ public class FlashTest {
     }
 
     @Test
-    public void storesFlashEntriesInSessionWhenDone() throws Throwable {
-        Map<String, String> entries = new HashMap<>();
-        entries.put("farewell", "Goodbye");
-        flash.connectTo(writeToFlash(entries));
+    public void storesFreshFlashEntriesInSessionWhenDoneAndForgetAboutOldEntries() throws Throwable {
+        flashes().put("greeting", "Hello");
+
+        Map<String, String> freshValues = new HashMap<>();
+        freshValues.put("farewell", "Goodbye");
+        flash.connectTo(writeToFlash(freshValues));
 
         flash.handle(request, response);
+        assertThat("old flashes", flashes(), nullValue());
 
         response.done();
         assertNoError();
@@ -88,8 +91,6 @@ public class FlashTest {
 
     @Test
     public void doesNotWriteEmptyFlashToSession() throws Throwable {
-        session.clear();
-
         flash.connectTo(writeToFlash(emptyMap()));
         flash.handle(request, response);
 

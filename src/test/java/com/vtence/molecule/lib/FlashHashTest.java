@@ -5,10 +5,12 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -86,5 +88,18 @@ public class FlashHashTest {
 
         assertThat("past greeting", pastGreeting, equalTo("Hello"));
         assertThat("removed greeting", flash.get("greeting"), nullValue());
+    }
+
+    @Test
+    public void sweepsOldEntries() {
+        Map<String, String> oldEntries = new HashMap<>();
+        oldEntries.put("greeting", "Hello");
+        FlashHash flash = new FlashHash(oldEntries);
+
+        flash.put("farewell", "Goodbye");
+        flash.sweep();
+
+        assertThat("fresh count", flash.toMap(), aMapWithSize(1));
+        assertThat("fresh values", flash.toMap(), hasKey("farewell"));
     }
 }

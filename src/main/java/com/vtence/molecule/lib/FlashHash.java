@@ -4,11 +4,13 @@ import com.vtence.molecule.Request;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class FlashHash {
     private final Map<String, Object> entries = new HashMap<>();
+    private final Set<String> keep = new HashSet<>();
 
     public FlashHash() {
         this(Collections.emptyMap());
@@ -37,6 +39,7 @@ public class FlashHash {
 
     @SuppressWarnings("unchecked")
     public <T> T put(Object key, Object value) {
+        keep.add(String.valueOf(key));
         return (T) entries.put(String.valueOf(key), value);
     }
 
@@ -73,6 +76,13 @@ public class FlashHash {
         for (Object key : values.keySet()) {
             put(key, values.get(key));
         }
+    }
+
+    public void sweep() {
+        Map<String, Object> fresh = new HashMap<>();
+        entries.keySet().stream().filter(this.keep::contains).forEach(key -> fresh.put(key, entries.get(key)));
+        entries.clear();
+        entries.putAll(fresh);
     }
 
     public Map<String, Object> toMap() {

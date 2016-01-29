@@ -31,7 +31,7 @@ public class Flash extends AbstractMiddleware {
     private FlashHash loadFlash(Request request) {
         Session session = fetchSession(request);
         Map<String, Object> flashes = session.contains(FlashHash.class) ?
-                session.get(FlashHash.class) : new HashMap<>();
+                session.remove(FlashHash.class) : new HashMap<>();
         return new FlashHash(flashes);
     }
 
@@ -39,6 +39,7 @@ public class Flash extends AbstractMiddleware {
         return response -> {
             Session session = fetchSession(request);
             FlashHash flash = FlashHash.get(request);
+            flash.sweep();
             if (!session.invalid() && !flash.empty()) {
                 session.put(FlashHash.class, flash.toMap());
             }

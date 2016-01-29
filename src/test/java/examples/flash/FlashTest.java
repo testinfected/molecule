@@ -45,4 +45,24 @@ public class FlashTest {
 
         assertThat(response).hasBodyText("Account 'james@gmail.com' successfully created");
     }
+
+    @Test
+    public void flashEntriesDoNotSurviveTheNextRequest() throws IOException {
+        response = request.but()
+                          .content(Form.urlEncoded().addField("email", "james@gmail.com"))
+                          .post("/accounts");
+
+        String redirection = response.header("Location");
+        String sessionId = response.cookie("molecule.session").getValue();
+        response = request.but()
+                          .cookie("molecule.session", sessionId)
+                          .get(redirection);
+
+        // play again
+        response = request.but()
+                          .cookie("molecule.session", sessionId)
+                          .get(redirection);
+
+        assertThat(response).hasBodyText("");
+    }
 }
