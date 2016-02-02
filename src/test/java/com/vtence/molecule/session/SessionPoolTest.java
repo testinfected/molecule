@@ -64,14 +64,29 @@ public class SessionPoolTest {
 
     @Test
     public void
-    renewsSessionIdsOnSave() {
+    canRenewExistingSessionsIdsOnSave() {
         pool.renewIds();
+
+        Session data = new Session();
+        String old = pool.save(data);
+        assertThat("old id", old, equalTo("1"));
+
+        Session session = pool.load(old);
+        String newId = pool.save(session);
+
+        assertThat("renewed id", newId, equalTo("2"));
+        assertThat("old session", pool.load(old), nullValue());
+        assertThat("new session", pool.load(newId), notNullValue());
+    }
+
+    @Test
+    public void
+    renewalHandlesNewSessionsGracefully() {
+        pool.renewIds();
+
         Session data = new Session();
         String id = pool.save(data);
-        assertThat("original id", id, equalTo("1"));
-        Session session = pool.load(id);
-        pool.clear();
-        assertThat("renewed id", pool.save(session), equalTo("2"));
+        assertThat("id", id, equalTo("1"));
     }
 
     @Test

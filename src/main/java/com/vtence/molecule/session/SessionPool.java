@@ -63,6 +63,8 @@ public class SessionPool implements SessionStore, SessionHouse {
 
     public String save(Session data) {
         if (data.invalid()) throw new IllegalStateException("Session invalidated");
+        if (shouldRenew(data)) destroy(data.id());
+
         String sid = sessionId(data);
         Session session = makeSession(sid, data);
         Instant now = now();
@@ -75,6 +77,10 @@ public class SessionPool implements SessionStore, SessionHouse {
             listener.sessionCreated(sid);
         }
         return sid;
+    }
+
+    private boolean shouldRenew(Session data) {
+        return data.exists() && renew;
     }
 
     public void destroy(String sid) {
@@ -100,10 +106,6 @@ public class SessionPool implements SessionStore, SessionHouse {
         session.updatedAt(data.updatedAt());
         session.createdAt(data.createdAt());
         return session;
-    }
-
-    private boolean contains(String id) {
-        return sessions.containsKey(id);
     }
 
     private boolean validate(Session session) {
