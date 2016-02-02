@@ -37,7 +37,6 @@ public final class HttpDate {
             } catch (DateTimeParseException skip) {
                 // try next
             }
-
         }
         throw new IllegalArgumentException("Invalid date format: " + httpDate);
     }

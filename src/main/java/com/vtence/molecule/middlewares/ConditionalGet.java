@@ -5,6 +5,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.http.HttpMethod;
 
+import java.time.Instant;
 import java.util.function.Consumer;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
@@ -46,7 +47,7 @@ public class ConditionalGet extends AbstractMiddleware {
 
     private boolean stillFresh(Request request, Response response) {
         String etag = request.header(IF_NONE_MATCH);
-        String lastTimeSeen = request.header(IF_MODIFIED_SINCE);
+        Instant lastTimeSeen = parseDate(request.header(IF_MODIFIED_SINCE));
 
         if (etag == null && lastTimeSeen == null) return false;
         if (lastTimeSeen != null && modifiedSince(lastTimeSeen, response)) return false;
@@ -55,13 +56,22 @@ public class ConditionalGet extends AbstractMiddleware {
         return true;
     }
 
+    private Instant parseDate(String date) {
+        if (date == null) return null;
+        try {
+            return HttpDate.parse(date);
+        } catch (IllegalArgumentException unsupportedDateFormat) {
+            return null;
+        }
+    }
+
+    private boolean modifiedSince(Instant modifiedSince, Response response) {
+        Instant lastModified = parseDate(response.header(LAST_MODIFIED));
+        return !modifiedSince.equals(lastModified);
+    }
+
     private boolean current(String noneMatch, Response response) {
         String etag = response.header(ETAG);
         return (etag != null) && etag.equals(noneMatch);
-    }
-
-    private boolean modifiedSince(String modifiedSince, Response response) {
-        String lastModified = response.header(LAST_MODIFIED);
-        return lastModified == null || !HttpDate.parse(lastModified).equals(HttpDate.parse(modifiedSince));
     }
 }

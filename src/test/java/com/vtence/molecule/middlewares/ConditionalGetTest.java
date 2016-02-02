@@ -124,6 +124,17 @@ public class ConditionalGetTest {
         assertThat(response).hasStatus(OK);
     }
 
+    @Test
+    public void
+    leavesResponseUnchangedIfModifiedSinceDateFormatIsNotSupported() throws Exception {
+        request.header("If-Modified-Since", "???");
+        conditional.handle(request, response);
+        response.header("Last-Modified", httpDate(Instant.now())).done();
+
+        assertNoExecutionError();
+        assertThat(response).hasStatus(OK);
+    }
+
     private Instant oneHourAgo() {
         return Instant.now().minus(1, ChronoUnit.HOURS);
     }
