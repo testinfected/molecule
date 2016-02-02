@@ -14,6 +14,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     private SessionPoolListener listener = SessionPoolListener.NONE;
     private int idleTimeout;
     private int timeToLive;
+    private boolean renew;
 
     public SessionPool() {
         this(new SecureIdentifierPolicy());
@@ -30,6 +31,11 @@ public class SessionPool implements SessionStore, SessionHouse {
 
     public SessionPool sessionListener(SessionPoolListener listener) {
         this.listener = listener;
+        return this;
+    }
+
+    public SessionPool renewIds() {
+        this.renew = true;
         return this;
     }
 
@@ -84,7 +90,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private String sessionId(Session data) {
-        return data.exists() && contains(data.id()) ? data.id() : policy.generateId();
+        return data.exists() && !renew ? data.id() : policy.generateId();
     }
 
     private Session makeSession(String sid, Session data) {

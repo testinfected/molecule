@@ -55,21 +55,22 @@ public class SessionPoolTest {
     @Test
     public void
     preservesExistingSessionsIds() {
-        Session data = new Session();
-        String id = pool.save(data);
-        Session session = pool.load(id);
-        assertThat("original id", pool.save(session), equalTo(id));
+        Session data = new Session("id");
+        assertThat("saved id", pool.save(data), equalTo("id"));
+        Session session = pool.load("id");
+        assertThat("loaded id", session.id(), equalTo("id"));
     }
 
     @Test
     public void
-    replacesIdsOfSessionsNotInPool() {
+    renewsSessionIdsOnSave() {
+        pool.renewIds();
         Session data = new Session();
         String id = pool.save(data);
         assertThat("original id", id, equalTo("1"));
         Session session = pool.load(id);
         pool.clear();
-        assertThat("replacement id", pool.save(session), equalTo("2"));
+        assertThat("renewed id", pool.save(session), equalTo("2"));
     }
 
     @Test
