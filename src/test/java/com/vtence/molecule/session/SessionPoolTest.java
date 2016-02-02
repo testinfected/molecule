@@ -27,7 +27,7 @@ public class SessionPoolTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
 
-    SessionIdentifierPolicy counter = new Sequence();
+    Sequence counter = new Sequence();
     Delorean delorean = new Delorean();
     int maxAge = (int) TimeUnit.MINUTES.toSeconds(30);
     int timeToLive = (int) TimeUnit.DAYS.toSeconds(2);
@@ -46,6 +46,7 @@ public class SessionPoolTest {
     public void
     generatesIdsForNewSessions() {
         Session data = new Session();
+        counter.expect(data);
         String id = pool.save(data);
         Session session = pool.load(id);
         assertThat("created session", session, notNullValue());
@@ -289,6 +290,7 @@ public class SessionPoolTest {
 
     private class Sequence implements SessionIdentifierPolicy {
         private int nextId;
+        private Matcher<Session> session = notNullValue(Session.class);
 
         private Sequence() {
             this(1);
@@ -298,7 +300,16 @@ public class SessionPoolTest {
             this.nextId = seed;
         }
 
-        public String generateId() {
+        public void expect(Session session) {
+            expect(equalTo(session));
+        }
+
+        public void expect(Matcher<Session> matching) {
+            this.session = matching;
+        }
+
+        public String generateId(Session data) {
+            assertThat("session data", data, session);
             return valueOf(nextId++);
         }
     }

@@ -4,7 +4,7 @@ import static java.util.UUID.randomUUID;
 
 public class SecureIdentifierPolicy implements SessionIdentifierPolicy {
 
-    public String generateId() {
+    public String generateId(Session data) {
         return randomUUID().toString();
     }
 }

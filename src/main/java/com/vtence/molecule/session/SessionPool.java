@@ -90,7 +90,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private String sessionId(Session data) {
-        return data.exists() && !renew ? data.id() : policy.generateId();
+        return data.exists() && !renew ? data.id() : policy.generateId(data);
     }
 
     private Session makeSession(String sid, Session data) {
