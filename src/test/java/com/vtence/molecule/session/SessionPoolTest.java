@@ -134,6 +134,18 @@ public class SessionPoolTest {
         assertThat("pool size", pool.size(), equalTo(count));
     }
 
+    @Test
+    public void
+    isEmptyOnceCleared() {
+        pool.save(new Session());
+        pool.save(new Session());
+        pool.save(new Session());
+
+        pool.clear();
+
+        assertThat("pool size", pool.size(), equalTo(0));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void
     forbidsSavingInvalidSessions() {
