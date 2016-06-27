@@ -12,12 +12,14 @@ import org.junit.Test;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.vtence.molecule.support.HasMethodWithValue.hasMethod;
 import static java.lang.String.valueOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
@@ -29,6 +31,9 @@ public class CookieSessionStoreTest {
     Delorean delorean = new Delorean();
     Sequence counter = new Sequence();
     CookieSessionStore cookies = new CookieSessionStore(counter, encoder, delorean);
+
+    int maxAge = (int) TimeUnit.MINUTES.toSeconds(30);
+    int timeToLive = (int) TimeUnit.DAYS.toSeconds(2);
 
     @Test
     public void
@@ -120,6 +125,53 @@ public class CookieSessionStoreTest {
         }});
 
         cookies.save(data);
+    }
+
+    @Test
+    public void
+    discardsExpiredSessions() throws Exception {
+        Session expired = new Session();
+        expired.maxAge(maxAge);
+
+        context.checking(new Expectations() {{
+            allowing(encoder).decode("expired"); will(returnValue(expired));
+        }});
+
+        delorean.travelInTime(timeJump(maxAge));
+
+        assertThat("expired session", cookies.load("expired"), nullValue());
+    }
+
+    @Test
+    public void
+    discardsStaleSessions() throws Exception {
+        cookies.idleTimeout(maxAge);
+        Session staleSession = new Session();
+
+        context.checking(new Expectations() {{
+            allowing(encoder).decode("stale"); will(returnValue(staleSession));
+        }});
+
+        delorean.travelInTime(timeJump(maxAge));
+        assertThat("stale session", cookies.load("stale"), nullValue());
+    }
+
+    @Test
+    public void
+    limitsSessionsLifetime() throws Exception {
+        cookies.timeToLive(timeToLive);
+        Session dead = new Session();
+
+        context.checking(new Expectations() {{
+            allowing(encoder).decode("dead"); will(returnValue(dead));
+        }});
+
+        delorean.travelInTime(timeJump(timeToLive));
+        assertThat("dead session", cookies.load("dead"), nullValue());
+    }
+
+    private long timeJump(int seconds) {
+        return TimeUnit.SECONDS.toMillis(seconds);
     }
 
     private Matcher<Session> sameSessionDataAs(Session data) {

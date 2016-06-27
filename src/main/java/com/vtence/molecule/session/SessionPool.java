@@ -44,8 +44,8 @@ public class SessionPool implements SessionStore, SessionHouse {
         return this;
     }
 
-    public SessionPool timeToLive(int timeToLive) {
-        this.timeToLive = timeToLive;
+    public SessionPool timeToLive(int seconds) {
+        this.timeToLive = seconds;
         return this;
     }
 
