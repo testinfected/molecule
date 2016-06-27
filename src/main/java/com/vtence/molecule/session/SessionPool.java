@@ -80,7 +80,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private boolean shouldRenew(Session data) {
-        return data.exists() && renew;
+        return !data.fresh() && renew;
     }
 
     public void destroy(String sid) {
@@ -96,7 +96,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private String sessionId(Session data) {
-        return data.exists() && !renew ? data.id() : policy.generateId(data);
+        return data.fresh() || renew ? policy.generateId(data) : data.id();
     }
 
     private Session makeSession(String sid, Session data) {

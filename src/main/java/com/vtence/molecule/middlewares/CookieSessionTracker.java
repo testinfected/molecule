@@ -88,7 +88,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private boolean shouldUpdate(Session session) {
-        return session.exists() || !session.isEmpty();
+        return !session.fresh() || !session.isEmpty();
     }
 
     private boolean newSession(String sid, CookieJar cookieJar) {

@@ -48,9 +48,9 @@ public class SessionPoolTest {
         Session data = new Session();
         counter.expect(data);
         String id = pool.save(data);
+        assertThat("generated id", id, equalTo("1"));
         Session session = pool.load(id);
         assertThat("created session", session, notNullValue());
-        assertThat("generated id", id, equalTo("1"));
     }
 
     @Test
@@ -75,8 +75,8 @@ public class SessionPoolTest {
         String newId = pool.save(session);
 
         assertThat("renewed id", newId, equalTo("2"));
-        assertThat("old session", pool.load(old), nullValue());
         assertThat("new session", pool.load(newId), notNullValue());
+        assertThat("old session", pool.load(old), nullValue());
     }
 
     @Test

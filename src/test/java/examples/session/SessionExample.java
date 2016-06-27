@@ -43,15 +43,17 @@ public class SessionExample {
 
     public void run(WebServer server) throws IOException {
         // Create an in-memory session pool which invalidates stale sessions after 30 minutes
-        SessionPool sessionPool = new SessionPool(new SecureIdentifierPolicy(), clock).idleTimeout(THIRTY_MINUTES);
+        SessionPool sessions = new SessionPool(new SecureIdentifierPolicy(), clock).idleTimeout(THIRTY_MINUTES);
         // Invalidate sessions that are over 2 days old, even if they are maintained active
-        sessionPool.timeToLive(TWO_DAYS);
+        sessions.timeToLive(TWO_DAYS);
+        // Alternatively, you could use cookie storage for sessions:
+        // CookieSessionStore sessions = new CookieSessionStore(new SecureIdentifierPolicy(), new Base64Marshaler());
 
               // Enable cookie support
         server.add(new Cookies())
               // Track sessions using transient - a.k.a session - cookies by default
               // You can change of the name of the cookie used to track sessions
-              .add(new CookieSessionTracker(sessionPool).usingCookieName("molecule.session"))
+              .add(new CookieSessionTracker(sessions).usingCookieName("molecule.session"))
               .start(new DynamicRoutes() {{
                          // The default route greets the signed in user
                          map("/").to((request, response) -> {

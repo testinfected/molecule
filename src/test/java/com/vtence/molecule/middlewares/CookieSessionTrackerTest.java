@@ -328,7 +328,7 @@ public class CookieSessionTrackerTest {
     private Application echoSessionId() {
         return (request, response) -> {
             Session session = Session.get(request);
-            response.body("Session: " + (session.exists() ? session.id() : "new"));
+            response.body("Session: " + (session.fresh() ? "new" : session.id()));
         };
     }
 

@@ -21,14 +21,14 @@ public class SessionTest {
 
     @Test
     public void
-    needsAnIdToExist() {
-        Session fresh = new Session();
-        assertThat("exists when fresh?", fresh.exists(), equalTo(false));
-        assertThat("fresh id", fresh.id(), nullValue());
+    isFreshWithoutAnId() {
+        Session newSession = new Session();
+        assertThat("new is fresh?", newSession.fresh(), equalTo(true));
+        assertThat("new id", newSession.id(), nullValue());
 
-        Session existing = new Session("exists");
-        assertThat("exists with an id?", existing.exists(), equalTo(true));
-        assertThat("exists id", existing.id(), equalTo("exists"));
+        Session oldSession = new Session("old");
+        assertThat("old is fresh?", oldSession.fresh(), equalTo(false));
+        assertThat("old id", oldSession.id(), equalTo("old"));
     }
 
     @Test

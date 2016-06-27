@@ -2,6 +2,7 @@ package com.vtence.molecule.session;
 
 import com.vtence.molecule.Request;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Session {
+public class Session implements Serializable {
 
     private final String id;
     private final Map<String, Object> attributes = new ConcurrentHashMap<>();
@@ -43,8 +44,8 @@ public class Session {
         return id;
     }
 
-    public boolean exists() {
-        return id != null;
+    public boolean fresh() {
+        return id == null;
     }
 
     public Instant createdAt() {
