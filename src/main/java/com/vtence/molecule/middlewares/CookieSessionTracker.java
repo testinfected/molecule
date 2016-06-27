@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
@@ -15,6 +16,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
 
     private String name = "molecule.session";
     private int expireAfter = -1;
+    private FailureReporter failureReporter = FailureReporter.IGNORE;
 
     public CookieSessionTracker(SessionStore store) {
         this.store = store;
@@ -28,6 +30,10 @@ public class CookieSessionTracker extends AbstractMiddleware {
     public CookieSessionTracker expireAfter(int seconds) {
         this.expireAfter = seconds;
         return this;
+    }
+
+    public void reportFailureTo(FailureReporter failureReporter) {
+        this.failureReporter = failureReporter;
     }
 
     public void handle(Request request, Response response) throws Exception {
@@ -48,8 +54,17 @@ public class CookieSessionTracker extends AbstractMiddleware {
     private Session acquireSession(CookieJar cookieJar) {
         String id = sessionId(cookieJar);
         if (id == null) return openSession();
-        Session session = store.load(id);
+        Session session = load(id);
         return session != null ? session : openSession();
+    }
+
+    private Session load(String id) {
+        try {
+            return store.load(id);
+        } catch (Exception error) {
+            failureReporter.errorOccurred(error);
+            return null;
+        }
     }
 
     private Session openSession() {
@@ -78,7 +93,12 @@ public class CookieSessionTracker extends AbstractMiddleware {
         }
 
         String sid = save(session);
-        if (newSession(sid, cookieJar) || expires(session)) {
+        if (sid == null) {
+            // session could not be saved, drop session content
+            return;
+        }
+
+        if (sessionChanged(sid, cookieJar) || expires(session)) {
             cookieJar.add(new Cookie(name, sid).httpOnly(true).maxAge(session.maxAge()));
         }
     }
@@ -91,7 +111,7 @@ public class CookieSessionTracker extends AbstractMiddleware {
         return !session.fresh() || !session.isEmpty();
     }
 
-    private boolean newSession(String sid, CookieJar cookieJar) {
+    private boolean sessionChanged(String sid, CookieJar cookieJar) {
         return !sid.equals(sessionId(cookieJar));
     }
 
@@ -100,10 +120,19 @@ public class CookieSessionTracker extends AbstractMiddleware {
     }
 
     private void destroy(Session session) {
-        store.destroy(session.id());
+        try {
+            store.destroy(session.id());
+        } catch (Exception error) {
+            failureReporter.errorOccurred(error);
+        }
     }
 
     private String save(Session session) {
-        return store.save(session);
+        try {
+            return store.save(session);
+        } catch (Throwable error) {
+            failureReporter.errorOccurred(error);
+            return null;
+        }
     }
 }

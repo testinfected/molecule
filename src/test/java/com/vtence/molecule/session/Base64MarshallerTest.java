@@ -31,17 +31,4 @@ public class Base64MarshallerTest {
             assertThat("decoded " + attribute, decoded.get(attribute), equalTo(data.get(attribute)));
         }
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void complainsOfIllegalArgumentIfSessionContentIsNotSerializable() {
-        Session session = new Session();
-        session.put("not serializable", new Object());
-
-        marshaler.encode(session);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void complainsOfIllegalArgumentWhenAttemptingToDecodeInvalidSessionContent() {
-        marshaler.decode("<corrupted content>");
-    }
 }

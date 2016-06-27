@@ -29,7 +29,7 @@ public class CookieSessionStoreTest {
 
     @Test
     public void
-    encodesSessionDataInCookie() {
+    encodesSessionDataInCookie() throws Exception {
         Session data = new Session("42");
         data.put("username", "Gorion");
         data.put("race", "Human");
@@ -45,7 +45,7 @@ public class CookieSessionStoreTest {
 
     @Test
     public void
-    generatesIdsForNewSessions() {
+    generatesIdsForNewSessions() throws Exception {
         Session data = new Session();
         counter.expect(data);
 
@@ -58,7 +58,7 @@ public class CookieSessionStoreTest {
 
     @Test
     public void
-    decodesSessionFromCookieValue() {
+    decodesSessionFromCookieValue() throws Exception {
         Session data = new Session() {
             public String toString() {
                 return "decoded session";
@@ -75,7 +75,7 @@ public class CookieSessionStoreTest {
 
     @Test
     public void
-    canRenewExistingSessionsIdsOnSave() {
+    canRenewExistingSessionsIdsOnSave() throws Exception {
         Session data = new Session("42");
 
         context.checking(new Expectations() {{

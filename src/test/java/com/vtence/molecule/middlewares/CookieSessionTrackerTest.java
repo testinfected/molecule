@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
@@ -29,6 +30,7 @@ public class CookieSessionTrackerTest {
     JUnitRuleMockery context = new JUnitRuleMockery();
 
     SessionStore store = context.mock(SessionStore.class);
+    FailureReporter failureReporter = context.mock(FailureReporter.class);
     int timeout = (int) TimeUnit.MINUTES.toSeconds(30);
     String SESSION_COOKIE = CookieSessionTracker.STANDARD_SERVLET_SESSION_COOKIE;
     CookieSessionTracker tracker = new CookieSessionTracker(store).usingCookieName(SESSION_COOKIE);
@@ -37,7 +39,7 @@ public class CookieSessionTrackerTest {
     Response response = new Response();
 
     @Before public void
-    stubSessionStore() {
+    stubSessionStore() throws Exception {
         context.checking(new Expectations() {{
             allowing(store).load("existing"); will(returnValue(new Session("existing")));
             allowing(store).load("expired"); will(returnValue(null));
@@ -257,6 +259,62 @@ public class CookieSessionTrackerTest {
 
         assertNoExecutionError();
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
+    }
+
+    @Test public void
+    dropsContentOfCorruptedSessions() throws Exception {
+        CookieJar cookieJar = fillCookieJar();
+        tracker.reportFailureTo(failureReporter);
+        tracker.connectTo(incrementCounter());
+
+        Exception saveError = new Exception("Save failed!");
+        context.checking(new Expectations() {{
+            oneOf(failureReporter).errorOccurred(saveError);
+            oneOf(store).save(with(any(Session.class))); will(throwException(saveError));
+        }});
+
+        tracker.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
+        assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
+    }
+
+    @Test public void
+    createsAFreshSessionIfClientSessionIsCorrupted() throws Exception {
+        fillCookieJar(new Cookie(SESSION_COOKIE, "corrupted"));
+        tracker.reportFailureTo(failureReporter);
+        tracker.connectTo(echoSessionId());
+
+        Exception loadError = new Exception("load failed!");
+        context.checking(new Expectations() {{
+            oneOf(failureReporter).errorOccurred(loadError);
+            allowing(store).load(with("corrupted")); will(throwException(loadError));
+        }});
+
+        tracker.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
+        assertThat(response).hasBodyText("Session: new");
+    }
+
+    @Test public void
+    reportsWhenSessionDestructionFails() throws Exception {
+        fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
+        tracker.reportFailureTo(failureReporter);
+        tracker.connectTo(writeAndInvalidateSession());
+
+        Exception destroyError = new Exception("destroy failed!");
+        context.checking(new Expectations() {{
+            oneOf(failureReporter).errorOccurred(destroyError);
+            allowing(store).destroy(with("existing")); will(throwException(destroyError));
+        }});
+
+        tracker.handle(request, response);
+        response.done();
+
+        assertNoExecutionError();
     }
 
     @Test public void
