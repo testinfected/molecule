@@ -25,7 +25,7 @@ public class CookieSessionStoreTest {
     public JUnitRuleMockery context = new JUnitRuleMockery();
     SessionCookieEncoder encoder = context.mock(SessionCookieEncoder.class);
     Sequence counter = new Sequence();
-    CookieSessionStore store = new CookieSessionStore(counter, encoder);
+    CookieSessionStore cookies = new CookieSessionStore(counter, encoder);
 
     @Test
     public void
@@ -39,7 +39,7 @@ public class CookieSessionStoreTest {
             allowing(encoder).encode(with(sameSessionDataAs(data))); will(returnValue("<encoded session>"));
         }});
 
-        String cookie = store.save(data);
+        String cookie = cookies.save(data);
         assertThat("session cookie", cookie, equalTo("<encoded session>"));
     }
 
@@ -50,10 +50,10 @@ public class CookieSessionStoreTest {
         counter.expect(data);
 
         context.checking(new Expectations() {{
-            allowing(encoder).encode(with(sessionWithId(counter.nextId())));
+            allowing(encoder).encode(with(sessionWithId(counter.nextId()))); will(returnValue("<...>"));
         }});
 
-        store.save(data);
+        cookies.save(data);
     }
 
     @Test
@@ -69,8 +69,23 @@ public class CookieSessionStoreTest {
             allowing(encoder).decode("<encoded session>"); will(returnValue(data));
         }});
 
-        Session session = store.load("<encoded session>");
+        Session session = cookies.load("<encoded session>");
         assertThat("session", session, sameInstance(data));
+    }
+
+    @Test
+    public void
+    canRenewExistingSessionsIdsOnSave() {
+        Session data = new Session("42");
+
+        context.checking(new Expectations() {{
+            allowing(encoder).encode(with(sessionWithId(counter.nextId()))); will(returnValue("<with renewed id>"));
+        }});
+
+        cookies.renewIds();
+        String renewed = cookies.save(data);
+
+        assertThat("renewed id", renewed, equalTo("<with renewed id>"));
     }
 
     private Matcher<Session> sameSessionDataAs(Session data) {
