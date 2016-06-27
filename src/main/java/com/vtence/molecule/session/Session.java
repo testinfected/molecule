@@ -143,8 +143,4 @@ public class Session implements Serializable {
     public boolean invalid() {
         return invalid;
     }
-
-    public String toString() {
-        return id + ": " + attributes.toString();
-    }
 }

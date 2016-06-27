@@ -1,14 +1,23 @@
 package com.vtence.molecule.session;
 
+import java.time.Clock;
+import java.time.Instant;
+
 public class CookieSessionStore implements SessionStore {
 
     private final SessionIdentifierPolicy identifierPolicy;
-    private final SessionCookieEncoder coder;
+    private final SessionCookieEncoder encoder;
+    private final Clock clock;
     private boolean renew;
 
-    public CookieSessionStore(SessionIdentifierPolicy policy, SessionCookieEncoder coder) {
+    public CookieSessionStore(SessionIdentifierPolicy policy, SessionCookieEncoder encoder) {
+        this(policy, encoder, Clock.systemDefaultZone());
+    }
+
+    public CookieSessionStore(SessionIdentifierPolicy policy, SessionCookieEncoder encoder, Clock clock) {
         this.identifierPolicy = policy;
-        this.coder = coder;
+        this.encoder = encoder;
+        this.clock = clock;
     }
 
     public void renewIds() {
@@ -16,13 +25,18 @@ public class CookieSessionStore implements SessionStore {
     }
 
     public Session load(String id) throws Exception {
-        return coder.decode(id);
+        return encoder.decode(id);
     }
 
     public String save(Session data) throws Exception {
         String sid = sessionId(data);
         Session session = makeSession(data, sid);
-        return coder.encode(session);
+        Instant now = clock.instant();
+        session.updatedAt(now);
+        if (!sid.equals(data.id())) {
+            session.createdAt(now);
+        }
+        return encoder.encode(session);
     }
 
     private String sessionId(Session data) {

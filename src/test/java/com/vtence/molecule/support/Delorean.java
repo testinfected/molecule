@@ -31,7 +31,7 @@ public class Delorean extends Clock {
     }
 
     public Instant instant() {
-        return currentTime().plusMillis(timeTravel);
+        return frozen() ? frozenAt : baseClock.instant().plusMillis(timeTravel);
     }
 
     public Instant freeze() {
@@ -57,9 +57,5 @@ public class Delorean extends Clock {
 
     private boolean frozen() {
         return frozenAt != null;
-    }
-
-    private Instant currentTime() {
-        return frozen() ? frozenAt : baseClock.instant();
     }
 }

@@ -1,5 +1,6 @@
 package com.vtence.molecule.session;
 
+import com.vtence.molecule.support.Delorean;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.AllOf;
@@ -8,6 +9,7 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +26,17 @@ public class CookieSessionStoreTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
     SessionCookieEncoder encoder = context.mock(SessionCookieEncoder.class);
+    Delorean delorean = new Delorean();
     Sequence counter = new Sequence();
-    CookieSessionStore cookies = new CookieSessionStore(counter, encoder);
+    CookieSessionStore cookies = new CookieSessionStore(counter, encoder, delorean);
 
     @Test
     public void
     encodesSessionDataInCookie() throws Exception {
         Session data = new Session("42");
+        Instant now = delorean.freeze();
+        data.updatedAt(now);
+        data.createdAt(now);
         data.put("username", "Gorion");
         data.put("race", "Human");
         data.maxAge(1800);
@@ -88,13 +94,41 @@ public class CookieSessionStoreTest {
         assertThat("renewed id", renewed, equalTo("<with renewed id>"));
     }
 
+    @Test
+    public void
+    marksSessionUpdateTime() throws Exception {
+        Session data = new Session();
+        delorean.travelInTime(50);
+        Instant updateTime = delorean.freeze();
+
+        context.checking(new Expectations() {{
+            allowing(encoder).encode(with(sessionUpdatedAt(updateTime)));
+        }});
+
+        cookies.save(data);
+    }
+
+    @Test
+    public void
+    marksSessionCreationTimeForNewSessions() throws Exception {
+        Session data = new Session();
+        delorean.travelInTime(50);
+        Instant creationTime = delorean.freeze();
+
+        context.checking(new Expectations() {{
+            allowing(encoder).encode(with(sessionCreatedAt(creationTime)));
+        }});
+
+        cookies.save(data);
+    }
+
     private Matcher<Session> sameSessionDataAs(Session data) {
         List<Matcher<? super Session>> matchers = new ArrayList<>();
 
         matchers.add(sessionWithId(data.id()));
-        matchers.add(hasMethod("createdAt", data.createdAt()));
-        matchers.add(hasMethod("updatedAt", data.updatedAt()));
-        matchers.add(hasMethod("maxAge", data.maxAge()));
+        matchers.add(sessionCreatedAt(data.createdAt()));
+        matchers.add(sessionUpdatedAt(data.updatedAt()));
+        matchers.add(sessionWithMaxAge(data.maxAge()));
 
         matchers.addAll(data.keys().stream().map(key -> sessionWithSameAttributeAs(data, key)).collect(Collectors.toList()));
 
@@ -103,6 +137,18 @@ public class CookieSessionStoreTest {
 
     private Matcher<Session> sessionWithId(String id) {
         return hasMethod("id", id);
+    }
+
+    private Matcher<Session> sessionCreatedAt(Instant value) {
+        return hasMethod("createdAt", value);
+    }
+
+    private Matcher<Session> sessionUpdatedAt(Instant value) {
+        return hasMethod("updatedAt", value);
+    }
+
+    private Matcher<Session> sessionWithMaxAge(int maxAge) {
+        return hasMethod("maxAge", maxAge);
     }
 
     private FeatureMatcher<Session, ?> sessionWithSameAttributeAs(final Session data, final String key) {
