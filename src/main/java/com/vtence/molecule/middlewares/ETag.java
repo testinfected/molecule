@@ -2,7 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.helpers.Hex;
+import com.vtence.molecule.helpers.HexEncoder;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
 
@@ -19,6 +19,7 @@ import static com.vtence.molecule.lib.BinaryBody.bytes;
 public class ETag extends AbstractMiddleware {
 
     private static final String REVALIDATE = "max-age=0; private; no-cache";
+    private final HexEncoder encoder = new HexEncoder();
 
     public void handle(Request request, Response response) throws Exception {
         forward(request, response).whenSuccessful(this::computeETag);
@@ -38,7 +39,7 @@ public class ETag extends AbstractMiddleware {
     }
 
     private String etagOf(byte[] output) throws NoSuchAlgorithmException {
-        return "\"" + Hex.from(computeHash(output)) + "\"";
+        return "\"" + encoder.toHex(computeHash(output)) + "\"";
     }
 
     private byte[] render(Response response) throws IOException {
