@@ -4,9 +4,8 @@ import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.middlewares.Cookies;
 import com.vtence.molecule.routing.DynamicRoutes;
-import com.vtence.molecule.session.SecureIdentifierPolicy;
+import com.vtence.molecule.session.CookieSessionStore;
 import com.vtence.molecule.session.Session;
-import com.vtence.molecule.session.SessionPool;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -42,12 +41,16 @@ public class SessionExample {
     }
 
     public void run(WebServer server) throws IOException {
-        // Create an in-memory session pool which invalidates stale sessions after 30 minutes
-        SessionPool sessions = new SessionPool(new SecureIdentifierPolicy(), clock).idleTimeout(THIRTY_MINUTES);
+        // Create a cookie based session store - session content is stored on the client
+        CookieSessionStore sessions = CookieSessionStore.secure("secret");
+        // Alternatively, you could use an in-memory session pool
+        // SessionPool sessions = SessionPool.secure();
+        // Invalidate stale sessions after 30 minutes
+        sessions.idleTimeout(THIRTY_MINUTES);
         // Invalidate sessions that are over 2 days old, even if they are maintained active
         sessions.timeToLive(TWO_DAYS);
-        // Alternatively, you could use cookie storage for sessions:
-        // CookieSessionStore sessions = new CookieSessionStore(new SecureIdentifierPolicy(), new Base64Marshaler());
+        // Use the provided clock to get time
+        sessions.usingClock(clock);
 
               // Enable cookie support
         server.add(new Cookies())

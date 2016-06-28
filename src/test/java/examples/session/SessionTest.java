@@ -72,19 +72,6 @@ public class SessionTest {
     }
 
     @Test
-    public void noteThatTransientSessionCookiesAreNotRefreshed() throws IOException {
-        response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
-        assertNoError();
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
-
-        // Play the same request again and include the cookie...
-        response = request.cookie(SESSION_COOKIE, sessionId).send();
-        assertNoError();
-        // ... there will be no cookie this time
-        assertThat(response).hasNoCookie(SESSION_COOKIE);
-    }
-
-    @Test
     public void creatingAPersistentSessionCookieWhichExpiresAfterFiveMinutes() throws IOException {
         response = request.content(new UrlEncodedForm().addField("username", "Vincent")
                                                        .addField("remember_me", "true"))

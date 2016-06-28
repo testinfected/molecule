@@ -15,7 +15,8 @@ public class FlashExample {
 
     public void run(WebServer server) throws IOException {
         server.add(new Cookies())
-              .add(new CookieSessionTracker(new SessionPool()))
+              // We'll use an in memory session pool in this example
+              .add(new CookieSessionTracker(SessionPool.secure()))
               .add(new Flash())
               .start(new DynamicRoutes() {{
                   post("/accounts").to((request, response) -> {

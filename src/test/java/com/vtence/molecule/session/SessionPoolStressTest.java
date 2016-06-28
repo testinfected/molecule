@@ -13,7 +13,7 @@ public class SessionPoolStressTest {
     Blitzer blitzer = new Blitzer(2500, 25);
     AtomicInteger errorCount = new AtomicInteger();
 
-    SessionPool pool = new SessionPool();
+    SessionPool pool = SessionPool.secure();
 
     @Test public void
     supportsStoringAndRetrievingSessionsFromMultipleThreadsSimultaneously() throws InterruptedException {

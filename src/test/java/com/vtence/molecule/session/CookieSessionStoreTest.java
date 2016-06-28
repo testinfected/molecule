@@ -29,7 +29,7 @@ public class CookieSessionStoreTest {
     SessionEncoder encoder = context.mock(SessionEncoder.class);
     Delorean delorean = new Delorean();
     Sequence counter = new Sequence();
-    CookieSessionStore cookies = new CookieSessionStore(counter, encoder, delorean);
+    CookieSessionStore cookies = new CookieSessionStore(counter, encoder).usingClock(delorean);
 
     int maxAge = (int) TimeUnit.MINUTES.toSeconds(30);
     int timeToLive = (int) TimeUnit.DAYS.toSeconds(2);

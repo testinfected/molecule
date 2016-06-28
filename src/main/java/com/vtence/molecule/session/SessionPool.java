@@ -9,24 +9,24 @@ public class SessionPool implements SessionStore, SessionHouse {
 
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
     private final SessionIdentifierPolicy policy;
-    private final Clock clock;
 
+    private Clock clock = Clock.systemDefaultZone();
     private SessionPoolListener listener = SessionPoolListener.NONE;
     private int idleTimeout;
     private int timeToLive;
     private boolean renew;
 
-    public SessionPool() {
-        this(new SecureIdentifierPolicy());
+    public static SessionPool secure() {
+        return new SessionPool(new SecureIdentifierPolicy());
     }
 
     public SessionPool(SessionIdentifierPolicy policy) {
-        this(policy, Clock.systemDefaultZone());
+        this.policy = policy;
     }
 
-    public SessionPool(SessionIdentifierPolicy policy, Clock clock) {
-        this.policy = policy;
+    public SessionPool usingClock(Clock clock) {
         this.clock = clock;
+        return this;
     }
 
     public SessionPool sessionListener(SessionPoolListener listener) {

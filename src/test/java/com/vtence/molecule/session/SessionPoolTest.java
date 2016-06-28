@@ -32,7 +32,7 @@ public class SessionPoolTest {
     int maxAge = (int) TimeUnit.MINUTES.toSeconds(30);
     int timeToLive = (int) TimeUnit.DAYS.toSeconds(2);
 
-    SessionPool pool = new SessionPool(counter, delorean);
+    SessionPool pool = new SessionPool(counter).usingClock(delorean);
     SessionPoolListener listener = context.mock(SessionPoolListener.class);
 
     @Test

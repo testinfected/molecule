@@ -7,31 +7,39 @@ public class CookieSessionStore implements SessionStore {
 
     private final SessionIdentifierPolicy identifierPolicy;
     private final SessionEncoder encoder;
-    private final Clock clock;
+
+    private Clock clock = Clock.systemDefaultZone();
     private boolean renew;
     private int idleTimeout;
     private int timeToLive;
 
-    public CookieSessionStore(SessionIdentifierPolicy policy, SessionEncoder encoder) {
-        this(policy, encoder, Clock.systemDefaultZone());
+    public static CookieSessionStore secure(String key) {
+        return new CookieSessionStore(new SecureIdentifierPolicy(), new SecureSessionEncoder(key));
     }
 
-    public CookieSessionStore(SessionIdentifierPolicy policy, SessionEncoder encoder, Clock clock) {
+    public CookieSessionStore(SessionIdentifierPolicy policy, SessionEncoder encoder) {
         this.identifierPolicy = policy;
         this.encoder = encoder;
-        this.clock = clock;
     }
 
-    public void renewIds() {
+    public CookieSessionStore renewIds() {
         this.renew = true;
+        return this;
     }
 
-    public void idleTimeout(int seconds) {
+    public CookieSessionStore idleTimeout(int seconds) {
         this.idleTimeout = seconds;
+        return this;
     }
 
-    public void timeToLive(int seconds) {
+    public CookieSessionStore timeToLive(int seconds) {
         this.timeToLive = seconds;
+        return this;
+    }
+
+    public CookieSessionStore usingClock(Clock clock) {
+        this.clock = clock;
+        return this;
     }
 
     public Session load(String id) throws Exception {

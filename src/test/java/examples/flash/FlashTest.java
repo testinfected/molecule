@@ -58,6 +58,9 @@ public class FlashTest {
                           .cookie("molecule.session", sessionId)
                           .get(redirection);
 
+        // Session id might have been updated
+        sessionId = response.cookie("molecule.session") != null ? response.cookie("molecule.session").getValue() :
+                sessionId;
         // play again
         response = request.but()
                           .cookie("molecule.session", sessionId)
