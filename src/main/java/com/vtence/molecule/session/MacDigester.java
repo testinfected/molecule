@@ -42,8 +42,8 @@ public class MacDigester implements Digester {
         return key.getBytes(charset);
     }
 
+    // Compare arrays in constant time to avoid timing attacks
     private boolean slowEquals(byte[] bytes, byte[] other) {
-        // Compare arrays in constant time
         int diff = bytes.length ^ other.length;
         for(int i = 0; i < bytes.length && i < other.length; i++)
             diff |= bytes[i] ^ other[i];

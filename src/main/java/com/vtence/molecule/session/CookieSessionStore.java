@@ -44,7 +44,7 @@ public class CookieSessionStore implements SessionStore {
 
     public Session load(String id) throws Exception {
         Session session = encoder.decode(id);
-        if (!validate(session)) return null;
+        if (session == null || !validate(session)) return null;
         else return session;
     }
 

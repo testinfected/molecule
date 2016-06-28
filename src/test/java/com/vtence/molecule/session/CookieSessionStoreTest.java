@@ -161,6 +161,15 @@ public class CookieSessionStoreTest {
         assertThat("dead session", cookies.load("dead"), nullValue());
     }
 
+    @Test public void
+    ignoresCorruptedSessions() throws Exception {
+        context.checking(new Expectations() {{
+            allowing(encoder).decode("corrupted"); will(returnValue(null));
+        }});
+
+        assertThat("corrupted session", cookies.load("corrupted"), nullValue());
+    }
+
     private long timeJump(int seconds) {
         return TimeUnit.SECONDS.toMillis(seconds);
     }
