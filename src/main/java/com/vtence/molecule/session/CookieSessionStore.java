@@ -6,17 +6,17 @@ import java.time.Instant;
 public class CookieSessionStore implements SessionStore {
 
     private final SessionIdentifierPolicy identifierPolicy;
-    private final SessionCookieEncoder encoder;
+    private final SessionEncoder encoder;
     private final Clock clock;
     private boolean renew;
     private int idleTimeout;
     private int timeToLive;
 
-    public CookieSessionStore(SessionIdentifierPolicy policy, SessionCookieEncoder encoder) {
+    public CookieSessionStore(SessionIdentifierPolicy policy, SessionEncoder encoder) {
         this(policy, encoder, Clock.systemDefaultZone());
     }
 
-    public CookieSessionStore(SessionIdentifierPolicy policy, SessionCookieEncoder encoder, Clock clock) {
+    public CookieSessionStore(SessionIdentifierPolicy policy, SessionEncoder encoder, Clock clock) {
         this.identifierPolicy = policy;
         this.encoder = encoder;
         this.clock = clock;

@@ -8,7 +8,7 @@ import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class Base64Marshaler implements SessionCookieEncoder {
+public class Base64Marshaller implements SessionEncoder {
 
     private static final byte[] NO_LINE_BREAK = new byte[0];
 
@@ -24,9 +24,9 @@ public class Base64Marshaler implements SessionCookieEncoder {
         return encoder.encodeToString(buffer.toByteArray());
     }
 
-    public Session decode(String encoded) throws Exception {
+    public Session decode(String content) throws Exception {
         ObjectInputStream input = new ObjectInputStream(new GZIPInputStream(
-                    new ByteArrayInputStream(decoder.decode(encoded))));
+                    new ByteArrayInputStream(decoder.decode(content))));
         return (Session) input.readObject();
     }
 }

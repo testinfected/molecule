@@ -1,21 +1,19 @@
 package com.vtence.molecule.session;
 
 import com.vtence.molecule.support.Delorean;
-import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
-import org.hamcrest.core.AllOf;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-import static com.vtence.molecule.support.HasMethodWithValue.hasMethod;
+import static com.vtence.molecule.session.SessionMatchers.sameSessionDataAs;
+import static com.vtence.molecule.session.SessionMatchers.sessionCreatedAt;
+import static com.vtence.molecule.session.SessionMatchers.sessionUpdatedAt;
+import static com.vtence.molecule.session.SessionMatchers.sessionWithId;
 import static java.lang.String.valueOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -27,7 +25,8 @@ public class CookieSessionStoreTest {
 
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
-    SessionCookieEncoder encoder = context.mock(SessionCookieEncoder.class);
+
+    SessionEncoder encoder = context.mock(SessionEncoder.class);
     Delorean delorean = new Delorean();
     Sequence counter = new Sequence();
     CookieSessionStore cookies = new CookieSessionStore(counter, encoder, delorean);
@@ -35,8 +34,7 @@ public class CookieSessionStoreTest {
     int maxAge = (int) TimeUnit.MINUTES.toSeconds(30);
     int timeToLive = (int) TimeUnit.DAYS.toSeconds(2);
 
-    @Test
-    public void
+    @Test public void
     encodesSessionDataInCookie() throws Exception {
         Session data = new Session("42");
         Instant now = delorean.freeze();
@@ -54,8 +52,7 @@ public class CookieSessionStoreTest {
         assertThat("session cookie", cookie, equalTo("<encoded session>"));
     }
 
-    @Test
-    public void
+    @Test public void
     generatesIdsForNewSessions() throws Exception {
         Session data = new Session();
         counter.expect(data);
@@ -67,8 +64,7 @@ public class CookieSessionStoreTest {
         cookies.save(data);
     }
 
-    @Test
-    public void
+    @Test public void
     decodesSessionFromCookieValue() throws Exception {
         Session data = new Session() {
             public String toString() {
@@ -84,8 +80,7 @@ public class CookieSessionStoreTest {
         assertThat("session", session, sameInstance(data));
     }
 
-    @Test
-    public void
+    @Test public void
     canRenewExistingSessionsIdsOnSave() throws Exception {
         Session data = new Session("42");
 
@@ -99,8 +94,7 @@ public class CookieSessionStoreTest {
         assertThat("renewed id", renewed, equalTo("<with renewed id>"));
     }
 
-    @Test
-    public void
+    @Test public void
     marksSessionUpdateTime() throws Exception {
         Session data = new Session();
         delorean.travelInTime(50);
@@ -127,8 +121,7 @@ public class CookieSessionStoreTest {
         cookies.save(data);
     }
 
-    @Test
-    public void
+    @Test public void
     discardsExpiredSessions() throws Exception {
         Session expired = new Session();
         expired.maxAge(maxAge);
@@ -142,8 +135,7 @@ public class CookieSessionStoreTest {
         assertThat("expired session", cookies.load("expired"), nullValue());
     }
 
-    @Test
-    public void
+    @Test public void
     discardsStaleSessions() throws Exception {
         cookies.idleTimeout(maxAge);
         Session staleSession = new Session();
@@ -156,8 +148,7 @@ public class CookieSessionStoreTest {
         assertThat("stale session", cookies.load("stale"), nullValue());
     }
 
-    @Test
-    public void
+    @Test public void
     limitsSessionsLifetime() throws Exception {
         cookies.timeToLive(timeToLive);
         Session dead = new Session();
@@ -172,43 +163,6 @@ public class CookieSessionStoreTest {
 
     private long timeJump(int seconds) {
         return TimeUnit.SECONDS.toMillis(seconds);
-    }
-
-    private Matcher<Session> sameSessionDataAs(Session data) {
-        List<Matcher<? super Session>> matchers = new ArrayList<>();
-
-        matchers.add(sessionWithId(data.id()));
-        matchers.add(sessionCreatedAt(data.createdAt()));
-        matchers.add(sessionUpdatedAt(data.updatedAt()));
-        matchers.add(sessionWithMaxAge(data.maxAge()));
-
-        matchers.addAll(data.keys().stream().map(key -> sessionWithSameAttributeAs(data, key)).collect(Collectors.toList()));
-
-        return new AllOf<>(matchers);
-    }
-
-    private Matcher<Session> sessionWithId(String id) {
-        return hasMethod("id", id);
-    }
-
-    private Matcher<Session> sessionCreatedAt(Instant value) {
-        return hasMethod("createdAt", value);
-    }
-
-    private Matcher<Session> sessionUpdatedAt(Instant value) {
-        return hasMethod("updatedAt", value);
-    }
-
-    private Matcher<Session> sessionWithMaxAge(int maxAge) {
-        return hasMethod("maxAge", maxAge);
-    }
-
-    private FeatureMatcher<Session, ?> sessionWithSameAttributeAs(final Session data, final String key) {
-        return new FeatureMatcher<Session, Object>(equalTo(data.get(key)), "session with attribute " + key, key) {
-            protected Object featureValueOf(Session actual) {
-                return actual.get(key);
-            }
-        };
     }
 
     private class Sequence implements SessionIdentifierPolicy {
