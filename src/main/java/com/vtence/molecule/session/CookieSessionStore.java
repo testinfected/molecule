@@ -13,8 +13,10 @@ public class CookieSessionStore implements SessionStore {
     private int idleTimeout;
     private int timeToLive;
 
-    public static CookieSessionStore secure(String key) {
-        return new CookieSessionStore(new SecureIdentifierPolicy(), new SecureSessionEncoder(key));
+    public static CookieSessionStore secure(String key, String... oldKeys) {
+        SecureSessionEncoder secureEncoder = new SecureSessionEncoder(key);
+        secureEncoder.acceptAlternateKeys(oldKeys);
+        return new CookieSessionStore(new SecureIdentifierPolicy(), secureEncoder);
     }
 
     public CookieSessionStore(SessionIdentifierPolicy policy, SessionEncoder encoder) {

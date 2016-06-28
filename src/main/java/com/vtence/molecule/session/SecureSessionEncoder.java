@@ -1,8 +1,12 @@
 package com.vtence.molecule.session;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class SecureSessionEncoder implements SessionEncoder {
 
-    private final String key;
+    private final List<String> keys = new ArrayList<>();
     private final SessionEncoder marshaller;
     private final Digester digester;
 
@@ -11,14 +15,14 @@ public class SecureSessionEncoder implements SessionEncoder {
     }
 
     public SecureSessionEncoder(String key, SessionEncoder marshaller, Digester digester) {
-        this.key = key;
+        this.keys.add(key);
         this.marshaller = marshaller;
         this.digester = digester;
     }
 
     public String encode(Session data) throws Exception {
         String encoded = marshaller.encode(data);
-        return encoded + "--" + digester.computeDigest(key, encoded);
+        return encoded + "--" + digester.computeDigest(currentKey(), encoded);
     }
 
     public Session decode(String content) throws Exception {
@@ -29,7 +33,22 @@ public class SecureSessionEncoder implements SessionEncoder {
         return digestsMatch(encoded, digest) ? marshaller.decode(encoded) : null;
     }
 
+    public SecureSessionEncoder acceptAlternateKeys(String... oldKeys) {
+        keys.addAll(Arrays.asList(oldKeys));
+        return this;
+    }
+
+    private String currentKey() {
+        return keys.get(0);
+    }
+
     private boolean digestsMatch(String encoded, String digest) throws Exception {
-        return digest != null && digester.checkDigest(key, encoded, digest);
+        if (digest == null) return false;
+
+        for (String key : keys) {
+            if (digester.checkDigest(key, encoded, digest)) return true;
+        }
+
+        return false;
     }
 }
