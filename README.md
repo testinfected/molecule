@@ -28,7 +28,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.9.1</version>
+      <version>0.10</version>
 </dependency>
 ```
  
@@ -39,7 +39,7 @@ If you want the development version, grab the latest snapshot from Sonatype snap
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.10-SNAPSHOT</version>
+      <version>0.11-SNAPSHOT</version>
 </dependency>
 ```
 
