@@ -64,6 +64,7 @@ Try out the following examples:
 * [REST](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/rest/RESTExample.java)
 * [Asynchronous Processing](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/async/AsyncExample.java)
 * [Cookies](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/cookies/CookiesExample.java)
+* [Flash](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/flash/FlashExample.java)
 * [Locale Negotiation](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/locale/LocaleNegotiationExample.java)
 * [Multipart Forms](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/multipart/MultipartExample.java)
 * [View Templates and Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java)
@@ -259,4 +260,5 @@ Molecule comes with a number of middlewares (more are coming), that you can use 
 * Not Found
 * Http Method Override
 * Layout
+* Flash
 
