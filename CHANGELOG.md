@@ -44,10 +44,21 @@ Sessions are considered stale when they have been inactive for longer than the c
 
 ### Fixed
 - `MiddlewareStack` no longer mixes up middlewares and mount points when several mount points are defined
-- `ApacheLogger`s will now correctly log request parameters as they were received, in case they are modified down the middleware chain
+
+## [0.9] - 2015-09-14
+
+### Added
+
+- It is now possible to serve content asynchronously in a separate thread to the original servicing thread. ([#35])
+- Filters can now be set using custom `RequestMatcher`s
+
+### Fixed
+- `ApacheCommonLogger` now correctly logs request parameters as they were received, in case they are modified down the middleware chain
+
 
 [0.10]: https://github.com/testinfected/molecule/compare/v0.10...v0.9.1
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.9
+[0.9]: https://github.com/testinfected/molecule/compare/v0.9...v0.8.2
 
 [#48]: https://github.com/testinfected/molecule/issues/48
 [#47]: https://github.com/testinfected/molecule/issues/47
@@ -59,4 +70,5 @@ Sessions are considered stale when they have been inactive for longer than the c
 [#40]: https://github.com/testinfected/molecule/issues/40
 [#38]: https://github.com/testinfected/molecule/issues/38
 [#37]: https://github.com/testinfected/molecule/issues/37
+[#35]: https://github.com/testinfected/molecule/issues/35
 [#4]: https://github.com/testinfected/molecule/issues/4
