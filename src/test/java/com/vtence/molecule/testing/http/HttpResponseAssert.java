@@ -86,6 +86,10 @@ public class HttpResponseAssert {
         return this;
     }
 
+    public HttpResponseAssert isEmpty() {
+        return hasBodySize(0);
+    }
+
     public HttpResponseAssert hasBodySize(int size) {
         return hasBodySize(is(size));
     }
