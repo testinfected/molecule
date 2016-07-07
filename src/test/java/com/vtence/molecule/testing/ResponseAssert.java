@@ -112,6 +112,10 @@ public class ResponseAssert {
         return this;
     }
 
+    public ResponseAssert isEmpty() {
+        return hasBodySize(0);
+    }
+
     public ResponseAssert hasBodySize(long byteCount) {
         return hasSize(is(byteCount));
     }

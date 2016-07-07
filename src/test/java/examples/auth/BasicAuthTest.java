@@ -5,7 +5,6 @@ import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,7 +29,6 @@ public class BasicAuthTest {
         server.stop();
     }
 
-    @Ignore("wip")
     @Test
     public void receivingAChallengeWhenNoCredentialsAreSpecified() throws IOException {
         response = request.get("/");
