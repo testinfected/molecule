@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -32,9 +32,25 @@ public class AuthorizationTest {
 
     @Test
     public void
-    viewsMissingSchemeAsEmptyScheme() throws Exception {
+    considersMissingSchemeAsEmpty() throws Exception {
         Authorization auth = Authorization.of(request.header("Authorization", ""));
 
-        assertThat("scheme", auth.scheme(), is(emptyOrNullString()));
+        assertThat("missing scheme", auth.scheme(), is(emptyString()));
+    }
+
+    @Test
+    public void
+    parsesAuthParamsFromHeader() throws Exception {
+        Authorization auth = Authorization.of(request.header("Authorization", "Basic <credentials>"));
+
+        assertThat("params", auth.params(), equalTo("<credentials>"));
+    }
+
+    @Test
+    public void
+    considersMissingParamsAsEmpty() throws Exception {
+        Authorization auth = Authorization.of(request.header("Authorization", "Basic"));
+
+        assertThat("missing params", auth.params(), is(emptyString()));
     }
 }

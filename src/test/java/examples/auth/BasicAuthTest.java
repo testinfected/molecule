@@ -1,6 +1,7 @@
 package examples.auth;
 
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.lib.MimeEncoder;
 import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
@@ -15,6 +16,8 @@ public class BasicAuthTest {
 
     BasicAuthExample auth = new BasicAuthExample("WallyWorld");
     WebServer server = WebServer.create(9999);
+
+    MimeEncoder base64 = MimeEncoder.inUtf8();
 
     HttpRequest request = new HttpRequest(9999);
     HttpResponse response;
@@ -37,5 +40,16 @@ public class BasicAuthTest {
                             .hasHeader("WWW-Authenticate", "Basic realm=\"WallyWorld\"")
                             .hasContentType("text/plain")
                             .isEmpty();
+    }
+
+    @Test
+    public void receivingANewChallengeWhenCredentialsAreInvalid() throws IOException {
+        auth.addUser("joe", "secret");
+
+        request.header("Authorization", "Basic " + base64.encode("joe:bad secret"));
+        response = request.get("/");
+
+        assertThat(response).hasStatusCode(401)
+                            .hasHeader("WWW-Authenticate", "Basic realm=\"WallyWorld\"");
     }
 }

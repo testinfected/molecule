@@ -20,7 +20,11 @@ public class Authorization {
         return tokens[0];
     }
 
-    public boolean hasScheme(String scheme) {
+    public boolean isForScheme(String scheme) {
         return scheme().equals(scheme);
+    }
+
+    public String params() {
+        return tokens.length > 1 ? tokens[1]: "";
     }
 }
