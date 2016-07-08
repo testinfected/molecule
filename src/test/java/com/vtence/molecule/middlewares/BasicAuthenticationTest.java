@@ -9,10 +9,12 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HttpStatus.ACCEPTED;
 import static com.vtence.molecule.http.HttpStatus.BAD_REQUEST;
 import static com.vtence.molecule.http.HttpStatus.UNAUTHORIZED;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 public class BasicAuthenticationTest {
 
@@ -43,12 +45,28 @@ public class BasicAuthenticationTest {
     }
 
     @Test
-    public void rejectsInvalidCredentials() throws Exception {
+    public void authorizesValidCredentials() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(authenticator).authenticate("email", "bad secret"); will(returnValue(empty()));
+            oneOf(authenticator).authenticate("joe", "secret"); will(returnValue(of("joe")));
         }});
 
-        authentication.handle(request.header("Authorization", "Basic " + mime.encode("email:bad secret")), response);
+        authentication.connectTo((request, response) -> {
+            String user = request.attribute("REMOTE_USER");
+            response.status(ACCEPTED).done("user: " + user);
+        });
+
+        authentication.handle(request.header("Authorization", "Basic " + mime.encode("joe:secret")), response);
+
+        assertThat(response).hasBodyText("user: joe").hasStatus(ACCEPTED);
+    }
+
+    @Test
+    public void rejectsInvalidCredentials() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(authenticator).authenticate("joe", "bad secret"); will(returnValue(empty()));
+        }});
+
+        authentication.handle(request.header("Authorization", "Basic " + mime.encode("joe:bad secret")), response);
 
         assertUnauthorized();
     }

@@ -65,6 +65,7 @@ public class BasicAuthExample {
 
     public static void main(String[] args) throws IOException {
         BasicAuthExample example = new BasicAuthExample("WallyWorld");
+        example.addUser("Boss", "password");
         // Run the default web server
         WebServer webServer = WebServer.create();
         example.run(webServer);

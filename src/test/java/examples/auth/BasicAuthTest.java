@@ -43,10 +43,21 @@ public class BasicAuthTest {
     }
 
     @Test
-    public void receivingANewChallengeWhenCredentialsAreInvalid() throws IOException {
-        auth.addUser("joe", "secret");
+    public void authenticatingWithValidCredentials() throws IOException {
+        auth.addUser("Joe", "secret");
 
-        request.header("Authorization", "Basic " + base64.encode("joe:bad secret"));
+        request.header("Authorization", "Basic " + base64.encode("Joe:secret"));
+        response = request.get("/");
+
+        assertThat(response).isOK()
+                            .hasBodyText("Hello, Joe");
+    }
+
+    @Test
+    public void receivingANewChallengeWhenCredentialsAreInvalid() throws IOException {
+        auth.addUser("Joe", "secret");
+
+        request.header("Authorization", "Basic " + base64.encode("Joe:bad secret"));
         response = request.get("/");
 
         assertThat(response).hasStatusCode(401)

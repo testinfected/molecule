@@ -6,6 +6,8 @@ import com.vtence.molecule.http.Authorization;
 import com.vtence.molecule.http.BasicCredentials;
 import com.vtence.molecule.lib.Authenticator;
 
+import java.util.Optional;
+
 import static com.vtence.molecule.http.HeaderNames.WWW_AUTHENTICATE;
 import static com.vtence.molecule.http.HttpStatus.BAD_REQUEST;
 import static com.vtence.molecule.http.HttpStatus.UNAUTHORIZED;
@@ -14,6 +16,7 @@ import static com.vtence.molecule.http.MimeTypes.TEXT;
 public class BasicAuthentication extends AbstractMiddleware {
 
     private static final String BASIC_AUTHENTICATION = "Basic";
+    private static final String REMOTE_USER = "REMOTE_USER";
 
     private final String realm;
     private final Authenticator authenticator;
@@ -37,9 +40,14 @@ public class BasicAuthentication extends AbstractMiddleware {
         }
 
         BasicCredentials credentials = BasicCredentials.decode(auth.params());
-        authenticator.authenticate(credentials.username(), credentials.password());
+        Optional<String> user = authenticator.authenticate(credentials.username(), credentials.password());
 
-        unauthorized(response);
+        if (user.isPresent()) {
+            request.attribute(REMOTE_USER, user.get());
+            forward(request, response);
+        } else {
+            unauthorized(response);
+        }
     }
 
     private void unauthorized(Response response) {
