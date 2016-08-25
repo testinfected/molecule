@@ -187,9 +187,52 @@ To do this, use the route definition methods that accept a _Matcher_ rather than
 
 ## Working with the Request
 
-### Request Object
+Applications receives a <code>request</code> that provide information about the client HTTP request and let you manipulate request attributes.
+
+The request represents the environment for the client HTTP request: the HTTP headers, the request body as well as CGI-like headers. The <code>Request</code> object is built from information provided by the HTTP server. 
+
+Any middleware can modify the content of the request during processing before passing control to the next stage of the middleware pipeline. This of course as no effect on the original HTTP request. See [Middlewares](#middlewares) for more information on middlewares and the middleware pipeline.
+
+### Request
+
+```java
+request.uri();                          // the uri, e.g. /path?query
+request.path();                         // the path info, e.g. /foo
+request.remoteIp();                     // ip of the client
+request.remoteHost();                   // hostname of the client
+request.remotePort();                   // port of the client
+request.protocol();                     // protocol, e.g. HTTP or HTTPS
+request.timestamp();                    // time the request came in
+request.secure();                       // whether the request was made over a secure connection
+request.method();                       // HTTP method (e.g.  GET, POST, PUT, etc.)
+request.body();                         // the body as a string, decoded using the request charset
+request.bodyContent();                  // the raw body content as bytes
+request.bodyStream();                   // the body as a stream of bytes
+request.parts();                        // list of parts of a multipart/form-data request
+request.part("name");                   // named part of a multipart/form-data request
+request.charset();                      // charset of the body, read from the content type
+request.hasHeader("name");              // checks presence of a named header
+request.header("name");                 // value of a given HTTP header
+request.headers("name");                // list of values of a given HTTP header
+request.headerNames();                  // the set of HTTP header names received
+request.contentLength();                // length of the body
+request.contentType();                  // content type of the body
+request.parameter("name");              // value of a specific request parameter
+request.paremeters("name");             // list of values of a specific request parameter
+request.parameterNames();               // set of all request parameter names
+request.allParameters();                // map of all request parameters
+request.attribute("key");               // value of a keyed attribute
+request.attribute("key", "value");      // sets the value of a keyed attribute
+request.attributeKeys();                // set of all attibute keys
+request.removeAttribute("key");         // removes a keyed attribute
+request.attributes();                   // map of all request attributes
+```
 
 ### Attributes
+
+Request attributes are not sent by the client - as opposed to request parameters. They are used for server-side processing only.
+
+Attributes are a local server storage mechanism, scoped within the request. Whereas request parameters are string literals, request attributes can be any type of <code>Object</code>s.
 
 ## Working with the Response
 
