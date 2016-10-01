@@ -329,11 +329,11 @@ For more on cookies, see the [Cookies example](#cookies).
 
 ## Middlewares
 
-Middlewares are a way to enhance your application with optional building blocks, using a pipeline design. 
+Middlewares are a way to enhance your application with optional building blocks, using a pipeline design. A middleware component sits between the client and the server, processing inbound requests and outbound responses.
 
-They implement functionality you tend to need across all your applications,
+Middlewares implement functionality you tend to need across all your applications,
 but you don't want to build everytime. Things like **access logging**, **authentication**, 
-**compression**, **static files**, **routing**, etc. 
+**compression**, **static files**, **routing**, etc.
 
 Being able to separate the processing of the request (and post-processing of the response) in different stages 
 has several benefits:
@@ -347,22 +347,88 @@ For example you could have the following separate stages of the pipeline doing:
 
 1. Capturing internal server errors to render a nice 500 page
 1. Monitoring, logging accesses to the server
-1. Authentication and authorisation, to control access to your applicatin
+1. Authentication and authorisation, to control access to your applicatoin
 1. Caching, returning a cached result if request has already been processed recently
 1. Compression, to reduce bandwith usage
 1. Security, to prevent attacks such as CSRF
-1. Processing, to actually process the request
+1. Processing, the actual request processing by your application
+ 
+### The Middleware Stack
+
+You can think of the Middleware pipeline as a stack, at the bottom of which is your application. When a request comes in, it starts at the top of the stack and goes down until it is processed by your application. The response then goes up the stack backwards through the middleware chain, before it is sent back to the client. 
+
+We call it a middleware stack because each part will call the next part in sequence. Or it might not. In fact there are two types of middlewares. Those that modify the request or response and call the next step in the chain, and those that short circuit the stack and return their own response without ever calling anything further down the stack.
+
+
+### Building the Middleware Stack
+
+The simplest way to build your middleware stack is to add middlewares to your WebServer. 
+
+For example, suppose we'd like to enhance performance of our application by adding caching and compression:
+
+```java
+WebServer server = WebServer.create();
+server.add(new ContentLengthHeader())
+      .add(new ConditionalGet())
+      .add(new ETag())
+      .add(new Compressor())
+      .start(new DynamicRoutes() {{
+          // ...
+      }});
+```
+
+Here's what a more complete, real-life middleware stack might look like:
+```java
+server.failureReporter(failureReporter)
+      .add(new ServerHeader("Simple/6.0.1"))
+      .add(new DateHeader())
+      .add(new ApacheCommonLogger(logger))
+      // a custom middleware to redirect non secure requests to HTTPS 
+      .add(new ForceSSL())
+      .add(new ContentLengthHeader())
+      .mount("/api", new MiddlewareStack() {{
+          use(new Failsafe());
+          use(new FailureMonitor(failureReporter));
+          use(new ConnectionScope(database));
+          // runs the api application
+          run(api());
+      }})
+      .add(new ConditionalGet())
+      .add(new ETag())
+      .add(new Compressor().compressibleTypes(CSS, HTML))
+      // configures the StaticAssets middleware
+      .add(staticAssets())
+      .add(new HttpMethodOverride())
+      .add(new Cookies())
+      // a custom middleware to redirect based on the preferred user locale
+      .add(selectLocale())
+      // a custom middleware to display static pages if case of errors
+      .add(new PublicExceptions())
+      .add(new Failsafe())
+      .add(new FailureMonitor(failureReporter))
+      .add(new ConnectionScope(dataSource))
+      .add(new CookieSessionTracker(CookieSessionStore.secure("secret")))
+      .add(new Flash())
+      // starts the main application
+      .start(webapp());
+```
+
+For more on using middlewares, take a look at the various code examples (see above), 
+including the [sample application](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java).
+
+The javadoc of the <code>WebServer</code> class is another good source of information. 
+
 
 ### Available Middlewares
 
-Molecule comes with a number of middlewares (more are coming), that you can use to build your processing pipeline:
+Molecule comes with a bunch of handy middlewares that you can use to build your processing pipeline:
 
 * Router (See [Routing](#routing))
 * Static Assets 
 * File Server
 * Apache Common Logger
 * Apache Combined Logger
-* Cookies
+* Cookies (See [Cookies](#cookies))
 * Locale Negotiation
 * Compressor
 * ETag
@@ -380,4 +446,5 @@ Molecule comes with a number of middlewares (more are coming), that you can use 
 * Http Method Override
 * Layout
 * Flash
+
 
