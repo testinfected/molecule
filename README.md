@@ -187,11 +187,11 @@ To do this, use the route definition methods that accept a _Matcher_ rather than
 
 ## Working with the Request
 
-Applications receives a <code>request</code> that provide information about the client HTTP request and let you manipulate request attributes.
+Applications receive a <code>Request</code> that provide information about the request coming in from the client.
 
-The request represents the environment for the client HTTP request: the HTTP headers, the request body as well as CGI-like headers. The <code>Request</code> object is built from information provided by the HTTP server. 
+The request represents the environment for the client request, including the headers, the request body as well as parameters and other common things. The <code>Request</code> object is built from information provided by the HTTP server. 
 
-Any middleware can modify the content of the request during processing before passing control to the next stage of the middleware pipeline. This of course as no effect on the original HTTP request. See [Middlewares](#middlewares) for more information on middlewares and the middleware pipeline.
+Any middleware can modify the content of the request during processing before passing control to the next stage of the middleware pipeline. This of course has no effect on the original HTTP request. See [Middlewares](#middlewares) for more information on middlewares and the middleware pipeline.
 
 ### Request
 
@@ -228,6 +228,8 @@ request.removeAttribute("key");         // removes a keyed attribute
 request.attributes();                   // map of all request attributes
 ```
 
+For the complete documentation, see the Javadoc of the <code>Request</code> class.
+
 ### Attributes
 
 Request attributes are not sent by the client - as opposed to request parameters. They are used for server-side processing only.
@@ -236,7 +238,28 @@ Attributes are a local server storage mechanism, scoped within the request. Wher
 
 ## Working with the Response
 
-### Response Object
+Applications respond to client requests by sending data back to the client using the <code>Response</code>. 
+
+The response includes a status code and text, headers and an optional body. 
+
+Any middleware can modify the content of the response during processing before returning control to the previous stage of the middleware pipeline. See [Middlewares](#middlewares) for more information on middlewares and the middleware pipeline.
+
+### Response
+
+```java
+response.status(HttpStatus.OK);         // sets the status
+response.statusCode(400);               // sets the status code
+response.statusText("Bad Request");     // sets the status text
+response.redirect("/url");              // 303 redirect to /url
+response.header("name", "value");       // sets the single value of a named header
+response.addHeader("name", "value");    // adds another value to a named header
+response.contentType("text/html");      // sets the Content-Type header of the response
+response.contentLength(16384);          // sets the Content-Length header of the response
+response.charset("utf-8");              // sets the charset of the response body
+response.body("response text");         // sets the response body as text
+```
+
+For the complete documentation, see the Javadoc of the <code>Response</code> class.
 
 ### Bodies
 
