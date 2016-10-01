@@ -267,6 +267,12 @@ headers and body.
 
 ### Bodies
 
+Response bodies can be sent back to the client either as text, binary content, or as <code>Body</code> objects.
+
+A <code>Body</code> provides an abstraction for representing data to be sent back to the client.
+
+Molecule comes with a few body implementations ready to use. For instance, you can use a <code>FileBody</code> to send back content of a file to the client.
+
 ### Redirection and Errors
 
 ## Cookies
