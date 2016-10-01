@@ -273,7 +273,20 @@ A <code>Body</code> provides an abstraction for representing data to be sent bac
 
 Molecule comes with a few body implementations ready to use. For instance, you can use a <code>FileBody</code> to send back content of a file to the client.
 
-### Redirection and Errors
+### Redirection
+
+You can trigger a browser redirect using a See Other (303) status code 
+using the <code>redirectTo</code> method on the <code>Response</code>:
+
+```java
+response.redirectTo("/url");
+```
+
+If you need to use a different status code, simply change the status: 
+
+```java
+response.redirectTo("/url").statusCode(301); // moved permanently
+```
 
 ## Cookies
 
