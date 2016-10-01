@@ -115,7 +115,7 @@ What this means is you can serve your response content from a thread separate to
 might need to wait for some remote process that takes some time to complete, such as an HTTP or SOAP request to an external server. You can simply 
 call this external resource from a different thread, and complete the response when you get the result.
 
-To tell the server that you're ready to serve the response, call the _done_ method on the response.
+To tell the server that you're ready to serve the response, call the <code>done</code> method on the response.
 
 Look at the [Asynchronous example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/async/AsyncExample.java)
 to see how to serve content from a separate thread.
@@ -290,11 +290,40 @@ response.redirectTo("/url").statusCode(301); // moved permanently
 
 ## Cookies
 
+To enable cookies support first add the <code>Cookies</code> middleware to your middleware pipeline (see [Middlewares](#middlewares) for more information on using middlewares).
+
+This will create a <code>CookieJar</code> and populate that cookie jar with cookies sent by the client. The cookie jar is available as a request attribute:
+
+```java
+CookieJar cookies = CookieJar.get(request);
+```
+
+To read cookies sent by the client:
+```java
+Cookie customer = cookies.get("customer");
+```
+
+To send back cookies to the client, all you have to do is add cookies to the jar:
+```java
+cookies.add("weapon", "rocket launcher")
+       .path("/ammo")
+       .maxAge(30)
+```
+
+To expire a cookie, discard it from the jar:
+```java
+cookies.discard("weapon").path("/ammo");
+```
+
+For more on cookies, see the [Cookies example](#cookies).
+
 ## Sessions
 
 ## Rendering Templates
 
 ## View Layouts
+
+## SSL
 
 ## Testing
 
