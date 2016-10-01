@@ -315,7 +315,7 @@ To expire a cookie, discard it from the jar:
 cookies.discard("weapon").path("/ammo");
 ```
 
-For more on cookies, see the [Cookies example](#cookies).
+For more on cookies, see the [Cookies example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/cookies/CookiesExample.java).
 
 ## Sessions
 
