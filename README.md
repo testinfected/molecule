@@ -257,9 +257,13 @@ response.contentType("text/html");      // sets the Content-Type header of the r
 response.contentLength(16384);          // sets the Content-Length header of the response
 response.charset("utf-8");              // sets the charset of the response body
 response.body("response text");         // sets the response body as text
+response.done();                        // sends the response to the client
 ```
-
 For the complete documentation, see the Javadoc of the <code>Response</code> class.
+
+Note that no response will actually be sent back to the client until the <code>done</code> is called.
+Calling <code>done</code> signals the end of the request processing and triggers sending back the status, 
+headers and body.
 
 ### Bodies
 
