@@ -24,11 +24,11 @@ public class MultiAppsExample {
         Application describe = (request, response) -> {
             // The mount point is available as a request attribute
             MountPoint mount = MountPoint.get(request);
-            // The modified request path, stripped of the mounted application prefix
-            // (e.g. this will be /baz for a request to /foo/bar/baz)
-            String pathInfo = request.path();
             // The mounted application path prefix (i.e. either /foo, /foo/bar or /baz in our example)
             String mountPoint = mount.app();
+            // The modified request path, stripped of the mounted application prefix
+            // (e.g. this will be /baz for a request to /foo/bar/baz if the mount point is /foo/bar)
+            String pathInfo = request.path();
             // To reconstruct the full uri, which is useful when creating links
             String uri = mount.uri(pathInfo);
 
