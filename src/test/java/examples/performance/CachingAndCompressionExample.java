@@ -43,7 +43,7 @@ import static com.vtence.molecule.http.MimeTypes.JAVASCRIPT;
  * </p>
  */
 public class CachingAndCompressionExample {
-    private static final Object NO_CONTEXT = null;
+    private static final Void NO_CONTEXT = null;
     private final Clock clock;
 
     public CachingAndCompressionExample(Clock clock) {
@@ -62,7 +62,7 @@ public class CachingAndCompressionExample {
         // Our web pages are Mustache templates with an .html extension
         Templates templates = new Templates(new JMustacheRenderer().fromDir(content).extension("html"));
         // This is our index.html template
-        final Template<Object> index = templates.named("index");
+        final Template<Void> index = templates.named("index");
 
               // Add Content-Length header to the response when size of content is known
         server.add(new ContentLengthHeader())
