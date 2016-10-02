@@ -32,17 +32,6 @@ You can get the latest release version from Maven Central:
 </dependency>
 ```
  
-If you want the development version, grab the latest snapshot from Sonatype snapshots repositories 
-(```https://oss.sonatype.org/content/repositories/snapshots```):
-
-```xml
-<dependency>
-      <groupId>com.vtence.molecule</groupId>
-      <artifactId>molecule</artifactId>
-      <version>0.11-SNAPSHOT</version>
-</dependency>
-```
-
 To use the default web server, you also need to add [Simple](http://www.simpleframework.org) as a dependency:
 
 ```xml
