@@ -31,7 +31,7 @@ public class RoutingExample {
             // from the request parameters and redirects to /users/username.
             post("/login").to((request, response) -> {
                 String username = request.parameter("username");
-                response.redirectTo("/users/" + username)
+                response.redirectTo("/hello/" + username)
                         .done();
             });
 
