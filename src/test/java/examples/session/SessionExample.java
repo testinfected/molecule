@@ -14,8 +14,8 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
- * Here's an example of setting up HTTP sessions. We use an im-memory session pool but you could very well
- * swap the pool implementation for, e.g. a signed cookie store session pool.
+ * Here's an example of setting up HTTP sessions. We use a a signed cookie store but you could very well
+ * swap the pool implementation for, e.g. an in memory session pool.
  *
  * <p>
  *     Each client is given a secure session identifier, stored as session cookie.
@@ -42,8 +42,9 @@ public class SessionExample {
 
     public void run(WebServer server) throws IOException {
         // Create a cookie based session store - session content is stored on the client
+        // Our secret key for encrypting sessions will be "secret"
         CookieSessionStore sessions = CookieSessionStore.secure("secret");
-        // Alternatively, you could use an in-memory session pool
+        // Alternatively, you could use an in-memory session pool like this:
         // SessionPool sessions = SessionPool.secure();
         // Invalidate stale sessions after 30 minutes
         sessions.idleTimeout(THIRTY_MINUTES);
