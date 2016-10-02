@@ -437,3 +437,19 @@ Molecule comes with a bunch of handy middlewares that you can use to build your 
 * Flash
 
 
+## Living on the edge
+
+
+If you want the latest development version, grab the latest snapshot from [Sonatype snapshots repositories]:
+
+```xml
+<dependency>
+      <groupId>com.vtence.molecule</groupId>
+      <artifactId>molecule</artifactId>
+      <version>0.11-SNAPSHOT</version>
+</dependency>
+```
+
+New snapshots are pushed to Sonatype on every commit. So you'll always be running the head version. 
+
+[Sonatype snapshots repositories]: https://oss.sonatype.org/content/repositories/snapshots
