@@ -12,16 +12,28 @@ import java.util.Map;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
+/**
+ * <p>
+ * In this example we demonstrate rendering output using a template engine. We have a template for a common site
+ * layout and templates for the individual pages.
+ * </p>
+ * <p>
+ * Our templates are Mustache templates with an <code>.html</code> extension. We use JMustache as the template
+ * engine.
+ * </p>
+ */
 public class TemplatingAndLayoutExample {
 
     public void run(WebServer server) throws IOException {
-        // We use Mustache templates with an .html extension
+        // We use JMustache to render Mustache templates with an .html extension
         Templates templates = new Templates(
                 new JMustacheRenderer().fromDir(locateOnClasspath("examples/templates")).extension("html"));
+        // This is template for the shared application layout
         final Template<Map<String, String>> layout = templates.named("layout");
+        // This is the template for the greeting.html page
         final Template<User> greeting = templates.named("greeting");
 
-        // Apply a common layout to all rendered pages
+        // Apply a common site layout to requests under the / path, i.e. to all rendered pages
         server.filter("/", Layout.html(layout))
               .start(new DynamicRoutes() {{
                   get("/hello").to((request, response) -> {
