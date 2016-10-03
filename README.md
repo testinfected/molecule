@@ -250,7 +250,7 @@ response.done();                        // sends the response to the client
 ```
 For the complete documentation, see the Javadoc of the <code>Response</code> class.
 
-Note that no response will actually be sent back to the client until the <code>done</code> is called.
+Note that no response will actually be sent back to the client until the <code>done</code> method is called.
 Calling <code>done</code> signals the end of the request processing and triggers sending back the status, 
 headers and body.
 
