@@ -308,6 +308,58 @@ For more on cookies, see the [Cookies example](https://github.com/testinfected/m
 
 ## Sessions
 
+### Enabling sessions support
+
+To use sessions you need to start your server with session support:
+
+```java
+server.add(new Cookies())
+      .add(new CookieSessionTracker(CookieSessionStore.secure("your secret");))
+      .start(new DynamicRoutes() {{
+      // your routing here
+}}
+```
+
+Since HTTP is a stateless protocol and Molecule uses a minimalist approach, sessions are not part of the request. 
+Usage of sessions requires the use of a middleware. This means you have full control over the way sessions are tracked and stored.
+
+Molecule comes with a <code>CookieSessionTracker</code> middleware that uses cookies to track sessions across HTTP requests and two session storage mechanisms:
+* An in memory session store, the <code>SessionPool</code>
+* A client side storage using encrypted cookies, the <code>CookieSessionStore</code> 
+
+### Using sessions
+
+Once session support is enabled, the current session is bound to the request:
+
+```java
+Session session = Session.get(request);
+```
+
+One thing to understand is that as long as your server is started with session support, there will *always* be a session bound to the request. There's no need to check against <code>null</code>. 
+
+That session might me fresh and empty - if no session is currently opened -, or it might be an existing session, opened in a previous request. This does not mean a new session is automatically created though. In fact a new session is persisted if and only if it has been modified before the end of the request cycle. This means you can safely read a new session. That session won't be persisted unless it's been written to. If you write data to the session, it will be automatically persisted - created or updated - to the session store you've selected. It you invalidate the session, if will be discarded.
+
+You don't have to worry asking for session creation when accessing the session. Simply use the session as you would naturally.
+
+Some of the things you can do with sessions include:
+```
+session.fresh()             // checks if session is new
+session.id()                // gets the session id
+session.createdAt()         // the session creation time
+session.updatedAd()         // the last session update time
+session.expires()           // whether this session expires
+session.expirationTime()    // this session expiration time, if it expires
+session.maxAge(30)          // sets the session to expire after 30s of inactivity
+session.contains("key")     // checks if this session contains a keyed attribute
+session.get("key")          // returns the keyed attribute
+session.remove("key")       // removes a keyed attribute
+session.put("key", "value") // writes a key value pair to the session
+session.clear()             // clears the session content
+session.invalidate()        // invalidates the session
+```
+
+For more on using sessions, see the [Session Example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java).
+
 ## Rendering Templates
 
 ## View Layouts
