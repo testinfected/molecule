@@ -38,7 +38,7 @@ public class TemplatingAndLayoutExample {
               .start(new DynamicRoutes() {{
                   get("/hello").to((request, response) -> {
                       response.contentType("text/html; charset=utf-8");
-                      String name = request.parameter("name") != null ? request.parameter("name") : "World";
+                      String name = request.hasParameter("name") ? request.parameter("name") : "World";
                       // Mustache can use any object or a Map as a rendering context
                       response.done(greeting.render(new User(name)));
                   });

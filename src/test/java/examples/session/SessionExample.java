@@ -81,15 +81,13 @@ public class SessionExample {
                              session.put("username", username);
 
                              // If remember me is checked, make session cookie persistent with a max age of 5 minutes
-                             boolean rememberMe = request.parameter("remember_me") != null;
-                             if (rememberMe) {
+                             if (request.hasParameter("remember_me")) {
                                  session.maxAge(FIVE_MINUTES);
                              }
 
                              // If renew, make a fresh session to avoid session fixation attacks
                              // by generating a new session id
-                             boolean renew = request.parameter("renew") != null;
-                             if (renew) {
+                             if (request.hasParameter("renew")) {
                                  Session freshSession = new Session();
                                  freshSession.merge(session);
                                  freshSession.bind(request);

@@ -80,7 +80,7 @@ public class CachingAndCompressionExample {
               .start((request, response) -> {
                   response.header(CONTENT_TYPE, HTML);
                   // We add freshness information only when query parameter 'conditional' is present
-                  if (request.parameter("conditional") != null) {
+                  if (request.hasParameter("conditional")) {
                       response.header(LAST_MODIFIED, clock.instant());
                   }
                   // This will render our index.html template
