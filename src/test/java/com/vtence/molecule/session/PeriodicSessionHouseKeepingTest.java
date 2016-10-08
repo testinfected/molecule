@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class PeriodicSessionHouseKeepingTest {
 
-    static final int CHORES_INTERVAL = 50;
+    static final long ONE_HOUR = TimeUnit.HOURS.toMillis(1);
 
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
@@ -22,7 +22,7 @@ public class PeriodicSessionHouseKeepingTest {
     CountChores count = new CountChores();
     DeterministicScheduler scheduler = new DeterministicScheduler();
 
-    PeriodicSessionHouseKeeping houseKeeper = new PeriodicSessionHouseKeeping(scheduler, count, CHORES_INTERVAL, TimeUnit.MILLISECONDS);
+    PeriodicSessionHouseKeeping houseKeeper = new PeriodicSessionHouseKeeping(scheduler, count);
 
     @Before public void
     start() {
@@ -35,19 +35,19 @@ public class PeriodicSessionHouseKeepingTest {
     }
 
     @Test public void
-    scheduleHouseKeepingPeriodicallyAtFixedDelays() throws Exception {
+    scheduleHouseKeepingEveryHourByDefault() throws Exception {
         assertHouseKeepingChores(0);
-        tick(CHORES_INTERVAL);
+        tick(ONE_HOUR);
         assertHouseKeepingChores(1);
-        tick(CHORES_INTERVAL / 2);
+        tick(ONE_HOUR / 2);
         assertHouseKeepingChores(1);
-        tick(CHORES_INTERVAL / 2);
+        tick(ONE_HOUR / 2);
         assertHouseKeepingChores(2);
-        tick(CHORES_INTERVAL);
+        tick(ONE_HOUR);
         assertHouseKeepingChores(3);
     }
 
-    private void tick(int millis) {
+    private void tick(long millis) {
         scheduler.tick(millis, TimeUnit.MILLISECONDS);
     }
 
