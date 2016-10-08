@@ -2,14 +2,18 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.lib.TextBody;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ETagTest {
 
@@ -96,6 +100,29 @@ public class ETagTest {
 
         assertNoExecutionError();
         assertThat(response).hasHeader("Cache-Control", "public");
+    }
+
+    @Test public void
+    closesOriginalBodyAfterComputingETag() throws Exception {
+        etag.handle(request, response);
+        CloseableBody originalBody = new CloseableBody();
+        response.body(originalBody).done();
+
+        assertNoExecutionError();
+
+        assertThat("closed?", originalBody.closed, is(true));
+    }
+
+    public static class CloseableBody extends TextBody {
+        public boolean closed;
+
+        public CloseableBody() {
+            append("Close me!");
+        }
+
+        public void close() throws IOException {
+            closed = true;
+        }
     }
 
     private void assertNoExecutionError() throws ExecutionException, InterruptedException {

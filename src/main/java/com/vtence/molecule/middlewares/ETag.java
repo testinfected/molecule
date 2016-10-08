@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.helpers.HexEncoder;
@@ -44,7 +45,9 @@ public class ETag extends AbstractMiddleware {
 
     private byte[] render(Response response) throws IOException {
         try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            response.body().writeTo(out, response.charset());
+            try(Body body = response.body()) {
+                body.writeTo(out, response.charset());
+            }
             return out.toByteArray();
         }
     }
