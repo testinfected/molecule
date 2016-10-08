@@ -514,7 +514,7 @@ public class Request {
     /**
      * Gets the value of a specific parameter of this request, or null if the parameter does not exist.
      *
-     * If the parameter has more than one value, the first one is returned.
+     * If the parameter has more than one value, the last one is returned.
      *
      * <p>Request parameters are contained in the query string or posted form data.</p>
      *

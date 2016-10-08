@@ -30,6 +30,15 @@ public class RequestTest {
     }
 
     @Test
+    public void usesLastSetParameterWhenMultipleParametersWithSameNameExist() {
+        request.addParameter("letter", "a");
+        request.addParameter("letter", "b");
+        request.addParameter("letter", "c");
+
+        assertThat("authoritative letter", request.parameter("letter"), equalTo("c"));
+    }
+
+    @Test
     public void maintainsAListOfParameterNames() {
         request.addParameter("letters", "a, b, c, etc.");
         request.addParameter("digits", "1, 2, 3, etc.");
