@@ -387,7 +387,7 @@ public class Request {
     /**
      * Checks for the presence of a specific HTTP message header in this request.
      *
-     * @param name the name of header to check
+     * @param name the name of the header to check
      * @return true if the header was set
      */
     public boolean hasHeader(String name) {
@@ -499,6 +499,16 @@ public class Request {
     public String contentType() {
         ContentType contentType = ContentType.of(this);
         return contentType != null ? contentType.mediaType() : null;
+    }
+
+    /**
+     * Checks for the presence of a specific parameter in this request.
+     *
+     * @param name the name of the parameter
+     * @return true if the parameter is present, false otherwise
+     */
+    public boolean hasParameter(String name) {
+        return !parameters(name).isEmpty();
     }
 
     /**

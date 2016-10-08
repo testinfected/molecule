@@ -25,6 +25,7 @@ public class RequestTest {
         request.addParameter("letters", "b");
         request.addParameter("letters", "c");
 
+        assertThat("has letters?", request.hasParameter("letters"), equalTo(true));
         assertThat("letters", request.parameters("letters"), contains("a", "b", "c"));
     }
 
@@ -39,10 +40,13 @@ public class RequestTest {
 
     @Test
     public void removingAParameterRemovesAllParametersWithSameName() {
-        request.addParameter("letters", "a, b, c, etc.");
+        request.addParameter("letters", "a");
+        request.addParameter("letters", "b");
+        request.addParameter("letters", "c");
         request.addParameter("digits", "1, 2, 3, etc.");
-        request.removeParameter("letters");
 
+        request.removeParameter("letters");
+        assertThat("has letters?", request.hasParameter("letters"), equalTo(false));
         assertThat("parameter names", request.parameterNames(), contains("digits"));
     }
 
