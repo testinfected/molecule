@@ -206,8 +206,9 @@ request.headers("name");                // list of values of a given HTTP header
 request.headerNames();                  // the set of HTTP header names received
 request.contentLength();                // length of the body
 request.contentType();                  // content type of the body
+request.hasParameter("name")            // checks for the presence of a request parameter
 request.parameter("name");              // value of a specific request parameter
-request.paremeters("name");             // list of values of a specific request parameter
+request.paremeters("name");             // list of values for a specific request parameter
 request.parameterNames();               // set of all request parameter names
 request.allParameters();                // map of all request parameters
 request.attribute("key");               // value of a keyed attribute
