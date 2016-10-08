@@ -336,11 +336,11 @@ Once session support is enabled, the current session is bound to the request:
 Session session = Session.get(request);
 ```
 
-One thing to understand is that as long as your server is started with session support, there will *always* be a session bound to the request. There's no need to check against <code>null</code>. 
+One thing to understand is that as long as your server is started with session support, there will *always* be a session bound to the request. There's no need to check against <code>null</code>. There's no need to ask for session creation either. 
 
-That session might me fresh and empty - if no session is currently opened -, or it might be an existing session, opened in a previous request. This does not mean a new session is automatically created though. In fact a new session is persisted if and only if it has been modified before the end of the request cycle. This means you can safely read a new session. That session won't be persisted unless it's been written to. If you write data to the session, it will be automatically persisted - created or updated - to the session store you've selected. It you invalidate the session, if will be discarded.
+The session attached to the request can be a fresh and empty session or the session opened in a previous request. This does not mean a new session is automatically opened for each request though. A fresh session is only persisted if it is modified before the end of the request cycle. This means you can safely read from a new session. 
 
-You don't have to worry asking for session creation when accessing the session. Simply use the session as you would naturally.
+If you write data to the session then it is automatically persisted to the session store you've selected - created in case of a new session or updated in case of an existing session. If you invalidate the session, it will be discarded from the session store automatically.
 
 Some of the things you can do with sessions include:
 ```
