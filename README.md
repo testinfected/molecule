@@ -162,7 +162,7 @@ Route patterns can be matched exactly - they are said to be static - or can incl
 ```java
 // matches "GET /photos/18" and "GET /photos/25"
 // request.parameter("id") is either '18' or '25'
-get("/photos/:id", (request, response) -> {
+get("/photos/:id").to((request, response) -> {
     response.done("Photo #" + request.parameter("id"));
 });
 ```
@@ -295,7 +295,7 @@ You can send an HTML string back to the browser by using a text body to render:
 response.done("<html><body><h1>It Works</h1></body></html>");
 ```
 
-This can be useful when you're rendering a small snippet of HTML code. However, you might want to consider moving it to a template file if the markup is complex. See [View Templating](#rendering-templates) for more on using templates. 
+This can be useful when you're rendering a small snippet of HTML code. However, you might want to consider moving it to a template file if the markup is complex. See [View Templating](#view-templates) for more on using templates. 
                        
                        
 #### Rendering JSON
@@ -337,7 +337,7 @@ response.body(content).done();
 You can use a <code>FileBody</code> to stream the content of a file:
  
  ```java
- response.render(new FileBody(new File(/path/to/file)))).done();
+ response.render(new FileBody(new File("/path/to/file")))).done();
  ```
  
  This will use a default chunk size of <code>8K</code>, although you can specify a different chunk size.
