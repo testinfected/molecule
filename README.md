@@ -307,6 +307,19 @@ Gson gson = new Gson();
 response.done(gson.toJSON("ok"));
 ``` 
 
+Another option would be to create a your own body implementation - let's call it <code>JSONBody</code> - 
+and use your preferred JSON serializer:
+ 
+```java
+response.done(new JSONBody("ok"));
+```
+
+or with a static factory method:
+
+```java
+response.done(json("ok"));
+```
+
 Rendering XML can be done the same way.
 
 
