@@ -246,8 +246,9 @@ response.addHeader("name", "value");    // adds another value to a named header
 response.contentType("text/html");      // sets the Content-Type header of the response
 response.contentLength(16384);          // sets the Content-Length header of the response
 response.charset("utf-8");              // sets the charset of the response body
-response.body("response text");         // sets the response body as text
+response.body("text");                  // sets the response body as text
 response.done();                        // sends the response to the client
+response.done("text");                  // sends the specified response text to the client
 ```
 For the complete documentation, see the Javadoc of the <code>Response</code> class.
 
@@ -255,27 +256,92 @@ Note that no response will actually be sent back to the client until the <code>d
 Calling <code>done</code> signals the end of the request processing and triggers sending back the status, 
 headers and body.
 
-### Bodies
+### Rendering
 
-Response bodies can be sent back to the client either as text, binary content, or as <code>Body</code> objects.
+There are a variety of ways to send back a response to the client. You can render text, binary content, 
+the content of a file, XML, JSON, use a view template or render nothing at all. You can specify the content type or HTTP status of the rendered response as well.
 
-A <code>Body</code> provides an abstraction for representing data to be sent back to the client.
+Molecule uses the concept of response <code>Body</code> to represent data to send back to the client.
 
-Molecule comes with a few body implementations ready to use. For instance, you can use a <code>FileBody</code> to send back content of a file to the client.
+Molecule comes with a few body implementations ready to use for sending text, binary content, the content of a file or
+ a view template.
+ 
 
-### Redirection
+#### Rendering an empty response
+
+You can render an empty response by not specifying a body at all. In which case, an empty body is used. 
+
+So this is perfectly valid:
+
+```java
+response.done();
+```
+
+#### Rendering text
+
+You can send plain text - with no markup at all - back to the browser like this:
+
+```java
+response.done("All good");
+```
+
+Rendering pure text is sometimes useful if you're client is expecting something other than proper HTML.
+                         
+#### Rendering HTML
+                         
+You can send an HTML string back to the browser by using a text body to render:
+                         
+```java
+response.done("<html><body><h1>It Works</h1></body></html>");
+```
+
+This can be useful when you're rendering a small snippet of HTML code. However, you might want to consider moving it to a template file if the markup is complex. See [View Templating](#rendering-templates) for more on using templates. 
+                       
+                       
+#### Rendering JSON
+
+You can send back JSON to the browser by using a text body. Here's an example using google Gson library:
+ 
+```java
+Gson gson = new Gson();
+response.done(gson.toJSON("ok"));
+``` 
+
+Rendering XML can be done the same way.
+
+
+#### Rendering binary content
+
+You can send back a raw body as binary like this:
+
+```java
+byte[] content = ... //
+response.body(content).done();
+```
+
+#### Rendering the content of a file
+
+You can use a <code>FileBody</code> to stream the content of a file:
+ 
+ ```java
+ response.render(new FileBody(new File(/path/to/file)))).done();
+ ```
+ 
+ This will use a default chunk size of <code>8K</code>, although you can specify a different chunk size.
+
+#### Redirection
 
 You can trigger a browser redirect using a See Other (303) status code 
 using the <code>redirectTo</code> method on the <code>Response</code>:
 
 ```java
-response.redirectTo("/url");
+response.redirectTo("/url").done();
 ```
 
 If you need to use a different status code, simply change the status: 
 
 ```java
-response.redirectTo("/url").statusCode(301); // moved permanently
+response.redirectTo("/url").statusCode(301).done(); // moved permanently
 ```
 
 ## Cookies
