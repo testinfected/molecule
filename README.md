@@ -440,8 +440,36 @@ session.invalidate()        // invalidates the session
 
 For more on using sessions, see the [Session Example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java).
 
-## Rendering Templates
+## View Templates
 
+When your markup becomes complex, you might want to consider moving it to a template file.
+
+Rendering a template requires a <code>RenderingEngine</code>. To use the built-in <code>JMustacheRenderer</code>, first
+  add [JMustache](https://github.com/samskivert/jmustache) to your dependencies:
+  
+```xml
+<dependency>
+    <groupId>com.samskivert</groupId>
+    <artifactId>jmustache</artifactId>
+    <version>1.13</version>
+</dependency>
+```
+
+Rendering a template takes a view model and returns a body object to use with the response. Assuming
+ a Mustache template file named <i>profile.mustache</i>, here's how we would render the template 
+ using an hypothetical <code>Employee</code> object: 
+  
+```java
+// Declare the template engine
+Templates templates = new Templates(new JMustacheRenderer().fromDir(new File("/path/to/template/files")));
+// Load the 'profile.mustache' template
+Template<Employee> profile = templates.named("profile");
+// Render the template using an Employee instance 
+response.done(profile.render(new Employee("Bob", "...")));
+```  
+  
+For further information on using view templates, take a look at the [View Templates and Layout example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java).
+ 
 ## View Layouts
 
 ## SSL
