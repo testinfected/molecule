@@ -525,8 +525,24 @@ server.filter("/", Layout.html(mainLayout))
 
 For more on using layouts, take a look at the [View Templates and Layout example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java).
 
-
 ## SSL
+
+To use HTTPS connections, enable SSL on the <code>WebServer</code>. Enabling HTTPS/SSL requires you to have a keystore file, which you can generate using the Java `keytool`. You specify the location of your keystore, the keystore password 
+and the keys password like this:
+
+```java
+WebServer server = WebServer.create();
+server.enableSSL(new File("/path/to/keystore/file"), "keyStorePassword", "keyPassword"))
+      .start(...);
+```
+
+This will start the server with TLS enabled, trusting all clients.
+
+If you need more control over the type of keystore and algorithms used, you can alternatively pass 
+an <code>javax.net.ssl.SSLContext</code> to use.
+
+See the [SSL example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/ssl/SSLExample.java) 
+for more details.
 
 ## Testing
 
