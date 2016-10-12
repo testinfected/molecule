@@ -472,6 +472,60 @@ For further information on using view templates, take a look at the [View Templa
  
 ## View Layouts
 
+Sometimes you want to share a common look and feel for a set of pages. This is when view layouts can help.
+ 
+Layouts are just templates that are used to decorate existing pages. A layout defines the surroundings of your HTML page. 
+It's where you define a common look and feel of your final output. This reverses the common pattern of 
+including shared headers and footers in many templates to isolate changes in repeated setups.
+
+Think of the layout rendering process in two steps. 
+
+The first step processes the generated HTML view to extract its content. 
+This extraction process makes individual pieces of the original page content available to the layout template:
+
+* the head content, excluding the title
+* the title
+* the body content
+* all the meta parameters
+
+The second step merges the content pieces with the layout template to produce the final
+result. 
+
+Here's a contrived example of a mustache layout template that simply recreates the original page:
+
+```html
+<html>
+<head>
+{{head}}
+<title>{{title}}</title>
+</head>
+<body>
+{{body}}
+</body>
+</html>
+```
+  
+The <code>Layout</code> middleware intercepts generated HTML responses and merges them with layout decorator(s) 
+to build the final result:
+
+```java
+// Declare the template engine
+Templates layouts = new Templates(new JMustacheRenderer().fromDir(new File("/path/to/layout/templates")));
+// Load the main layout template
+Template<Map<String, String>> mainLayout = layouts.named("main");
+
+// Apply the main site layout to requests under the / path, in other words to all rendered pages
+server.filter("/", Layout.html(mainLayout))
+      .start(new DynamicRoutes() {{
+          // Your routes definitions here
+          // ...
+      }});
+
+``` 
+
+For more on using layouts, take a look at the [View Templates and Layout example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java).
+
+
 ## SSL
 
 ## Testing
