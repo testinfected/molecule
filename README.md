@@ -20,6 +20,22 @@ Access your application at:
 
 `http://localhost:8080`
 
+## About
+
+Molecule is a rack inspired micro web framework for Java, with minimal dependencies. It is fast, small, 
+easy to use, easy to learn and easy to extend.
+
+Molecule is great for building micro services or regular web applications. It is designed around simplicity,
+testability and freedom of choice. It's more a library than a framework really.
+
+Molecule is small, it weights less than 140k, and will stay as lean as possible. It is pluggable through the concept
+of rack middlewares and offers some out-of-the box integrations. You're free to use the built-in options 
+or provide your own implementations. 
+
+Molecule requires Java 8. It runs an embedded web-server powered by [Simple](http://simpleframework.org). Both are fully asynchronous and non-blocking, which means they can scale to very high loads.
+
+Have fun!
+
 ## Download 
 
 You can get the latest release version from Maven Central:
