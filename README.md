@@ -55,6 +55,7 @@ To use the default web server, you also need to add [Simple](http://www.simplefr
       <groupId>org.simpleframework</groupId>
       <artifactId>simple-http</artifactId>
       <version>6.0.1</version>
+      <scope>runtime</scope>
 </dependency>
 ```
 
@@ -561,6 +562,82 @@ See the [SSL example](https://github.com/testinfected/molecule/blob/master/src/t
 for more details.
 
 ## Testing
+
+Molecule provides fluent assertion helpers for unit testing your application endpoints and middlewares.
+ It also provides a test HTTP client for integration testing your server.
+
+Add the testing jar to your dependencies to benefit from the test HTTP client and fluent assertion helpers:
+
+```xml
+<dependency>
+      <groupId>com.vtence.molecule</groupId>
+      <artifactId>molecule-tests</artifactId>
+      <version>0.10</version>
+      <scope>test</scope>
+</dependency>
+```
+
+You will also need to add [Hamcrest](http://hamcrest.org/JavaHamcrest/) to your list of dependencies:
+
+```xml
+<dependency>
+    <groupId>org.hamcrest</groupId>
+    <artifactId>java-hamcrest</artifactId>
+    <version>2.0.0.0</version>
+    <scope>test</scope>
+</dependency>
+```
+
+
+### Unit Testing Middlewares and Application Endpoints
+ 
+The `Request` and `Response` are plain Java objects that you can use directly in your unit tests. They are simple 
+representations of the environment for the client request  and the content of the response your application 
+wants to send back. They are not wrappers around the actual HTTP request and response, so there's no need to mock
+ them:
+ 
+```java
+Request request = new Request();
+Response response = new Response();
+
+request.header("Authorization", "Basic " + mime.encode("joe:bad secret"));
+
+// Call your application endpoint
+authentication.handle(request, response);
+
+// Make assertions on the response
+// ...
+
+```
+
+#### Fluent Assertions
+
+`ResponseAssert` provides a fluent interface for asserting the generated response. Based on
+the previous example:
+
+```java
+// ...
+assertThat(response).hasStatus(UNAUTHORIZED)
+                    .hasHeader("WWW-Authenticate", "Basic realm=\"WallyWorld\"")
+                    .hasContentType("text/plain")
+                    .isEmpty()
+                    .isDone();
+```
+
+`RequestAssert` helps make assertions on the request:
+
+```java
+assertThat(request).hasAttribute("username", "joe");
+```
+
+`CookieJarAssert` and `CookieAssert` both provide fluent assertions for `Cookie`s and the `CookieJar`: 
+
+```java
+assertThat(cookieJar).hasCookie("session")
+                     .hasValue("sJaAMRYetEJhQcS9s283pMrlGoXr88LkFf0NCOTZb8A")
+                     .isHttpOnly();
+```
+
 
 ## Middlewares
 
