@@ -588,7 +588,6 @@ You will also need to add [Hamcrest](http://hamcrest.org/JavaHamcrest/) to your 
 </dependency>
 ```
 
-
 ### Unit Testing Middlewares and Application Endpoints
  
 The `Request` and `Response` are plain Java objects that you can use directly in your unit tests. They are simple 
@@ -638,6 +637,28 @@ assertThat(cookieJar).hasCookie("session")
                      .isHttpOnly();
 ```
 
+### Integration Testing
+
+You can use the test HTTP client to write integration tests for your API or 
+test how various parts of your web application interact:
+ 
+```java
+HttpRequest request = new HttpRequest(8080).followRedirects(false);
+HttpResponse response = request.content(Form.urlEncoded().addField("username", "bob")
+                                                         .addField("password", "secret"))
+                               .post("/login");
+```
+
+#### Fluent Assertions
+
+`HttpResponseAssert` and `HttpCookieAssert` provides fluent interfaces for making assertions on the HTTP response
+and cookies:
+
+```java
+assertThat(response).hasStatusCode(303)
+                    .hasHeader("Location", "/users/bob")
+                    .hasCookie("session").hasMaxAge(300);
+```
 
 ## Middlewares
 
