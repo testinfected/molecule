@@ -132,13 +132,15 @@ public class HttpRequest {
         request.method(method);
         request.followRedirects(followRedirects);
         request.secure(secure);
+        request.content(content);
+
         for (String header : headers.names()) {
             request.header(header, headers.list(header));
         }
         for (String cookie : cookies.keySet()) {
             request.cookie(cookie, cookies.get(cookie));
         }
-        request.content(content);
+
         return request;
     }
 
