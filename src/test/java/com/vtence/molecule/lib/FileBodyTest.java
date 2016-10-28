@@ -29,6 +29,6 @@ public class FileBodyTest {
     }
 
     private byte[] contentOf(final File file) throws IOException {
-        return Streams.toBytes(new FileInputStream(file));
+        return Streams.consume(new FileInputStream(file));
     }
 }

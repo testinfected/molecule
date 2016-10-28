@@ -15,12 +15,13 @@ public final class Streams {
     }
 
     public static String toString(InputStream in, Charset charset) throws IOException {
-        return new String(toBytes(in), charset);
+        return new String(consume(in), charset);
     }
 
-    public static byte[] toBytes(InputStream in) throws IOException {
+    public static byte[] consume(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         copy(in, out);
+        in.close();
         return out.toByteArray();
     }
 

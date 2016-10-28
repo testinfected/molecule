@@ -246,7 +246,7 @@ public class Request {
      * @return the bytes content of the body
      */
     public byte[] bodyContent() throws IOException {
-        return Streams.toBytes(bodyStream());
+        return Streams.consume(bodyStream());
     }
 
     /**

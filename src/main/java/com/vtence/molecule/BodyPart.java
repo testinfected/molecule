@@ -100,7 +100,7 @@ public class BodyPart {
      * @throws IOException thrown if the content can not be accessed
      */
     public byte[] content() throws IOException {
-        return Streams.toBytes(stream());
+        return Streams.consume(stream());
     }
 
     /**

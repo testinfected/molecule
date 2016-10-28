@@ -181,7 +181,7 @@ public class HttpRequest {
 
     private byte[] readResponseBody(HttpURLConnection connection) throws IOException {
         InputStream bodyStream = successful(connection) ? connection.getInputStream() : connection.getErrorStream();
-        return bodyStream != null ? Streams.toBytes(bodyStream) : new byte[0];
+        return bodyStream != null ? Streams.consume(bodyStream) : new byte[0];
     }
 
     private boolean successful(HttpURLConnection connection) throws IOException {
