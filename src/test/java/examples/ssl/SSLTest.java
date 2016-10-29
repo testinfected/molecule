@@ -15,24 +15,37 @@ import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 public class SSLTest {
 
     SSLExample ssl = new SSLExample();
-    WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999).secure(true);
+    WebServer secureServer = WebServer.create("localhost", 9443);
+    WebServer insecureServer = WebServer.create("localhost", 9999);
+
+    HttpRequest sslRequest = new HttpRequest(9443).secure(true);
+    HttpRequest insecureRequest = new HttpRequest(9999);
     HttpResponse response;
 
     @Before
     public void startServer() throws IOException, GeneralSecurityException {
-        ssl.run(server);
+        ssl.redirect(insecureServer, secureServer);
+        ssl.run(secureServer);
     }
 
     @After
     public void stopServer() throws IOException {
-        server.stop();
+        secureServer.stop();
+        insecureServer.stop();
     }
 
     @Test
     public void connectingSecurely() throws IOException {
-        response = request.get("/");
+        response = sslRequest.get("/");
         assertThat(response).hasBodyText("You are on a secure channel");
+    }
+
+    @Test
+    public void redirectingToASecureConnection() throws IOException {
+        response = insecureRequest.get("/resource");
+
+        assertThat(response).hasStatusCode(301)
+                            .hasHeader("Location", "https://localhost:9443/resource");
     }
 }

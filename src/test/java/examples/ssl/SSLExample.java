@@ -1,6 +1,7 @@
 package examples.ssl;
 
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.middlewares.ForceSSL;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +12,8 @@ import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 /**
  * <p>
  *     In this example we create and start an HTTPS server. We use a JKS keystore that contains our
- *     self-signed certificate.
+ *     self-signed certificate. Alongside the secure server we start a insecure HTTP server, which redirects
+ *     to the secure server.
  * </p>
  * <p>
  *     To generate the self-signed certificate using an 2048 bits RSA key pair, use the following command:
@@ -21,6 +23,11 @@ import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
  * </p>
  */
 public class SSLExample {
+
+    public void redirect(WebServer insecure, WebServer secure) throws IOException {
+        // Redirect users to the secure connection
+        insecure.start(new ForceSSL().redirectTo(secure.uri().getAuthority()));
+    }
 
     public void run(WebServer server) throws IOException, GeneralSecurityException {
         // That's our JKS keystore containing our certificate
@@ -38,9 +45,12 @@ public class SSLExample {
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
         SSLExample example = new SSLExample();
-        // Run the default web server on port 8443
-        WebServer webServer = WebServer.create(8443);
-        example.run(webServer);
-        System.out.println("Access at " + webServer.uri());
+        // Run the insecure web server on port 8080
+        WebServer insecure = WebServer.create(8080);
+        // Run the secure (SSL) web server on port 8443
+        WebServer secure = WebServer.create(8443);
+        example.redirect(insecure, secure);
+        example.run(secure);
+        System.out.println("Access at " + insecure.uri());
     }
 }
