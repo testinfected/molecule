@@ -187,7 +187,7 @@ public abstract class ServerCompatibilityTests {
 
         assertThat("header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
         assertThat("accept-encoding", headers.get("encoding"),
-                contains("gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0"));
+                   contains("gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0"));
     }
 
     @Test public void
@@ -221,12 +221,30 @@ public abstract class ServerCompatibilityTests {
         assertNoError();
 
         assertThat("request content", content, allOf(hasEntry("contentType", "application/json"),
-                hasEntry("contentLength", "17"),
-                hasEntry("body", "{\"name\": \"value\"}")));
+                                                     hasEntry("contentLength", "17"),
+                                                     hasEntry("body", "{\"name\": \"value\"}")));
     }
 
     @Test public void
-    supportsRequestArrayParameters() throws IOException {
+    readsQueryParameters() throws IOException {
+        final Map<String, String> parameters = new HashMap<>();
+        server.run((request, response) -> {
+            for (String name : request.parameterNames()) {
+                parameters.put(name, request.parameter(name));
+            }
+            response.done();
+        });
+
+        request.get("/?param1=value1&param2=value2");
+
+        assertNoError();
+        assertThat("query parameters", parameters, allOf(hasEntry("param1", "value1"),
+                                                         hasEntry("param2", "value2")));
+
+    }
+
+    @Test public void
+    supportsMultipleQueryParametersWithSameName() throws IOException {
         server.run((request, response) -> response.body(request.parameters("names").toString()).done());
 
         response = request.get("/?names=Alice&names=Bob&names=Charles");
@@ -246,14 +264,28 @@ public abstract class ServerCompatibilityTests {
             response.done();
         });
 
-        request.contentType("application/x-www-form-urlencoded")
-               .body("param1=value1&param2=value2")
-               .post("/uri");
+        response = request.content(Form.urlEncoded()
+                                       .addField("param1", "value1")
+                                       .addField("param2", "value2"))
+                          .post("/");
 
         assertNoError();
         assertThat("form parameters", parameters, allOf(hasEntry("param1", "value1"),
                                                         hasEntry("param2", "value2")));
+    }
 
+    @Test public void
+    supportsMultipleFormEncodedParametersWithSameName() throws IOException {
+        server.run((request, response) -> response.body(request.parameters("name").toString()).done());
+
+        response = request.content(Form.urlEncoded()
+                                       .addField("name", "Alice")
+                                       .addField("name", "Bob")
+                                       .addField("name", "Charles"))
+                          .post("/");
+
+        assertNoError();
+        assertThat(response).hasBodyText("[Alice, Bob, Charles]");
     }
 
     @Test public void
@@ -267,9 +299,10 @@ public abstract class ServerCompatibilityTests {
             response.done();
         });
 
-        Form form = new MultipartForm().addField("param1", "value1")
-                                      .addField("param2", "value2");
-        response = request.content(form).post("/");
+        response = request.content(Form.multipart()
+                                       .addField("param1", "value1")
+                                       .addField("param2", "value2"))
+                          .post("/");
 
         assertNoError();
         assertThat("form data parameters", parameters, allOf(hasEntry("param1", "value1"),
