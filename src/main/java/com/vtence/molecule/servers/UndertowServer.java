@@ -136,7 +136,7 @@ public class UndertowServer implements Server {
         }
 
         private String queryComponent(HttpServerExchange exchange) {
-            return exchange.getQueryString() != null ? "?" + exchange.getQueryString() : "";
+            return !exchange.getQueryString().isEmpty()? "?" + exchange.getQueryString() : "";
         }
 
         private void setHeaders(Request request, HttpServerExchange exchange) {
