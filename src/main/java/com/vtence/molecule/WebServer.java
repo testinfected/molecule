@@ -5,6 +5,7 @@ import com.vtence.molecule.middlewares.FilterMap;
 import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.RouteBuilder;
 import com.vtence.molecule.servers.SimpleServer;
+import com.vtence.molecule.servers.UndertowServer;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -43,13 +44,36 @@ public class WebServer {
     }
 
     /**
-     * Creates a WebServer listening on the specified interface and port.
+     * Creates a default WebServer listening on the specified interface and port. The default web server
+     * is powered by Simple.
+     *
+     * @param host the hostname to bind to
+     * @param port the port to listen on
+     * @see #simple(String, int)
+     * @see #undertow(String, int)
+     */
+    public static WebServer create(String host, int port) {
+        return simple(host, port);
+    }
+
+    /**
+     * Creates a WebServer powered by Simple listening on the specified interface and port.
      *
      * @param host the hostname to bind to
      * @param port the port to listen on
      */
-    public static WebServer create(String host, int port) {
+    public static WebServer simple(String host, int port) {
         return new WebServer(new SimpleServer(host, port));
+    }
+
+    /**
+     * Creates a WebServer powered by Undertow listening on the specified interface and port.
+     *
+     * @param host the hostname to bind to
+     * @param port the port to listen on
+     */
+    public static WebServer undertow(String host, int port) {
+        return new WebServer(new UndertowServer(host, port));
     }
 
     /**
@@ -73,7 +97,8 @@ public class WebServer {
      * @see com.vtence.molecule.ssl.SecureProtocol
      * @see com.vtence.molecule.ssl.KeyStoreType
      */
-    public WebServer enableSSL(File keyStore, String storePassword, String keyPassword) throws GeneralSecurityException, IOException {
+    public WebServer enableSSL(File keyStore, String storePassword, String keyPassword)
+            throws GeneralSecurityException, IOException {
         return enableSSL(TLS.initialize(DEFAULT.loadKeys(keyStore, storePassword, keyPassword)));
     }
 

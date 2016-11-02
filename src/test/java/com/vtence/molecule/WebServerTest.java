@@ -3,11 +3,13 @@ package com.vtence.molecule;
 import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.util.logging.LogManager;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
@@ -20,6 +22,11 @@ public class WebServerTest {
     HttpRequest request = new HttpRequest(8080);
     HttpResponse response;
 
+    @BeforeClass public static void
+    silenceLogging() {
+        LogManager.getLogManager().reset();
+    }
+
     @After
     public void stopServer() throws Exception {
         server.stop();
@@ -28,12 +35,19 @@ public class WebServerTest {
     @Test
     public void runsServerOnPort8080ByDefault() throws IOException, GeneralSecurityException {
         server = WebServer.create();
-        server.start((request, response) -> {
-            response.body("It works!").done();
-        });
+        server.start((request, response) -> response.body("It works!").done());
 
         response = request.get("/");
         assertThat(response).hasBodyText("It works!");
+    }
+
+    @Test
+    public void canBePoweredByUndertow() throws Exception {
+        server = WebServer.undertow("localhost", 8080);
+        server.start((request, response) -> response.body("It works even faster!").done());
+
+        response = request.get("/");
+        assertThat(response).hasBodyText("It works even faster!");
     }
 
     @Test
