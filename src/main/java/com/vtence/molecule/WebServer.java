@@ -192,7 +192,11 @@ public class WebServer {
      */
     public Server start() throws IOException {
         stack.boot();
-        server.run(stack, ssl);
+        if (ssl != null) {
+            server.run(stack, ssl);
+        } else {
+            server.run(stack);
+        }
         return server;
     }
 

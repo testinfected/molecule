@@ -8,17 +8,20 @@ import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.testing.http.Form;
 import com.vtence.molecule.testing.http.HttpRequest;
 import com.vtence.molecule.testing.http.HttpResponse;
-import com.vtence.molecule.testing.http.MultipartForm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static com.vtence.molecule.ssl.KeyStoreType.DEFAULT;
+import static com.vtence.molecule.ssl.SecureProtocol.TLS;
+import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -98,16 +101,6 @@ public abstract class ServerCompatibilityTests {
         assertNoError();
         assertThat(response).hasStatusCode(201)
                             .hasStatusMessage("Created");
-    }
-
-    @Test public void
-    chunksResponseWhenContentLengthUnknown() throws IOException {
-        server.run((request, response) -> response.body("<html>...</html>").done());
-
-        response = request.send();
-        assertNoError();
-        assertThat(response).hasBodyText("<html>...</html>")
-                            .isChunked();
     }
 
     @Test public void
@@ -323,15 +316,27 @@ public abstract class ServerCompatibilityTests {
         });
 
 
-        Form form = new MultipartForm().addBinaryFile("file", resources.locate("assets/images/minion.png"));
-        response = request.content(form).post("/");
+        response = request.content(Form.multipart()
+                                       .addBinaryFile("file", resources.locate("assets/images/minion.png")))
+                          .post("/");
 
         assertNoError();
         assertThat("filenames", files, hasEntry("minion.png", 21134));
         assertThat("mime types", mimeTypes, hasEntry("minion.png", "image/png"));
     }
 
-    private void assertNoError() {
+    @Test public void
+    supportsHttps() throws Exception {
+        SSLContext sslContext =
+                TLS.initialize(DEFAULT.loadKeys(locateOnClasspath("ssl/keystore"), "password", "password"));
+        server.run((request, response) -> response.done("Secure!"), sslContext);
+
+        response = request.secure(true).get("/");
+
+        assertThat(response).hasBodyText("Secure!");
+    }
+
+    protected void assertNoError() {
         if (error != null) fail(StackTrace.of(error));
     }
 }

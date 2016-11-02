@@ -79,9 +79,9 @@ public class SimpleServer implements Server {
 
         public void handle(org.simpleframework.http.Request httpRequest, org.simpleframework.http.Response httpResponse) {
             final List<Closeable> resources = new ArrayList<>();
+            final Request request = new Request();
+            final Response response = new Response();
             try {
-                final Request request = new Request();
-                final Response response = new Response();
                 read(request, httpRequest, resources);
                 app.handle(request, response);
                 response.whenSuccessful(commitTo(httpResponse))
