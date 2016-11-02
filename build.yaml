@@ -8,6 +8,10 @@ artifacts:
   simple_common: org.simpleframework:simple-common:jar:6.0.1
   simple_transport: org.simpleframework:simple-transport:jar:6.0.1
   simple_http: org.simpleframework:simple-http:jar:6.0.1
+  undertow: io.undertow:undertow-core:jar:1.4.4.Final
+  xnio_api: org.jboss.xnio:xnio-api:jar:3.3.6.Final
+  xnio: org.jboss.xnio:xnio-nio:jar:3.3.6.Final
+  jboss_logging: org.jboss.logging:jboss-logging:jar:3.2.1.Final
   mustache: com.samskivert:jmustache:jar:1.9
 
   # -- test dependencies

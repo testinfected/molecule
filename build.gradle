@@ -27,6 +27,7 @@ targetCompatibility = 1.8
 
 def libs = [
         simple            : 'org.simpleframework:simple-http:6.0.1',
+        undertow          : 'io.undertow:undertow-core:1.4.4.Final',
         jmustache         : 'com.samskivert:jmustache:1.9',
         hamcrest          : ['org.hamcrest:java-hamcrest:2.0.0.0',
                              'org.hamcrest:hamcrest-junit:2.0.0.0'],
@@ -42,6 +43,7 @@ repositories {
 
 dependencies {
   compile libs.simple, optional
+  compile libs.undertow, optional
   compile libs.jmustache, optional
 
   testCompile libs.hamcrest
