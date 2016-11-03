@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.11.0] - 
 
 ### Added
+- A server adapter for powering Molecule with [Undertow](http://undertow.io). Undertow is fast!
 
 ### Changed
 
