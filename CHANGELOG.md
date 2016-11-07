@@ -7,14 +7,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - A server adapter for powering Molecule with [Undertow](http://undertow.io). Undertow is fast! ([#53])
 - A way to check for the presence of a given request parameter instead of checking its value against null.
-This is typically useful for boolean parameters. ([#49])
+This is typically useful for boolean parameters. See `Request#hasParameter` ([#49])
 - A basic authentication middleware with pluggable authentication provider ([#28])
+- Access to request query string. See `Request#query` ([#54])
  
 ### Changed
 - Request input streams are now closed automatically at the end of the request cycle. This includes file uploads. ([#52])
  
 ### Fixed
-- The test HTTP client no longer loses then _Content-Type_ header when creating a fresh request from
+- The test HTTP client no longer loses the _Content-Type_ header when creating a fresh request from
  a prototype request ([#50])
 - ETag middleware now properly closes original body after computing ETag.
 
@@ -72,10 +73,12 @@ Sessions are considered stale when they have been inactive for longer than the c
 - `ApacheCommonLogger` now correctly logs request parameters as they were received, in case they are modified down the middleware chain
 
 
+[0.11.0]: https://github.com/testinfected/molecule/compare/v0.11.0...v0.10
 [0.10]: https://github.com/testinfected/molecule/compare/v0.10...v0.9.1
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.9
 [0.9]: https://github.com/testinfected/molecule/compare/v0.9...v0.8.2
 
+[#54]: https://github.com/testinfected/molecule/issues/54
 [#53]: https://github.com/testinfected/molecule/issues/53
 [#52]: https://github.com/testinfected/molecule/issues/52
 [#50]: https://github.com/testinfected/molecule/issues/50

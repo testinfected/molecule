@@ -32,9 +32,6 @@ import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 
-import static io.undertow.util.QueryParameterUtils.getQueryParamEncoding;
-import static io.undertow.util.QueryParameterUtils.parseQueryString;
-
 public class UndertowServer implements Server {
 
     private final String host;
@@ -126,6 +123,7 @@ public class UndertowServer implements Server {
         private void setRequestInfo(Request request, HttpServerExchange exchange) {
             request.uri(exchange.getRequestURI() + queryComponent(exchange));
             request.path(exchange.getRequestPath());
+            request.query(exchange.getQueryString());
             request.remoteIp(exchange.getSourceAddress().getAddress().getHostAddress());
             request.remotePort(exchange.getSourceAddress().getPort());
             request.remoteHost(exchange.getSourceAddress().getHostName());
@@ -136,7 +134,7 @@ public class UndertowServer implements Server {
         }
 
         private String queryComponent(HttpServerExchange exchange) {
-            return !exchange.getQueryString().isEmpty()? "?" + exchange.getQueryString() : "";
+            return !exchange.getQueryString().isEmpty() ? "?" + exchange.getQueryString() : "";
         }
 
         private void setHeaders(Request request, HttpServerExchange exchange) {
@@ -149,9 +147,7 @@ public class UndertowServer implements Server {
         }
 
         private void setQueryParameters(Request request, HttpServerExchange exchange) {
-            Map<String, Deque<String>> parameters =
-                    parseQueryString(exchange.getQueryString(), getQueryParamEncoding(exchange));
-
+            Map<String, Deque<String>> parameters = exchange.getQueryParameters();
             for (String name : parameters.keySet()) {
                 for (String value : parameters.get(name)) {
                     request.addParameter(name, value);

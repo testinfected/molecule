@@ -105,6 +105,7 @@ public class SimpleServer implements Server {
         private void readInfo(Request request, org.simpleframework.http.Request httpRequest) {
             request.uri(httpRequest.getTarget());
             request.path(httpRequest.getPath().getPath());
+            request.query(httpRequest.getQuery().toString());
             request.remoteIp(httpRequest.getClientAddress().getAddress().getHostAddress());
             request.remotePort(httpRequest.getClientAddress().getPort());
             request.remoteHost(httpRequest.getClientAddress().getHostName());

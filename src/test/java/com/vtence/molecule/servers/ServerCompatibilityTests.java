@@ -140,6 +140,7 @@ public abstract class ServerCompatibilityTests {
         server.run((request, response) -> {
             info.put("uri", request.uri());
             info.put("path", request.path());
+            info.put("query", request.query());
             info.put("ip", request.remoteIp());
             info.put("hostname", request.remoteHost());
             info.put("port", valueOf(request.remotePort()));
@@ -149,12 +150,13 @@ public abstract class ServerCompatibilityTests {
             response.done();
         });
 
-        request.get("/path?query");
+        request.get("/over/there?name=ferret");
         assertNoError();
 
         assertThat("request information", info, allOf(
-                hasEntry("uri", "/path?query"),
-                hasEntry("path", "/path"),
+                hasEntry("uri", "/over/there?name=ferret"),
+                hasEntry("path", "/over/there"),
+                hasEntry("query", "name=ferret"),
                 hasEntry("ip", "127.0.0.1"),
                 hasEntry(equalTo("hostname"), notNullValue()),
                 hasEntry(equalTo("port"), not(equalTo("0"))),

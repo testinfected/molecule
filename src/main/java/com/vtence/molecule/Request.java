@@ -38,6 +38,7 @@ public class Request {
 
     private String uri;
     private String path;
+    private String query;
     private String ip;
     private int port;
     private String hostName;
@@ -50,18 +51,19 @@ public class Request {
     public Request() {}
 
     /**
-     * Reads the uri of this request.
+     * Reads the URI of this request. It can be a relative URI or the full URL if the client included
+     * the host in the request. The URI will include the query string.
      *
-     * @return the request uri
+     * @return the request URI
      */
     public String uri() {
         return uri;
     }
 
     /**
-     * Changes the uri of this request.
+     * Changes the URI of this request.
      *
-     * @param uri the new uri
+     * @param uri the new URI
      */
     public Request uri(String uri) {
         this.uri = uri;
@@ -69,7 +71,7 @@ public class Request {
     }
 
     /**
-     * Reads the path of this request.
+     * Reads the path of this request. This is the normalized path.
      *
      * @return the request path
      */
@@ -84,6 +86,25 @@ public class Request {
      */
     public Request path(String path) {
         this.path = path;
+        return this;
+    }
+
+    /**
+     * Reads the query part of this request's URI. The query string does not include the leading <code>?</code>.
+     *
+     * @return the query associated with this request's URI, which might be an empty string
+     */
+    public String query() {
+        return query;
+    }
+
+    /**
+     * Changes the query part of this request. The query string should not include the leading <code>?</code>.
+     *
+     * @param query the new query part
+     */
+    public Request query(String query) {
+        this.query = query;
         return this;
     }
 
