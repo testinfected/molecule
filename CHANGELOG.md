@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This is typically useful for boolean parameters. See `Request#hasParameter` ([#49])
 - A basic authentication middleware with pluggable authentication provider ([#28])
 - Access to request query string. See `Request#query` ([#54])
+- Access to request scheme. See `Request#scheme` ([#58])
  
 ### Changed
 - Request input streams are now closed automatically at the end of the request cycle. This includes file uploads. ([#52])
@@ -78,6 +79,7 @@ Sessions are considered stale when they have been inactive for longer than the c
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.9
 [0.9]: https://github.com/testinfected/molecule/compare/v0.9...v0.8.2
 
+[#58]: https://github.com/testinfected/molecule/issues/58
 [#54]: https://github.com/testinfected/molecule/issues/54
 [#53]: https://github.com/testinfected/molecule/issues/53
 [#52]: https://github.com/testinfected/molecule/issues/52

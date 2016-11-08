@@ -141,6 +141,7 @@ public abstract class ServerCompatibilityTests {
             info.put("uri", request.uri());
             info.put("path", request.path());
             info.put("query", request.query());
+            info.put("scheme", request.scheme());
             info.put("ip", request.remoteIp());
             info.put("hostname", request.remoteHost());
             info.put("port", valueOf(request.remotePort()));
@@ -157,6 +158,7 @@ public abstract class ServerCompatibilityTests {
                 hasEntry("uri", "/over/there?name=ferret"),
                 hasEntry("path", "/over/there"),
                 hasEntry("query", "name=ferret"),
+                hasEntry("scheme", "http"),
                 hasEntry("ip", "127.0.0.1"),
                 hasEntry(equalTo("hostname"), notNullValue()),
                 hasEntry(equalTo("port"), not(equalTo("0"))),
@@ -331,11 +333,20 @@ public abstract class ServerCompatibilityTests {
     supportsHttps() throws Exception {
         SSLContext sslContext =
                 TLS.initialize(DEFAULT.loadKeys(locateOnClasspath("ssl/keystore"), "password", "password"));
-        server.run((request, response) -> response.done("Secure!"), sslContext);
+
+        final Map<String, String> info = new HashMap<>();
+        server.run((request, response) -> {
+            info.put("scheme", request.scheme());
+            info.put("secure", valueOf(request.secure()));
+            response.done();
+        }, sslContext);
 
         response = request.secure(true).get("/");
+        assertNoError();
 
-        assertThat(response).hasBodyText("Secure!");
+        assertThat("request information", info, allOf(
+                hasEntry("scheme", "https"),
+                hasEntry("secure", "true")));
     }
 
     protected void assertNoError() {

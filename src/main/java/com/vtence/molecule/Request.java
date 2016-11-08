@@ -39,6 +39,7 @@ public class Request {
     private String uri;
     private String path;
     private String query;
+    private String scheme;
     private String ip;
     private int port;
     private String hostName;
@@ -162,6 +163,25 @@ public class Request {
      */
     public Request remotePort(int port) {
         this.port = port;
+        return this;
+    }
+
+    /**
+     * Gets this request URI scheme. It will be one of {@code http} or {@code https}.
+     *
+     * @return the request URI scheme
+     */
+    public String scheme() {
+        return scheme;
+    }
+
+    /**
+     * Changes the scheme of this request URI. It should be one of {@code http} or {@code https}.
+     *
+     * @return the new scheme
+     */
+    public Request scheme(String scheme) {
+        this.scheme = scheme;
         return this;
     }
 
