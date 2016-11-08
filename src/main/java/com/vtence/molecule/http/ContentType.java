@@ -22,22 +22,24 @@ public class ContentType {
         this.charset = charset;
     }
 
-    public static ContentType of(Response response) {
-        return parse(response.header(CONTENT_TYPE));
+    public static ContentType of(Request request) {
+        String header = request.header(CONTENT_TYPE);
+        return header != null ? parse(header) : null;
     }
 
-    public static ContentType of(Request request) {
-        return parse(request.header(CONTENT_TYPE));
+    public static ContentType of(Response response) {
+        String header = response.header(CONTENT_TYPE);
+        return header != null ? parse(header) : null;
     }
 
     public static ContentType parse(String header) {
-        return header != null ? from(new Header(header)) : null;
+        return from(new Header(header));
     }
 
     public static ContentType from(Header header) {
         Header.Value contentType = header.first();
         String[] tokens = contentType.value().split("/");
-        return new ContentType(type(tokens), subType(tokens), charset(contentType));
+        return new ContentType(type(tokens), subType(tokens), charsetOf(contentType));
     }
 
     private static String type(String[] tokens) {
@@ -48,7 +50,7 @@ public class ContentType {
         return tokens.length > 1 ? tokens[SUB_TYPE] : null;
     }
 
-    private static String charset(Header.Value header) {
+    private static String charsetOf(Header.Value header) {
         return header.parameter("charset");
     }
 
@@ -65,7 +67,11 @@ public class ContentType {
     }
 
     public Charset charset() {
-        return charset != null ? Charset.forName(charset) : null;
+        return charset(null);
+    }
+
+    public Charset charset(Charset defaultCharset) {
+        return charset != null ? Charset.forName(charset) : defaultCharset;
     }
 
     public String charsetName() {

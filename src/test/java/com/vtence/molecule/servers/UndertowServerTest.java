@@ -16,8 +16,8 @@ public class UndertowServerTest extends ServerCompatibilityTests {
         LogManager.getLogManager().reset();
     }
 
-    protected Server createServer(int port) {
-        return new UndertowServer("localhost", port);
+    protected Server createServer(String host, int port) {
+        return new UndertowServer(host, port);
     }
 
     @Test public void

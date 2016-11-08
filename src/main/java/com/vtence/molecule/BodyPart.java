@@ -143,10 +143,7 @@ public class BodyPart {
     }
 
     private Charset charset() {
-        ContentType contentType = ContentType.parse(contentType());
-        if (contentType == null || contentType.charset() == null) {
-            return StandardCharsets.UTF_8;
-        }
-        return contentType.charset();
+        if (contentType == null) return StandardCharsets.UTF_8;
+        return ContentType.parse(contentType).charset(StandardCharsets.UTF_8);
     }
 }

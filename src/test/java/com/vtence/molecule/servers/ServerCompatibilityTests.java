@@ -42,18 +42,18 @@ public abstract class ServerCompatibilityTests {
 
     Server server;
     ResourceLocator resources = ResourceLocator.onClasspath();
-    HttpRequest request = new HttpRequest(port);
+    HttpRequest request = new HttpRequest("localhost", port);
     HttpResponse response;
 
     Throwable error;
 
     @Before public void
     configureServer() {
-        server = createServer(port);
+        server = createServer("127.0.0.1", port);
         server.reportErrorsTo(error -> ServerCompatibilityTests.this.error = error);
     }
 
-    protected abstract Server createServer(int port);
+    protected abstract Server createServer(String host, int port);
 
     @After public void
     stopServer() throws Exception {
@@ -61,8 +61,8 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    knowsItsHostName() throws IOException {
-        assertThat("hostname", server.host(), equalTo("localhost"));
+    knowsItsHost() throws IOException {
+        assertThat("host", server.host(), equalTo("127.0.0.1"));
     }
 
     @Test public void
@@ -142,9 +142,10 @@ public abstract class ServerCompatibilityTests {
             info.put("path", request.path());
             info.put("query", request.query());
             info.put("scheme", request.scheme());
-            info.put("ip", request.remoteIp());
-            info.put("hostname", request.remoteHost());
-            info.put("port", valueOf(request.remotePort()));
+            info.put("hostname", request.hostname());
+            info.put("remote-ip", request.remoteIp());
+            info.put("remote-host", request.remoteHost());
+            info.put("remote-port", valueOf(request.remotePort()));
             info.put("protocol", request.protocol());
             info.put("secure", valueOf(request.secure()));
             info.put("timestamp", valueOf(request.timestamp()));
@@ -159,9 +160,10 @@ public abstract class ServerCompatibilityTests {
                 hasEntry("path", "/over/there"),
                 hasEntry("query", "name=ferret"),
                 hasEntry("scheme", "http"),
-                hasEntry("ip", "127.0.0.1"),
-                hasEntry(equalTo("hostname"), notNullValue()),
-                hasEntry(equalTo("port"), not(equalTo("0"))),
+                hasEntry("hostname", "localhost"),
+                hasEntry("remote-ip", "127.0.0.1"),
+                hasEntry("remote-host", "localhost"),
+                hasEntry(equalTo("remote-port"), not(equalTo("0"))),
                 hasEntry(equalTo("timestamp"), not(equalTo("0"))),
                 hasEntry("protocol", "HTTP/1.1"),
                 hasEntry("secure", "false")));

@@ -129,6 +129,7 @@ public class UndertowServer implements Server {
             request.remoteHost(exchange.getSourceAddress().getHostName());
             request.timestamp(exchange.getRequestStartTime());
             request.scheme(exchange.getRequestScheme());
+            request.hostname(exchange.getHostName());
             request.protocol(exchange.getProtocol().toString());
             request.secure(exchange.getConnection().getSslSessionInfo() != null);
             request.method(exchange.getRequestMethod().toString());

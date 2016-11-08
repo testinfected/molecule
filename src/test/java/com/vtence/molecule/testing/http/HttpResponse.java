@@ -48,11 +48,9 @@ public class HttpResponse {
     }
 
     public Charset charset() {
-        ContentType contentType = ContentType.parse(contentType());
-        if (contentType == null || contentType.charset() == null)
-            return StandardCharsets.ISO_8859_1;
+        if (contentType() == null) return StandardCharsets.ISO_8859_1;
 
-        return contentType.charset();
+        return ContentType.parse(contentType()).charset(StandardCharsets.ISO_8859_1);
     }
 
     public Map<String, HttpCookie> cookies() {

@@ -10,27 +10,29 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.vtence.molecule.http.HeaderNames.ACCEPT_LANGUAGE;
-import static java.util.stream.Collectors.toList;
 
 public class AcceptLanguage {
     private final List<Locale> locales = new ArrayList<>();
 
     public static AcceptLanguage of(Request request) {
         String header = request.header(ACCEPT_LANGUAGE);
-        return header != null ? new AcceptLanguage(header) : new AcceptLanguage("");
+        return parse(header != null ? header : "");
     }
 
-    public AcceptLanguage(String header) {
-        this(new Header(header));
+    public static AcceptLanguage parse(String header) {
+        return AcceptLanguage.from(new Header(header != null ? header : ""));
     }
 
-    public AcceptLanguage(Header header) {
-        parseLocales(header);
+    public static AcceptLanguage from(Header header) {
+        AcceptLanguage accept = new AcceptLanguage();
+        header.values().stream()
+              .filter(locale -> !locale.equals(""))
+              .map(Locale::forLanguageTag).forEach(accept::add);
+        return accept;
     }
 
-    private void parseLocales(Header header) {
-        locales.addAll(header.values().stream().filter(locale -> !locale.equals(""))
-                             .map(Locale::forLanguageTag).collect(toList()));
+    private void add(Locale locale) {
+        this.locales.add(locale);
     }
 
     public List<Locale> list() {

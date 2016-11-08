@@ -11,19 +11,21 @@ import static com.vtence.molecule.http.HeaderNames.ACCEPT_ENCODING;
 import static java.util.stream.Collectors.toList;
 
 public class AcceptEncoding {
-    private final List<Header.Value> values;
+    private final List<Header.Value> values = new ArrayList<>();
 
     public static AcceptEncoding of(Request request) {
         String header = request.header(ACCEPT_ENCODING);
-        return header != null ? new AcceptEncoding(header) : new AcceptEncoding("");
+        return parse(header != null ? header : "");
     }
 
-    public AcceptEncoding(String header) {
-        this(new Header(header));
+    public static AcceptEncoding parse(String header) {
+        return from(new Header(header));
     }
 
-    public AcceptEncoding(Header header) {
-        this.values = header.all();
+    public static AcceptEncoding from(Header header) {
+        AcceptEncoding accept = new AcceptEncoding();
+        accept.values.addAll(header.all());
+        return accept;
     }
 
     public String selectBestEncoding(String... candidates) {

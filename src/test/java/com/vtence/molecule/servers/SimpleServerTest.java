@@ -9,8 +9,8 @@ import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 
 public class SimpleServerTest extends ServerCompatibilityTests {
 
-    protected Server createServer(int port) {
-        return new SimpleServer("localhost", port);
+    protected Server createServer(String host, int port) {
+        return new SimpleServer(host, port);
     }
 
     @Test public void

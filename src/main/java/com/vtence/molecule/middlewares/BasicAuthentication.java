@@ -34,7 +34,7 @@ public class BasicAuthentication extends AbstractMiddleware {
             return;
         }
 
-        if (!auth.isForScheme(BASIC_AUTHENTICATION)) {
+        if (!auth.hasScheme(BASIC_AUTHENTICATION)) {
             response.status(BAD_REQUEST).done();
             return;
         }

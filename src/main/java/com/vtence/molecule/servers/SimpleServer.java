@@ -7,6 +7,8 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.http.HeaderNames;
+import com.vtence.molecule.http.Host;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerSocketProcessor;
@@ -111,16 +113,22 @@ public class SimpleServer implements Server {
             request.remoteHost(httpRequest.getClientAddress().getHostName());
             request.timestamp(httpRequest.getRequestTime());
             request.scheme(schemeOf(httpRequest));
+            request.hostname(hostOf(httpRequest));
             request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
             request.secure(httpRequest.isSecure());
             request.method(httpRequest.getMethod());
         }
 
         private String schemeOf(org.simpleframework.http.Request httpRequest) {
-            // Prefer the scheme specified in the host header if any
+            // Prefer the scheme specified in the request line if any
             String scheme = httpRequest.getAddress().getScheme();
             if (scheme != null) return scheme;
             return httpRequest.isSecure() ? "https" : "http";
+        }
+
+        private String hostOf(org.simpleframework.http.Request httpRequest) {
+            String header = httpRequest.getValue(HeaderNames.HOST);
+            return header != null ? Host.parse(header).name() : host;
         }
 
         private void readHeaders(Request request, org.simpleframework.http.Request httpRequest) {

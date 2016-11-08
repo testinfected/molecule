@@ -56,7 +56,7 @@ public class AcceptEncodingTest {
     }
 
     private String select(String header, List<String> candidates) {
-        AcceptEncoding acceptEncoding = new AcceptEncoding(header);
+        AcceptEncoding acceptEncoding = AcceptEncoding.parse(header);
         return acceptEncoding.selectBestEncoding(candidates);
     }
 

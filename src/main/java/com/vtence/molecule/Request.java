@@ -40,9 +40,10 @@ public class Request {
     private String path;
     private String query;
     private String scheme;
-    private String ip;
-    private int port;
-    private String hostName;
+    private String host;
+    private String remoteHost;
+    private String remoteIp;
+    private int remotePort;
     private String protocol;
     private InputStream input = new EmptyInputStream();
     private HttpMethod method;
@@ -115,7 +116,7 @@ public class Request {
      * @return the remote client ip
      */
     public String remoteIp() {
-        return ip;
+        return remoteIp;
     }
 
     /**
@@ -124,7 +125,7 @@ public class Request {
      * @param ip the new ip
      */
     public Request remoteIp(String ip) {
-        this.ip = ip;
+        this.remoteIp = ip;
         return this;
     }
 
@@ -134,7 +135,7 @@ public class Request {
      * @return the remote client hostname
      */
     public String remoteHost() {
-        return hostName;
+        return remoteHost;
     }
 
     /**
@@ -143,7 +144,7 @@ public class Request {
      * @param hostName the new hostname
      */
     public Request remoteHost(String hostName) {
-        this.hostName = hostName;
+        this.remoteHost = hostName;
         return this;
     }
 
@@ -153,7 +154,7 @@ public class Request {
      * @return the remote client port
      */
     public int remotePort() {
-        return port;
+        return remotePort;
     }
 
     /**
@@ -162,7 +163,7 @@ public class Request {
      * @param port the new port
      */
     public Request remotePort(int port) {
-        this.port = port;
+        this.remotePort = port;
         return this;
     }
 
@@ -182,6 +183,26 @@ public class Request {
      */
     public Request scheme(String scheme) {
         this.scheme = scheme;
+        return this;
+    }
+
+    /**
+     * Gets the host name of the server to which this request was sent.
+     * It is taken from the Host header value, if any, otherwise the server hostname is used.
+     *
+     * @return the server host name
+     */
+    public String hostname() {
+        return host;
+    }
+
+    /**
+     * Changes the host name of this request.
+     *
+     * @return the new host name
+     */
+    public Request hostname(String name) {
+        this.host = name;
         return this;
     }
 

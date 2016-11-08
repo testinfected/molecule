@@ -15,11 +15,12 @@ public class ContentLanguage {
     private final List<Locale> locales = new ArrayList<>();
 
     public static ContentLanguage of(Response response) {
-        return ContentLanguage.parse(response.header(CONTENT_LANGUAGE));
+        String header = response.header(CONTENT_LANGUAGE);
+        return header != null ? ContentLanguage.parse(header) : null;
     }
 
     public static ContentLanguage parse(String header) {
-        return header != null ? from(new Header(header)) : from(new Header(""));
+        return from(new Header(header));
     }
 
     public static ContentLanguage from(Header header) {

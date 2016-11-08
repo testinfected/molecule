@@ -6,25 +6,33 @@ import static com.vtence.molecule.http.HeaderNames.AUTHORIZATION;
 
 public class Authorization {
 
-    private final String[] tokens;
+    private final String scheme;
+    private final String params;
 
     public static Authorization of(Request request) {
-        return request.hasHeader(AUTHORIZATION) ? new Authorization(request.header(AUTHORIZATION)) : null;
+        String header = request.header(AUTHORIZATION);
+        return header != null ? parse(header) : null;
     }
 
-    public Authorization(String header) {
-        this.tokens = header.split(" ");
+    public static Authorization parse(String header) {
+        String[] tokens = header.split(" ");
+        return new Authorization(tokens[0], tokens.length > 1 ? tokens[1]: "");
+    }
+
+    public Authorization(String scheme, String params) {
+        this.scheme = scheme;
+        this.params = params;
     }
 
     public String scheme() {
-        return tokens[0];
+        return scheme;
     }
 
-    public boolean isForScheme(String scheme) {
-        return scheme().equals(scheme);
+    public boolean hasScheme(String scheme) {
+        return this.scheme.equals(scheme);
     }
 
     public String params() {
-        return tokens.length > 1 ? tokens[1]: "";
+        return params;
     }
 }

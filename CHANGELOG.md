@@ -11,6 +11,7 @@ This is typically useful for boolean parameters. See `Request#hasParameter` ([#4
 - A basic authentication middleware with pluggable authentication provider ([#28])
 - Access to request query string. See `Request#query` ([#54])
 - Access to request scheme. See `Request#scheme` ([#58])
+- Access to server host name as specified in the host header. See `Request#hostname` ([#55])
  
 ### Changed
 - Request input streams are now closed automatically at the end of the request cycle. This includes file uploads. ([#52])
@@ -80,6 +81,7 @@ Sessions are considered stale when they have been inactive for longer than the c
 [0.9]: https://github.com/testinfected/molecule/compare/v0.9...v0.8.2
 
 [#58]: https://github.com/testinfected/molecule/issues/58
+[#55]: https://github.com/testinfected/molecule/issues/55
 [#54]: https://github.com/testinfected/molecule/issues/54
 [#53]: https://github.com/testinfected/molecule/issues/53
 [#52]: https://github.com/testinfected/molecule/issues/52
