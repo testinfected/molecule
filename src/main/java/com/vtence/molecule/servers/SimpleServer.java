@@ -113,7 +113,7 @@ public class SimpleServer implements Server {
             request.remoteHost(httpRequest.getClientAddress().getHostName());
             request.timestamp(httpRequest.getRequestTime());
             request.scheme(schemeOf(httpRequest));
-            request.hostname(hostOf(httpRequest));
+            readHostAndPort(request, httpRequest);
             request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
             request.secure(httpRequest.isSecure());
             request.method(httpRequest.getMethod());
@@ -126,9 +126,26 @@ public class SimpleServer implements Server {
             return httpRequest.isSecure() ? "https" : "http";
         }
 
-        private String hostOf(org.simpleframework.http.Request httpRequest) {
-            String header = httpRequest.getValue(HeaderNames.HOST);
-            return header != null ? Host.parse(header).name() : host;
+        private void readHostAndPort(Request request, org.simpleframework.http.Request httpRequest) {
+            String hostHeader = httpRequest.getValue(HeaderNames.HOST);
+
+            if (hostHeader == null) {
+                request.hostname(host);
+                request.port(port);
+                return;
+            }
+
+            Host host = Host.parse(hostHeader);
+            request.hostname(host.name());
+            request.port(host.port(defaultPortFor(request)));
+        }
+
+        private int defaultPortFor(Request request) {
+            // Yes, we assume the scheme has been set
+            String scheme = request.scheme();
+            if (scheme.equals("http")) return 80;
+            if (scheme.equals("https")) return 443;
+            return port;
         }
 
         private void readHeaders(Request request, org.simpleframework.http.Request httpRequest) {

@@ -41,6 +41,7 @@ public class Request {
     private String query;
     private String scheme;
     private String host;
+    private int port;
     private String remoteHost;
     private String remoteIp;
     private int remotePort;
@@ -203,6 +204,26 @@ public class Request {
      */
     public Request hostname(String name) {
         this.host = name;
+        return this;
+    }
+
+    /**
+     * Reads the port of the server to which this request was sent.
+     * It is taken from the Host header value, if any, otherwise the server port is used.
+     *
+     * @return the server port
+     */
+    public int port() {
+        return port;
+    }
+
+    /**
+     * Changes the server port of this request.
+     *
+     * @return the new port number
+     */
+    public Request port(int port) {
+        this.port = port;
         return this;
     }
 

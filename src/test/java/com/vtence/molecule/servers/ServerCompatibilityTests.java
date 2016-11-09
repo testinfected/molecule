@@ -66,6 +66,11 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
+    knowsItsPort() throws IOException {
+        assertThat("port", server.port(), equalTo(9999));
+    }
+
+    @Test public void
     notifiesReportersOfFailures() throws IOException {
         server.run((request, response) -> {
             throw new Exception("Crash!");
@@ -143,6 +148,7 @@ public abstract class ServerCompatibilityTests {
             info.put("query", request.query());
             info.put("scheme", request.scheme());
             info.put("hostname", request.hostname());
+            info.put("port", valueOf(request.port()));
             info.put("remote-ip", request.remoteIp());
             info.put("remote-host", request.remoteHost());
             info.put("remote-port", valueOf(request.remotePort()));
@@ -161,6 +167,7 @@ public abstract class ServerCompatibilityTests {
                 hasEntry("query", "name=ferret"),
                 hasEntry("scheme", "http"),
                 hasEntry("hostname", "localhost"),
+                hasEntry("port", "9999"),
                 hasEntry("remote-ip", "127.0.0.1"),
                 hasEntry("remote-host", "localhost"),
                 hasEntry(equalTo("remote-port"), not(equalTo("0"))),
