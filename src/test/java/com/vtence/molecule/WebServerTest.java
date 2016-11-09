@@ -42,15 +42,6 @@ public class WebServerTest {
     }
 
     @Test
-    public void canBePoweredByUndertow() throws Exception {
-        server = WebServer.undertow("localhost", 8080);
-        server.start((request, response) -> response.body("It works even faster!").done());
-
-        response = request.get("/");
-        assertThat(response).hasBodyText("It works even faster!");
-    }
-
-    @Test
     public void knowsServerUri() throws IOException {
         server = WebServer.create("0.0.0.0", 9000);
         assertThat("server uri", server.uri(), equalTo(URI.create("http://0.0.0.0:9000")));

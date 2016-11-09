@@ -32,7 +32,8 @@ Molecule is small, it weights less than 150k, and will stay as lean as possible.
 of rack middlewares and offers some out-of-the box integrations. You're free to use the built-in options 
 or provide your own implementations. 
 
-Molecule requires Java 8. It runs an embedded web-server powered by [Simple](http://simpleframework.org) or [Undertow](http://undertow.io). Both are fully asynchronous and non-blocking, which means they can scale to very high loads.
+Molecule requires Java 8. It runs an embedded web-server powered by [Simple](http://simpleframework.org) or [Undertow](http://undertow.io). 
+Both are fully asynchronous and non-blocking, which means they can scale to very high loads.
 
 Have fun!
 
@@ -48,7 +49,7 @@ You can get the latest release version from Maven Central:
 </dependency>
 ```
  
-To use the default web server, you also need to add [Simple](http://www.simpleframework.org) as a dependency:
+To use Simple as your web server, add [Simple](http://www.simpleframework.org) as a dependency:
 
 ```xml
 <dependency>
@@ -59,7 +60,7 @@ To use the default web server, you also need to add [Simple](http://www.simplefr
 </dependency>
 
 ```
-To use the Undertow web server, add [Undertow](http://undertow.io) instead to your dependencies:
+To choose Undertow as your web server, add [Undertow](http://undertow.io) instead to your dependencies:
 
 ```xml
 <dependency>
@@ -102,8 +103,7 @@ First thing first, you need a server to run your app:
 WebServer server = WebServer.create();
 ```
 
-This will set the default web server, which is powered by [Simple](http://www.simpleframework.org), 
-to run locally on port 8080.
+This will set the web server to run locally on port 8080.
 
 To start the server, give it an app:
 
@@ -123,15 +123,10 @@ You can optionally specify the interface and port to bound to when creating the 
 WebServer server = WebServer.create("0.0.0.0", 8088);
 ```
 
-To run [Undertow](http://undertow.io) instead of Simple:
-```java
-WebServer server = WebServer.undertow("127.0.0.1", 8080);
-```
-
 
 ## Asynchronous Processing
 
-Molecule uses [Simple](http://www.simpleframework.org) as a default webserver. You have the choice to run using [Undertow](http://undertow.io) instead. Both are fully asynchronous and non-blocking. This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending on a high latency external resource.
+Molecule uses [Simple](http://www.simpleframework.org) as a default web server. You have the choice to run using [Undertow](http://undertow.io) instead. Both are fully asynchronous and non-blocking. This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending on a high latency external resource.
          
 What this means is you can serve your response content from a thread separate to the original servicing thread. For instance your application 
 might need to wait for some remote process that takes some time to complete, such as an HTTP or SOAP request to an external server. You can simply 

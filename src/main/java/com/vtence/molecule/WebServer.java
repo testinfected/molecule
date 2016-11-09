@@ -4,8 +4,7 @@ import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.middlewares.FilterMap;
 import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.RouteBuilder;
-import com.vtence.molecule.servers.SimpleServer;
-import com.vtence.molecule.servers.UndertowServer;
+import com.vtence.molecule.servers.Servers;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -28,14 +27,14 @@ public class WebServer {
     private SSLContext ssl;
 
     /**
-     * Creates a default WebServer listening on the default interface (0.0.0.0) and port (8080)
+     * Creates a WebServer listening on the default interface (0.0.0.0) and port (8080).
      */
     public static WebServer create() {
         return create(DEFAULT_PORT);
     }
 
     /**
-     * Creates a default WebServer listening on the default interface (0.0.0.0) and the specified port.
+     * Creates a WebServer listening on the default interface (0.0.0.0) and the specified port.
      *
      * @param port the port to listen on
      */
@@ -44,36 +43,13 @@ public class WebServer {
     }
 
     /**
-     * Creates a default WebServer listening on the specified interface and port. The default web server
-     * is powered by Simple.
+     * Creates a WebServer listening on the specified interface and port.
      *
      * @param host the hostname to bind to
      * @param port the port to listen on
-     * @see #simple(String, int)
-     * @see #undertow(String, int)
      */
     public static WebServer create(String host, int port) {
-        return simple(host, port);
-    }
-
-    /**
-     * Creates a WebServer powered by Simple listening on the specified interface and port.
-     *
-     * @param host the hostname to bind to
-     * @param port the port to listen on
-     */
-    public static WebServer simple(String host, int port) {
-        return new WebServer(new SimpleServer(host, port));
-    }
-
-    /**
-     * Creates a WebServer powered by Undertow listening on the specified interface and port.
-     *
-     * @param host the hostname to bind to
-     * @param port the port to listen on
-     */
-    public static WebServer undertow(String host, int port) {
-        return new WebServer(new UndertowServer(host, port));
+        return new WebServer(Servers.create(host, port));
     }
 
     /**
@@ -90,10 +66,9 @@ public class WebServer {
      * Secures connections made to this WebServer with TLS using the specified key store and credentials.
      * The key store must be of the default platform type and use the default key manager algorithm.
      *
-     * @param keyStore the location of the key store containing the certificate and keys
+     * @param keyStore      the location of the key store containing the certificate and keys
      * @param storePassword the password that opens the key store
-     * @param keyPassword the password for using the keys
-     *
+     * @param keyPassword   the password for using the keys
      * @see com.vtence.molecule.ssl.SecureProtocol
      * @see com.vtence.molecule.ssl.KeyStoreType
      */
@@ -106,9 +81,9 @@ public class WebServer {
      * Secures connections made to this WebServer using the provided security context. This allows to use
      * security settings that differ from platform defaults (such as using PKCS12 instead of JKS).
      *
+     * @param context the security context for securing connections
      * @see com.vtence.molecule.ssl.SecureProtocol
      * @see com.vtence.molecule.ssl.KeyStoreType
-     * @param context the security context for securing connections
      */
     public WebServer enableSSL(SSLContext context) {
         this.ssl = context;
@@ -139,7 +114,7 @@ public class WebServer {
      * Adds a middleware filter to this WebServer's stack of configured middlewares. The server will apply the
      * given filter to all requests with a path starting with the specified prefix.
      *
-     * @param path the path to trigger filtering
+     * @param path   the path to trigger filtering
      * @param filter the filter to apply to incoming requests that match the path prefix
      */
     public WebServer filter(String path, Middleware filter) {
@@ -152,7 +127,7 @@ public class WebServer {
      * filter to all requests matched by the specified matcher.
      *
      * @param requestMatcher the matcher to trigger filtering
-     * @param filter the filter to apply to incoming requests that are matched
+     * @param filter         the filter to apply to incoming requests that are matched
      */
     public WebServer filter(Matcher<? super Request> requestMatcher, Middleware filter) {
         stack.use(new FilterMap().map(requestMatcher, filter));
@@ -164,7 +139,7 @@ public class WebServer {
      * which target that path or any sub-path to the specified application.
      *
      * @param path the mount point
-     * @param app the application to attach to the mount point
+     * @param app  the application to attach to the mount point
      */
     public WebServer mount(String path, Application app) {
         stack.mount(path, app);
@@ -184,7 +159,7 @@ public class WebServer {
     /**
      * Boots and starts this WebServer using the previously configured middlewares and create a router
      * with the specified routes. The router will run at the root mount point.
-     *
+     * <p>
      * The server will start accepting and processing incoming requests.
      *
      * @param routes the routes to run at the root mount point (/)
@@ -196,7 +171,7 @@ public class WebServer {
     /**
      * Boots and starts this WebServer using the previously configured middlewares
      * and the specified application at the root the mount point.
-     *
+     * <p>
      * The server will start accepting and processing incoming requests.
      *
      * @param application the application to run at the root mount point (/)
