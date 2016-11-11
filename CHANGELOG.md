@@ -14,7 +14,7 @@ This is typically useful for boolean parameters. See `Request#hasParameter` ([#4
   See `Request#serverHost` and `Request#hostname` ([#55])
 - The server port and the request port, the latter taken from the host header. 
   See `Request#serverPort` and `Request#port` ([#56])
-- Access to request scheme. See `Request#scheme` ([#58])
+- The request scheme. See `Request#scheme` ([#58])
  
 ### Changed
 - Request input streams are now closed automatically at the end of the request cycle. This includes file uploads. ([#52])
