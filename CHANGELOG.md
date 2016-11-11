@@ -5,23 +5,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.11.0] - 
 
 ### Added
+- A basic authentication middleware with pluggable authentication providers. ([#28])
 - A server adapter for powering Molecule with [Undertow](http://undertow.io). Undertow is fast! ([#53])
-- A way to check for the presence of a given request parameter instead of checking its value against null.
-This is typically useful for boolean parameters. See `Request#hasParameter` ([#49])
-- A basic authentication middleware with pluggable authentication provider ([#28])
-- The request query string. See `Request#query` ([#54])
-- The server host name and the request host name, the latter taken from host header. 
-  See `Request#serverHost` and `Request#hostname` ([#55])
-- The server port and the request port, the latter taken from the host header. 
-  See `Request#serverPort` and `Request#port` ([#56])
-- The request scheme. See `Request#scheme` ([#58])
+- The possibility to check for the presence of a given request parameter. 
+This avoids checks against null for boolean parameters. See `Request#hasParameter`. ([#49])
+- The request query string. See `Request#query`. ([#54])
+- The server host name and the request host name, the latter taken from the _HOST_ header. 
+  See `Request#serverHost` and `Request#hostname`. ([#55])
+- The server port and the request port, the latter taken from the _HOST_ header. 
+  See `Request#serverPort` and `Request#port`. ([#56])
+- The request scheme. See `Request#scheme`. ([#58])
+- The reconstructed request URL. See `Request#url`. ([#57])
  
 ### Changed
 - Request input streams are now closed automatically at the end of the request cycle. This includes file uploads. ([#52])
  
 ### Fixed
 - The test HTTP client no longer loses the _Content-Type_ header when creating a fresh request from
- a prototype request ([#50])
+ a prototype request. ([#50])
 - ETag middleware now properly closes original body after computing ETag.
 
 ## [0.10] - 2016-06-28
@@ -84,6 +85,7 @@ Sessions are considered stale when they have been inactive for longer than the c
 [0.9]: https://github.com/testinfected/molecule/compare/v0.9...v0.8.2
 
 [#58]: https://github.com/testinfected/molecule/issues/58
+[#57]: https://github.com/testinfected/molecule/issues/57
 [#56]: https://github.com/testinfected/molecule/issues/56
 [#55]: https://github.com/testinfected/molecule/issues/55
 [#54]: https://github.com/testinfected/molecule/issues/54

@@ -46,4 +46,8 @@ public class Host {
     public int port(int defaultPort) {
         return port != -1 ? port : defaultPort;
     }
+
+    public String toString() {
+        return IPAddress.format(hostname) + (port != -1 ? ":" + port : "");
+    }
 }

@@ -11,6 +11,7 @@ import com.vtence.molecule.lib.EmptyInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -254,6 +255,20 @@ public class Request {
         }
 
         return port;
+    }
+
+    /**
+     * Reconstructs the URL the client used to make this request or reads the URI if it is absolute.
+     *
+     * @return the absolute URI or the reconstructed URL
+     */
+    public String url() {
+        if (URI.create(uri).isAbsolute()) {
+            return uri;
+        }
+
+        Host host = new Host(hostname(), port() == Scheme.of(this).defaultPort() ? -1 : port());
+        return scheme + "://" + host + uri;
     }
 
     /**

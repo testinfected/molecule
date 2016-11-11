@@ -206,6 +206,28 @@ public class RequestTest {
         assertThat("fallback port", request.port(), equalTo(5432));
     }
 
+    @Test
+    public void usesUriForUrlIfAbsolute() {
+        request.uri("http://www.example.com/over/there?name=ferret");
+
+        assertThat("absolute url", request.url(),
+                   equalTo("http://www.example.com/over/there?name=ferret"));
+    }
+
+    @Test
+    public void reconstructsOriginalUrlIfUriIsRelative() {
+        request.uri("/over/there?name=ferret");
+        request.scheme("http");
+
+        request.header(HOST, "www.example.com");
+        assertThat("using default port", request.url(),
+                   equalTo("http://www.example.com/over/there?name=ferret"));
+
+        request.header(HOST, "www.example.com:8080");
+        assertThat("using custom port", request.url(),
+                   equalTo("http://www.example.com:8080/over/there?name=ferret"));
+    }
+
     private Matcher<Iterable<?>> containsKeys(Object... keys) {
         return Matchers.containsInAnyOrder(keys);
     }

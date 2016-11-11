@@ -214,6 +214,7 @@ Any middleware can modify the content of the request during processing before pa
 
 ```java
 request.uri();                          // the uri, e.g. /foo?bar
+request.url();                          // the full url, e.g. http://www.example.com/foo?bar
 request.path();                         // the path info, e.g. /foo
 request.query();                        // the query string, e.g. bar
 request.serverHost();                   // the server name or ip
