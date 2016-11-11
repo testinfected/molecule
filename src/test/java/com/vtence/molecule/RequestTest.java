@@ -180,6 +180,32 @@ public class RequestTest {
         assertThat("hostname", request.hostname(), equalTo("www.example.com"));
     }
 
+    @Test
+    public void readsPortFromHostHeader() {
+        request.serverPort(5432);
+        request.header(HOST, "www.example.com:8080");
+
+        assertThat("port", request.port(), equalTo(8080));
+    }
+
+    @Test
+    public void knowsSchemeDefaultPort() {
+        request.header(HOST, "www.example.com");
+
+        request.scheme("http");
+        assertThat("http port", request.port(), equalTo(80));
+
+        request.scheme("https");
+        assertThat("https port", request.port(), equalTo(443));
+    }
+
+    @Test
+    public void usesServerPortAsFallback() {
+        request.serverPort(5432);
+
+        assertThat("fallback port", request.port(), equalTo(5432));
+    }
+
     private Matcher<Iterable<?>> containsKeys(Object... keys) {
         return Matchers.containsInAnyOrder(keys);
     }

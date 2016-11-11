@@ -148,7 +148,7 @@ public abstract class ServerCompatibilityTests {
             info.put("query", request.query());
             info.put("scheme", request.scheme());
             info.put("server-host", request.serverHost());
-            info.put("port", valueOf(request.port()));
+            info.put("server-port", valueOf(request.serverPort()));
             info.put("remote-ip", request.remoteIp());
             info.put("remote-host", request.remoteHost());
             info.put("remote-port", valueOf(request.remotePort()));
@@ -168,7 +168,7 @@ public abstract class ServerCompatibilityTests {
                 hasEntry("query", "name=ferret"),
                 hasEntry("scheme", "http"),
                 hasEntry("server-host", "localhost"),
-                hasEntry("port", "9999"),
+                hasEntry("server-port", "9999"),
                 hasEntry("remote-ip", "127.0.0.1"),
                 hasEntry("remote-host", "localhost"),
                 hasEntry(equalTo("remote-port"), not(equalTo("0"))),

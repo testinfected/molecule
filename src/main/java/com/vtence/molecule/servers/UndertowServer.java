@@ -122,6 +122,7 @@ public class UndertowServer implements Server {
 
         private void setRequestInfo(Request request, HttpServerExchange exchange) {
             request.serverHost(host);
+            request.serverPort(port);
             request.uri(exchange.getRequestURI() + queryComponent(exchange));
             request.path(exchange.getRequestPath());
             request.query(exchange.getQueryString());
@@ -130,7 +131,6 @@ public class UndertowServer implements Server {
             request.remoteHost(exchange.getSourceAddress().getHostName());
             request.timestamp(exchange.getRequestStartTime());
             request.scheme(exchange.getRequestScheme());
-            request.port(exchange.getHostPort());
             request.protocol(exchange.getProtocol().toString());
             request.secure(exchange.getConnection().getSslSessionInfo() != null);
             request.method(exchange.getRequestMethod().toString());

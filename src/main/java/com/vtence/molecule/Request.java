@@ -5,6 +5,7 @@ import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.Host;
 import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.http.Scheme;
 import com.vtence.molecule.lib.EmptyInputStream;
 
 import java.io.ByteArrayInputStream;
@@ -42,8 +43,8 @@ public class Request {
     private String path;
     private String query;
     private String scheme;
-    private String host;
-    private int port;
+    private String serverHost;
+    private int serverPort;
     private String remoteHost;
     private String remoteIp;
     private int remotePort;
@@ -117,7 +118,7 @@ public class Request {
      * @return the server host or ip
      */
     public String serverHost() {
-        return host;
+        return serverHost;
     }
 
     /**
@@ -126,7 +127,26 @@ public class Request {
      * @return the new server name or ip
      */
     public Request serverHost(String host) {
-        this.host = host;
+        this.serverHost = host;
+        return this;
+    }
+
+    /**
+     * Gets the port of the server.
+     *
+     * @return the server port
+     */
+    public int serverPort() {
+        return serverPort;
+    }
+
+    /**
+     * Changes the port of the server.
+     *
+     * @return the new server port
+     */
+    public Request serverPort(int port) {
+        this.serverPort = port;
         return this;
     }
 
@@ -213,7 +233,7 @@ public class Request {
      * @return the server host name
      */
     public String hostname() {
-        return hasHeader(HOST) ? Host.parseName(header(HOST)) : host;
+        return hasHeader(HOST) ? Host.parseName(header(HOST)) : serverHost;
     }
 
     /**
@@ -223,17 +243,17 @@ public class Request {
      * @return the server port
      */
     public int port() {
-        return port;
-    }
+        int port = hasHeader(HOST) ? Host.parsePort(header(HOST)) : serverPort;
 
-    /**
-     * Changes the server port of this request.
-     *
-     * @return the new port number
-     */
-    public Request port(int port) {
-        this.port = port;
-        return this;
+        if (port == -1) {
+            port = Scheme.of(this).defaultPort();
+        }
+
+        if (port == -1) {
+            port = serverPort;
+        }
+
+        return port;
     }
 
     /**

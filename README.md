@@ -216,11 +216,13 @@ Any middleware can modify the content of the request during processing before pa
 request.uri();                          // the uri, e.g. /path?query
 request.path();                         // the path info, e.g. /foo
 request.serverHost();                   // the server name or ip
+request.serverPort();                   // the server port
 request.remoteIp();                     // ip of the client
 request.remoteHost();                   // hostname of the client
 request.remotePort();                   // port of the client
 request.protocol();                     // protocol, e.g. HTTP or HTTPS
 request.hostname();                     // the hostname part of the HOST header
+request.port();                         // the port part of the HOST header
 request.timestamp();                    // time the request came in
 request.secure();                       // whether the request was made over a secure connection
 request.method();                       // HTTP method (e.g.  GET, POST, PUT, etc.)

@@ -7,8 +7,6 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.http.HeaderNames;
-import com.vtence.molecule.http.Host;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerSocketProcessor;
@@ -106,6 +104,7 @@ public class SimpleServer implements Server {
 
         private void readInfo(Request request, org.simpleframework.http.Request httpRequest) {
             request.serverHost(host);
+            request.serverPort(port);
             request.uri(httpRequest.getTarget());
             request.path(httpRequest.getPath().getPath());
             request.query(httpRequest.getQuery().toString());
@@ -114,7 +113,6 @@ public class SimpleServer implements Server {
             request.remoteHost(httpRequest.getClientAddress().getHostName());
             request.timestamp(httpRequest.getRequestTime());
             request.scheme(schemeOf(httpRequest));
-            readHostAndPort(request, httpRequest);
             request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
             request.secure(httpRequest.isSecure());
             request.method(httpRequest.getMethod());
@@ -125,26 +123,6 @@ public class SimpleServer implements Server {
             String scheme = httpRequest.getAddress().getScheme();
             if (scheme != null) return scheme;
             return httpRequest.isSecure() ? "https" : "http";
-        }
-
-        private void readHostAndPort(Request request, org.simpleframework.http.Request httpRequest) {
-            String hostHeader = httpRequest.getValue(HeaderNames.HOST);
-
-            if (hostHeader == null) {
-                request.port(port);
-                return;
-            }
-
-            Host host = Host.parse(hostHeader);
-            request.port(host.port(defaultPortFor(request)));
-        }
-
-        private int defaultPortFor(Request request) {
-            // Yes, we assume the scheme has been set
-            String scheme = request.scheme();
-            if (scheme.equals("http")) return 80;
-            if (scheme.equals("https")) return 443;
-            return port;
         }
 
         private void readHeaders(Request request, org.simpleframework.http.Request httpRequest) {

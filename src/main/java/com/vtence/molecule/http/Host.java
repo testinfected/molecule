@@ -26,15 +26,15 @@ public class Host {
         return colonIndex != -1 ? header.substring(0, colonIndex) : header;
     }
 
-    public static Integer parsePort(String header) {
+    public static int parsePort(String header) {
         int colonIndex = header.startsWith("[") ?
                 header.indexOf(':', header.indexOf(']')) :
                 header.indexOf(':');
 
-        return colonIndex != -1 ? Integer.parseInt(header.substring(colonIndex + 1)) : null;
+        return colonIndex != -1 ? Integer.parseInt(header.substring(colonIndex + 1)) : -1;
     }
 
-    public Host(String hostname, Integer port) {
+    public Host(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
     }
@@ -44,6 +44,6 @@ public class Host {
     }
 
     public int port(int defaultPort) {
-        return port != null ? port : defaultPort;
+        return port != -1 ? port : defaultPort;
     }
 }
