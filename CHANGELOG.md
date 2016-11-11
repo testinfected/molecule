@@ -9,8 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - A way to check for the presence of a given request parameter instead of checking its value against null.
 This is typically useful for boolean parameters. See `Request#hasParameter` ([#49])
 - A basic authentication middleware with pluggable authentication provider ([#28])
-- Access to request query string. See `Request#query` ([#54])
-- Access to server host name as specified in the host header. See `Request#hostname` ([#55])
+- The request query string. See `Request#query` ([#54])
+- The server host name and the request host name. See `Request#hostname` and `Request#serverHost` ([#55])
 - Access to server port as specified in the host header. See `Request#port` ([#56])
 - Access to request scheme. See `Request#scheme` ([#58])
  

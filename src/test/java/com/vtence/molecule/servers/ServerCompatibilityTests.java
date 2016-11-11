@@ -42,14 +42,14 @@ public abstract class ServerCompatibilityTests {
 
     Server server;
     ResourceLocator resources = ResourceLocator.onClasspath();
-    HttpRequest request = new HttpRequest("localhost", port);
+    HttpRequest request = new HttpRequest(port);
     HttpResponse response;
 
     Throwable error;
 
     @Before public void
     configureServer() {
-        server = createServer("127.0.0.1", port);
+        server = createServer("localhost", port);
         server.reportErrorsTo(error -> ServerCompatibilityTests.this.error = error);
     }
 
@@ -62,7 +62,7 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     knowsItsHost() throws IOException {
-        assertThat("host", server.host(), equalTo("127.0.0.1"));
+        assertThat("host", server.host(), equalTo("localhost"));
     }
 
     @Test public void
@@ -147,7 +147,7 @@ public abstract class ServerCompatibilityTests {
             info.put("path", request.path());
             info.put("query", request.query());
             info.put("scheme", request.scheme());
-            info.put("hostname", request.hostname());
+            info.put("server-host", request.serverHost());
             info.put("port", valueOf(request.port()));
             info.put("remote-ip", request.remoteIp());
             info.put("remote-host", request.remoteHost());
@@ -161,12 +161,13 @@ public abstract class ServerCompatibilityTests {
         request.get("/over/there?name=ferret");
         assertNoError();
 
+
         assertThat("request information", info, allOf(
                 hasEntry("uri", "/over/there?name=ferret"),
                 hasEntry("path", "/over/there"),
                 hasEntry("query", "name=ferret"),
                 hasEntry("scheme", "http"),
-                hasEntry("hostname", "localhost"),
+                hasEntry("server-host", "localhost"),
                 hasEntry("port", "9999"),
                 hasEntry("remote-ip", "127.0.0.1"),
                 hasEntry("remote-host", "localhost"),

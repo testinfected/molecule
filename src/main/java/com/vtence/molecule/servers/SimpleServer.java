@@ -105,6 +105,7 @@ public class SimpleServer implements Server {
         }
 
         private void readInfo(Request request, org.simpleframework.http.Request httpRequest) {
+            request.serverHost(host);
             request.uri(httpRequest.getTarget());
             request.path(httpRequest.getPath().getPath());
             request.query(httpRequest.getQuery().toString());
@@ -130,13 +131,11 @@ public class SimpleServer implements Server {
             String hostHeader = httpRequest.getValue(HeaderNames.HOST);
 
             if (hostHeader == null) {
-                request.hostname(host);
                 request.port(port);
                 return;
             }
 
             Host host = Host.parse(hostHeader);
-            request.hostname(host.name());
             request.port(host.port(defaultPortFor(request)));
         }
 

@@ -3,6 +3,7 @@ package com.vtence.molecule;
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
+import com.vtence.molecule.http.Host;
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.lib.EmptyInputStream;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
+import static com.vtence.molecule.http.HeaderNames.HOST;
 import static java.lang.Long.parseLong;
 
 /**
@@ -50,8 +52,6 @@ public class Request {
     private HttpMethod method;
     private boolean secure;
     private long timestamp;
-
-    public Request() {}
 
     /**
      * Reads the URI of this request. It can be a relative URI or the full URL if the client included
@@ -108,6 +108,25 @@ public class Request {
      */
     public Request query(String query) {
         this.query = query;
+        return this;
+    }
+
+    /**
+     * Gets the hostname of the server. It might be the server name or server address.
+     *
+     * @return the server host or ip
+     */
+    public String serverHost() {
+        return host;
+    }
+
+    /**
+     * Changes the hostname of the server.
+     *
+     * @return the new server name or ip
+     */
+    public Request serverHost(String host) {
+        this.host = host;
         return this;
     }
 
@@ -194,17 +213,7 @@ public class Request {
      * @return the server host name
      */
     public String hostname() {
-        return host;
-    }
-
-    /**
-     * Changes the host name of this request.
-     *
-     * @return the new host name
-     */
-    public Request hostname(String name) {
-        this.host = name;
-        return this;
+        return hasHeader(HOST) ? Host.parseName(header(HOST)) : host;
     }
 
     /**

@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
+import static com.vtence.molecule.http.HeaderNames.HOST;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -162,6 +163,21 @@ public class RequestTest {
         request.removePart("b");
 
         assertThat("body parts", request.parts(), contains(partWithName("a"), partWithName("c")));
+    }
+
+    @Test
+    public void readsHostnameFromHostHeader() {
+        request.serverHost("127.0.0.1");
+        request.header(HOST, "www.example.com");
+
+        assertThat("hostname", request.hostname(), equalTo("www.example.com"));
+    }
+
+    @Test
+    public void fallbacksToServerHostIfHostHeaderMissing() {
+        request.serverHost("www.example.com");
+
+        assertThat("hostname", request.hostname(), equalTo("www.example.com"));
     }
 
     private Matcher<Iterable<?>> containsKeys(Object... keys) {

@@ -14,10 +14,10 @@ public class Host {
     }
 
     public static Host parse(String header) {
-        return new Host(parseHostName(header), parsePort(header));
+        return new Host(parseName(header), parsePort(header));
     }
 
-    private static String parseHostName(String header) {
+    public static String parseName(String header) {
         if (header.startsWith("[")) {
             return header.substring(1, header.indexOf(']'));
         }
@@ -26,7 +26,7 @@ public class Host {
         return colonIndex != -1 ? header.substring(0, colonIndex) : header;
     }
 
-    private static Integer parsePort(String header) {
+    public static Integer parsePort(String header) {
         int colonIndex = header.startsWith("[") ?
                 header.indexOf(':', header.indexOf(']')) :
                 header.indexOf(':');
