@@ -2,7 +2,7 @@ package com.vtence.molecule.testing;
 
 import com.vtence.molecule.http.Cookie;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -23,12 +23,12 @@ public class CookieAssert {
     }
 
     public CookieAssert hasValue(Matcher<? super String> matching) {
-        Assert.assertThat("cookie '" + cookie.name() + "' value", cookie.value(), matching);
+        MatcherAssert.assertThat("cookie '" + cookie.name() + "' value", cookie.value(), matching);
         return this;
     }
 
     public CookieAssert isHttpOnly() {
-        Assert.assertTrue("cookie '" + cookie.name() + "' is not http only", cookie.httpOnly());
+        MatcherAssert.assertThat("cookie '" + cookie.name() + "' is not http only", cookie.httpOnly());
         return this;
     }
 
@@ -37,7 +37,7 @@ public class CookieAssert {
     }
 
     public CookieAssert hasMaxAge(Matcher<? super Integer> matching) {
-        Assert.assertThat("cookie '" + cookie.name() + "' max age", cookie.maxAge(), matching);
+        MatcherAssert.assertThat("cookie '" + cookie.name() + "' max age", cookie.maxAge(), matching);
         return this;
     }
 }

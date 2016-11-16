@@ -2,7 +2,7 @@ package com.vtence.molecule.testing;
 
 import com.vtence.molecule.Request;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -28,7 +28,7 @@ public class RequestAssert {
     }
 
     public RequestAssert hasAttribute(Object key, Matcher<Object> matching) {
-        Assert.assertThat("request attribute '" + key.toString() + "'", request.attribute(key), matching);
+        MatcherAssert.assertThat("request attribute '" + key.toString() + "'", request.attribute(key), matching);
         return this;
     }
 }

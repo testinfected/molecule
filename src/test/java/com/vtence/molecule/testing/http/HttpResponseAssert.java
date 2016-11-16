@@ -1,7 +1,7 @@
 package com.vtence.molecule.testing.http;
 
 import org.hamcrest.Matcher;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 
 import java.net.HttpCookie;
 import java.util.List;
@@ -34,7 +34,7 @@ public class HttpResponseAssert {
     }
 
     private HttpResponseAssert hasStatusCode(Matcher<? super Integer> matching) {
-        Assert.assertThat("response status code", response.statusCode(), matching);
+        MatcherAssert.assertThat("response status code", response.statusCode(), matching);
         return this;
     }
 
@@ -43,7 +43,7 @@ public class HttpResponseAssert {
     }
 
     public HttpResponseAssert hasStatusMessage(Matcher<? super String> matching) {
-        Assert.assertThat("response status message", response.statusMessage(), matching);
+        MatcherAssert.assertThat("response status message", response.statusMessage(), matching);
         return this;
     }
 
@@ -60,12 +60,12 @@ public class HttpResponseAssert {
     }
 
     public HttpResponseAssert hasHeader(String name, Matcher<? super String> matching) {
-        Assert.assertThat("response '" + name + "' header", response.header(name), matching);
+        MatcherAssert.assertThat("response '" + name + "' header", response.header(name), matching);
         return this;
     }
 
     public HttpResponseAssert hasHeaders(String name, Matcher<? super List<String>> matching) {
-        Assert.assertThat("response '" + name + "' headers", response.headers(name), matching);
+        MatcherAssert.assertThat("response '" + name + "' headers", response.headers(name), matching);
         return this;
     }
 
@@ -82,7 +82,7 @@ public class HttpResponseAssert {
     }
 
     public HttpResponseAssert hasBodyText(Matcher<? super String> matching) {
-        Assert.assertThat("response body text", response.bodyText(), matching);
+        MatcherAssert.assertThat("response body text", response.bodyText(), matching);
         return this;
     }
 
@@ -95,7 +95,7 @@ public class HttpResponseAssert {
     }
 
     public HttpResponseAssert hasBodySize(Matcher<? super Integer> matching) {
-        Assert.assertThat("response body size", response.body().length, matching);
+        MatcherAssert.assertThat("response body size", response.body().length, matching);
         return this;
     }
 
@@ -104,19 +104,19 @@ public class HttpResponseAssert {
     }
 
     public HttpResponseAssert hasContentEncodedAs(Matcher<? super String> matching) {
-        Assert.assertThat("response content encoding", detectCharsetOf(response.body()), matching);
+        MatcherAssert.assertThat("response content encoding", detectCharsetOf(response.body()), matching);
         return this;
     }
 
     public HttpCookieAssert hasCookie(String named) {
         HttpCookie cookie = response.cookie(named);
-        Assert.assertTrue("response contains no cookie named '" + named + "'", cookie != null);
+        MatcherAssert.assertThat("response contains no cookie named '" + named + "'", cookie != null);
         return HttpCookieAssert.assertThat(cookie);
     }
 
     public HttpResponseAssert hasNoCookie(String named) {
         HttpCookie cookie = response.cookie(named);
-        Assert.assertTrue("response contains unexpected cookie '" + named + "'", cookie == null);
+        MatcherAssert.assertThat("response contains unexpected cookie '" + named + "'", cookie == null);
         return this;
     }
 

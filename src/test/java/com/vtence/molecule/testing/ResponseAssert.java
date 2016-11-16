@@ -3,10 +3,13 @@ package com.vtence.molecule.testing;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HeaderNames;
 import com.vtence.molecule.http.HttpStatus;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.IsEqual;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.testing.CharsetDetector.detectCharsetOf;
@@ -33,7 +36,7 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasStatusCode(Matcher<? super Integer> matching) {
-        Assert.assertThat("response status code", response.statusCode(), matching);
+        MatcherAssert.assertThat("response status code", response.statusCode(), matching);
         return this;
     }
 
@@ -43,7 +46,7 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasStatusText(Matcher<? super String> matching) {
-        Assert.assertThat("response status text", response.statusText(), matching);
+        MatcherAssert.assertThat("response status text", response.statusText(), matching);
         return this;
     }
 
@@ -74,12 +77,12 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasHeader(String name, Matcher<? super String> matchingValue) {
-        Assert.assertThat("response '" + name + "' header", response.header(name), matchingValue);
+        MatcherAssert.assertThat("response '" + name + "' header", response.header(name), matchingValue);
         return this;
     }
 
     public ResponseAssert hasHeaders(String name, Matcher<Iterable<? extends String>> matchingValues) {
-        Assert.assertThat("response '" + name + "' headers", response.headers(name), matchingValues);
+        MatcherAssert.assertThat("response '" + name + "' headers", response.headers(name), matchingValues);
         return this;
     }
 
@@ -103,12 +106,22 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasBodyText(Matcher<? super String> matching) {
-        Assert.assertThat("response body text", BodyContent.asText(response), matching);
+        MatcherAssert.assertThat("response body text", BodyContent.asText(response), matching);
         return this;
     }
 
     public ResponseAssert hasBodyContent(byte[] content) {
-        Assert.assertArrayEquals("response body content", content, BodyContent.asBytes(response));
+        byte[] actual = BodyContent.asBytes(response);
+        // Yep, I know, but it's good enough
+        MatcherAssert.assertThat("response body byte stream", actual, new IsEqual<byte[]>(content) {
+            public void describeTo(Description description) {
+                description.appendValue(Arrays.toString(content));
+            }
+
+            public void describeMismatch(Object item, Description description) {
+                description.appendText("was ").appendValue(Arrays.toString((byte[]) item));
+            }
+        });
         return this;
     }
 
@@ -121,7 +134,7 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasSize(Matcher<? super Long> matching) {
-        Assert.assertThat("response size", response.size(), matching);
+        MatcherAssert.assertThat("response size", response.size(), matching);
         return this;
     }
 
@@ -134,12 +147,12 @@ public class ResponseAssert {
     }
 
     public ResponseAssert hasBodyEncoding(Matcher<? super String> matching) {
-        Assert.assertThat("response body encoding", detectCharsetOf(BodyContent.asBytes(response)), matching);
+        MatcherAssert.assertThat("response body encoding", detectCharsetOf(BodyContent.asBytes(response)), matching);
         return this;
     }
 
     public ResponseAssert isDone() {
-        Assert.assertThat("response completed", response.isDone(), is(true));
+        MatcherAssert.assertThat("response completed", response.isDone(), is(true));
         return this;
     }
 }

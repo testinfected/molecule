@@ -1,8 +1,8 @@
 package com.vtence.molecule.testing.http;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 
 import java.net.HttpCookie;
 
@@ -24,12 +24,12 @@ public class HttpCookieAssert {
     }
 
     public HttpCookieAssert hasValue(Matcher<String> matching) {
-        Assert.assertThat(message("value"), cookie.getValue(), matching);
+        MatcherAssert.assertThat(message("value"), cookie.getValue(), matching);
         return this;
     }
 
     private HttpCookieAssert hasPath(Matcher<? super String> matching) {
-        Assert.assertThat(message("path"), cookie.getPath(), matching);
+        MatcherAssert.assertThat(message("path"), cookie.getPath(), matching);
         return this;
     }
 
@@ -42,7 +42,7 @@ public class HttpCookieAssert {
     }
 
     private HttpCookieAssert hasDomain(Matcher<? super String> matching) {
-        Assert.assertThat(message("domain"), cookie.getDomain(), matching);
+        MatcherAssert.assertThat(message("domain"), cookie.getDomain(), matching);
         return this;
     }
 
@@ -51,17 +51,17 @@ public class HttpCookieAssert {
     }
 
     public HttpCookieAssert hasMaxAge(Matcher<? super Long> matching) {
-        Assert.assertThat(message("max age"), cookie.getMaxAge(), matching);
+        MatcherAssert.assertThat(message("max age"), cookie.getMaxAge(), matching);
         return this;
     }
 
     public HttpCookieAssert isSecure() {
-        Assert.assertTrue(message("is not secure"), cookie.getSecure());
+        MatcherAssert.assertThat(message("is not secure"), cookie.getSecure());
         return this;
     }
 
     public HttpCookieAssert isHttpOnly() {
-        Assert.assertTrue(message("is not http only"), cookie.isHttpOnly());
+        MatcherAssert.assertThat(message("is not http only"), cookie.isHttpOnly());
         return this;
     }
 
