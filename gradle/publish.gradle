@@ -38,7 +38,3 @@ modifyPom {
     dependencies.removeAll { it.scope == "test" }
   }
 }
-
-nexus {
-  attachTests = true
-}

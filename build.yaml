@@ -14,10 +14,12 @@ artifacts:
   jboss_logging: org.jboss.logging:jboss-logging:jar:3.2.1.Final
   mustache: com.samskivert:jmustache:jar:1.9
 
+  # -- testing dependencies
+  hamcrest: org.hamcrest:java-hamcrest:jar:2.0.0.0
+  juniversalchardet: com.googlecode.juniversalchardet:juniversalchardet:jar:1.0.3
+
   # -- test dependencies
   jmock: org.jmock:jmock:jar:2.6.0
-  hamcrest: org.hamcrest:java-hamcrest:jar:2.0.0.0
   hamcrest_junit: org.hamcrest:hamcrest-junit:jar:2.0.0.0
-  juniversalchardet: com.googlecode.juniversalchardet:juniversalchardet:jar:1.0.3
 
 jmock: 2.6.0

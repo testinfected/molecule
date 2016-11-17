@@ -14,13 +14,12 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   compile.options.source = '1.8'
   compile.options.target = '1.8'
 
-  compile.with SIMPLE, UNDERTOW, :mustache
-  test.with :hamcrest, :hamcrest_junit, :jmock, :juniversalchardet
+  compile.with SIMPLE, UNDERTOW, :mustache, :hamcrest, :juniversalchardet
+  test.with :hamcrest_junit, :jmock
 
   package :jar
   package :javadoc
   package :sources
-  package(:test_jar).clean.path('com/vtence/molecule').include(_('target/test/classes/**/testing'))
 
   pom.name = 'Molecule'
   pom.description = 'A web micro-framework for Java'
@@ -28,5 +27,5 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   pom.add_github_project('testinfected/molecule')
   pom.scm_developer_connection = 'scm:hg:git+ssh://git@github.com:testinfected/molecule.git'
   pom.add_developer('testinfected', 'Vincent Tence', 'vtence@gmail.com', ['Developer'])
-  pom.optional_dependencies.concat [SIMPLE, UNDERTOW, :mustache].flatten
+  pom.optional_dependencies.concat [SIMPLE, UNDERTOW, :mustache, :hamcrest, :juniversalchardet].flatten
 end

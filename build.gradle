@@ -29,8 +29,8 @@ def libs = [
         simple            : 'org.simpleframework:simple-http:6.0.1',
         undertow          : 'io.undertow:undertow-core:1.4.4.Final',
         jmustache         : 'com.samskivert:jmustache:1.9',
-        hamcrest          : ['org.hamcrest:java-hamcrest:2.0.0.0',
-                             'org.hamcrest:hamcrest-junit:2.0.0.0'],
+        hamcrest          : 'org.hamcrest:java-hamcrest:2.0.0.0',
+        hamcrest_junit    : 'org.hamcrest:hamcrest-junit:2.0.0.0',
         junit             : 'junit:junit:4.11@jar',
         jmock             : 'org.jmock:jmock:2.6.0@jar',
         jmock_junit4      : 'org.jmock:jmock-junit4:2.6.0@jar',
@@ -46,7 +46,11 @@ dependencies {
   compile libs.undertow, optional
   compile libs.jmustache, optional
 
-  testCompile libs.hamcrest
+  // For the testing package
+  compile libs.hamcrest, optional
+  compile libs.juniversal_chardet, optional
+
+  testCompile libs.hamcrest_junit
   testCompile libs.junit
   testCompile libs.jmock
   testCompile libs.jmock_junit4
@@ -63,6 +67,13 @@ jacocoTestReport {
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
+    }
+
+    // Exclude testing package from the report
+    afterEvaluate {
+        classDirectories =  files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: '**/testing/**')
+        })
     }
 }
 
