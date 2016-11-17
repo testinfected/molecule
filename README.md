@@ -583,25 +583,25 @@ for more details.
 
 Molecule provides fluent assertion helpers for unit testing your application endpoints and middlewares.
  It also provides a test HTTP client for integration testing your server.
-
-Add the testing jar to your dependencies to benefit from the test HTTP client and fluent assertion helpers:
-
-```xml
-<dependency>
-      <groupId>com.vtence.molecule</groupId>
-      <artifactId>molecule-tests</artifactId>
-      <version>0.10</version>
-      <scope>test</scope>
-</dependency>
-```
-
-You will also need to add [Hamcrest](http://hamcrest.org/JavaHamcrest/) to your list of dependencies:
+ 
+The test helpers are located in the `com.vtence.molecule.testing` package. To use them, you need to include [Hamcrest](http://hamcrest.org/JavaHamcrest/) to your list of dependencies:
 
 ```xml
 <dependency>
     <groupId>org.hamcrest</groupId>
     <artifactId>java-hamcrest</artifactId>
     <version>2.0.0.0</version>
+    <scope>test</scope>
+</dependency>
+```
+
+If you want to use charset detection, you will also need [JUniversalChardet](https://github.com/thkoch2001/juniversalchardet): 
+
+```xml
+<dependency>
+    <groupId>com.googlecode.juniversalchardet</groupId>
+    <artifactId>juniversalchardet</artifactId>
+    <version>1.0.3</version>
     <scope>test</scope>
 </dependency>
 ```

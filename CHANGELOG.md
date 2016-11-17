@@ -18,6 +18,8 @@ This avoids checks against null for boolean parameters. See `Request#hasParamete
 - The reconstructed request URL. See `Request#url`. ([#57])
  
 ### Changed
+- The `testing` package, which contains helpers for testing applications built with Molecule, is now included in the main jar. 
+The test jar is no longer distributed. ([#51])
 - Request input streams are now closed automatically at the end of the request cycle. This includes file uploads. ([#52])
  
 ### Fixed
@@ -91,6 +93,7 @@ Sessions are considered stale when they have been inactive for longer than the c
 [#54]: https://github.com/testinfected/molecule/issues/54
 [#53]: https://github.com/testinfected/molecule/issues/53
 [#52]: https://github.com/testinfected/molecule/issues/52
+[#51]: https://github.com/testinfected/molecule/issues/51
 [#50]: https://github.com/testinfected/molecule/issues/50
 [#49]: https://github.com/testinfected/molecule/issues/49
 [#48]: https://github.com/testinfected/molecule/issues/48
