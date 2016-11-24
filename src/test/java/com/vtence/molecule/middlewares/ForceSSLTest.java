@@ -52,6 +52,7 @@ public class ForceSSLTest {
     public void redirectsPermanentlyOnGetAndHead() throws Exception {
         for (HttpMethod method: asList(HEAD, GET)) {
             request.method(method);
+
             assertIsRedirectPermanently(request);
         }
     }
@@ -62,7 +63,15 @@ public class ForceSSLTest {
             request.method(method);
 
             assertIsRedirectedTemporary(request);
-        };
+        }
+    }
+
+    @Test
+    public void doesNotRedirectProxiedHttps() throws Exception {
+        ssl.redirectOn("X-Forwarded-Proto");
+
+        assertIsNotRedirected(request.header("X-Forwarded-Proto", "https"));
+        assertIsRedirectedTemporary(request.header("X-Forwarded-Proto", "http"));
     }
 
     private void assertIsNotRedirected(Request request) throws Exception {

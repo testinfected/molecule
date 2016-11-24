@@ -11,18 +11,31 @@ import static com.vtence.molecule.http.HttpStatus.TEMPORARY_REDIRECT;
 
 public class ForceSSL extends AbstractMiddleware {
     private String customHost;
+    private String redirectOn;
 
     public ForceSSL redirectTo(String host) {
         this.customHost = host;
         return this;
     }
 
+    public void redirectOn(String header) {
+        redirectOn = header;
+    }
+
     public void handle(Request request, Response response) throws Exception {
-        if (!request.secure()) {
+        if (!secure(request)) {
             redirectToHttps(request, response);
         } else {
             forward(request, response);
         }
+    }
+
+    private boolean secure(Request request) {
+        return request.secure() || isProxiedHttps(request);
+    }
+
+    private boolean isProxiedHttps(Request request) {
+        return redirectOn != null && "https".equalsIgnoreCase(request.header(redirectOn));
     }
 
     private void redirectToHttps(Request request, Response response) {
