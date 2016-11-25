@@ -39,6 +39,8 @@ public class SSLExample {
 
         // We enable TLS with our key store password and key password
         server.enableSSL(keyStore, keyStorePassword, keyPassword)
+              // Add HSTS security headers
+              .add(new ForceSSL())
               // We a render a simple text to let our user know she is on a secure channel
               .start((request, response) -> response.done("You are on a secure channel"));
     }

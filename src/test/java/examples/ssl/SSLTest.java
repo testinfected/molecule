@@ -38,7 +38,9 @@ public class SSLTest {
     @Test
     public void connectingSecurely() throws IOException {
         response = sslRequest.get("/");
-        assertThat(response).hasBodyText("You are on a secure channel");
+
+        assertThat(response).hasBodyText("You are on a secure channel")
+                            .hasHeader("Strict-Transport-Security", "max-age=31536000");
     }
 
     @Test

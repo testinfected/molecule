@@ -62,4 +62,6 @@ public interface HeaderNames {
 
     String SET_COOKIE = "Set-Cookie";
     String COOKIE = "Cookie";
+
+    String STRICT_TRANSPORT_SECURITY = "Strict-Transport-Security";
 }

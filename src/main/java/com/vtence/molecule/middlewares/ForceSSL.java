@@ -4,14 +4,35 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpStatus;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.vtence.molecule.http.HeaderNames.STRICT_TRANSPORT_SECURITY;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpStatus.MOVED_PERMANENTLY;
 import static com.vtence.molecule.http.HttpStatus.TEMPORARY_REDIRECT;
 
 public class ForceSSL extends AbstractMiddleware {
+
+    // Default HSTS settings
+    private boolean hsts = true;
+    private long hstsExpiry = TimeUnit.DAYS.toSeconds(365);
+    private boolean subdomains;
+
     private String customHost;
     private String redirectOn;
+
+    public void hsts(boolean enabled) {
+        hsts = enabled;
+    }
+
+    public void expires(long delayInSeconds) {
+        hstsExpiry = delayInSeconds;
+    }
+
+    public void includesSubdomains(boolean included) {
+        subdomains = included;
+    }
 
     public ForceSSL redirectTo(String host) {
         this.customHost = host;
@@ -26,8 +47,19 @@ public class ForceSSL extends AbstractMiddleware {
         if (!secure(request)) {
             redirectToHttps(request, response);
         } else {
-            forward(request, response);
+            forward(request, response).whenSuccessful(this::addHSTSHeader);
         }
+    }
+
+    private void addHSTSHeader(Response response) {
+        if (response.hasHeader(STRICT_TRANSPORT_SECURITY)) return;
+
+        if (!hsts) {
+            hstsExpiry = 0;
+        }
+
+        String security = "max-age=" + hstsExpiry + (subdomains ? "; includeSubdomains" : "");
+        response.header(STRICT_TRANSPORT_SECURITY, security);
     }
 
     private boolean secure(Request request) {
