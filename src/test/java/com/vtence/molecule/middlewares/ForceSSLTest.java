@@ -112,6 +112,13 @@ public class ForceSSLTest {
         assertThat(response).hasHeader("Strict-Transport-Security", "provided");
     }
 
+    @Test
+    public void canBeDisabledForDevelopmentMode() throws Exception {
+        ssl.enable(false);
+
+        assertIsNotRedirected(request);
+    }
+
     private void assertIsNotRedirected(Request request) throws Exception {
         forceSSL(request);
 

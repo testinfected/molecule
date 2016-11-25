@@ -2,7 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.11.0] - 
+## [0.12.0] - 
+
+### Added
+- A middleware to force SSL connections. It does permanent redirects and adds the HSTS header. ([#36])
+
+## [0.11.0] - 2016-11-17
 
 ### Added
 - A basic authentication middleware with pluggable authentication providers. ([#28])
@@ -81,10 +86,11 @@ Sessions are considered stale when they have been inactive for longer than the c
 - `ApacheCommonLogger` now correctly logs request parameters as they were received, in case they are modified down the middleware chain
 
 
-[0.11.0]: https://github.com/testinfected/molecule/compare/v0.11.0...v0.10
-[0.10]: https://github.com/testinfected/molecule/compare/v0.10...v0.9.1
-[0.9.1]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.9
-[0.9]: https://github.com/testinfected/molecule/compare/v0.9...v0.8.2
+[0.12.0]: https://github.com/testinfected/molecule/compare/v0.11.0...master
+[0.11.0]: https://github.com/testinfected/molecule/compare/v0.10...v0.11.1
+[0.10]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.10
+[0.9.1]: https://github.com/testinfected/molecule/compare/v0.9...v0.9.1
+[0.9]: https://github.com/testinfected/molecule/compare/v0.8.2...v0.9
 
 [#58]: https://github.com/testinfected/molecule/issues/58
 [#57]: https://github.com/testinfected/molecule/issues/57
@@ -106,6 +112,7 @@ Sessions are considered stale when they have been inactive for longer than the c
 [#40]: https://github.com/testinfected/molecule/issues/40
 [#38]: https://github.com/testinfected/molecule/issues/38
 [#37]: https://github.com/testinfected/molecule/issues/37
+[#36]: https://github.com/testinfected/molecule/issues/36
 [#35]: https://github.com/testinfected/molecule/issues/35
 [#28]: https://github.com/testinfected/molecule/issues/28
 [#4]: https://github.com/testinfected/molecule/issues/4

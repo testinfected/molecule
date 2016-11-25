@@ -14,13 +14,27 @@ import static com.vtence.molecule.http.HttpStatus.TEMPORARY_REDIRECT;
 
 public class ForceSSL extends AbstractMiddleware {
 
+    private boolean enable;
+
     // Default HSTS settings
     private boolean hsts = true;
     private long hstsExpiry = TimeUnit.DAYS.toSeconds(365);
-    private boolean subdomains;
 
+    private boolean subdomains;
     private String customHost;
     private String redirectOn;
+
+    public ForceSSL() {
+        this(true);
+    }
+
+    public ForceSSL(boolean enabled) {
+        this.enable = enabled;
+    }
+
+    public void enable(boolean enabled) {
+        enable = enabled;
+    }
 
     public void hsts(boolean enabled) {
         hsts = enabled;
@@ -44,7 +58,7 @@ public class ForceSSL extends AbstractMiddleware {
     }
 
     public void handle(Request request, Response response) throws Exception {
-        if (!secure(request)) {
+        if (enable && !secure(request)) {
             redirectToHttps(request, response);
         } else {
             forward(request, response).whenSuccessful(this::addHSTSHeader);
