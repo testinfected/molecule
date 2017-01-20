@@ -1,6 +1,10 @@
 package com.vtence.molecule.session;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.Base64;
 
 import static com.vtence.molecule.session.SessionMatchers.sameSessionDataAs;
 import static org.hamcrest.Matchers.nullValue;
@@ -10,6 +14,8 @@ public class SecureSessionEncoderTest {
 
     String key = "secret";
     SecureSessionEncoder encoder = new SecureSessionEncoder(key);
+    public @Rule
+    ExpectedException error = ExpectedException.none();
 
     @Test public void
     decodesSessionWithIntegrityHash() throws Exception {
@@ -28,8 +34,9 @@ public class SecureSessionEncoderTest {
         data.put("username", "Joe");
 
         String secure = encoder.encode(data);
-        Session decoded = encoder.decode("tampered content" + digestPartOf(secure));
-        assertThat("tampered session", decoded, nullValue());
+        String tampered = encodeInBase64("tampered content") + "--" + digestPartOf(secure);
+
+        assertThat("tampered session", encoder.decode(tampered), nullValue());
     }
 
     @Test public void
@@ -38,10 +45,14 @@ public class SecureSessionEncoderTest {
         data.put("username", "Joe");
 
         String secure = encoder.encode(data);
-        Session decoded = encoder.decode(contentPartOf(secure));
-        assertThat("tampered session", decoded, nullValue());
+        String contentOnly = contentPartOf(secure);
+        assertThat("missing hash", encoder.decode(contentOnly), nullValue());
     }
 
+    @Test public void
+    ignoresEmptyContent() throws Exception {
+        assertThat("empty content", encoder.decode(""), nullValue());
+    }
 
     @Test public void
     allowsGracefulSecretRotation() throws Exception {
@@ -69,5 +80,9 @@ public class SecureSessionEncoderTest {
     private String digestPartOf(String secure) {
         String[] parts = secure.split("--");
         return parts[1];
+    }
+
+    private String encodeInBase64(String s) {
+        return Base64.getMimeEncoder().encodeToString(s.getBytes());
     }
 }
