@@ -1,5 +1,8 @@
 package com.vtence.molecule.session;
 
+import com.vtence.molecule.crypto.DigestAlgorithm;
+import com.vtence.molecule.crypto.HMacDigest;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -7,10 +10,8 @@ import java.util.List;
 
 public class SecureSessionEncoder implements SessionEncoder {
 
-    private static final byte[] NO_LINE_BREAK = new byte[0];
-
-    private final Base64.Encoder encoder = Base64.getMimeEncoder(0, NO_LINE_BREAK);
-    private final Base64.Decoder decoder = Base64.getMimeDecoder();
+    private final Base64.Encoder encoder = Base64.getEncoder();
+    private final Base64.Decoder decoder = Base64.getDecoder();
 
     private final List<String> keys = new ArrayList<>();
     private final Marshaller<Session> marshaller;

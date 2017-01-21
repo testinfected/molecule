@@ -1,4 +1,4 @@
-package com.vtence.molecule.session;
+package com.vtence.molecule.crypto;
 
 public interface DigestAlgorithm {
 

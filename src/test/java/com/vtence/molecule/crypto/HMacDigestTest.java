@@ -1,4 +1,4 @@
-package com.vtence.molecule.session;
+package com.vtence.molecule.crypto;
 
 import org.junit.Test;
 
