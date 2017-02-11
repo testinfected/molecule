@@ -72,11 +72,13 @@ public class URLMap extends AbstractMiddleware {
         }
 
         public String pathInfo(Request request) {
+            if (mountPoint.equals("/")) return request.path();
             String pathInfo = request.path().replaceFirst(mountPoint, "");
             return pathInfo.isEmpty() ? "/" : pathInfo;
         }
 
         public String uri(String path) {
+            if (mountPoint.equals("/")) return path;
             return mountPoint.concat(path.endsWith("/") ? stripTrailingSlash(path) : path);
         }
 

@@ -49,8 +49,10 @@ public class URLMapTest {
         map.mount("/", this::describeMount);
 
         map.handle(request.path("/"), response);
-
         assertThat(response).hasStatus(OK).hasBodyText("/ at / (/)");
+
+        map.handle(request.path("/foo"), response);
+        assertThat(response).hasStatus(OK).hasBodyText("/ at /foo (/foo)");
     }
 
     @Test
