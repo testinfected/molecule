@@ -97,27 +97,27 @@ public class UndertowServer implements Server {
 
         public void handleRequest(HttpServerExchange exchange) {
             final List<Closeable> resources = new ArrayList<>();
-            final Request request = new Request();
-            final Response response = new Response();
             try {
-                read(request, exchange, resources);
-                app.handle(request, response);
-                response.whenSuccessful(commitTo(exchange))
-                        .whenFailed((result, error) -> failureReporter.errorOccurred(error))
-                        .whenComplete((result, error) -> closeAll(resources, exchange));
+                Request request = asRequest(exchange, resources);
+                app.handle(request)
+                   .whenSuccessful(commitTo(exchange))
+                   .whenFailed((result, error) -> failureReporter.errorOccurred(error))
+                   .whenComplete((result, error) -> closeAll(resources, exchange));
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
                 closeAll(resources, exchange);
             }
         }
 
-        private void read(Request request, HttpServerExchange exchange, List<Closeable> resources) throws IOException {
+        private Request asRequest(HttpServerExchange exchange, List<Closeable> resources) throws IOException {
+            Request request = new Request();
             setRequestInfo(request, exchange);
             setHeaders(request, exchange);
             setQueryParameters(request, exchange);
             setFormParameters(request, exchange);
             setParts(request, exchange, resources);
             setBody(request, exchange, resources);
+            return request;
         }
 
         private void setRequestInfo(Request request, HttpServerExchange exchange) {

@@ -79,27 +79,28 @@ public class SimpleServer implements Server {
 
         public void handle(org.simpleframework.http.Request httpRequest, org.simpleframework.http.Response httpResponse) {
             final List<Closeable> resources = new ArrayList<>();
-            final Request request = new Request();
-            final Response response = new Response();
+
             try {
-                read(request, httpRequest, resources);
-                app.handle(request, response);
-                response.whenSuccessful(commitTo(httpResponse))
-                        .whenFailed((result, error) -> failureReporter.errorOccurred(error))
-                        .whenComplete((result, error) -> closeAll(resources, httpResponse));
+                final Request request = asRequest(httpRequest, resources);
+                app.handle(request)
+                   .whenSuccessful(commitTo(httpResponse))
+                   .whenFailed((result, error) -> failureReporter.errorOccurred(error))
+                   .whenComplete((result, error) -> closeAll(resources, httpResponse));
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
                 closeAll(resources, httpResponse);
             }
         }
 
-        private void read(Request request, org.simpleframework.http.Request httpRequest,
-                          Collection<Closeable> resources) throws IOException {
+        private Request asRequest(org.simpleframework.http.Request httpRequest,
+                                  Collection<Closeable> resources) throws IOException {
+            Request request = new Request();
             readInfo(request, httpRequest);
             readHeaders(request, httpRequest);
             readParameters(request, httpRequest);
             readMultiPartData(request, httpRequest, resources);
             readBody(request, httpRequest, resources);
+            return request;
         }
 
         private void readInfo(Request request, org.simpleframework.http.Request httpRequest) {
@@ -193,7 +194,7 @@ public class SimpleServer implements Server {
 
         private void writeHeaders(org.simpleframework.http.Response httpResponse, Response response) {
             for (String name : response.headerNames()) {
-                for (String value: response.headers(name)) {
+                for (String value : response.headers(name)) {
                     httpResponse.addValue(name, value);
                 }
             }
