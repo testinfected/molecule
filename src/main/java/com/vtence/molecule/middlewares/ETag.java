@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -21,6 +22,10 @@ public class ETag extends AbstractMiddleware {
 
     private static final String REVALIDATE = "max-age=0; private; no-cache";
     private final HexEncoder encoder = new HexEncoder();
+
+    public Application then(Application next) {
+        return Application.of(request -> next.handle(request).whenSuccessful(this::computeETag));
+    }
 
     public void handle(Request request, Response response) throws Exception {
         forward(request, response).whenSuccessful(this::computeETag);
