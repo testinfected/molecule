@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -115,6 +116,11 @@ public class Compressor extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
         forward(request, response).whenSuccessful(compressResponse(selectBestAvailableEncodingFor(request)));
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> next.handle(request)
+                                             .whenSuccessful(compressResponse(selectBestAvailableEncodingFor(request))));
     }
 
     private Consumer<Response> compressResponse(String bestEncoding) {

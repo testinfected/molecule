@@ -25,7 +25,8 @@ public class DateHeader extends AbstractMiddleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request).whenSuccessful(this::setDateHeaderIfMissing));
+        return Application.of(request -> next.handle(request)
+                                             .whenSuccessful(this::setDateHeaderIfMissing));
     }
 
     private void setDateHeaderIfMissing(Response response) {

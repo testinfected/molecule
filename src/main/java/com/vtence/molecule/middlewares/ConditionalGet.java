@@ -28,7 +28,8 @@ public class ConditionalGet extends AbstractMiddleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request).whenSuccessful(conditionalGet(request)));
+        return Application.of(request -> next.handle(request)
+                                             .whenSuccessful(conditionalGet(request)));
     }
 
     private Consumer<Response> conditionalGet(Request request) {
