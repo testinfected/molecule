@@ -35,9 +35,6 @@ public class CookieSessionTrackerTest {
     String SESSION_COOKIE = CookieSessionTracker.STANDARD_SERVLET_SESSION_COOKIE;
     CookieSessionTracker tracker = new CookieSessionTracker(store).usingCookieName(SESSION_COOKIE);
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Before public void
     stubSessionStore() throws Exception {
         context.checking(new Expectations() {{
@@ -48,224 +45,226 @@ public class CookieSessionTrackerTest {
 
     @Test(expected = IllegalStateException.class) public void
     requiresACookieJar() throws Exception {
-        tracker.handle(request, response);
+        tracker.then(ok()).handle(Request.get("/"));
     }
 
     @Test public void
     createsSessionsForNewClientsButDoesNotCommitEmptySessions() throws Exception {
-        CookieJar cookieJar = fillCookieJar();
-        tracker.connectTo(echoSessionId());
-
         context.checking(new Expectations() {{
             never(store).save(with(any(Session.class)));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request);
+
+        Response response = tracker.then(echoSessionId()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("Session: new");
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
     createsSessionCookieOnceDone() throws Exception {
-        CookieJar cookieJar = fillCookieJar();
-        tracker.connectTo(incrementCounter());
-
         context.checking(new Expectations() {{
             oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request);
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
 
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasValue("new").isHttpOnly();
     }
 
     @Test public void
     storesNewSessionIfNotEmpty() throws Exception {
-        fillCookieJar();
-        tracker.connectTo(incrementCounter());
-
         context.checking(new Expectations() {{
             oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request);
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("Counter: 1");
     }
 
     @Test public void
     tracksExistingSessionsUsingACookieAndSavesSessionIfModified() throws Exception {
-        fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-        tracker.connectTo(incrementCounter());
-
         Session clientSession = store.load("existing");
         clientSession.put("counter", 1);
         context.checking(new Expectations() {{
             oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("Counter: 2");
     }
 
     @Test public void
     savesExistingSessionEvenIfNotWritten() throws Exception {
-        fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-
         context.checking(new Expectations() {{
             oneOf(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(ok()).handle(request);
         response.done();
-        assertNoExecutionError();
+        assertNoExecutionError(response);
     }
 
     @Test public void
     createsAFreshSessionIfClientSessionHasExpired() throws Exception {
-        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "expired"));
-        tracker.connectTo(incrementCounter());
-
         context.checking(new Expectations() {{
             oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request, new Cookie(SESSION_COOKIE, "expired"));
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("Counter: 1");
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasValue("new");
     }
 
     @Test public void
     doesNotSendTheSameSessionIdIfItDidNotChange() throws Exception {
-        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-
         context.checking(new Expectations() {{
             allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(ok()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
     destroysInvalidSessions() throws Exception {
-        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-        tracker.connectTo(writeAndInvalidateSession());
-
         context.checking(new Expectations() {{
             oneOf(store).destroy(with("existing"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(writeAndInvalidateSession()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasDiscardedCookie(SESSION_COOKIE);
     }
 
     @Test public void
     usesPersistentSessionsByDefault() throws Exception {
-        CookieJar cookieJar = fillCookieJar();
-        tracker.connectTo(incrementCounter());
-
         context.checking(new Expectations() {{
             oneOf(store).save(with(sessionWithMaxAge(-1))); will(returnValue("persistent"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request);
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
     }
 
     @Test public void
     setsSessionAndCookieToExpireIfExpirationPeriodSpecified() throws Exception {
-        CookieJar cookieJar = fillCookieJar();
         tracker.expireAfter(timeout);
-        tracker.connectTo(incrementCounter());
 
         context.checking(new Expectations() {{
             oneOf(store).save(with(sessionWithMaxAge(timeout))); will(returnValue("expires"));
         }});
-        tracker.handle(request, response);
+
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request);
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
     @Test public void
     setsCookieToExpireAfterSessionMaxAge() throws Exception {
-        CookieJar cookieJar = fillCookieJar();
-        tracker.connectTo(expireSessionAfter(timeout));
-
         context.checking(new Expectations() {{
             allowing(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request);
+
+        Response response = tracker.then(expireSessionAfter(timeout)).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
     @Test public void
     refreshesCookieForExistingSessionsIfMaxAgeSpecified() throws Exception {
-        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-        tracker.connectTo(expireSessionAfter(timeout));
-
         context.checking(new Expectations() {{
             allowing(store).save(with(sessionWithId("existing"))); will(returnValue("existing"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(expireSessionAfter(timeout)).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasMaxAge(timeout);
     }
 
     @Test public void
     ignoresDroppedSessions() throws Exception {
-        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-        tracker.connectTo(writeAndDropSession());
-
         context.checking(new Expectations() {{
             never(store).save(with(any(Session.class)));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(writeAndDropSession()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
     dropsContentOfCorruptedSessions() throws Exception {
-        CookieJar cookieJar = fillCookieJar();
         tracker.reportFailureTo(failureReporter);
-        tracker.connectTo(incrementCounter());
 
         Exception saveError = new Exception("Save failed!");
         context.checking(new Expectations() {{
@@ -273,18 +272,19 @@ public class CookieSessionTrackerTest {
             oneOf(store).save(with(any(Session.class))); will(throwException(saveError));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request);
+
+        Response response = tracker.then(incrementCounter()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasNoCookie(SESSION_COOKIE);
     }
 
     @Test public void
     createsAFreshSessionIfClientSessionIsCorrupted() throws Exception {
-        fillCookieJar(new Cookie(SESSION_COOKIE, "corrupted"));
         tracker.reportFailureTo(failureReporter);
-        tracker.connectTo(echoSessionId());
 
         Exception loadError = new Exception("load failed!");
         context.checking(new Expectations() {{
@@ -292,18 +292,19 @@ public class CookieSessionTrackerTest {
             allowing(store).load(with("corrupted")); will(throwException(loadError));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request, new Cookie(SESSION_COOKIE, "corrupted"));
+
+        Response response = tracker.then(echoSessionId()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("Session: new");
     }
 
     @Test public void
     reportsWhenSessionDestructionFails() throws Exception {
-        fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
         tracker.reportFailureTo(failureReporter);
-        tracker.connectTo(writeAndInvalidateSession());
 
         Exception destroyError = new Exception("destroy failed!");
         context.checking(new Expectations() {{
@@ -311,53 +312,64 @@ public class CookieSessionTrackerTest {
             allowing(store).destroy(with("existing")); will(throwException(destroyError));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(writeAndInvalidateSession()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
     }
 
     @Test public void
     usesNewSessionIfRenewed() throws Exception {
-        CookieJar cookieJar = fillCookieJar(new Cookie(SESSION_COOKIE, "existing"));
-        tracker.connectTo(writeNewSession());
-
         context.checking(new Expectations() {{
             oneOf(store).save(with(newSession())); will(returnValue("new"));
         }});
 
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        CookieJar cookieJar = bindCookieJar(request, new Cookie(SESSION_COOKIE, "existing"));
+
+        Response response = tracker.then(writeNewSession()).handle(request);
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(cookieJar).hasCookie(SESSION_COOKIE).hasValue("new");
     }
 
     @Test public void
     unbindsSessionAfterwards() throws Exception {
-        fillCookieJar();
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request);
+
+        Response response = tracker.then(ok()).handle(request);
         assertThat(request).hasAttribute(Session.class, notNullValue());
 
         response.done();
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(request).hasNoAttribute(Session.class);
     }
 
     @Test public void
     unbindsSessionInCaseOfErrorsToo() throws Exception {
-        fillCookieJar();
-        tracker.handle(request, response);
+        Request request = Request.get("/");
+        bindCookieJar(request).bind(request);
+
+        Response response = tracker.then(ok()).handle(request);
 
         response.done(new Exception("Error!"));
         assertThat(request).hasNoAttribute(Session.class);
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private Application.ApplicationFunction ok() {
+        return request -> Response.ok();
+    }
+
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 
-    private CookieJar fillCookieJar(Cookie... cookies) {
+    private CookieJar bindCookieJar(Request request, Cookie... cookies) {
         CookieJar cookieJar = new CookieJar(cookies);
         cookieJar.bind(request);
         return cookieJar;
@@ -384,52 +396,54 @@ public class CookieSessionTrackerTest {
     }
 
     private Application echoSessionId() {
-        return (request, response) -> {
+        return Application.of(request -> {
             Session session = Session.get(request);
-            response.body("Session: " + (session.fresh() ? "new" : session.id()));
-        };
+            return Response.ok().body("Session: " + (session.fresh() ? "new" : session.id()));
+        });
     }
 
     private Application incrementCounter() {
-        return (request, response) -> {
+        return Application.of(request -> {
             Session session = Session.get(request);
             Integer counter = session.contains("counter") ? session.get("counter") : 0;
             session.put("counter", counter++);
-            response.body("Counter: " + counter);
-        };
-    }
-
-    private Application expireSessionAfter(final int timeout) {
-        return (request, response) -> {
-            Session session = Session.get(request);
-            session.put("written", true);
-            session.maxAge(timeout);
-        };
+            return Response.ok().body("Counter: " + counter);
+        });
     }
 
     private Application writeAndInvalidateSession() {
-        return (request, response) -> {
+        return Application.of(request -> {
             Session session = Session.get(request);
             session.put("written", true);
             session.invalidate();
-        };
+            return Response.ok();
+        });
+    }
+
+    private Application expireSessionAfter(final int timeout) {
+        return Application.of(request -> {
+            Session session = Session.get(request);
+            session.put("written", true);
+            session.maxAge(timeout);
+            return Response.ok();
+        });
     }
 
     private Application writeAndDropSession() {
-        return (request, response) -> {
+        return Application.of(request -> {
             Session session = Session.get(request);
             session.put("written", true);
             Session.unbind(request);
-            response.done();
-        };
+            return Response.ok();
+        });
     }
 
     private Application writeNewSession() {
-        return (request, response) -> {
+        return Application.of(request -> {
             Session session = new Session();
             session.put("written", true);
             session.bind(request);
-            response.done();
-        };
+            return Response.ok();
+        });
     }
 }

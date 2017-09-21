@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -36,13 +37,23 @@ public class CookieSessionTracker extends AbstractMiddleware {
         this.failureReporter = failureReporter;
     }
 
+    public Application then(Application next) {
+        return Application.of(request -> {
+            CookieJar cookieJar = fetchCookieJar(request);
+            acquireSession(cookieJar).bind(request);
+
+            return next.handle(request)
+                       .whenSuccessful(result -> commitSession(request))
+                       .whenComplete((error, action) -> Session.unbind(request));
+        });
+    }
+
     public void handle(Request request, Response response) throws Exception {
         CookieJar cookieJar = fetchCookieJar(request);
         acquireSession(cookieJar).bind(request);
 
-        forward(request, response)
-                .whenSuccessful(result -> commitSession(request))
-                .whenComplete((error, action) -> Session.unbind(request));
+        forward(request, response).whenSuccessful(result -> commitSession(request))
+                                  .whenComplete((error, action) -> Session.unbind(request));
     }
 
     private CookieJar fetchCookieJar(Request request) {
