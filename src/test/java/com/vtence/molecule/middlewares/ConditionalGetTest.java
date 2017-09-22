@@ -9,9 +9,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutionException;
 
 import static com.vtence.molecule.http.HttpDate.httpDate;
-import static com.vtence.molecule.http.HttpMethod.GET;
-import static com.vtence.molecule.http.HttpMethod.HEAD;
-import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.http.HttpStatus.CREATED;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.HttpStatus.OK;
@@ -21,20 +18,17 @@ public class ConditionalGetTest {
 
     ConditionalGet conditional = new ConditionalGet();
 
-    Request request = new Request().method(GET);
-    Response response = new Response();
-
     @Test
     public void
     sendsNotModifiedWithoutMessageBodyWhenGettingEntityWhoseRepresentationHasNotChanged() throws Exception {
-        request.header("If-None-Match", "12345678");
-        conditional.handle(request, response);
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("ETag", "12345678")
+                                                                .contentType("text/plain").contentLength(32)
+                                                                .done("response content"))
+                                       .handle(Request.get("/")
+                                                      .header("If-None-Match", "12345678"));
 
-        response.header("ETag", "12345678")
-                .contentType("text/plain").contentLength(32).body("response content")
-                .done();
-
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(NOT_MODIFIED)
                             .hasBodySize(0)
                             .hasNoHeader("Content-Type")
@@ -44,10 +38,11 @@ public class ConditionalGetTest {
     @Test
     public void
     leavesResponseUnchangedOnGetWhenCacheValidatorsAreMissing() throws Exception {
-        conditional.handle(request, response);
-        response.body("response content").done();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .done("response content"))
+                                       .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(OK)
                             .hasBodyText("response content");
     }
@@ -55,33 +50,39 @@ public class ConditionalGetTest {
     @Test
     public void
     ignoresCacheValidatorsOnGetIfResponseNotOK() throws Exception {
-        request.header("If-None-Match", "12345678");
-        conditional.handle(request, response);
-        response.status(CREATED).header("ETag", "12345678").done();
+        Response response = conditional.then(request -> Response.of(CREATED)
+                                                                .header("ETag", "12345678")
+                                                                .done())
+                                       .handle(Request.get("/")
+                                                      .header("If-None-Match", "12345678"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(CREATED);
     }
 
     @Test
     public void
     appliesConditionalLogicToHeadRequestsAsWell() throws Exception {
-        request.method(HEAD).header("If-None-Match", "12345678");
-        conditional.handle(request, response);
-        response.header("ETag", "12345678").done();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("ETag", "12345678")
+                                                                .done())
+                                       .handle(Request.head("/")
+                                                      .header("If-None-Match", "12345678"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
     @Test
     public void
     ignoresNonGetOrHeadRequests() throws Exception {
-        request.method(POST).header("If-None-Match", "12345678");
-        conditional.handle(request, response);
-        response.header("ETag", "12345678").done();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("ETag", "12345678")
+                                                                .done())
+                                       .handle(Request.post("/")
+                                                      .header("If-None-Match", "12345678"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(OK);
     }
 
@@ -89,11 +90,14 @@ public class ConditionalGetTest {
     public void
     sendsNotModifiedWhenGettingEntityWhichHasNotBeenModifiedSinceLastServed() throws Exception {
         final String lastModification = httpDate(Instant.now());
-        request.header("If-Modified-Since", lastModification);
-        conditional.handle(request, response);
-        response.header("Last-Modified", lastModification).done();
 
-        assertNoExecutionError();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("Last-Modified", lastModification)
+                                                                .done())
+                                       .handle(Request.get("/")
+                                                      .header("If-Modified-Since", lastModification));
+
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(NOT_MODIFIED);
     }
 
@@ -102,36 +106,43 @@ public class ConditionalGetTest {
     leavesResponseUnchangedWhenEntityHasNotBeenModifiedButETagIndicatesItIsNotCurrent() throws Exception {
         final String lastModification = httpDate(Instant.now());
 
-        request.header("If-None-Match", "87654321")
-               .header("If-Modified-Since", lastModification);
-        conditional.handle(request, response);
-        response.header("ETag", "12345678").header("Last-Modified", lastModification).done();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("ETag", "12345678")
+                                                                .header("Last-Modified", lastModification)
+                                                                .done())
+                                       .handle(Request.get("/")
+                                                      .header("If-None-Match", "87654321")
+                                                      .header("If-Modified-Since", lastModification));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(OK);
     }
 
     @Test
     public void
     leavesResponseUnchangedWhenEntityWasModifiedButETagIndicatesItIsCurrent() throws Exception {
-        request.header("If-None-Match", "12345678")
-               .header("If-Modified-Since", httpDate(oneHourAgo()));
-        conditional.handle(request, response);
-        response.header("ETag", "12345678")
-                .header("Last-Modified", httpDate(Instant.now())).done();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("ETag", "12345678")
+                                                                .header("Last-Modified", httpDate(Instant.now()))
+                                                                .done())
+                                       .handle(Request.get("/")
+                                                      .header("If-None-Match", "12345678")
+                                                      .header("If-Modified-Since", httpDate(oneHourAgo())));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(OK);
     }
 
     @Test
     public void
     leavesResponseUnchangedIfModifiedSinceDateFormatIsNotSupported() throws Exception {
-        request.header("If-Modified-Since", "???");
-        conditional.handle(request, response);
-        response.header("Last-Modified", httpDate(Instant.now())).done();
+        Response response = conditional.then(request -> Response.ok()
+                                                                .header("Last-Modified", httpDate(Instant.now()))
+                                                                .done())
+                                       .handle(Request.get("/")
+                                                      .header("If-Modified-Since", "???"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasStatus(OK);
     }
 
@@ -139,7 +150,7 @@ public class ConditionalGetTest {
         return Instant.now().minus(1, ChronoUnit.HOURS);
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 }

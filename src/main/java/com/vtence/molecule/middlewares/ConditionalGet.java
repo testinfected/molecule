@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpDate;
@@ -24,6 +25,10 @@ public class ConditionalGet extends AbstractMiddleware {
 
     public void handle(Request request, Response response) throws Exception {
         forward(request, response).whenSuccessful(conditionalGet(request));
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> next.handle(request).whenSuccessful(conditionalGet(request)));
     }
 
     private Consumer<Response> conditionalGet(Request request) {

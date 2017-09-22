@@ -26,6 +26,8 @@ import java.util.Set;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.HOST;
+import static com.vtence.molecule.http.HttpMethod.HEAD;
+import static com.vtence.molecule.http.HttpMethod.POST;
 import static java.lang.Long.parseLong;
 import static org.simpleframework.http.Method.GET;
 
@@ -63,7 +65,34 @@ public class Request {
      * @return the new request
      */
     public static Request get(String path) {
-        return new Request().method(GET)
+        return new Request().scheme("http")
+                            .method(GET)
+                            .uri(path)
+                            .path(path);
+    }
+
+    /**
+     * Creates a HTTP POST request with the given request path.
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request post(String path) {
+        return new Request().scheme("http")
+                            .method(POST)
+                            .uri(path)
+                            .path(path);
+    }
+
+    /**
+     * Creates a HTTP HEAD request with the given request path.
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request head(String path) {
+        return new Request().scheme("http")
+                            .method(HEAD)
                             .uri(path)
                             .path(path);
     }

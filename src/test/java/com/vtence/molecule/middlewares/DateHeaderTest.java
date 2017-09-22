@@ -33,10 +33,10 @@ public class DateHeaderTest {
 
     @Test public void
     wontOverrideExistingDateHeader() throws Exception {
-        Response response = dateHeader.then(request -> Response.ok())
+        Response response = dateHeader.then(request -> Response.ok()
+                                                               .header("Date", "now")
+                                                               .done())
                                       .handle(Request.get("/"));
-
-        response.header("Date", "now").done();
 
         assertNoExecutionError(response);
         assertThat(response).hasHeader("Date", "now");
