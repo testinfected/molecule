@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Authorization;
@@ -50,8 +51,40 @@ public class BasicAuthentication extends AbstractMiddleware {
         }
     }
 
+    public Application then(Application next) {
+        return Application.of(request -> {
+            Authorization auth = Authorization.of(request);
+
+            if (auth == null) {
+                return unauthorized();
+            }
+
+            if (!auth.hasScheme(BASIC_AUTHENTICATION)) {
+                return Response.of(BAD_REQUEST)
+                               .done();
+            }
+
+            BasicCredentials credentials = BasicCredentials.decode(auth.params());
+            Optional<String> user = authenticator.authenticate(credentials.username(), credentials.password());
+
+            if (user.isPresent()) {
+                request.attribute(REMOTE_USER, user.get());
+                return next.handle(request);
+            } else {
+                return unauthorized();
+            }
+        });
+    }
+
     private void unauthorized(Response response) {
         response.status(UNAUTHORIZED)
+                .addHeader(WWW_AUTHENTICATE, challenge())
+                .contentType(TEXT)
+                .done();
+    }
+
+    private Response unauthorized() {
+        return Response.of(UNAUTHORIZED)
                 .addHeader(WWW_AUTHENTICATE, challenge())
                 .contentType(TEXT)
                 .done();

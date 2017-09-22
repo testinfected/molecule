@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.Authenticator;
@@ -25,57 +26,74 @@ public class BasicAuthenticationTest {
     BasicAuthentication authentication = new BasicAuthentication("WallyWorld", authenticator);
     MimeEncoder mime = MimeEncoder.inUtf8();
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test
     public void
     issuesAChallengeWhenNoCredentialsAreSpecified() throws Exception {
-        authentication.handle(request, response);
+        Response response = authentication.then(request -> Response.ok())
+                                          .handle(Request.get("/"));
 
-        assertUnauthorized();
+        assertUnauthorized(response);
     }
 
     @Test
     public void
     rejectsUnsupportedAuthenticationSchemes() throws Exception {
-        authentication.handle(request.header("Authorization", "Unsupported Scheme"), response);
+        Response response = authentication.then(request -> Response.ok())
+                                          .handle(Request.get("/")
+                                                         .header("Authorization", "Unsupported Scheme"));
 
-        assertThat(response).hasStatus(BAD_REQUEST).isDone();
+        assertThat(response)
+                .hasStatus(BAD_REQUEST)
+                .isDone();
     }
 
     @Test
     public void authorizesValidCredentials() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(authenticator).authenticate("joe", "secret"); will(returnValue(of("joe")));
+            oneOf(authenticator).authenticate("joe", "secret");
+                will(returnValue(of("joe")));
         }});
 
-        authentication.connectTo((request, response) -> {
-            String user = request.attribute("REMOTE_USER");
-            response.status(ACCEPTED).done("user: " + user);
-        });
+        Response response = authentication.then(echoRemoteUser())
+                                          .handle(Request.get("/")
+                                                         .header("Authorization", basic("joe:secret")));
 
-        authentication.handle(request.header("Authorization", "Basic " + mime.encode("joe:secret")), response);
-
-        assertThat(response).hasBodyText("user: joe").hasStatus(ACCEPTED);
+        assertThat(response)
+                .hasBodyText("user: joe")
+                .hasStatus(ACCEPTED);
     }
 
     @Test
     public void rejectsInvalidCredentials() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(authenticator).authenticate("joe", "bad secret"); will(returnValue(empty()));
+            oneOf(authenticator).authenticate("joe", "bad secret");
+                will(returnValue(empty()));
         }});
 
-        authentication.handle(request.header("Authorization", "Basic " + mime.encode("joe:bad secret")), response);
+        Response response = authentication.then(request -> Response.ok())
+                                          .handle(Request.get("/")
+                                                         .header("Authorization", basic("joe:bad secret")));
 
-        assertUnauthorized();
+        assertUnauthorized(response);
     }
 
-    private void assertUnauthorized() {
+    private void assertUnauthorized(Response response) {
         assertThat(response).hasStatus(UNAUTHORIZED)
                             .hasHeader("WWW-Authenticate", "Basic realm=\"WallyWorld\"")
                             .hasContentType("text/plain")
                             .isEmpty()
                             .isDone();
+    }
+
+    private Application echoRemoteUser() {
+        return Application.of(request -> {
+            String user = request.attribute("REMOTE_USER");
+            return Response.of(ACCEPTED)
+                           .done("user: " + user);
+        });
+    }
+
+    private String basic(String src) {
+        return "Basic " + mime.encode(src);
     }
 }

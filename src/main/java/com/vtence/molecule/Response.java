@@ -45,7 +45,14 @@ public class Response {
      * Creates a response with a HTTP status of OK
      */
     public static Response ok() {
-        return new Response().status(OK);
+        return of(OK);
+    }
+
+    /**
+     * Creates a response with the given HTTP status
+     */
+    public static Response of(HttpStatus status) {
+        return new Response().status(status);
     }
 
     /**
@@ -411,8 +418,8 @@ public class Response {
      * </p>
      * @param text the body text to write back to the client
      **/
-    public void done(String text) {
-        done(text(text));
+    public Response done(String text) {
+        return done(text(text));
     }
 
     /**
@@ -424,8 +431,8 @@ public class Response {
      * </p>
      * @param body the body to write back to the client
      **/
-    public void done(Body body) {
-        body(body).done();
+    public Response done(Body body) {
+        return body(body).done();
     }
 
     /**
@@ -435,8 +442,9 @@ public class Response {
      * abnormally.
      * </p>
      **/
-    public void done() {
+    public Response done() {
         done.complete(this);
+        return this;
     }
 
     /**
@@ -570,5 +578,4 @@ public class Response {
     private Throwable unwrap(Throwable error) {
         return error instanceof CompletionException ? error.getCause() : error;
     }
-
 }
