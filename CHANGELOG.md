@@ -2,10 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.12.0] - 
+## [0.12.0] - 2017-09-21
 
 ### Added
 - A middleware to force SSL connections. It does permanent redirects and adds the HSTS header. ([#36])
+
+### Changed
+- Session cookies are now encrypted using SHA256 instead of SHA1 by default. ([#60])
+- Session cookies are now encoded in RFC4648 base64. ([#61])
+
+### Fixed
+- URL Map middleware was failing to dispatch to root mount. `/foo` is now matched if mounted to `/`). ([#62])
 
 ## [0.11.0] - 2016-11-17
 
@@ -92,6 +99,9 @@ Sessions are considered stale when they have been inactive for longer than the c
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9...v0.9.1
 [0.9]: https://github.com/testinfected/molecule/compare/v0.8.2...v0.9
 
+[#62]: https://github.com/testinfected/molecule/issues/62
+[#61]: https://github.com/testinfected/molecule/issues/61
+[#60]: https://github.com/testinfected/molecule/issues/60
 [#58]: https://github.com/testinfected/molecule/issues/58
 [#57]: https://github.com/testinfected/molecule/issues/57
 [#56]: https://github.com/testinfected/molecule/issues/56
