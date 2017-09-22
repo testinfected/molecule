@@ -21,6 +21,7 @@ import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.http.HttpDate.httpDate;
+import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
 import static com.vtence.molecule.lib.BinaryBody.bytes;
 import static com.vtence.molecule.lib.TextBody.text;
@@ -40,7 +41,12 @@ public class Response {
     private String statusText = HttpStatus.OK.text;
     private Body body = BinaryBody.empty();
 
-    public Response() {}
+    /**
+     * Creates a response with a HTTP status of OK
+     */
+    public static Response ok() {
+        return new Response().status(OK);
+    }
 
     /**
      * Sets the HTTP status for this response. This will set both the status code and the status text.
@@ -564,4 +570,5 @@ public class Response {
     private Throwable unwrap(Throwable error) {
         return error instanceof CompletionException ? error.getCause() : error;
     }
+
 }

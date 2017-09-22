@@ -27,10 +27,11 @@ import java.util.Set;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.HOST;
 import static java.lang.Long.parseLong;
+import static org.simpleframework.http.Method.GET;
 
 /**
  * Holds client HTTP request information and maintains attributes during the request lifecycle.
- *
+ * <p>
  * Information includes among other things the body, headers, parameters, cookies and locales.
  */
 public class Request {
@@ -54,6 +55,18 @@ public class Request {
     private HttpMethod method;
     private boolean secure;
     private long timestamp;
+
+    /**
+     * Creates a get request with the given path
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request get(String path) {
+        return new Request().method(GET)
+                            .uri(path)
+                            .path(path);
+    }
 
     /**
      * Reads the URI of this request. It can be a relative URI or the full URL if the client included
@@ -360,8 +373,8 @@ public class Request {
     /**
      * Consumes the body of this request and returns it as text. The text is decoded using the charset of the request.
      *
-     * @see Request#charset()
      * @return the text that makes up the body
+     * @see Request#charset()
      */
     public String body() throws IOException {
         return new String(bodyContent(), charset());
@@ -387,12 +400,12 @@ public class Request {
 
     /**
      * Changes the body of this request. The body is encoded using the charset of the request.
-     *
+     * <p>
      * Note that this will not affect the list of parameters that might have been sent with the original
      * body as POST parameters.
      *
-     * @see Request#charset()
      * @param body the new body as a string
+     * @see Request#charset()
      */
     public Request body(String body) {
         return body(body.getBytes(charset()));
@@ -400,7 +413,7 @@ public class Request {
 
     /**
      * Changes the body of this request.
-     *
+     * <p>
      * Note that this will not affect the list of parameters that might have been sent with the original
      * body as POST parameters.
      *
@@ -413,7 +426,7 @@ public class Request {
 
     /**
      * Changes the body of this request.
-     *
+     * <p>
      * Note that this will not affect the list of parameters that might have been sent with the original
      * body as POST parameters.
      *
@@ -426,7 +439,7 @@ public class Request {
 
     /**
      * Ads a new body part to this request.
-     *
+     * <p>
      * <p>
      * Note that this will not change the body of the request, which will still contain the original multipart
      * encoded body.
@@ -445,7 +458,7 @@ public class Request {
      * This is typically used in case of file uploads or multipart <code>POST</code> requests.
      * </p>
      * <p>
-     *     Note that the list is a copy, modifications to the returned list will not change the request.
+     * Note that the list is a copy, modifications to the returned list will not change the request.
      * </p>
      *
      * @return the (possibly empty) list of body parts
@@ -459,7 +472,6 @@ public class Request {
      * This is typically used in case of file uploads or multipart <code>POST</code> requests.
      *
      * @param name the name of the body part to acquire
-     *
      * @return the named part or null if the part does not exist or the request
      * is not of type <code>multipart/form-data</code>
      */
@@ -472,7 +484,7 @@ public class Request {
 
     /**
      * Removes the body part with the specified name from this request.
-     *
+     * <p>
      * <p>
      * In case there are multiple body parts with that name, they are all removed.
      * </p>
@@ -523,11 +535,11 @@ public class Request {
 
     /**
      * Gets the value of the specified header sent with this request. The name is case insensitive.
-     *
+     * <p>
      * <p>
      * In case there are multiple headers with that name, a comma separated list of values is returned.
      * </p>
-     *
+     * <p>
      * This method returns a null value if the request does not include any header of the specified name.
      *
      * @param name the name of the header to retrieve
@@ -553,12 +565,12 @@ public class Request {
     /**
      * Gets the list of all the values sent with this request under the specified header.
      * The name is case insensitive.
-     *
+     * <p>
      * <p>
      * Some headers can be sent by clients as several headers - each with a different value - rather than sending
      * the header as a comma separated list.
      * </p>
-     *
+     * <p>
      * If the request does not include any header of the specified name, the list is empty.
      * Modifications to the provided list are safe and will not affect the request.
      *
@@ -573,7 +585,7 @@ public class Request {
      * Adds an HTTP message header to this request. The new value will be added to the list
      * of existing values for that header name.
      *
-     * @param name the name of the header to add
+     * @param name  the name of the header to add
      * @param value the additional value for that header
      */
     public Request addHeader(String name, String value) {
@@ -584,7 +596,7 @@ public class Request {
     /**
      * Sets an HTTP message header on this request. The new value will replace existing values for that header name.
      *
-     * @param name the name of the header to set
+     * @param name  the name of the header to set
      * @param value the value the header will have
      */
     public Request header(String name, String value) {
@@ -594,7 +606,7 @@ public class Request {
 
     /**
      * Removes the value of the specified header on this request. The name is case insensitive.
-     *
+     * <p>
      * <p>
      * In case there are multiple headers with that name, all values are removed.
      * </p>
@@ -640,11 +652,11 @@ public class Request {
 
     /**
      * Gets the value of a specific parameter of this request, or null if the parameter does not exist.
-     *
+     * <p>
      * If the parameter has more than one value, the last one is returned.
-     *
+     * <p>
      * <p>Request parameters are contained in the query string or posted form data.</p>
-     *
+     * <p>
      * <p>
      * Note that changing the body of the request will not cause the parameters to change. To change the request
      * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
@@ -655,15 +667,15 @@ public class Request {
      */
     public String parameter(String name) {
         List<String> values = parameters(name);
-        return values.isEmpty() ?  null : values.get(values.size() - 1);
+        return values.isEmpty() ? null : values.get(values.size() - 1);
     }
 
     /**
      * Gets the list of values of a specific parameter of this request. If the parameter does not exist, the list will
      * be empty. The returned list is safe for modification and will not affect the request.
-     *
+     * <p>
      * <p>Request parameters are contained in the query string or posted form data.</p>
-     *
+     * <p>
      * <p>
      * Note that changing the body of the request will not cause the parameters to change. To change the request
      * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
@@ -680,11 +692,11 @@ public class Request {
      * Returns the names of all the parameters contained in this request.
      * If the request has no parameter, the method returns an empty <code>Set</code>. The returned
      * set is safe for modification and will not affect the request.
-     *
+     * <p>
      * <p>
      * Parameters are taken from the query or HTTP form posting.
      * </p>
-     *
+     * <p>
      * <p>
      * Note that changing the body of the request will not cause the parameters to change. To change the request
      * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
@@ -699,11 +711,11 @@ public class Request {
     /**
      * Returns a <code>Map</code> of all the parameters contained in this request. If the request has no parameter,
      * the map will be empty. The map is not modifiable.
-     *
+     * <p>
      * <p>
      * Parameters are taken from the query or HTTP form posting.
      * </p>
-     *
+     * <p>
      * <p>
      * Note that changing the body of the request will not cause the parameters to change. To change the request
      * parameters, use {@link Request#addParameter(String, String)} and {@link Request#removeParameter(String)}.
@@ -719,7 +731,7 @@ public class Request {
      * Adds a parameter value to this request. If a parameter with the same name already exists,
      * the new value is appended to this list of values for that parameter.
      *
-     * @param name the parameter name
+     * @param name  the parameter name
      * @param value the additional parameter value
      */
     public Request addParameter(String name, String value) {
@@ -742,16 +754,16 @@ public class Request {
 
     /**
      * Gets the value of a keyed attribute of this request, or null if no attribute with the given key exists.
-     *
      * <p>
-     *     This method will attempt to cast the attribute value to type T,
-     *     which can result in a <code>ClassCastException</code>.
+     * <p>
+     * This method will attempt to cast the attribute value to type T,
+     * which can result in a <code>ClassCastException</code>.
      * </p>
      *
-     * @see Request#attribute(Object, Object)
      * @param key the key of the attribute to retrieve
      * @return the value of the attribute, or null if the attribute does not exist
      * @throws java.lang.ClassCastException if the attribute value is not an instance of the type parameter
+     * @see Request#attribute(Object, Object)
      */
     @SuppressWarnings("unchecked")
     public <T> T attribute(Object key) {
@@ -760,12 +772,12 @@ public class Request {
 
     /**
      * Sets an attribute on this request. Attributes make available custom information about the request.
-     *
+     * <p>
      * <p>
      * Attribute keys are unique. If an attribute exists under the same key, its value will be replaced by the new value.
      * </p>
      *
-     * @param key the key of the attribute to set
+     * @param key   the key of the attribute to set
      * @param value the new attribute value
      */
     public Request attribute(Object key, Object value) {
@@ -775,7 +787,7 @@ public class Request {
 
     /**
      * Gets the set of all attribute keys on this request. If no attribute exist, the set will be empty.
-     *
+     * <p>
      * <p>
      * Note that the set is a copy, it can be modified without changing the request.
      * </p>
@@ -798,7 +810,7 @@ public class Request {
 
     /**
      * Gets the map of all attributes of this request. If no attribute exists, the map will be empty.
-     *
+     * <p>
      * <p>
      * Note that the map is not modifiable.
      * </p>
@@ -808,4 +820,5 @@ public class Request {
     public Map<Object, Object> attributes() {
         return Collections.unmodifiableMap(attributes);
     }
+
 }
