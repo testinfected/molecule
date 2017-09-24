@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
@@ -13,6 +14,21 @@ public class ConnectionScope extends AbstractMiddleware {
 
     public ConnectionScope(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> {
+            Connection connection = dataSource.getConnection();
+            Reference ref = new Reference(request);
+
+            ref.set(connection);
+            try {
+                return next.handle(request).whenComplete((result, error) -> dispose(ref));
+            } catch (Throwable e) {
+                dispose(ref);
+                throw e;
+            }
+        });
     }
 
     public void handle(Request request, Response response) throws Exception {
