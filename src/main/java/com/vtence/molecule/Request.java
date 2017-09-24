@@ -26,6 +26,7 @@ import java.util.Set;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.HOST;
+import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpMethod.POST;
 import static java.lang.Long.parseLong;
@@ -85,12 +86,64 @@ public class Request {
     }
 
     /**
+     * Creates a HTTP PUT request with the given request path.
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request put(String path) {
+        return new Request().scheme("http")
+                            .method(DELETE)
+                            .uri(path)
+                            .path(path);
+    }
+
+    /**
+     * Creates a HTTP PATCH request with the given request path.
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request patch(String path) {
+        return new Request().scheme("http")
+                            .method(DELETE)
+                            .uri(path)
+                            .path(path);
+    }
+
+    /**
+     * Creates a HTTP DELETE request with the given request path.
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request delete(String path) {
+        return new Request().scheme("http")
+                            .method(DELETE)
+                            .uri(path)
+                            .path(path);
+    }
+
+    /**
      * Creates a HTTP HEAD request with the given request path.
      *
      * @param path the request path
      * @return the new request
      */
     public static Request head(String path) {
+        return new Request().scheme("http")
+                            .method(HEAD)
+                            .uri(path)
+                            .path(path);
+    }
+
+    /**
+     * Creates a HTTP OPTIONS request with the given request path.
+     *
+     * @param path the request path
+     * @return the new request
+     */
+    public static Request options(String path) {
         return new Request().scheme("http")
                             .method(HEAD)
                             .uri(path)
@@ -849,5 +902,4 @@ public class Request {
     public Map<Object, Object> attributes() {
         return Collections.unmodifiableMap(attributes);
     }
-
 }
