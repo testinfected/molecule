@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
@@ -11,7 +12,24 @@ import static com.vtence.molecule.http.MimeTypes.HTML;
 
 public class Failsafe extends AbstractMiddleware {
 
-    public Failsafe() {}
+    public Failsafe() {
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> {
+            try {
+                return next.handle(request).rescue(this::failsafeResponse);
+            } catch (Throwable error) {
+                return failsafeResponse(error);
+            }
+        });
+    }
+
+    private Response failsafeResponse(Throwable error) {
+        return Response.of(INTERNAL_SERVER_ERROR)
+                       .contentType(HTML + "; charset=utf-8")
+                       .done(formatAsHtml(error));
+    }
 
     public void handle(Request request, Response response) throws Exception {
         try {
