@@ -2,15 +2,13 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.helpers.Streams;
-import com.vtence.molecule.http.HttpDate;
-import com.vtence.molecule.http.HttpMethod;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
+import static com.vtence.molecule.http.HttpDate.format;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
@@ -32,7 +30,7 @@ public class FileServerTest {
 
     @Test public void
     servesFiles() throws Exception {
-        fileServer.handle(request, response);
+        Response response = fileServer.handle(Request.get(SAMPLE_IMAGE));
 
         assertThat(response).hasStatus(OK)
                             .hasHeader("Content-Length", valueOf(file.length()))
@@ -43,7 +41,7 @@ public class FileServerTest {
 
     @Test public void
     guessesMimeTypeFromExtension() throws Exception {
-        fileServer.handle(request, response);
+        Response response = fileServer.handle(Request.get(SAMPLE_IMAGE));
 
         assertThat(response).hasContentType("image/png");
     }
@@ -51,21 +49,21 @@ public class FileServerTest {
     @Test public void
     learnsNewMediaTypes() throws Exception {
         fileServer.registerMediaType("png", "image/custom-png");
-        fileServer.handle(request, response);
+        Response response = fileServer.handle(Request.get(SAMPLE_IMAGE));
 
         assertThat(response).hasContentType("image/custom-png");
     }
 
     @Test public void
     setsLastModifiedHeader() throws Exception {
-        fileServer.handle(request, response);
+        Response response = fileServer.handle(Request.get(SAMPLE_IMAGE));
 
-        assertThat(response).hasHeader("Last-Modified", HttpDate.format(file.lastModified()));
+        assertThat(response).hasHeader("Last-Modified", format(file.lastModified()));
     }
 
     @Test public void
     rendersNotFoundWhenFileIsNotFound() throws Exception {
-        fileServer.handle(request.path("/images/missing.png"), response);
+        Response response = fileServer.handle(Request.get("/images/missing.png"));
 
         assertThat(response).hasStatus(NOT_FOUND)
                             .hasContentType("text/plain")
@@ -75,15 +73,15 @@ public class FileServerTest {
 
     @Test public void
     rendersNotFoundWhenFileIsNotReadable() throws Exception {
-        fileServer.handle(request.path("/images"), response);
+        Response response = fileServer.handle(request.path("/images"));
 
         assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test public void
     sendsNotModifiedIfFileHasNotBeenModifiedSinceLastServe() throws Exception {
-        request.header("If-Modified-Since", HttpDate.format(file.lastModified()));
-        fileServer.handle(request, response);
+        Response response = fileServer.handle(Request.get(SAMPLE_IMAGE)
+                                                     .header("If-Modified-Since", format(file.lastModified())));
 
         assertThat(response).hasStatus(NOT_MODIFIED).isDone();
     }
@@ -93,14 +91,14 @@ public class FileServerTest {
         fileServer.header("Cache-Control", "public, max-age=60")
                   .header("Access-Control-Allow-Origin", "*");
 
-        fileServer.handle(request, response);
+        Response response = fileServer.handle(Request.get(SAMPLE_IMAGE));
         assertThat(response).hasHeader("Cache-Control", "public, max-age=60")
                             .hasHeader("Access-Control-Allow-Origin", "*");
     }
 
     @Test public void
     allowsHeadRequests() throws Exception {
-        fileServer.handle(request.method(HttpMethod.HEAD), response);
+        Response response = fileServer.handle(Request.head(SAMPLE_IMAGE));
 
         assertThat(response).hasStatus(OK)
                             .hasHeader("Content-Length", valueOf(file.length()))
@@ -110,7 +108,7 @@ public class FileServerTest {
 
     @Test public void
     rejectsUnsupportedMethod() throws Exception {
-        fileServer.handle(request.method(HttpMethod.POST), response);
+        Response response = fileServer.handle(Request.post(SAMPLE_IMAGE));
 
         assertThat(response).hasStatus(METHOD_NOT_ALLOWED)
                             .hasHeader("Allow", "GET, HEAD")
@@ -119,6 +117,6 @@ public class FileServerTest {
     }
 
     private byte[] contentOf(final File file) throws IOException {
-        return Streams.consume(new FileInputStream(file));
+        return Files.readAllBytes(file.toPath());
     }
 }

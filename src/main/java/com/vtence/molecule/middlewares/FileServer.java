@@ -23,6 +23,7 @@ import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.MimeTypes.TEXT;
 
@@ -48,6 +49,37 @@ public class FileServer implements Application {
         return this;
     }
 
+    public Response handle(Request request) throws Exception {
+        if (!methodAllowed(request)) {
+            return Response.of(METHOD_NOT_ALLOWED)
+                           .header(ALLOW, ALLOW_HEADER)
+                           .done();
+        }
+
+        File file = new File(root, request.path());
+        if (!canServe(file)) {
+            return Response.of(NOT_FOUND)
+                           .contentType(TEXT)
+                           .body("File not found: " + request.path())
+                           .done();
+        }
+
+        if (notModifiedSince(lastTimeSeen(request), file)) {
+            return Response.of(NOT_MODIFIED)
+                           .done();
+        }
+
+        Response response = Response.ok();
+        addFileHeaders(response, file);
+        addCustomHeaders(response);
+
+        if (head(request)) {
+            return response.done();
+        }
+
+        return response.done(new FileBody(file));
+    }
+
     public void handle(Request request, Response response) throws Exception {
         if (!methodAllowed(request)) {
             response.header(ALLOW, ALLOW_HEADER);
@@ -58,7 +90,7 @@ public class FileServer implements Application {
 
         File file = new File(root, request.path());
         if (!canServe(file)) {
-            response.status(HttpStatus.NOT_FOUND);
+            response.status(NOT_FOUND);
             response.contentType(TEXT);
             response.body("File not found: " + request.path());
             response.done();
