@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
@@ -38,6 +39,10 @@ public class Layout extends AbstractMiddleware {
         this.selector = selector;
         this.processor = processor;
         this.decorator = decorator;
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> next.handle(request).whenSuccessful(decorate(request)));
     }
 
     public void handle(Request request, Response response) throws Exception {
