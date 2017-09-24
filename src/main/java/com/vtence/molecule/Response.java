@@ -56,6 +56,25 @@ public class Response {
     }
 
     /**
+     * Sends a SEE OTHER (303) redirect response to the client using the specified redirect location.
+     *
+     * @param location the url of the other location
+     */
+    public static Response redirect(String location) {
+        return Response.redirect(location, SEE_OTHER);
+    }
+
+    /**
+     * Sends a redirect response to the client using the specified redirect location and HTTP status.
+     *
+     * @param location the url of the other location
+     * @param status the status to set on the response
+     */
+    public static Response redirect(String location, HttpStatus status) {
+        return Response.of(status).header("Location", location);
+    }
+
+    /**
      * Sets the HTTP status for this response. This will set both the status code and the status text.
      *
      * <p>

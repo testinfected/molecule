@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpStatus;
@@ -57,6 +58,16 @@ public class ForceSSL extends AbstractMiddleware {
         redirectOn = header;
     }
 
+    public Application then(Application next) {
+        return Application.of(request -> {
+            if (enable && !secure(request)) {
+                return redirectToHttps(request);
+            } else {
+                return next.handle(request).whenSuccessful(this::addHSTSHeader);
+            }
+        });
+    }
+
     public void handle(Request request, Response response) throws Exception {
         if (enable && !secure(request)) {
             redirectToHttps(request, response);
@@ -88,6 +99,11 @@ public class ForceSSL extends AbstractMiddleware {
         response.redirectTo(httpsLocationFor(request))
                 .status(redirectionStatusFor(request))
                 .done();
+    }
+
+    private Response redirectToHttps(Request request) {
+        return Response.redirect(httpsLocationFor(request), redirectionStatusFor(request))
+                       .done();
     }
 
     private String httpsLocationFor(Request request) {
