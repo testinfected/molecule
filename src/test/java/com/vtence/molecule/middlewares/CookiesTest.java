@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.CookieJar;
@@ -16,82 +17,74 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class CookiesTest {
 
-    Request request = new Request();
-    Response response = new Response();
-
-    Cookies cookies = new Cookies();
     @Rule
     public ExpectedException error = ExpectedException.none();
 
+    Cookies cookies = new Cookies();
+
     @Test
     public void fillsCookieJarWithClientCookies() throws Exception {
-        cookies.connectTo((request, response) -> {
+        Response response = cookies.then(request -> {
             CookieJar jar = CookieJar.get(request);
-            response.body("foo: " + jar.get("foo").value() + ", baz: " + jar.get("baz").value());
-        });
+            return Response.ok()
+                           .done("foo: " + jar.get("foo").value() + ", " +
+                                 "baz: " + jar.get("baz").value());
+        }).handle(Request.get("/")
+                         .addHeader("Cookie", "foo=bar; baz=qux"));
 
-        request.addHeader("Cookie", "foo=bar; baz=qux");
-        cookies.handle(request, response);
-        response.done();
-
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("foo: bar, baz: qux");
     }
 
     @Test
     public void poursNewCookiesFromJar() throws Exception {
-        cookies.connectTo((request, response) -> {
+        Response response = cookies.then(request -> {
             CookieJar jar = CookieJar.get(request);
             jar.add("oogle", "foogle");
             jar.add("gorp", "mumble");
-        });
+            return Response.ok().done();
+        }).handle(Request.get("/")
+                         .addHeader("Cookie", "foo=bar; baz=qux"));
 
-        request.addHeader("Cookie", "foo=bar; baz=qux");
-        cookies.handle(request, response);
-        response.done();
-
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeaders("Set-Cookie",
-                contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
+                                        contains("oogle=foogle; version=1; path=/", "gorp=mumble; version=1; path=/"));
     }
 
     @Test
     public void expiresDiscardedCookies() throws Exception {
-        cookies.connectTo((request, response) -> {
+        Response response = cookies.then(request -> {
             CookieJar jar = CookieJar.get(request);
             jar.discard("foo");
-        });
+            return Response.ok().done();
+        }).handle(Request.get("/")
+                         .addHeader("Cookie", "foo=bar; baz=qux"));
 
-        request.addHeader("Cookie", "foo=bar; baz=qux");
-        cookies.handle(request, response);
-        response.done();
-
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeaders("Set-Cookie", contains("foo=; version=1; path=/; max-age=0"));
     }
 
     @Test
     public void
     unbindsCookieJarOnceDone() throws Exception {
-        cookies.handle(request, response);
-        assertThat(request).hasAttribute(CookieJar.class, notNullValue());
+        Request request = Request.get("/");
+        Response response = cookies.then(ok()).handle(request);
 
+        assertThat(request).hasAttribute(CookieJar.class, notNullValue());
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(request).hasNoAttribute(CookieJar.class);
     }
 
     @Test
     public void
     unbindsCookieJarWhenAnErrorOccurs() throws Exception {
-        cookies.connectTo((request, response) -> {
-            throw new Exception("Error!");
-        });
-
         error.expectMessage("Error!");
+
+        Request request = Request.get("/");
         try {
-            cookies.handle(request, response);
+            cookies.then(crash()).handle(request);
         } finally {
             assertThat(request).hasNoAttribute(CookieJar.class);
         }
@@ -100,13 +93,24 @@ public class CookiesTest {
     @Test
     public void
     unbindsCookieJarWhenAnErrorOccursLater() throws Throwable {
-        cookies.handle(request, response);
+        Request request = Request.get("/");
+        Response response = cookies.then(ok()).handle(request);
 
         response.done(new Exception("Error!"));
         assertThat(request).hasNoAttribute(CookieJar.class);
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private Application.ApplicationFunction ok() {
+        return request -> Response.ok();
+    }
+
+    private Application.ApplicationFunction crash() {
+        return request -> {
+            throw new Exception("Error!");
+        };
+    }
+
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 }

@@ -436,6 +436,20 @@ public class Response {
     }
 
     /**
+     * If not already completed, triggers an abnormal (i.e failed) completion of this response with the
+     * given exception.
+     *
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     **/
+    public Response done(Throwable error) {
+        done.completeExceptionally(error);
+        return this;
+    }
+
+    /**
      * If not already completed, triggers a normal (i.e successful) completion of this response.
      * <p>
      * A call to <code>done</code> has no effect if this response has already completed, whether normally or
@@ -445,19 +459,6 @@ public class Response {
     public Response done() {
         done.complete(this);
         return this;
-    }
-
-    /**
-     * If not already completed, triggers an abnormal (i.e failed) completion of this response with the
-     * given exception.
-     *
-     * <p>
-     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
-     * abnormally.
-     * </p>
-     **/
-    public void done(Throwable error) {
-        done.completeExceptionally(error);
     }
 
     /**
