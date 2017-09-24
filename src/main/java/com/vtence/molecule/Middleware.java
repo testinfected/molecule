@@ -57,4 +57,8 @@ public interface Middleware extends Application {
             }
         };
     }
+
+    static Middleware identity() {
+        return Middleware.from(application -> application);
+    }
 }

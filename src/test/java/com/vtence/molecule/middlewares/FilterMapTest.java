@@ -1,10 +1,11 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.lib.matchers.Matchers;
-import org.junit.Before;
 import org.junit.Test;
 
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
@@ -14,18 +15,11 @@ public class FilterMapTest {
 
     FilterMap filters = new FilterMap();
 
-    Request request = new Request();
-    Response response = new Response();
-
-    @Before public void
-    stubApplication() {
-        filters.connectTo((request, response) -> response.header("content", "content"));
-    }
-
     @Test public void
     immediatelyForwardsRequestWhenNoFilterIsRegistered() throws Exception {
-        filters.handle(request, response);
-        assertFilteredContent("content");
+        Response response = filters.then(stubResponse("content"))
+                                   .handle(Request.get("/"));
+        assertFilteredContent(response, "content");
     }
 
     @Test public void
@@ -33,24 +27,26 @@ public class FilterMapTest {
         filters.map(none(), filter("none"));
         filters.map(all(), filter("filter"));
 
-        filters.handle(request, response);
-        assertFilteredContent("filter(content)");
+        Response response = filters.then(stubResponse("content"))
+                                   .handle(Request.get("/"));
+        assertFilteredContent(response, "filter(content)");
     }
 
     @Test public void
-    forwardsRequestIfNoFilterMatches() throws Exception {
+    forwardsRequestIfNoFilterMatch() throws Exception {
         filters.map(none(), filter("no"));
-        filters.handle(request, response);
-        assertFilteredContent("content");
+        Response response = filters.then(stubResponse("content"))
+                                   .handle(Request.get("/"));
+        assertFilteredContent(response, "content");
     }
 
     @Test public void
     matchesOnPathPrefix() throws Exception {
-        request.path("/filtered/path");
         filters.map("/filtered", filter("filter"));
 
-        filters.handle(request, response);
-        assertFilteredContent("filter(content)");
+        Response response = filters.then(stubResponse("content"))
+                                   .handle(Request.get("/filtered/path"));
+        assertFilteredContent(response, "filter(content)");
     }
 
     @Test public void
@@ -58,11 +54,12 @@ public class FilterMapTest {
         filters.map(all(), filter("filter"));
         filters.map(all(), filter("replacement"));
 
-        filters.handle(request, response);
-        assertFilteredContent("replacement(content)");
+        Response response = filters.then(stubResponse("content"))
+                                   .handle(Request.get("/"));
+        assertFilteredContent(response, "replacement(content)");
     }
 
-    private void assertFilteredContent(String content) {
+    private void assertFilteredContent(Response response, String content) {
         assertThat(response).hasHeader("content", content);
     }
 
@@ -74,12 +71,15 @@ public class FilterMapTest {
         return Matchers.nothing();
     }
 
-    private AbstractMiddleware filter(final String name) {
-        return new AbstractMiddleware() {
-            public void handle(Request request, Response response) throws Exception {
-                forward(request, response);
-                response.header("content", format("%s(%s)", name, response.header("content")));
-            }
-        };
+    private Middleware filter(final String name) {
+        return Middleware.from(
+                next -> Application.of(request -> {
+                    Response response = next.handle(request);
+                    return response.header("content", format("%s(%s)", name, response.header("content")));
+                }));
     }
-}
+
+    private Application.ApplicationFunction stubResponse(String content) {
+        return request -> Response.ok().header("content", content).done();
+    }
+};
