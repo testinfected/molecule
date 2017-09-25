@@ -31,6 +31,17 @@ public class StaticAssets extends AbstractMiddleware {
         return this;
     }
 
+    public Application then(Application next) {
+        return Application.of(request -> canServe(request.path()) ? serve(request) :  next.handle(request));
+    }
+
+    private Response serve(Request request) throws Exception {
+        if (targetsDirectory(request)) {
+            request.path(request.path() + indexFile);
+        }
+        return fileServer.handle(request);
+    }
+
     public void handle(Request request, Response response) throws Exception {
         if (canServe(request.path())) {
             serve(request, response);
