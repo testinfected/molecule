@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
@@ -10,16 +11,12 @@ import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class URLMapTest {
 
-    URLMap map = new URLMap(new NotFound());
-    Request request = new Request();
-    Response response = new Response();
+    URLMap map = new URLMap();
 
     @Test
-    public void fallsBackToDefaultApplicationForUnmappedPaths() throws Exception {
-        request.path("/unmapped");
-
-        map.handle(request, response);
-        response.done();
+    public void fallsBackToApplicationForUnmappedPaths() throws Exception {
+        Response response = map.then(new NotFound())
+                               .handle(Request.get("/unmapped"));
 
         assertThat(response).hasStatus(NOT_FOUND)
                             .hasBodyText("Not found: /unmapped");
@@ -27,64 +24,87 @@ public class URLMapTest {
 
     @Test
     public void dispatchesBasedOnRequestPath() throws Exception {
-        map.mount("/foo", this::describeMount)
-           .mount("/baz", this::describeMount);
+        map.mount("/foo", describeMount())
+           .mount("/baz", describeMount());
 
-        map.handle(request.path("/baz/quux"), response);
+        Response response = map.then(ok())
+                               .handle(Request.get("/baz/quux"));
 
-        assertThat(response).hasStatus(OK).hasBodyText("/baz at /quux (/baz/quux)");
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("/baz at /quux (/baz/quux)");
     }
 
     @Test
     public void matchesMountPointsAsWords() throws Exception {
-        map.mount("/foo", (request, response) -> response.done("mounted!?!"));
+        map.mount("/foo", Application.of(request -> Response.ok().done("mounted!?!")));
 
-        map.handle(request.path("/foobar"), response);
+        Response response = map.then(new NotFound())
+                               .handle(Request.get("/foobar"));
 
         assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test
     public void dispatchesToServerRootCorrectly() throws Exception {
-        map.mount("/", this::describeMount);
+        map.mount("/", describeMount());
 
-        map.handle(request.path("/"), response);
-        assertThat(response).hasStatus(OK).hasBodyText("/ at / (/)");
+        Response response = map.then(ok())
+                               .handle(Request.get("/"));
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("/ at / (/)");
 
-        map.handle(request.path("/foo"), response);
-        assertThat(response).hasStatus(OK).hasBodyText("/ at /foo (/foo)");
+        response = map.then(ok())
+                      .handle(Request.get("/foo"));
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("/ at /foo (/foo)");
     }
 
     @Test
     public void dispatchesToImplicitMountRootCorrectly() throws Exception {
-        map.mount("/foo", this::describeMount);
+        map.mount("/foo", describeMount());
 
-        map.handle(request.path("/foo"), response);
+        Response response = map.then(ok())
+                               .handle(Request.get("/foo"));
 
-        assertThat(response).hasStatus(OK).hasBodyText("/foo at / (/foo)");
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("/foo at / (/foo)");
     }
 
     @Test
     public void dispatchesToExplicitMountRootCorrectly() throws Exception {
-        map.mount("/foo", this::describeMount);
+        map.mount("/foo", describeMount());
 
-        map.handle(request.path("/foo/"), response);
+        Response response = map.then(ok())
+                               .handle(Request.get("/foo/"));
 
-        assertThat(response).hasStatus(OK).hasBodyText("/foo at / (/foo)");
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("/foo at / (/foo)");
     }
 
     @Test
     public void dispatchesToMostSpecificPath() throws Exception {
-        map.mount("/foo", this::describeMount)
-           .mount("/foo/bar", this::describeMount);
+        map.mount("/foo", describeMount())
+           .mount("/foo/bar", describeMount());
 
-        map.handle(request.path("/foo/bar/quux"), response);
+        Response response = map.then(ok())
+                               .handle(Request.get("/foo/bar/quux"));
 
-        assertThat(response).hasStatus(OK).hasBodyText("/foo/bar at /quux (/foo/bar/quux)");
+        assertThat(response).hasStatus(OK)
+                            .hasBodyText("/foo/bar at /quux (/foo/bar/quux)");
     }
 
-    public void describeMount(Request request, Response response) {
-        URLMap.MountPoint mountPoint = request.attribute(URLMap.MountPoint.class);
-        response.done(String.format("%s at %s (%s)", mountPoint.app(), request.path(), mountPoint.uri(request.path())));
+    private Application.ApplicationFunction ok() {
+        return request -> Response.ok().done();
+    }
+
+    public Application describeMount() {
+        return Application.of(request -> {
+            URLMap.MountPoint mountPoint = request.attribute(URLMap.MountPoint.class);
+            return Response.ok()
+                           .done(String.format("%s at %s (%s)",
+                                               mountPoint.app(),
+                                               request.path(),
+                                               mountPoint.uri(request.path())));
+        });
     }
 }

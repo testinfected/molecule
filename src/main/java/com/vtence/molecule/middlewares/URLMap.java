@@ -26,12 +26,22 @@ public class URLMap extends AbstractMiddleware {
         return this;
     }
 
+    public Application then(Application next) {
+        return Application.of(request -> mountFor(request).orElse(new Mount(next)).handle(request));
+    }
+
     private void sortByMostSpecificPaths(List<Mount> mounts) {
         mounts.sort((mount1, mount2) -> mount2.mountPoint.length() - mount1.mountPoint.length());
     }
 
+    private Optional<Mount> mountFor(Request request) {
+        return mounts.stream()
+                     .filter(m -> m.matches(request))
+                     .findFirst();
+    }
+
     public void handle(Request request, Response response) throws Exception {
-        Optional<Mount> mount = mounts.stream().filter(m -> m.matches(request)).findFirst();
+        Optional<Mount> mount = mountFor(request);
 
         if (mount.isPresent()) {
             mount.get().handle(request, response);
@@ -41,7 +51,6 @@ public class URLMap extends AbstractMiddleware {
     }
 
     public interface MountPoint {
-
         String app();
 
         String uri(String path);
@@ -57,6 +66,10 @@ public class URLMap extends AbstractMiddleware {
 
         private final String mountPoint;
         private final Application app;
+
+        public Mount(Application app) {
+            this("/", app);
+        }
 
         public Mount(String mountPoint, Application app) {
             this.mountPoint = mountPoint;
@@ -75,6 +88,12 @@ public class URLMap extends AbstractMiddleware {
             if (mountPoint.equals("/")) return request.path();
             String pathInfo = request.path().replaceFirst(mountPoint, "");
             return pathInfo.isEmpty() ? "/" : pathInfo;
+        }
+
+        public Response handle(Request request) throws Exception {
+            request.path(pathInfo(request));
+            request.attribute(MountPoint.class, this);
+            return app.handle(request);
         }
 
         public String uri(String path) {
