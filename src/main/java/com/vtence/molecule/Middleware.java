@@ -4,7 +4,7 @@ public interface Middleware extends Application {
 
     // Define a functional interface ...
     interface MiddlewareFunction {
-        Application then(Application application);
+        Application then(Application next);
     }
 
     // ... so that we can use method references with new our style `Middleware`s ...

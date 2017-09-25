@@ -2,10 +2,8 @@ package examples.middleware;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Middleware;
-import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.AbstractMiddleware;
 
 import java.io.IOException;
 
@@ -28,39 +26,40 @@ public class CustomMiddlewareExample {
     public void run(WebServer server) throws IOException {
         // To demonstrate performing some work before handling control to the processing pipeline,
         // we read the User-Agent header and redirect IE users to the Mozilla web site.
-        Middleware getFirefox = new AbstractMiddleware() {
-            public void handle(Request request, Response response) throws Exception {
+        Middleware getFirefox = Middleware.from(next ->
+            Application.of(request -> {
                 // Tell IE users to get Firefox
                 String userAgent = request.header("User-Agent");
                 if (userAgent != null && userAgent.contains("MSIE")) {
                     // Short-circuit the processing pipeline and redirect our user
                     // to the Mozilla web site
-                    response.redirectTo("http://www.mozilla.org").done();
+                    return Response.redirect("http://www.mozilla.org").done();
                 } else {
                     // Hand over control to next application in the stack
-                    forward(request, response);
+                    return next.handle(request);
                 }
-            }
-        };
+            })
+        );
 
         // To demonstrate performing additional work after getting control back, we set the Content-Length
         // header on the response
         // (for a more capable version of this middleware, check the ContentLengthHeader middleware)
-        Middleware contentLengthHeader = new AbstractMiddleware() {
-            public void handle(Request request, Response response) throws Exception {
+        Middleware contentLengthHeader = Middleware.from(next ->
+            Application.of(request ->
                 // Forward the request for processing, the perform additional work when the response
                 // completes
-                forward(request, response).whenSuccessful(resp -> {
+                next.handle(request).whenSuccessful(resp -> {
                     // Set the content length header on the response
                     resp.contentLength(resp.size());
-                });
-            }
-        };
-
+                })
+            )
+        );
 
         // A simple hello world application
-        Application helloWorld = (request, response) ->
-                response.contentType("text/html").done("<html><body>Hello, World</body></html>");
+        Application helloWorld = Application.of(request ->
+                Response.ok()
+                        .contentType("text/html")
+                        .done("<html><body>Hello, World</body></html>"));
 
         // Deploy middlewares first, followed by our application
         server.add(getFirefox)
