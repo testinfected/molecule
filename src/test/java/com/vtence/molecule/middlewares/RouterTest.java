@@ -9,35 +9,30 @@ import com.vtence.molecule.lib.matchers.Nothing;
 import com.vtence.molecule.routing.Route;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class RouterTest {
 
-    Router router = new Router(new NotFound());
-    Request request = new Request();
-    Response response = new Response();
+    Router router = new Router();
 
     @Test public void
-    routesToDefaultWhenNoRouteMatches() throws Exception {
-        router.defaultsTo(route("default")).add(new StaticRoute(none(), route("other")));
-        router.handle(request, response);
-        assertRoutedTo("default");
+    rendersNotFoundWhenNoRouteMatch() throws Exception {
+        router.add(new StaticRoute(none(), route("other")));
+        Response response = router.handle(Request.get("/"));
+        assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test public void
     dispatchesToFirstRouteThatMatches() throws Exception {
         router.add(new StaticRoute(all(), route("preferred")));
         router.add(new StaticRoute(all(), route("alternate")));
-        router.handle(request, response);
-        assertRoutedTo("preferred");
-    }
-
-    private void assertRoutedTo(String route) {
-        assertThat(response).hasBodyText(route);
+        Response response = router.handle(Request.get("/"));
+        assertThat(response).hasBodyText("preferred");
     }
 
     private Application route(final String name) {
-        return (request, response) -> response.body(name);
+        return Application.of(request -> Response.ok().done(name));
     }
 
     public static Matcher<Request> all() {
@@ -59,6 +54,10 @@ public class RouterTest {
 
         public void handle(Request request, Response response) throws Exception {
             app.handle(request, response);
+        }
+
+        public Response handle(Request request) throws Exception {
+            return app.handle(request);
         }
 
         public boolean matches(Request actual) {

@@ -30,6 +30,17 @@ public class DynamicRoute implements Route {
         return Combination.both(matcher);
     }
 
+    public Response handle(Request request) throws Exception {
+        if (path instanceof WithBoundParameters) {
+            WithBoundParameters dynamicPath = (WithBoundParameters) path;
+            Map<String, String> dynamicParameters = dynamicPath.parametersBoundTo(request.path());
+            for (String name: dynamicParameters.keySet()  ) {
+                request.addParameter(name, dynamicParameters.get(name));
+            }
+        }
+        return app.handle(request);
+    }
+
     public void handle(Request request, Response response) throws Exception {
         if (path instanceof WithBoundParameters) {
             WithBoundParameters dynamicPath = (WithBoundParameters) path;

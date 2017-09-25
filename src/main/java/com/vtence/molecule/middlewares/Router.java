@@ -9,9 +9,8 @@ import com.vtence.molecule.routing.RouteSet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class Router extends AbstractMiddleware implements RouteSet {
+public class Router implements Application, RouteSet {
 
     public static Router draw(RouteBuilder routeBuilder) {
         Router router = new Router();
@@ -20,33 +19,51 @@ public class Router extends AbstractMiddleware implements RouteSet {
     }
 
     private final List<Route> routingTable = new ArrayList<>();
+    private final Application fallback;
 
     public Router() {
         this(new NotFound());
     }
 
     public Router(final Application fallback) {
-        connectTo(fallback);
-    }
-
-    public Router defaultsTo(Application app) {
-        connectTo(app);
-        return this;
+        this.fallback = fallback;
     }
 
     public void add(Route route) {
         routingTable.add(route);
     }
 
-    private Optional<Route> routeFor(Request request) {
-        return routingTable.stream().filter(route -> route.matches(request)).findFirst();
+    public Response handle(Request request) throws Exception {
+        return routeFor(request).handle(request);
     }
 
     public void handle(Request request, Response response) throws Exception {
-        Optional<Route> route = routeFor(request);
-        if (route.isPresent())
-            route.get().handle(request, response);
-        else
-            forward(request, response);
+        routeFor(request).handle(request, response);
+    }
+
+    private Route routeFor(Request request) {
+        return routingTable.stream().filter(route -> route.matches(request))
+                           .findFirst()
+                           .orElse(new FallbackRoute(fallback));
+    }
+
+    private class FallbackRoute implements Route {
+        private final Application fallback;
+
+        public FallbackRoute(Application fallback) {
+            this.fallback = fallback;
+        }
+
+        public Response handle(Request request) throws Exception {
+            return fallback.handle(request);
+        }
+
+        public void handle(Request request, Response response) throws Exception {
+            fallback.handle(request, response);
+        }
+
+        public boolean matches(Request actual) {
+            return true;
+        }
     }
 }
