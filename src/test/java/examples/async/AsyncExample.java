@@ -1,5 +1,7 @@
 package examples.async;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 
 import java.io.IOException;
@@ -22,7 +24,8 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 public class AsyncExample {
 
     public void run(WebServer server) throws IOException {
-        server.start((request, response) -> {
+        server.start(Application.of(request -> {
+            Response response = Response.ok();
             // We can serve responses asynchronously from a separate thread, without blocking I/O. We'll use
             // the common fork-join pool to run a task that takes 500ms to complete.
             runAsync(() -> {
@@ -34,7 +37,9 @@ public class AsyncExample {
                 // to the client.
                 response.done("After waiting for a long time...");
             });
-        });
+
+            return response;
+        }));
     }
 
     private void aLongRunningProcess(int millis) {
