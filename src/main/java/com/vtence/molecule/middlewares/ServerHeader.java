@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
@@ -11,6 +12,11 @@ public class ServerHeader extends AbstractMiddleware {
 
     public ServerHeader(String serverName) {
         this.serverName = serverName;
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> next.handle(request)
+                                             .whenSuccessful(this::setServerHeaderIfMissing));
     }
 
     public void handle(Request request, Response response) throws Exception {
