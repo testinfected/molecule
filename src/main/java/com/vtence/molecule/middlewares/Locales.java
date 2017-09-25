@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.AcceptLanguage;
@@ -22,6 +23,21 @@ public class Locales extends AbstractMiddleware {
             locales.add(Locale.forLanguageTag(tag));
         }
         return locales;
+    }
+
+    public Application then(Application next) {
+        return Application.of(request -> {
+            AcceptLanguage acceptedLanguages = AcceptLanguage.of(request);
+            Locale best = acceptedLanguages.selectBest(supported);
+            request.attribute(Locale.class, best != null ? best : Locale.getDefault());
+
+            try {
+                return next.handle(request).whenComplete((result, error) -> unbindLocale(request));
+            } catch(Throwable error) {
+                unbindLocale(request);
+                throw error;
+            }
+        });
     }
 
     public void handle(Request request, Response response) throws Exception {
