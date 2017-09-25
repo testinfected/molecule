@@ -1,17 +1,16 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.middlewares.AbstractMiddleware;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 public class MiddlewareStackTest {
 
     MiddlewareStack stack = new MiddlewareStack();
-
-    Request request = new Request();
-    Response response = new Response();
 
     @Test public void
     assemblesChainInOrderOfAddition() throws Exception {
@@ -20,16 +19,20 @@ public class MiddlewareStackTest {
         stack.use(middleware("bottom"));
         stack.run(application("runner"));
 
-        stack.handle(request, response);
-        assertChain(is("top -> middle -> bottom -> runner"));
+        Response response = stack.boot()
+                                 .handle(Request.get("/"));
+
+        assertChainOf(response, is("top -> middle -> bottom -> runner"));
     }
 
     @Test public void
     supportMountPointsInsteadOfRunners() throws Exception {
         stack.mount("/api", application("api"));
 
-        stack.handle(request.path("/api"), response);
-        assertChain(is("api"));
+        Response response = stack.boot()
+                                 .handle(Request.get("/api"));
+
+        assertChainOf(response, is("api"));
     }
 
     @Test public void
@@ -37,8 +40,20 @@ public class MiddlewareStackTest {
         stack.mount("/api", application("api"));
         stack.run(application("main"));
 
-        stack.handle(request.path("/"), response);
-        assertChain(is("main"));
+        Response response = stack.boot()
+                                 .handle(Request.get("/"));
+
+        assertChainOf(response, is("main"));
+    }
+
+    @Test public void
+    mountsToNotFoundInTheAbsenceOfARunner() throws Exception {
+        stack.mount("/api", application("api"));
+
+        Response response = stack.boot()
+                                 .handle(Request.get("/"));
+
+        assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test public void
@@ -49,8 +64,10 @@ public class MiddlewareStackTest {
         stack.mount("/admin", application("admin"));
         stack.run(application("main"));
 
-        stack.handle(request.path("/"), response);
-        assertChain(is("top -> bottom -> main"));
+        Response response = stack.boot()
+                                 .handle(Request.get("/"));
+
+        assertChainOf(response, is("top -> bottom -> main"));
     }
 
     @Test public void
@@ -60,48 +77,50 @@ public class MiddlewareStackTest {
         stack.use(middleware("bottom"));
         stack.mount("/admin", application("admin"));
 
-        stack.handle(request.path("/api"), response);
-        assertChain(is("top -> api"));
+        Response response = stack.boot()
+                                 .handle(Request.get("/api"));
+
+        assertChainOf(response, is("top -> api"));
     }
 
     @Test public void
-    acceptsAnWarmUpSequence() throws Exception {
+    acceptsAWarmUpSequence() throws Exception {
+        final boolean[] booted = {false};
+
         stack.use(middleware("ready"));
         stack.use(middleware("set"));
         stack.warmup(app -> {
-            try {
-                app.handle(request, response);
-            } catch (Exception e) {
-                throw new AssertionError(e);
-            }
+            booted[0] = true;
         });
         stack.run(application("go!"));
 
-        stack.boot();
-        assertChain(is("ready -> set -> go!"));
+        Response response = stack.boot()
+                                 .handle(Request.get("/"));
+
+        assertChainOf(response, is("ready -> set -> go!"));
+        assertThat("booted", booted[0], is(true));
     }
 
     @Test(expected = IllegalStateException.class) public void
     eitherMountOrRunnerIsRequired() throws Exception {
         stack.use(middleware("middleware"));
 
-        stack.handle(request, response);
+        stack.boot()
+             .handle(Request.get("/"));
     }
 
     private Middleware middleware(final String order) {
-        return new AbstractMiddleware() {
-            public void handle(Request request, Response response) throws Exception {
-                forward(request, response);
-                response.header("chain", order + " -> " + response.header("chain"));
-            }
-        };
+        return Middleware.from(application -> Application.of(request -> {
+            Response response = application.handle(request);
+            return response.header("chain", order + " -> " + response.header("chain"));
+        }));
     }
 
     private Application application(final String app) {
-        return (request, response) -> response.header("chain", app);
+        return Application.of(request -> Response.ok().header("chain", app).done());
     }
 
-    private void assertChain(org.hamcrest.Matcher<? super String> chaining) {
+    private void assertChainOf(Response response, Matcher<? super String> chaining) {
         assertThat(response).hasHeader("chain", chaining);
     }
 }

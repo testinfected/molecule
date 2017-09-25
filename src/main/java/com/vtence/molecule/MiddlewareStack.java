@@ -1,29 +1,23 @@
 package com.vtence.molecule;
 
+import com.vtence.molecule.middlewares.NotFound;
 import com.vtence.molecule.middlewares.URLMap;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Iterator;
 import java.util.function.Consumer;
 
-public class MiddlewareStack implements Application {
+public class MiddlewareStack {
 
-    private final Deque<Middleware> stack = new ArrayDeque<>();
-
+    private Middleware pipeline = Middleware.identity();
     private URLMap map;
     private Application runner;
-    private Application pipeline = (request, response) -> boot().handle(request, response);
     private Consumer<Application> warmup;
-
-    public MiddlewareStack() {}
 
     public MiddlewareStack use(Middleware middleware) {
         if (map != null) {
-            stack.add(map);
+            pipeline = pipeline.then(map);
             map = null;
         }
-        stack.add(middleware);
+        pipeline = pipeline.then(middleware);
         return this;
     }
 
@@ -45,33 +39,17 @@ public class MiddlewareStack implements Application {
         return this;
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        pipeline.handle(request, response);
-    }
-
     public Application boot() {
         if (map == null && runner == null) {
             throw new IllegalStateException("No app or mount points defined");
         }
 
         if (map != null) {
-            runner = runner != null ? map.mount("/", runner) : map;
+            pipeline = pipeline.then(map);
         }
 
-        pipeline = assemble();
-        if (warmup != null) warmup.accept(pipeline);
-        return pipeline;
-    }
-
-    private Application assemble() {
-        Application chain = runner;
-
-        for (Iterator<Middleware> middlewares = stack.descendingIterator(); middlewares.hasNext(); ) {
-            Middleware previous = middlewares.next();
-            previous.connectTo(chain);
-            chain = previous;
-        }
-
-        return chain;
+        Application app = pipeline.then(runner != null ? runner : new NotFound());
+        if (warmup != null) warmup.accept(app);
+        return app;
     }
 }

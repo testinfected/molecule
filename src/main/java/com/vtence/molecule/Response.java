@@ -71,7 +71,7 @@ public class Response {
      * @param status the status to set on the response
      */
     public static Response redirect(String location, HttpStatus status) {
-        return Response.of(status).header("Location", location);
+        return Response.of(status).header(LOCATION, location);
     }
 
     /**
