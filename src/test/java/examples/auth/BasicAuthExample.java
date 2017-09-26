@@ -1,5 +1,7 @@
 package examples.auth;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.http.MimeTypes;
 import com.vtence.molecule.lib.Authenticator;
@@ -40,11 +42,13 @@ public class BasicAuthExample {
     public void run(WebServer server) throws IOException {
         // Use HTTP Basic Authentication to protect our application
         server.add(new BasicAuthentication(realm, this::authenticate))
-              .start((request, response) -> {
+              .start(Application.of(request -> {
                   // Authenticated username is available as the REMOTE_USER request attribute
                   String username = request.attribute("REMOTE_USER");
-                  response.contentType(MimeTypes.TEXT).done("Hello, " + username);
-              });
+                  return Response.ok()
+                                 .contentType(MimeTypes.TEXT)
+                                 .done("Hello, " + username);
+              }));
     }
 
     public Optional<String> authenticate(String... credentials) {

@@ -83,7 +83,7 @@ public class SimpleServer implements Server {
             try {
                 final Request request = asRequest(httpRequest, resources);
                 app.handle(request)
-                   .whenSuccessful(commitTo(httpResponse))
+                   .whenSuccessful(transferTo(httpResponse))
                    .whenFailed((result, error) -> failureReporter.errorOccurred(error))
                    .whenComplete((result, error) -> closeAll(resources, httpResponse));
             } catch (Throwable failure) {
@@ -171,7 +171,7 @@ public class SimpleServer implements Server {
             request.body(input);
         }
 
-        private Consumer<Response> commitTo(org.simpleframework.http.Response httpResponse) {
+        private Consumer<Response> transferTo(org.simpleframework.http.Response httpResponse) {
             return response -> {
                 try {
                     commit(httpResponse, response);

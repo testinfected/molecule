@@ -100,7 +100,7 @@ public class UndertowServer implements Server {
             try {
                 Request request = asRequest(exchange, resources);
                 app.handle(request)
-                   .whenSuccessful(commitTo(exchange))
+                   .whenSuccessful(transferTo(exchange))
                    .whenFailed((result, error) -> failureReporter.errorOccurred(error))
                    .whenComplete((result, error) -> closeAll(resources, exchange));
             } catch (Throwable failure) {
@@ -211,7 +211,7 @@ public class UndertowServer implements Server {
             request.body(body);
         }
 
-        private Consumer<Response> commitTo(HttpServerExchange exchange) {
+        private Consumer<Response> transferTo(HttpServerExchange exchange) {
             return response -> {
                 try {
                     commit(exchange, response);
