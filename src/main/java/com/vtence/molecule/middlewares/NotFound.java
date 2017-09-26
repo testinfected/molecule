@@ -14,12 +14,4 @@ public class NotFound implements Application {
                 .contentType(TEXT)
                 .done("Not found: " + request.path());
     }
-
-    public void handle(Request request, Response response) throws Exception {
-        response.status(NOT_FOUND)
-                .contentType(TEXT)
-                .body("Not found: " + request.path())
-                .done();
-
-    }
 }
