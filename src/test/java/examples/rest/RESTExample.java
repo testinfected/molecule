@@ -1,5 +1,7 @@
 package examples.rest;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.lib.TextBody;
 import com.vtence.molecule.middlewares.HttpMethodOverride;
@@ -37,7 +39,7 @@ public class RESTExample {
         server.add(new HttpMethodOverride())
               .start((new DynamicRoutes() {{
                   // GET to /albums returns the entire list of albums
-                  get("/albums").to((request, response) -> {
+                  get("/albums").to(Application.of(request -> {
                       // We server a simple plain text response
                       TextBody body = new TextBody();
                       for (int id : albums.keySet()) {
@@ -47,32 +49,35 @@ public class RESTExample {
                       if (body.text().isEmpty()) {
                           body.append("Your music library is empty");
                       }
-                      response.done(body);
-                  });
+                      return Response.ok()
+                                     .done(body);
+                  }));
 
                   // POST to /albums creates a new album
-                  post("/albums").to((request, response) -> {
+                  post("/albums").to(Application.of(request -> {
                       int id = sequence.next();
                       Album album = new Album(request.parameter("title"), request.parameter("artist"));
                       albums.put(id, album);
-                      response.statusCode(201)
-                              .done(album.info());
-                  });
+                      return Response.of(201)
+                                     .done(album.info());
+                  }));
 
                   // GET to /albums/<id> fetches an existing album
-                  get("/albums/:id").to((request, response) -> {
+                  get("/albums/:id").to(Application.of(request -> {
                       int id = Integer.parseInt(request.parameter("id"));
                       if (albums.containsKey(id)) {
                           Album album = albums.get(id);
-                          response.done(album.info());
+                          return Response.ok()
+                                         .done(album.info());
                       } else {
-                          response.statusCode(404).done();
+                          return Response.of(404)
+                                         .done();
                       }
-                  });
+                  }));
 
                   // PUT to /albums/<id> updates an existing album
                   // It can be done with either a PUT or a POST with parameter _method=PUT
-                  put("/albums/:id").to((request, response) -> {
+                  put("/albums/:id").to(Application.of(request -> {
                       int id = Integer.parseInt(request.parameter("id"));
                       Album album = albums.get(id);
                       if (album != null) {
@@ -80,23 +85,27 @@ public class RESTExample {
                           if (title != null) album.title = title;
                           String artist = request.parameter("artist");
                           if (artist != null) album.artist = artist;
-                          response.done(album.info());
+                          return Response.ok()
+                                         .done(album.info());
                       } else {
-                          response.statusCode(404).done();
+                          return Response.of(404)
+                                         .done();
                       }
-                  });
+                  }));
 
                   // DELETE to /albums/<id> deletes an existing album
                   // It can be done with either a DELETE or a POST with parameter _method=DELETE
-                  delete("/albums/:id").to((request, response) -> {
+                  delete("/albums/:id").to(Application.of(request -> {
                       int id = Integer.parseInt(request.parameter("id"));
                       Album album = albums.remove(id);
                       if (album != null) {
-                          response.done(album.info());
+                          return Response.ok()
+                                         .done(album.info());
                       } else {
-                          response.statusCode(404).done();
+                          return Response.of(404)
+                                         .done();
                       }
-                  });
+                  }));
               }}));
     }
 

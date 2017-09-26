@@ -50,9 +50,20 @@ public class Response {
 
     /**
      * Creates a response with the given HTTP status
+     *
+     * @param status the HTTP status to set on the response
      */
     public static Response of(HttpStatus status) {
         return new Response().status(status);
+    }
+
+    /**
+     * Creates a response with the given HTTP status code
+     *
+     * @param statusCode the HTTP status code to set on the response
+     */
+    public static Response of(int statusCode) {
+        return new Response().statusCode(statusCode);
     }
 
     /**
