@@ -1,5 +1,7 @@
 package examples.templating;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.Layout;
 import com.vtence.molecule.routing.DynamicRoutes;
@@ -36,12 +38,13 @@ public class TemplatingAndLayoutExample {
         // Apply a common site layout to requests under the / path, i.e. to all rendered pages
         server.filter("/", Layout.html(layout))
               .start(new DynamicRoutes() {{
-                  get("/hello").to((request, response) -> {
-                      response.contentType("text/html; charset=utf-8");
+                  get("/hello").to(Application.of(request -> {
+                      Response response = Response.ok()
+                                                  .contentType("text/html; charset=utf-8");
                       String name = request.hasParameter("name") ? request.parameter("name") : "World";
                       // Mustache can use any object or a Map as a rendering context
-                      response.done(greeting.render(new User(name)));
-                  });
+                      return response.done(greeting.render(new User(name)));
+                  }));
               }});
     }
 
