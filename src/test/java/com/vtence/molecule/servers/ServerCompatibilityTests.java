@@ -1,8 +1,9 @@
 package com.vtence.molecule.servers;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.BodyPart;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.testing.http.Form;
@@ -72,9 +73,9 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     notifiesReportersOfFailures() throws IOException {
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             throw new Exception("Crash!");
-        });
+        }));
         request.send();
         assertThat("error", error, notNullValue());
         assertThat("error message", error.getMessage(), equalTo("Crash!"));
@@ -82,7 +83,7 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     notifiesReportersOfErrorsOccurringAsync() throws IOException {
-        server.run((request, response) -> response.done(new Exception("Crash!")));
+        server.run(Application.of(request -> Response.ok().done(new Exception("Crash!"))));
         request.send();
         assertThat("error", error, notNullValue());
         assertThat("error message", error.getMessage(), equalTo("Crash!"));
@@ -90,7 +91,7 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     respondsToRequests() throws IOException {
-        server.run((request, response) -> response.status(CREATED).done());
+        server.run(Application.of(request -> Response.of(CREATED).done()));
 
         response = request.send();
         assertNoError();
@@ -100,7 +101,11 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     respondsToRequestsAsynchronously() throws IOException {
-        server.run((request, response) -> runAsync(() -> response.status(CREATED).done()));
+        server.run(Application.of(request -> {
+            Response response = Response.of(CREATED);
+            runAsync(response::done);
+            return response;
+        }));
 
         response = request.send();
         assertNoError();
@@ -110,11 +115,10 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     doesNotChunkResponsesWithContentLengthHeader() throws IOException {
-        server.run((request, response) -> {
-            response.contentLength(16);
-            response.body("<html>...</html>");
-            response.done();
-        });
+        server.run(Application.of(request -> Response.ok()
+                                                     .contentLength(16)
+                                                     .body("<html>...</html>")
+                                                     .done()));
 
         response = request.send();
         assertNoError();
@@ -125,12 +129,11 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     encodesResponsesAccordingToContentType() throws IOException {
-        server.run((request, response) -> {
-            response.contentType("text/plain; charset=utf-16");
-            response.body("This content requires encoding &âçüè!");
-            response.status(HttpStatus.OK);
-            response.done();
-        });
+        server.run(Application.of(request -> {
+            return Response.ok()
+                           .contentType("text/plain; charset=utf-16")
+                           .done("This content requires encoding &âçüè!");
+        }));
 
         response = request.send();
         assertNoError();
@@ -142,7 +145,7 @@ public abstract class ServerCompatibilityTests {
     @Test public void
     providesGeneralRequestInformation() throws IOException {
         final Map<String, String> info = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             info.put("uri", request.uri());
             info.put("path", request.path());
             info.put("query", request.query());
@@ -155,8 +158,8 @@ public abstract class ServerCompatibilityTests {
             info.put("protocol", request.protocol());
             info.put("secure", valueOf(request.secure()));
             info.put("timestamp", valueOf(request.timestamp()));
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
         request.get("/over/there?name=ferret");
         assertNoError();
@@ -181,11 +184,11 @@ public abstract class ServerCompatibilityTests {
     @Test public void
     readsRequestHeaders() throws IOException {
         final Map<String, Iterable<String>> headers = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             headers.put("names", request.headerNames());
             headers.put("encoding", request.headers("Accept-Encoding"));
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
         request.header("Accept", "text/html")
                .header("Accept-Encoding", "gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0")
@@ -199,11 +202,9 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     writesHeadersWithMultipleValues() throws IOException {
-        server.run((request, response) -> {
-            response.addHeader("Cache-Control", "no-cache");
-            response.addHeader("Cache-Control", "no-store");
-            response.done();
-        });
+        server.run(Application.of(request -> Response.ok().addHeader("Cache-Control", "no-cache")
+                                                     .addHeader("Cache-Control", "no-store")
+                                                     .done()));
 
         response = request.send();
 
@@ -215,44 +216,45 @@ public abstract class ServerCompatibilityTests {
     @Test public void
     readsRequestContent() throws IOException {
         final Map<String, String> content = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             content.put("contentType", valueOf(request.contentType()));
             content.put("contentLength", valueOf(request.contentLength()));
             content.put("body", request.body());
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
         request.contentType("application/json")
                .body("{\"name\": \"value\"}")
                .post("/uri");
         assertNoError();
 
-        assertThat("request content", content, allOf(hasEntry("contentType", "application/json"),
-                                                     hasEntry("contentLength", "17"),
-                                                     hasEntry("body", "{\"name\": \"value\"}")));
+        assertThat("request content", content, allOf(
+                hasEntry("contentType", "application/json"),
+                hasEntry("contentLength", "17"),
+                hasEntry("body", "{\"name\": \"value\"}")));
     }
 
     @Test public void
     readsQueryParameters() throws IOException {
         final Map<String, String> parameters = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             for (String name : request.parameterNames()) {
                 parameters.put(name, request.parameter(name));
             }
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
         request.get("/?param1=value1&param2=value2");
 
         assertNoError();
-        assertThat("query parameters", parameters, allOf(hasEntry("param1", "value1"),
-                                                         hasEntry("param2", "value2")));
-
+        assertThat("query parameters", parameters, allOf(
+                hasEntry("param1", "value1"),
+                hasEntry("param2", "value2")));
     }
 
     @Test public void
     supportsMultipleQueryParametersWithSameName() throws IOException {
-        server.run((request, response) -> response.body(request.parameters("names").toString()).done());
+        server.run(Application.of(request -> Response.ok().done(request.parameters("names").toString())));
 
         response = request.get("/?names=Alice&names=Bob&names=Charles");
 
@@ -264,12 +266,12 @@ public abstract class ServerCompatibilityTests {
     @Test public void
     readsFormEncodedParameters() throws IOException {
         final Map<String, String> parameters = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             for (String name : request.parameterNames()) {
                 parameters.put(name, request.parameter(name));
             }
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
         response = request.content(Form.urlEncoded()
                                        .addField("param1", "value1")
@@ -277,13 +279,15 @@ public abstract class ServerCompatibilityTests {
                           .post("/");
 
         assertNoError();
-        assertThat("form parameters", parameters, allOf(hasEntry("param1", "value1"),
-                                                        hasEntry("param2", "value2")));
+        assertThat("form parameters", parameters, allOf(
+                hasEntry("param1", "value1"),
+                hasEntry("param2", "value2")));
     }
 
     @Test public void
     supportsMultipleFormEncodedParametersWithSameName() throws IOException {
-        server.run((request, response) -> response.body(request.parameters("name").toString()).done());
+        server.run(Application.of(request -> Response.ok()
+                                                     .done(request.parameters("name").toString())));
 
         response = request.content(Form.urlEncoded()
                                        .addField("name", "Alice")
@@ -298,13 +302,13 @@ public abstract class ServerCompatibilityTests {
     @Test public void
     readsMultiPartFormParameters() throws IOException {
         final Map<String, String> parameters = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             List<BodyPart> parts = request.parts();
             for (BodyPart part : parts) {
                 parameters.put(part.name(), part.value());
             }
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
         response = request.content(Form.multipart()
                                        .addField("param1", "value1")
@@ -312,22 +316,23 @@ public abstract class ServerCompatibilityTests {
                           .post("/");
 
         assertNoError();
-        assertThat("form data parameters", parameters, allOf(hasEntry("param1", "value1"),
-                                                             hasEntry("param2", "value2")));
+        assertThat("form data parameters", parameters, allOf(
+                hasEntry("param1", "value1"),
+                hasEntry("param2", "value2")));
     }
 
     @Test public void
     downloadsUploadedFiles() throws IOException {
         final Map<String, Integer> files = new HashMap<>();
         final Map<String, String> mimeTypes = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             List<BodyPart> parts = request.parts();
             for (BodyPart part : parts) {
                 files.put(part.filename(), part.content().length);
                 mimeTypes.put(part.filename(), part.contentType());
             }
-            response.done();
-        });
+            return Response.ok().done();
+        }));
 
 
         response = request.content(Form.multipart()
@@ -345,11 +350,11 @@ public abstract class ServerCompatibilityTests {
                 TLS.initialize(DEFAULT.loadKeys(locateOnClasspath("ssl/keystore"), "password", "password"));
 
         final Map<String, String> info = new HashMap<>();
-        server.run((request, response) -> {
+        server.run(Application.of(request -> {
             info.put("scheme", request.scheme());
             info.put("secure", valueOf(request.secure()));
-            response.done();
-        }, sslContext);
+            return Response.ok().done();
+        }), sslContext);
 
         response = request.secure(true).get("/");
         assertNoError();
