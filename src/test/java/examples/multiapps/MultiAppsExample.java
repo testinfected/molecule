@@ -22,7 +22,7 @@ public class MultiAppsExample {
 
     public void run(WebServer server) throws IOException {
         // We will mount a simple application that prints information about the mount point and client request
-        Application describe = Application.of(request -> {
+        Application describe = request -> {
             // The mount point is available as a request attribute
             MountPoint mount = MountPoint.get(request);
             // The mounted application path prefix (i.e. either /foo, /foo/bar or /baz in our example)
@@ -35,7 +35,7 @@ public class MultiAppsExample {
 
             return Response.ok()
                            .done(String.format("%s at %s (%s)", mountPoint, pathInfo, uri));
-        });
+        };
 
         // Mount points are matched in definition order, the most specific match wins
         server.mount("/foo", describe) // matches urls starting with /foo but not /foo/bar

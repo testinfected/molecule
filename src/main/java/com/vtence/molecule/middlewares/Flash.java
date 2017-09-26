@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class Flash implements Middleware {
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             FlashHash flash = loadFlash(request);
             flash.bind(request);
 
@@ -27,7 +27,7 @@ public class Flash implements Middleware {
                 FlashHash.unbind(request);
                 throw error;
             }
-        });
+        };
     }
 
     private BiConsumer<Response, Throwable> unbindFlashFrom(final Request request) {

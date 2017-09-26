@@ -60,13 +60,13 @@ public class ForceSSL implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             if (enable && !secure(request)) {
                 return redirectToHttps(request);
             } else {
                 return next.handle(request).whenSuccessful(this::addHSTSHeader);
             }
-        });
+        };
     }
 
     private void addHSTSHeader(Response response) {
@@ -86,12 +86,6 @@ public class ForceSSL implements Middleware {
 
     private boolean isProxiedHttps(Request request) {
         return redirectOn != null && "https".equalsIgnoreCase(request.header(redirectOn));
-    }
-
-    private void redirectToHttps(Request request, Response response) {
-        response.redirectTo(httpsLocationFor(request))
-                .status(redirectionStatusFor(request))
-                .done();
     }
 
     private Response redirectToHttps(Request request) {

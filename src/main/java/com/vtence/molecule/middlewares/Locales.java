@@ -26,7 +26,7 @@ public class Locales implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             AcceptLanguage acceptedLanguages = AcceptLanguage.of(request);
             Locale best = acceptedLanguages.selectBest(supported);
             request.attribute(Locale.class, best != null ? best : Locale.getDefault());
@@ -37,7 +37,7 @@ public class Locales implements Middleware {
                 unbindLocale(request);
                 throw error;
             }
-        });
+        };
     }
 
     private Request unbindLocale(Request request) {

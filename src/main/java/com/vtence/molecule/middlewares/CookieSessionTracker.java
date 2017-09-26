@@ -38,14 +38,14 @@ public class CookieSessionTracker implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             CookieJar cookieJar = fetchCookieJar(request);
             acquireSession(cookieJar).bind(request);
 
             return next.handle(request)
                        .whenSuccessful(result -> commitSession(request))
                        .whenComplete((error, action) -> Session.unbind(request));
-        });
+        };
     }
 
     private CookieJar fetchCookieJar(Request request) {

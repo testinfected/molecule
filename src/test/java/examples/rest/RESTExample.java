@@ -37,9 +37,9 @@ public class RESTExample {
         // PUT and DELETE can be done using a POST providing there is a _method
         // parameter that describes the actual verb
         server.add(new HttpMethodOverride())
-              .start((new DynamicRoutes() {{
+              .route((new DynamicRoutes() {{
                   // GET to /albums returns the entire list of albums
-                  get("/albums").to(Application.of(request -> {
+                  Application application4 = request -> {
                       // We server a simple plain text response
                       TextBody body = new TextBody();
                       for (int id : albums.keySet()) {
@@ -51,19 +51,21 @@ public class RESTExample {
                       }
                       return Response.ok()
                                      .done(body);
-                  }));
+                  };
+                  get("/albums").to(application4);
 
                   // POST to /albums creates a new album
-                  post("/albums").to(Application.of(request -> {
+                  Application application3 = request -> {
                       int id = sequence.next();
                       Album album = new Album(request.parameter("title"), request.parameter("artist"));
                       albums.put(id, album);
                       return Response.of(201)
                                      .done(album.info());
-                  }));
+                  };
+                  post("/albums").to(application3);
 
                   // GET to /albums/<id> fetches an existing album
-                  get("/albums/:id").to(Application.of(request -> {
+                  Application application2 = request -> {
                       int id = Integer.parseInt(request.parameter("id"));
                       if (albums.containsKey(id)) {
                           Album album = albums.get(id);
@@ -73,11 +75,12 @@ public class RESTExample {
                           return Response.of(404)
                                          .done();
                       }
-                  }));
+                  };
+                  get("/albums/:id").to(application2);
 
                   // PUT to /albums/<id> updates an existing album
                   // It can be done with either a PUT or a POST with parameter _method=PUT
-                  put("/albums/:id").to(Application.of(request -> {
+                  Application application1 = request -> {
                       int id = Integer.parseInt(request.parameter("id"));
                       Album album = albums.get(id);
                       if (album != null) {
@@ -91,11 +94,12 @@ public class RESTExample {
                           return Response.of(404)
                                          .done();
                       }
-                  }));
+                  };
+                  put("/albums/:id").to(application1);
 
                   // DELETE to /albums/<id> deletes an existing album
                   // It can be done with either a DELETE or a POST with parameter _method=DELETE
-                  delete("/albums/:id").to(Application.of(request -> {
+                  Application application = request -> {
                       int id = Integer.parseInt(request.parameter("id"));
                       Album album = albums.remove(id);
                       if (album != null) {
@@ -105,7 +109,8 @@ public class RESTExample {
                           return Response.of(404)
                                          .done();
                       }
-                  }));
+                  };
+                  delete("/albums/:id").to(application);
               }}));
     }
 

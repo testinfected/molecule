@@ -1,6 +1,5 @@
 package com.vtence.molecule.servers;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import org.junit.BeforeClass;
@@ -24,7 +23,7 @@ public class UndertowServerTest extends ServerCompatibilityTests {
 
     @Test public void
     setsContentLengthAutomaticallyForSmallResponses() throws IOException {
-        server.run(Application.of(request -> Response.ok().done("<html>...</html>")));
+        server.run(request -> Response.ok().done("<html>...</html>"));
 
         response = request.send();
         assertNoError();

@@ -43,6 +43,6 @@ public class HttpMethodOverrideTest {
     }
 
     private Application echoMethodName() {
-        return Application.of(request -> Response.ok().done(request.method().name()));
+        return request -> Response.ok().done(request.method().name());
     }
 }

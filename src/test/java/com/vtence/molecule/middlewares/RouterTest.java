@@ -32,7 +32,7 @@ public class RouterTest {
     }
 
     private Application route(final String name) {
-        return Application.of(request -> Response.ok().done(name));
+        return request -> Response.ok().done(name);
     }
 
     public static Matcher<Request> all() {

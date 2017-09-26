@@ -12,13 +12,13 @@ public class FailureMonitor implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             try {
                 return next.handle(request).whenFailed((result, error) -> reporter.errorOccurred(error));
             } catch (Throwable error) {
                 reporter.errorOccurred(error);
                 throw error;
             }
-        });
+        };
     }
 }

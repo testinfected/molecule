@@ -20,7 +20,7 @@ public class URLMap implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> mountFor(request).orElse(new Mount(next)).handle(request));
+        return request -> mountFor(request).orElse(new Mount(next)).handle(request);
     }
 
     private void sortByMostSpecificPaths(List<Mount> mounts) {

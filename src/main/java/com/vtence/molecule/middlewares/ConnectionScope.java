@@ -17,7 +17,7 @@ public class ConnectionScope implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             Connection connection = dataSource.getConnection();
             Reference ref = new Reference(request);
 
@@ -28,7 +28,7 @@ public class ConnectionScope implements Middleware {
                 dispose(ref);
                 throw e;
             }
-        });
+        };
     }
 
     private void dispose(Reference ref) {

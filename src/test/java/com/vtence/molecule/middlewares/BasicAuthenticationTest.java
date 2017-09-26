@@ -86,11 +86,11 @@ public class BasicAuthenticationTest {
     }
 
     private Application echoRemoteUser() {
-        return Application.of(request -> {
+        return request -> {
             String user = request.attribute("REMOTE_USER");
             return Response.of(ACCEPTED)
                            .done("user: " + user);
-        });
+        };
     }
 
     private String basic(String src) {

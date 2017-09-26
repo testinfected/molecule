@@ -1,6 +1,5 @@
 package examples.multipart;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
@@ -25,39 +24,38 @@ public class MultipartExample {
 
     public void run(WebServer server) throws IOException {
         // Start the server with a set of routes
-        server.start(new DynamicRoutes() {{
+        server.route(new DynamicRoutes() {{
 
             // A GET request to /profile renders an HTML profile form. It will be submitted as
             // multipart/form-data. In this form the user can enter an email address, upload a text biography
             // and a profile image
-            get("/profile").to(Application.of(request -> {
-                return Response.ok()
-                               // Set the content type of the response to text/html
-                               .contentType("text/html")
-                               // Render the profile form
-                               .done("<html>" +
-                                     "<body>" +
-                                     "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
-                                     "<p>" +
-                                     "  <label>Email: <input type=\"email\" name=\"email\"></label>\n" +
-                                     "</p>" +
-                                     "<p>" +
-                                     "  <label>Biography: <input type=\"file\" name=\"biography\"></label>\n" +
-                                     "</p>" +
-                                     "<p>" +
-                                     "  <label>Avatar: <input type=\"file\" name=\"avatar\"></label>\n" +
-                                     "</p>" +
-                                     "<p>" +
-                                     "  <input type=\"submit\" value=\"Go\">\n" +
-                                     "</p>" +
-                                     "</form>" +
-                                     "</body>" +
-                                     "</html>");
-            }));
+            get("/profile").to(
+                    request -> Response.ok()
+                                       // Set the content type of the response to text/html
+                                       .contentType("text/html")
+                                       // Render the profile form
+                                       .done("<html>" +
+                                             "<body>" +
+                                             "<form enctype='multipart/form-data' action='/profile' method='post'>\n" +
+                                             "<p>" +
+                                             "  <label>Email: <input type=\"email\" name=\"email\"></label>\n" +
+                                             "</p>" +
+                                             "<p>" +
+                                             "  <label>Biography: <input type=\"file\" name=\"biography\"></label>\n" +
+                                             "</p>" +
+                                             "<p>" +
+                                             "  <label>Avatar: <input type=\"file\" name=\"avatar\"></label>\n" +
+                                             "</p>" +
+                                             "<p>" +
+                                             "  <input type=\"submit\" value=\"Go\">\n" +
+                                             "</p>" +
+                                             "</form>" +
+                                             "</body>" +
+                                             "</html>"));
 
             // A POST to /profile submits the form, then returns a plain text page with a summary of the
             // profile.
-            post("/profile").to(Application.of(request -> {
+            post("/profile").to(request -> {
                 // Get the email address as a body part
                 BodyPart email = request.part("email");
                 // Get the biography as a second body part
@@ -82,7 +80,7 @@ public class MultipartExample {
                 return Response.ok()
                                .contentType("text/plain")
                                .done(echo);
-            }));
+            });
         }});
     }
 

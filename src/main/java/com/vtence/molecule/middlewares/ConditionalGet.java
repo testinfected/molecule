@@ -25,8 +25,8 @@ import static com.vtence.molecule.lib.BinaryBody.empty;
 public class ConditionalGet implements Middleware {
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request)
-                                             .whenSuccessful(conditionalGet(request)));
+        return request -> next.handle(request)
+                              .whenSuccessful(conditionalGet(request));
     }
 
     private Consumer<Response> conditionalGet(Request request) {

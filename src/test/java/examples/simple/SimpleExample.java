@@ -1,6 +1,5 @@
 package examples.simple;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.Failsafe;
@@ -27,7 +26,7 @@ public class SimpleExample {
         // The failsafe middleware captures internal server errors and renders a default 500 page,
         // showing a stack trace of the exception and its causes.
         server.add(new Failsafe())
-              .start(Application.of(request -> {
+              .start(request -> {
                   // An unsupported charset will cause an exception, which will in turn cause the failsafe middleware
                   // to render a 500 page
                   Charset encoding = Charset.forName(request.parameter("encoding"));
@@ -43,7 +42,7 @@ public class SimpleExample {
                                        "</p>" +
                                        "</body>" +
                                        "</html>");
-              }));
+              });
     }
 
 

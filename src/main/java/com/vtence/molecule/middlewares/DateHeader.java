@@ -21,8 +21,8 @@ public class DateHeader implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request)
-                                             .whenSuccessful(this::setDateHeaderIfMissing));
+        return request -> next.handle(request)
+                              .whenSuccessful(this::setDateHeaderIfMissing);
     }
 
     private void setDateHeaderIfMissing(Response response) {

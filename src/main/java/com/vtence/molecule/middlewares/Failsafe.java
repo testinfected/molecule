@@ -13,13 +13,13 @@ import static com.vtence.molecule.http.MimeTypes.HTML;
 public class Failsafe implements Middleware {
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             try {
                 return next.handle(request).rescue(this::failsafeResponse);
             } catch (Throwable error) {
                 return failsafeResponse(error);
             }
-        });
+        };
     }
 
     private Response failsafeResponse(Throwable error) {

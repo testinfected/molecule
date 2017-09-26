@@ -30,10 +30,10 @@ public abstract class ApacheLogger implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             Consumer<Response> logAccess = logAccess(request);
             return next.handle(request).whenSuccessful(logAccess);
-        });
+        };
     }
 
     protected abstract Consumer<Response> logAccess(Request request);

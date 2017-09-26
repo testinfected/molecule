@@ -33,7 +33,7 @@ public class StaticAssets implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> canServe(request.path()) ? serve(request) :  next.handle(request));
+        return request -> canServe(request.path()) ? serve(request) :  next.handle(request);
     }
 
     private Response serve(Request request) throws Exception {

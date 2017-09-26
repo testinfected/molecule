@@ -10,8 +10,8 @@ import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 public class ContentLengthHeader implements Middleware {
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request)
-                                             .whenSuccessful(this::addContentLengthHeader));
+        return request -> next.handle(request)
+                              .whenSuccessful(this::addContentLengthHeader);
     }
 
     private void addContentLengthHeader(Response response) {

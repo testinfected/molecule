@@ -19,7 +19,7 @@ public class FilterMap implements Middleware {
     private final Map<Matcher<? super Request>, Middleware> filters = new LinkedHashMap<>();
 
     public Application then(Application next) {
-        return Application.of(request -> filterFor(request).then(next).handle(request));
+        return request -> filterFor(request).then(next).handle(request);
     }
 
     public FilterMap map(String pathPrefix, Middleware filter) {

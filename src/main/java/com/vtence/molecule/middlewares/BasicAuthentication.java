@@ -28,7 +28,7 @@ public class BasicAuthentication implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             Authorization auth = Authorization.of(request);
 
             if (auth == null) {
@@ -49,7 +49,7 @@ public class BasicAuthentication implements Middleware {
             } else {
                 return unauthorized();
             }
-        });
+        };
     }
 
     private Response unauthorized() {

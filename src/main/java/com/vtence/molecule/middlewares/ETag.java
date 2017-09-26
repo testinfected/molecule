@@ -24,7 +24,7 @@ public class ETag implements Middleware {
     private final HexEncoder encoder = new HexEncoder();
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request).whenSuccessful(this::computeETag));
+        return request -> next.handle(request).whenSuccessful(this::computeETag);
     }
 
     private void computeETag(Response response) {

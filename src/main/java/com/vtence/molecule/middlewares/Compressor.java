@@ -116,8 +116,8 @@ public class Compressor implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request)
-                                             .whenSuccessful(compressResponse(selectBestAvailableEncodingFor(request))));
+        return request -> next.handle(request)
+                              .whenSuccessful(compressResponse(selectBestAvailableEncodingFor(request)));
     }
 
     private Consumer<Response> compressResponse(String bestEncoding) {

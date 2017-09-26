@@ -14,12 +14,12 @@ public class HttpMethodOverride implements Middleware {
     public static final String METHOD_OVERRIDE_PARAMETER = "_method";
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             if (overrideDetected(request) && validOverride(request)) {
                 request.method(methodOverride(request).toUpperCase());
             }
             return next.handle(request);
-        });
+        };
     }
 
     private boolean validOverride(Request request) {

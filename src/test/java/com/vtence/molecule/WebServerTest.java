@@ -35,7 +35,7 @@ public class WebServerTest {
     @Test
     public void runsServerOnPort8080ByDefault() throws IOException, GeneralSecurityException {
         server = WebServer.create();
-        server.start(Application.of(request -> Response.ok().done("It works!")));
+        server.start(request -> Response.ok().done("It works!"));
 
         response = request.get("/");
         assertThat(response).hasBodyText("It works!");

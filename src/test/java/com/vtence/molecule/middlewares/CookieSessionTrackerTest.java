@@ -396,54 +396,54 @@ public class CookieSessionTrackerTest {
     }
 
     private Application echoSessionId() {
-        return Application.of(request -> {
+        return request -> {
             Session session = Session.get(request);
             return Response.ok().body("Session: " + (session.fresh() ? "new" : session.id()));
-        });
+        };
     }
 
     private Application incrementCounter() {
-        return Application.of(request -> {
+        return request -> {
             Session session = Session.get(request);
             Integer counter = session.contains("counter") ? session.get("counter") : 0;
             session.put("counter", counter++);
             return Response.ok().body("Counter: " + counter);
-        });
+        };
     }
 
     private Application writeAndInvalidateSession() {
-        return Application.of(request -> {
+        return request -> {
             Session session = Session.get(request);
             session.put("written", true);
             session.invalidate();
             return Response.ok();
-        });
+        };
     }
 
     private Application expireSessionAfter(final int timeout) {
-        return Application.of(request -> {
+        return request -> {
             Session session = Session.get(request);
             session.put("written", true);
             session.maxAge(timeout);
             return Response.ok();
-        });
+        };
     }
 
     private Application writeAndDropSession() {
-        return Application.of(request -> {
+        return request -> {
             Session session = Session.get(request);
             session.put("written", true);
             Session.unbind(request);
             return Response.ok();
-        });
+        };
     }
 
     private Application writeNewSession() {
-        return Application.of(request -> {
+        return request -> {
             Session session = new Session();
             session.put("written", true);
             session.bind(request);
             return Response.ok();
-        });
+        };
     }
 }

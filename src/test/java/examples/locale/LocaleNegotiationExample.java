@@ -1,6 +1,5 @@
 package examples.locale;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.Locales;
@@ -34,7 +33,7 @@ public class LocaleNegotiationExample {
     public void run(WebServer server) throws IOException {
         // Knowing what languages we support, figure out the best locale to use for each incoming request
         server.add(new Locales(supportedLanguages))
-              .start(Application.of(request -> {
+              .start(request -> {
                   // The best possible locale is available as a request attribute
                   Locale locale = request.attribute(Locale.class);
                   // Set the response to plain text
@@ -49,7 +48,7 @@ public class LocaleNegotiationExample {
                                        // The best locale for this request, depending on supported locales and requested locale
                                        "The best match is: " + locale.toLanguageTag() + "\n"
                                  );
-              }));
+              });
     }
 
     public static void main(String[] args) throws IOException {

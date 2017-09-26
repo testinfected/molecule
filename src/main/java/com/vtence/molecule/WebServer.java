@@ -175,7 +175,7 @@ public class WebServer {
      *
      * @param routes the routes to run at the root mount point (/)
      */
-    public Server start(RouteBuilder routes) throws IOException {
+    public Server route(RouteBuilder routes) throws IOException {
         return start(Router.draw(routes));
     }
 

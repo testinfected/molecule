@@ -15,8 +15,8 @@ public class ServerHeader implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request)
-                                             .whenSuccessful(this::setServerHeaderIfMissing));
+        return request -> next.handle(request)
+                              .whenSuccessful(this::setServerHeaderIfMissing);
     }
 
     private void setServerHeaderIfMissing(Response response) {

@@ -89,9 +89,7 @@ public class MiddlewareStackTest {
 
         stack.use(middleware("ready"));
         stack.use(middleware("set"));
-        stack.warmup(app -> {
-            booted[0] = true;
-        });
+        stack.warmup(app -> booted[0] = true);
         stack.run(application("go!"));
 
         Response response = stack.boot()
@@ -110,14 +108,14 @@ public class MiddlewareStackTest {
     }
 
     private Middleware middleware(final String order) {
-        return application -> Application.of(request -> {
-            Response response = application.handle(request);
-            return response.header("chain", order + " -> " + response.header("chain"));
-        });
+        return application -> request -> {
+                    Response response = application.handle(request);
+                    return response.header("chain", order + " -> " + response.header("chain"));
+                };
     }
 
     private Application application(final String app) {
-        return Application.of(request -> Response.ok().header("chain", app).done());
+        return request -> Response.ok().header("chain", app).done();
     }
 
     private void assertChainOf(Response response, Matcher<? super String> chaining) {

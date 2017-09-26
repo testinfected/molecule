@@ -43,7 +43,7 @@ public class Layout implements Middleware {
     }
 
     public Application then(Application next) {
-        return Application.of(request -> next.handle(request).whenSuccessful(decorate(request)));
+        return request -> next.handle(request).whenSuccessful(decorate(request));
     }
 
     private Consumer<Response> decorate(Request request) {

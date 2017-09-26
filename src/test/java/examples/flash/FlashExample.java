@@ -1,7 +1,6 @@
 package examples.flash;
 
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.lib.FlashHash;
@@ -34,9 +33,9 @@ public class FlashExample {
               .add(new CookieSessionTracker(SessionPool.secure()))
               // We need the Flash middleware
               .add(new Flash())
-              .start(new DynamicRoutes() {{
+              .route(new DynamicRoutes() {{
                   // a post to /accounts creates a new account if email is not already taken
-                  post("/accounts").to(Application.of(request -> {
+                  post("/accounts").to(request -> {
                       FlashHash flash = FlashHash.get(request);
 
                       String email = request.parameter("email");
@@ -48,10 +47,10 @@ public class FlashExample {
                           flash.alert("An email is required");
                       }
                       return Response.redirect("/account").done();
-                  }));
+                  });
 
                   // a get /account displays the flash message
-                  get("/account").to(Application.of(request -> {
+                  get("/account").to(request -> {
                       FlashHash flash = FlashHash.get(request);
 
                       // Display either the notice or alert to the user  ...
@@ -63,7 +62,7 @@ public class FlashExample {
                       }
                       // ... or nothing
                       return Response.ok().done();
-                  }));
+                  });
               }});
     }
 

@@ -1,6 +1,5 @@
 package examples.files;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.ApacheCommonLogger;
@@ -51,7 +50,7 @@ public class StaticFilesExample {
               // so we can see what we're serving.
               .add(new ApacheCommonLogger(logger))
               .add(assets)
-              .start(Application.of(request -> Response.of(NOT_FOUND).done("Nothing here!")));
+              .start(request -> Response.of(NOT_FOUND).done("Nothing here!"));
     }
 
     public static void main(String[] args) throws IOException {

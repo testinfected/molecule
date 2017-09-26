@@ -36,7 +36,7 @@ public class URLMapTest {
 
     @Test
     public void matchesMountPointsAsWords() throws Exception {
-        map.mount("/foo", Application.of(request -> Response.ok().done("mounted!?!")));
+        map.mount("/foo", request -> Response.ok().done("mounted!?!"));
 
         Response response = map.then(new NotFound())
                                .handle(Request.get("/foobar"));
@@ -98,13 +98,13 @@ public class URLMapTest {
     }
 
     public Application describeMount() {
-        return Application.of(request -> {
+        return request -> {
             URLMap.MountPoint mountPoint = request.attribute(URLMap.MountPoint.class);
             return Response.ok()
                            .done(String.format("%s at %s (%s)",
                                                mountPoint.app(),
                                                request.path(),
                                                mountPoint.uri(request.path())));
-        });
+        };
     }
 }

@@ -1,6 +1,5 @@
 package examples.session;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
@@ -60,57 +59,57 @@ public class SessionExample {
               // Track sessions using transient - a.k.a session - cookies by default
               // You can change of the name of the cookie used to track sessions
               .add(new CookieSessionTracker(sessions).usingCookieName("molecule.session"))
-              .start(new DynamicRoutes() {{
-                         // The default route greets the signed in user
-                         map("/").to(Application.of(request -> {
-                             // There's always a session bound to the request, although it may be empty and fresh
-                             // We can safely read a new session. The session won't be saved to the pool unless
-                             // it's been written or it was already present in the pool.
-                             Session session = Session.get(request);
-                             // If our user has already identified to our site,
-                             // we have a username stored in the session
-                             String username = session.contains("username") ? session.<String>get("username") : "Guest";
-                             return Response.ok()
-                                            .done("Hello, " + username);
-                         }));
+              .route(new DynamicRoutes() {{
+                  // The default route greets the signed in user
+                  map("/").to(request -> {
+                      // There's always a session bound to the request, although it may be empty and fresh
+                      // We can safely read a new session. The session won't be saved to the pool unless
+                      // it's been written or it was already present in the pool.
+                      Session session = Session.get(request);
+                      // If our user has already identified to our site,
+                      // we have a username stored in the session
+                      String username = session.contains("username") ? session.<String>get("username") : "Guest";
+                      return Response.ok()
+                                     .done("Hello, " + username);
+                  });
 
-                         // The sign in route
-                         post("/login").to(Application.of(request -> {
-                             // We expect a username parameter
-                             String username = request.parameter("username");
-                             Session session = Session.get(request);
-                             // Store the username in the session. Since the session has been written to,
-                             // it will automatically be saved to the pool by the end of the request cycle
-                             session.put("username", username);
+                  // The sign in route
+                  post("/login").to(request -> {
+                      // We expect a username parameter
+                      String username = request.parameter("username");
+                      Session session = Session.get(request);
+                      // Store the username in the session. Since the session has been written to,
+                      // it will automatically be saved to the pool by the end of the request cycle
+                      session.put("username", username);
 
-                             // If remember me is checked, make session cookie persistent with a max age of 5 minutes
-                             if (request.hasParameter("remember_me")) {
-                                 session.maxAge(FIVE_MINUTES);
-                             }
+                      // If remember me is checked, make session cookie persistent with a max age of 5 minutes
+                      if (request.hasParameter("remember_me")) {
+                          session.maxAge(FIVE_MINUTES);
+                      }
 
-                             // If renew, make a fresh session to avoid session fixation attacks
-                             // by generating a new session id
-                             if (request.hasParameter("renew")) {
-                                 Session freshSession = new Session();
-                                 freshSession.merge(session);
-                                 freshSession.bind(request);
-                             }
+                      // If renew, make a fresh session to avoid session fixation attacks
+                      // by generating a new session id
+                      if (request.hasParameter("renew")) {
+                          Session freshSession = new Session();
+                          freshSession.merge(session);
+                          freshSession.bind(request);
+                      }
 
-                             return Response.redirect("/")
-                                            .done();
-                         }));
+                      return Response.redirect("/")
+                                     .done();
+                  });
 
-                         // The sign out route
-                         delete("/logout").to(Application.of(request -> {
-                             Session session = Session.get(request);
-                             // We invalidate the session, which prevents further use and removes the session
-                             // from the pool at the end of the request cycle
-                             session.invalidate();
-                             return Response.redirect("/")
-                                            .done();
-                         }));
-                     }}
-              );
+                 // The sign out route
+                  delete("/logout").to(request -> {
+                      Session session = Session.get(request);
+                      // We invalidate the session, which prevents further use and removes the session
+                      // from the pool at the end of the request cycle
+                      session.invalidate();
+                      return Response.redirect("/")
+                                     .done();
+                  });
+             }}
+          );
     }
 
     public static void main(String[] args) throws IOException {

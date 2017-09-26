@@ -1,6 +1,5 @@
 package examples.ssl;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.ForceSSL;
@@ -30,8 +29,8 @@ public class SSLExample {
     public void redirect(WebServer insecure, WebServer secure) throws IOException {
         // Redirect users to the secure connection
         insecure.add(new ForceSSL().redirectTo(secure.uri().getAuthority()))
-                .start(Application.of(request -> Response.of(NOT_FOUND)
-                                                         .done("Nothing here!")));
+                .start(request -> Response.of(NOT_FOUND)
+                                          .done("Nothing here!"));
     }
 
     public void run(WebServer server) throws IOException, GeneralSecurityException {
@@ -47,7 +46,7 @@ public class SSLExample {
               // Add HSTS security headers
               .add(new ForceSSL())
               // We a render a simple text to let our user know she is on a secure channel
-              .start(Application.of(request -> Response.ok().done("You are on a secure channel")));
+              .start(request -> Response.ok().done("You are on a secure channel"));
     }
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {

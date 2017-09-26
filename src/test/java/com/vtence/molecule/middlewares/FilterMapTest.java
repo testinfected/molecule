@@ -72,10 +72,10 @@ public class FilterMapTest {
     }
 
     private Middleware filter(final String name) {
-        return next -> Application.of(request -> {
+        return next -> request -> {
             Response response = next.handle(request);
             return response.header("content", format("%s(%s)", name, response.header("content")));
-        });
+        };
     }
 
     private Application stubResponse(String content) {

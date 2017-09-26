@@ -149,19 +149,19 @@ public class FlashTest {
     }
 
     private Application crashWith(Exception error) {
-        return Application.of(request -> {
+        return request -> {
             throw error;
-        });
+        };
     }
 
     private Application writeToFlash(Map<String, String> values) {
-        return Application.of(request -> {
+        return request -> {
             FlashHash flash = FlashHash.get(request);
             assertThat("request flash", flash, notNullValue());
 
             flash.putAll(values);
             return Response.ok();
-        });
+        };
     }
 
     private Response printFlashContent(Request request) throws Exception {

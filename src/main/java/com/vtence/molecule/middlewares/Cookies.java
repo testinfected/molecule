@@ -20,7 +20,7 @@ public class Cookies implements Middleware {
     private final CookieDecoder cookieDecoder = new CookieDecoder();
 
     public Application then(Application next) {
-        return Application.of(request -> {
+        return request -> {
             CookieJar cookieJar = new CookieJar(clientCookiesFrom(request));
             cookieJar.bind(request);
             try {
@@ -31,7 +31,7 @@ public class Cookies implements Middleware {
                 cookieJar.unbind(request);
                 throw error;
             }
-        });
+        };
     }
 
     private Consumer<Response> commitCookies(CookieJar cookies) {

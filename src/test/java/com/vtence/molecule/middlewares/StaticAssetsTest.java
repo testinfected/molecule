@@ -13,7 +13,12 @@ public class StaticAssetsTest {
 
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 
-    Application fileServer = Application.of(request -> Response.ok().done(request.path()));
+    Application fileServer;
+
+    {
+        fileServer = request -> Response.ok().done(request.path());
+    }
+
     StaticAssets assets = new StaticAssets(fileServer, "/favicon.ico");
 
     @Test public void
