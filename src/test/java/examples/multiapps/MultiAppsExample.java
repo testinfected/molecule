@@ -33,7 +33,8 @@ public class MultiAppsExample {
             // To reconstruct the full uri, which is useful when creating links
             String uri = mount.uri(pathInfo);
 
-            return Response.ok().done(String.format("%s at %s (%s)", mountPoint, pathInfo, uri));
+            return Response.ok()
+                           .done(String.format("%s at %s (%s)", mountPoint, pathInfo, uri));
         });
 
         // Mount points are matched in definition order, the most specific match wins
