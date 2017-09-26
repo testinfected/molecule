@@ -1,5 +1,7 @@
 package examples.cookies;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.lib.CookieJar;
@@ -32,41 +34,45 @@ public class CookiesExample {
 
                   // A GET to / will read the 'customer' client cookie
                   // This will not write any cookie back to client, since we're only reading from the jar
-                  get("/").to((request, response) -> {
+                  get("/").to(Application.of(request -> {
                       CookieJar cookies = CookieJar.get(request);
                       // Read 'customer' cookie
                       Cookie customer = cookies.get("customer");
-                      response.done("Welcome, " + valueOf(customer));
-                  });
+                      return Response.ok()
+                                     .done("Welcome, " + valueOf(customer));
+                  }));
 
                   // A GET to /weapon will send back the 'weapon' cookie for path /ammo to Will E. Coyote,
                   // our client. This cookie if valid for the duration of the browser session.
-                  get("/weapon").to((request, response) -> {
+                  get("/weapon").to(Application.of(request -> {
                       CookieJar cookies = CookieJar.get(request);
                       // Will E. Coyote acquires a rocket launcher
                       // Send back a 'weapon' session cookie for path /ammo
                       cookies.add("weapon", "rocket launcher").path("/ammo");
-                      response.done();
-                  });
+                      return Response.ok()
+                                     .done();
+                  }));
 
                   // A GET to /ammo sends a 'ammo' cookie for path /ammo which is set to expire after 30s.
                   // It the cookie already exists, it is refreshed.
-                  get("/ammo").to((request, response) -> {
+                  get("/ammo").to(Application.of(request -> {
                       CookieJar cookies = CookieJar.get(request);
                       // Will. E. Coyote purchases a riding rocket
                       // Set or refresh the 'ammo' cookie with a max age of 30s
                       cookies.add("ammo", "riding rocket").path("/ammo").maxAge(30);
-                      response.done();
-                  });
+                      return Response.ok()
+                                     .done();
+                  }));
 
                   // A GET to /backfire will expire any existing 'ammo' cookie
-                  get("/backfire").to((request, response) -> {
+                  get("/backfire").to(Application.of(request -> {
                       CookieJar cookies = CookieJar.get(request);
                       // Riding rocket backfires and explodes
                       // Expire 'weapon' cookie
                       cookies.discard("weapon").path("/ammo");
-                      response.done();
-                  });
+                      return Response.ok()
+                                     .done();
+                  }));
               }});
     }
 
