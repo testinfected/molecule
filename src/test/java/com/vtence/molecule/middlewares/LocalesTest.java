@@ -103,11 +103,11 @@ public class LocalesTest {
         }
     }
 
-    private Application.ApplicationFunction ok() {
+    private Application ok() {
         return request -> Response.ok();
     }
 
-    private Application.ApplicationFunction crash() {
+    private Application crash() {
         return request -> {
             throw new Exception("Error!");
         };

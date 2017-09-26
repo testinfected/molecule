@@ -95,11 +95,11 @@ public class ConnectionScopeTest {
         assertThat(request).hasNoAttribute(Connection.class);
     }
 
-    private Application.ApplicationFunction ok() {
+    private Application ok() {
         return request -> Response.ok();
     }
 
-    private Application.ApplicationFunction crash() {
+    private Application crash() {
         return request -> {
             throw new Exception("Boom!");
         };

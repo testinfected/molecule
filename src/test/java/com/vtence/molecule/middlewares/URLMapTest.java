@@ -93,7 +93,7 @@ public class URLMapTest {
                             .hasBodyText("/foo/bar at /quux (/foo/bar/quux)");
     }
 
-    private Application.ApplicationFunction ok() {
+    private Application ok() {
         return request -> Response.ok().done();
     }
 

@@ -361,7 +361,7 @@ public class CookieSessionTrackerTest {
         assertThat(request).hasNoAttribute(Session.class);
     }
 
-    private Application.ApplicationFunction ok() {
+    private Application ok() {
         return request -> Response.ok();
     }
 

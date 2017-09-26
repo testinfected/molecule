@@ -67,7 +67,7 @@ public class FailsafeTest {
         assertThat(response).hasContentType("text/html; charset=utf-8").isDone();
     }
 
-    private Application.ApplicationFunction throwException(Error error) {
+    private Application throwException(Error error) {
         return request -> {
             throw error;
         };

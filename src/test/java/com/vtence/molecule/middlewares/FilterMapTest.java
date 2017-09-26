@@ -78,7 +78,7 @@ public class FilterMapTest {
         });
     }
 
-    private Application.ApplicationFunction stubResponse(String content) {
+    private Application stubResponse(String content) {
         return request -> Response.ok().header("content", content).done();
     }
 };

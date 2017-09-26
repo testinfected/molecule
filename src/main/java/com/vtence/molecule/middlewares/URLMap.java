@@ -87,11 +87,5 @@ public class URLMap implements Middleware {
         private String stripTrailingSlash(String path) {
             return path.replaceAll("/$", "");
         }
-
-        public void handle(Request request, Response response) throws Exception {
-            request.path(pathInfo(request));
-            request.attribute(MountPoint.class, this);
-            app.handle(request, response);
-        }
     }
 }

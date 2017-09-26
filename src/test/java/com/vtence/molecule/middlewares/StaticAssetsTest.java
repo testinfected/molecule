@@ -50,7 +50,7 @@ public class StaticAssetsTest {
         assertThat(response).hasBodyText("Forwarded");
     }
 
-    private Application.ApplicationFunction forward() {
+    private Application forward() {
         return request -> Response.ok().done("Forwarded");
     }
 }

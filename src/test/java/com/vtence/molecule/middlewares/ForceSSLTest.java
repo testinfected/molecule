@@ -129,7 +129,7 @@ public class ForceSSLTest {
         assertIsNotRedirected(request);
     }
 
-    private Application.ApplicationFunction ok() {
+    private Application ok() {
         return request -> Response.ok().done();
     }
 

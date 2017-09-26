@@ -37,10 +37,6 @@ public class Router implements Application, RouteSet {
         return routeFor(request).handle(request);
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        routeFor(request).handle(request, response);
-    }
-
     private Route routeFor(Request request) {
         return routingTable.stream().filter(route -> route.matches(request))
                            .findFirst()
@@ -56,10 +52,6 @@ public class Router implements Application, RouteSet {
 
         public Response handle(Request request) throws Exception {
             return fallback.handle(request);
-        }
-
-        public void handle(Request request, Response response) throws Exception {
-            fallback.handle(request, response);
         }
 
         public boolean matches(Request actual) {

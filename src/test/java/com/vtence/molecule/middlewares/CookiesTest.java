@@ -100,11 +100,11 @@ public class CookiesTest {
         assertThat(request).hasNoAttribute(CookieJar.class);
     }
 
-    private Application.ApplicationFunction ok() {
+    private Application ok() {
         return request -> Response.ok();
     }
 
-    private Application.ApplicationFunction crash() {
+    private Application crash() {
         return request -> {
             throw new Exception("Error!");
         };

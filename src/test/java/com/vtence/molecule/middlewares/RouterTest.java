@@ -52,10 +52,6 @@ public class RouterTest {
             this.app = app;
         }
 
-        public void handle(Request request, Response response) throws Exception {
-            app.handle(request, response);
-        }
-
         public Response handle(Request request) throws Exception {
             return app.handle(request);
         }
