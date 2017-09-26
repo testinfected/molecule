@@ -1,5 +1,7 @@
 package examples.session;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.middlewares.Cookies;
@@ -16,16 +18,16 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 /**
  * Here's an example of setting up HTTP sessions. We use a a signed cookie store but you could very well
  * swap the pool implementation for, e.g. an in memory session pool.
- *
  * <p>
- *     Each client is given a secure session identifier, stored as session cookie.
- *     If the client request it, we make the cookie persistent (for 5 min).
- *     Every time the session is accessed, we refresh the client cookie expiry date.
+ * <p>
+ * Each client is given a secure session identifier, stored as session cookie.
+ * If the client request it, we make the cookie persistent (for 5 min).
+ * Every time the session is accessed, we refresh the client cookie expiry date.
  * </p>
  * <p>
- *     The session pool expires stale sessions after 30 minutes.
- *     As a protection mechanism, we also expire sessions that are older than 2 days,
- *     even if they have been maintained active.
+ * The session pool expires stale sessions after 30 minutes.
+ * As a protection mechanism, we also expire sessions that are older than 2 days,
+ * even if they have been maintained active.
  * </p>
  */
 public class SessionExample {
@@ -53,14 +55,14 @@ public class SessionExample {
         // Use the provided clock to get time
         sessions.usingClock(clock);
 
-              // Enable cookie support
+        // Enable cookie support
         server.add(new Cookies())
               // Track sessions using transient - a.k.a session - cookies by default
               // You can change of the name of the cookie used to track sessions
               .add(new CookieSessionTracker(sessions).usingCookieName("molecule.session"))
               .start(new DynamicRoutes() {{
                          // The default route greets the signed in user
-                         map("/").to((request, response) -> {
+                         map("/").to(Application.of(request -> {
                              // There's always a session bound to the request, although it may be empty and fresh
                              // We can safely read a new session. The session won't be saved to the pool unless
                              // it's been written or it was already present in the pool.
@@ -68,11 +70,12 @@ public class SessionExample {
                              // If our user has already identified to our site,
                              // we have a username stored in the session
                              String username = session.contains("username") ? session.<String>get("username") : "Guest";
-                             response.done("Hello, " + username);
-                         });
+                             return Response.ok()
+                                            .done("Hello, " + username);
+                         }));
 
                          // The sign in route
-                         post("/login").to((request, response) -> {
+                         post("/login").to(Application.of(request -> {
                              // We expect a username parameter
                              String username = request.parameter("username");
                              Session session = Session.get(request);
@@ -93,17 +96,19 @@ public class SessionExample {
                                  freshSession.bind(request);
                              }
 
-                             response.redirectTo("/").done();
-                         });
+                             return Response.redirect("/")
+                                            .done();
+                         }));
 
                          // The sign out route
-                         delete("/logout").to((request, response) -> {
+                         delete("/logout").to(Application.of(request -> {
                              Session session = Session.get(request);
                              // We invalidate the session, which prevents further use and removes the session
                              // from the pool at the end of the request cycle
                              session.invalidate();
-                             response.redirectTo("/").done();
-                         });
+                             return Response.redirect("/")
+                                            .done();
+                         }));
                      }}
               );
     }
