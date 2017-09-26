@@ -13,7 +13,7 @@ public class TemplatesTest {
     RenderingEngine renderer = new JMustacheRenderer().fromDir(locateOnClasspath("views"));
     Templates templates = new Templates(renderer);
 
-    Template template = templates.named("hello");
+    Template<Context> template = templates.named("hello");
     Response response = new Response();
 
     @Test public void
