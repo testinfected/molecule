@@ -1,5 +1,7 @@
 package examples.performance;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.Compressor;
 import com.vtence.molecule.middlewares.ConditionalGet;
@@ -77,15 +79,15 @@ public class CachingAndCompressionExample {
               // We serve static assets with freshness information. This is the expiration model.
               .add(assets)
               // If client is not requesting a static file, we'll serve our index.html mustache template
-              .start((request, response) -> {
-                  response.header(CONTENT_TYPE, HTML);
+              .start(Application.of(request -> {
+                  Response response = Response.ok().header(CONTENT_TYPE, HTML);
                   // We add freshness information only when query parameter 'conditional' is present
                   if (request.hasParameter("conditional")) {
                       response.header(LAST_MODIFIED, clock.instant());
                   }
                   // This will render our index.html template
-                  response.done(index.render(NO_CONTEXT));
-              });
+                  return response.done(index.render(NO_CONTEXT));
+              }));
     }
 
     public static void main(String[] args) throws IOException {
