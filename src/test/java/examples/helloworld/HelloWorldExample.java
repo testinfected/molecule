@@ -1,5 +1,7 @@
 package examples.helloworld;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 
 import java.io.IOException;
@@ -13,7 +15,7 @@ public class HelloWorldExample {
     public void run(WebServer server) throws IOException {
         // Start the default web server and provide a single application, which
         // responds to all incoming requests.
-        server.start((request, response) -> response.done("Hello, World!"));
+        server.start(Application.of(request -> Response.ok().done("Hello, World!")));
     }
 
     public static void main(String[] args) throws IOException {
