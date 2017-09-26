@@ -28,9 +28,12 @@ import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.HOST;
 import static com.vtence.molecule.http.HttpMethod.DELETE;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
+import static com.vtence.molecule.http.HttpMethod.OPTIONS;
+import static com.vtence.molecule.http.HttpMethod.PATCH;
 import static com.vtence.molecule.http.HttpMethod.POST;
 import static java.lang.Long.parseLong;
 import static org.simpleframework.http.Method.GET;
+import static org.simpleframework.http.Method.PUT;
 
 /**
  * Holds client HTTP request information and maintains attributes during the request lifecycle.
@@ -93,7 +96,7 @@ public class Request {
      */
     public static Request put(String path) {
         return new Request().scheme("http")
-                            .method(DELETE)
+                            .method(PUT)
                             .uri(path)
                             .path(path);
     }
@@ -106,7 +109,7 @@ public class Request {
      */
     public static Request patch(String path) {
         return new Request().scheme("http")
-                            .method(DELETE)
+                            .method(PATCH)
                             .uri(path)
                             .path(path);
     }
@@ -145,7 +148,7 @@ public class Request {
      */
     public static Request options(String path) {
         return new Request().scheme("http")
-                            .method(HEAD)
+                            .method(OPTIONS)
                             .uri(path)
                             .path(path);
     }
