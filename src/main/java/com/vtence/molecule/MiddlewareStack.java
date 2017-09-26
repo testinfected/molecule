@@ -14,10 +14,10 @@ public class MiddlewareStack {
 
     public MiddlewareStack use(Middleware middleware) {
         if (map != null) {
-            pipeline = pipeline.then(map);
+            pipeline = pipeline.compose(map);
             map = null;
         }
-        pipeline = pipeline.then(middleware);
+        pipeline = pipeline.compose(middleware);
         return this;
     }
 
@@ -45,7 +45,7 @@ public class MiddlewareStack {
         }
 
         if (map != null) {
-            pipeline = pipeline.then(map);
+            pipeline = pipeline.compose(map);
         }
 
         Application app = pipeline.then(runner != null ? runner : new NotFound());

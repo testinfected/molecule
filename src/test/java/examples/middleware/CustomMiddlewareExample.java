@@ -26,7 +26,7 @@ public class CustomMiddlewareExample {
     public void run(WebServer server) throws IOException {
         // To demonstrate performing some work before handling control to the processing pipeline,
         // we read the User-Agent header and redirect IE users to the Mozilla web site.
-        Middleware getFirefox = Middleware.from(next ->
+        Middleware getFirefox = next ->
             Application.of(request -> {
                 // Tell IE users to get Firefox
                 String userAgent = request.header("User-Agent");
@@ -38,13 +38,12 @@ public class CustomMiddlewareExample {
                     // Hand over control to next application in the stack
                     return next.handle(request);
                 }
-            })
-        );
+            });
 
         // To demonstrate performing additional work after getting control back, we set the Content-Length
         // header on the response
         // (for a more capable version of this middleware, check the ContentLengthHeader middleware)
-        Middleware contentLengthHeader = Middleware.from(next ->
+        Middleware contentLengthHeader = next ->
             Application.of(request ->
                 // Forward the request for processing, the perform additional work when the response
                 // completes
@@ -52,8 +51,7 @@ public class CustomMiddlewareExample {
                     // Set the content length header on the response
                     resp.contentLength(resp.size());
                 })
-            )
-        );
+            );
 
         // A simple hello world application
         Application helloWorld = Application.of(request ->

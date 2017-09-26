@@ -1,12 +1,12 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 
 import static com.vtence.molecule.http.HeaderNames.SERVER;
 
-public class ServerHeader extends AbstractMiddleware {
+public class ServerHeader implements Middleware {
 
     private final String serverName;
 
@@ -17,10 +17,6 @@ public class ServerHeader extends AbstractMiddleware {
     public Application then(Application next) {
         return Application.of(request -> next.handle(request)
                                              .whenSuccessful(this::setServerHeaderIfMissing));
-    }
-
-    public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(this::setServerHeaderIfMissing);
     }
 
     private void setServerHeaderIfMissing(Response response) {

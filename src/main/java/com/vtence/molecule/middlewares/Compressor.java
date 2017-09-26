@@ -2,6 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.AcceptEncoding;
@@ -27,7 +28,7 @@ import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
 import static com.vtence.molecule.http.MimeTypes.TEXT;
 import static com.vtence.molecule.middlewares.Compressor.Codings.identity;
 
-public class Compressor extends AbstractMiddleware {
+public class Compressor implements Middleware {
 
     private final Collection<String> compressibleTypes = new ArrayList<>();
 
@@ -112,10 +113,6 @@ public class Compressor extends AbstractMiddleware {
     public Compressor compressibleTypes(String... mimeTypes) {
         this.compressibleTypes.addAll(Arrays.asList(mimeTypes));
         return this;
-    }
-
-    public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(compressResponse(selectBestAvailableEncodingFor(request)));
     }
 
     public Application then(Application next) {

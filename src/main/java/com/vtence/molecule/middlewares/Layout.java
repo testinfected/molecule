@@ -2,6 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.decoration.ContentProcessor;
@@ -21,7 +22,7 @@ import java.util.function.Consumer;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 
-public class Layout extends AbstractMiddleware {
+public class Layout implements Middleware {
 
     private final Selector selector;
     private final ContentProcessor processor;
@@ -43,10 +44,6 @@ public class Layout extends AbstractMiddleware {
 
     public Application then(Application next) {
         return Application.of(request -> next.handle(request).whenSuccessful(decorate(request)));
-    }
-
-    public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(decorate(request));
     }
 
     private Consumer<Response> decorate(Request request) {

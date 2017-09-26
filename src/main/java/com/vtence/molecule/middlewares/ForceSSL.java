@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.HttpStatus;
@@ -13,7 +14,7 @@ import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpStatus.MOVED_PERMANENTLY;
 import static com.vtence.molecule.http.HttpStatus.TEMPORARY_REDIRECT;
 
-public class ForceSSL extends AbstractMiddleware {
+public class ForceSSL implements Middleware {
 
     private boolean enable;
 
@@ -66,14 +67,6 @@ public class ForceSSL extends AbstractMiddleware {
                 return next.handle(request).whenSuccessful(this::addHSTSHeader);
             }
         });
-    }
-
-    public void handle(Request request, Response response) throws Exception {
-        if (enable && !secure(request)) {
-            redirectToHttps(request, response);
-        } else {
-            forward(request, response).whenSuccessful(this::addHSTSHeader);
-        }
     }
 
     private void addHSTSHeader(Response response) {

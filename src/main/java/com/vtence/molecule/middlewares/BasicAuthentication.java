@@ -1,7 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Authorization;
 import com.vtence.molecule.http.BasicCredentials;
@@ -14,7 +14,7 @@ import static com.vtence.molecule.http.HttpStatus.BAD_REQUEST;
 import static com.vtence.molecule.http.HttpStatus.UNAUTHORIZED;
 import static com.vtence.molecule.http.MimeTypes.TEXT;
 
-public class BasicAuthentication extends AbstractMiddleware {
+public class BasicAuthentication implements Middleware {
 
     private static final String BASIC_AUTHENTICATION = "Basic";
     private static final String REMOTE_USER = "REMOTE_USER";
@@ -25,30 +25,6 @@ public class BasicAuthentication extends AbstractMiddleware {
     public BasicAuthentication(String realm, Authenticator authenticator) {
         this.realm = realm;
         this.authenticator = authenticator;
-    }
-
-    public void handle(Request request, Response response) throws Exception {
-        Authorization auth = Authorization.of(request);
-
-        if (auth == null) {
-            unauthorized(response);
-            return;
-        }
-
-        if (!auth.hasScheme(BASIC_AUTHENTICATION)) {
-            response.status(BAD_REQUEST).done();
-            return;
-        }
-
-        BasicCredentials credentials = BasicCredentials.decode(auth.params());
-        Optional<String> user = authenticator.authenticate(credentials.username(), credentials.password());
-
-        if (user.isPresent()) {
-            request.attribute(REMOTE_USER, user.get());
-            forward(request, response);
-        } else {
-            unauthorized(response);
-        }
     }
 
     public Application then(Application next) {
@@ -74,13 +50,6 @@ public class BasicAuthentication extends AbstractMiddleware {
                 return unauthorized();
             }
         });
-    }
-
-    private void unauthorized(Response response) {
-        response.status(UNAUTHORIZED)
-                .addHeader(WWW_AUTHENTICATE, challenge())
-                .contentType(TEXT)
-                .done();
     }
 
     private Response unauthorized() {

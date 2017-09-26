@@ -1,64 +1,25 @@
 package com.vtence.molecule;
 
-public interface Middleware extends Application {
+public interface Middleware {
 
-    // Define a functional interface ...
-    interface MiddlewareFunction {
-        Application then(Application next);
-    }
+    Application then(Application next);
 
-    // ... so that we can use method references with new our style `Middleware`s ...
-    static Middleware from(MiddlewareFunction middleware) {
-        return new Middleware() {
-            public void handle(Request request, Response response) throws Exception {
-                throw new UnsupportedOperationException();
-            }
-
-            public void connectTo(Application successor) {
-                throw new UnsupportedOperationException();
-            }
-
-            public Application then(Application application) {
-                return middleware.then(application);
-            }
-        };
-    }
-
-    // .. until eventually this becomes our new functional interface ...
-    default Application then(Application next) {
-        connectTo(next);
-        return this;
-    }
-
-    // ... and this is gone.
-    void connectTo(Application successor);
-
-    // Until then support application as functions with this trick
-    default Application then(ApplicationFunction application) {
+    // Support applications as functions with this trick until Application is a pure function
+    default Application then(Application.ApplicationFunction application) {
         return then(Application.of(application));
     }
 
     /**
-     * Returns a composed middleware that chains this middleware
-     * with the next.
+     * Compose this middleware with the next in chain.
      */
-    default Middleware then(Middleware next) {
-        return new Middleware() {
-            public void handle(Request request, Response response) throws Exception {
-                throw new UnsupportedOperationException();
-            }
-
-            public void connectTo(Application successor) {
-                throw new UnsupportedOperationException();
-            }
-
-            public Application then(Application application) {
-                return Middleware.this.then(next.then(application));
-            }
-        };
+    default Middleware compose(Middleware next) {
+        return application -> then(next.then(application));
     }
 
+    /**
+     * The identity function.
+     */
     static Middleware identity() {
-        return Middleware.from(application -> application);
+        return application -> application;
     }
 }

@@ -110,10 +110,10 @@ public class MiddlewareStackTest {
     }
 
     private Middleware middleware(final String order) {
-        return Middleware.from(application -> Application.of(request -> {
+        return application -> Application.of(request -> {
             Response response = application.handle(request);
             return response.header("chain", order + " -> " + response.header("chain"));
-        }));
+        });
     }
 
     private Application application(final String app) {

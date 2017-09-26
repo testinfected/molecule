@@ -36,7 +36,7 @@ public class FilteringExample {
     public void run(WebServer server) throws IOException {
         // We implement a simple authentication middleware that checks against a map of authorized users
         // If credentials match, we allow access to the requested resource. If not, we send a 401 - Unauthorized.
-        Middleware authenticate = Middleware.from(next ->
+        Middleware authenticate = next ->
             Application.of(request -> {
                 // We read the username and password from the request parameters
                 String user = request.parameter("username");
@@ -53,8 +53,7 @@ public class FilteringExample {
                     return Response.of(UNAUTHORIZED)
                                    .done("Get away!");
                 }
-            })
-        );
+            });
 
         // All requests to /private/... go through the authentication filter
         server.filter("/private", authenticate)

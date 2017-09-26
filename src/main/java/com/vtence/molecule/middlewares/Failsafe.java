@@ -1,7 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.Request;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 
 import java.io.PrintWriter;
@@ -10,10 +10,7 @@ import java.io.StringWriter;
 import static com.vtence.molecule.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static com.vtence.molecule.http.MimeTypes.HTML;
 
-public class Failsafe extends AbstractMiddleware {
-
-    public Failsafe() {
-    }
+public class Failsafe implements Middleware {
 
     public Application then(Application next) {
         return Application.of(request -> {
@@ -29,14 +26,6 @@ public class Failsafe extends AbstractMiddleware {
         return Response.of(INTERNAL_SERVER_ERROR)
                        .contentType(HTML + "; charset=utf-8")
                        .done(formatAsHtml(error));
-    }
-
-    public void handle(Request request, Response response) throws Exception {
-        try {
-            forward(request, response).rescue(this::failsafeResponse);
-        } catch (Throwable error) {
-            failsafeResponse(response, error);
-        }
     }
 
     private void failsafeResponse(Response response, Throwable error) {
