@@ -44,11 +44,8 @@ public class MiddlewareStack {
             throw new IllegalStateException("No app or mount points defined");
         }
 
-        if (map != null) {
-            pipeline = pipeline.andThen(map);
-        }
-
-        Application app = pipeline.then(runner != null ? runner : new NotFound());
+        Middleware chain = map != null ? pipeline.andThen(map) : pipeline;
+        Application app = chain.then(runner != null ? runner : new NotFound());
         if (warmup != null) warmup.accept(app);
         return app;
     }
