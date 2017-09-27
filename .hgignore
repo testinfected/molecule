@@ -12,3 +12,4 @@ buildr.rb
 build
 .java-version
 .ruby-version
+out
