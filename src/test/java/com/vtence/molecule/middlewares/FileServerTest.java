@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static com.vtence.molecule.http.HttpDate.format;
-import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
@@ -25,8 +24,6 @@ public class FileServerTest {
     File base = onClasspath().locate("assets");
     FileServer fileServer = new FileServer(base);
     File file = new File(base, SAMPLE_IMAGE);
-    Request request = new Request().method(GET).path(SAMPLE_IMAGE);
-    Response response = new Response();
 
     @Test public void
     servesFiles() throws Exception {
@@ -73,7 +70,7 @@ public class FileServerTest {
 
     @Test public void
     rendersNotFoundWhenFileIsNotReadable() throws Exception {
-        Response response = fileServer.handle(request.path("/images"));
+        Response response = fileServer.handle(Request.get("/images"));
 
         assertThat(response).hasStatus(NOT_FOUND);
     }

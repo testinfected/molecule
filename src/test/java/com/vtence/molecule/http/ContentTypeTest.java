@@ -52,6 +52,6 @@ public class ContentTypeTest {
 
     @Test public void
     handlesAbsenceOfHeaderInResponse() {
-        assertThat("content type", ContentType.of(new Response()), nullValue());
+        assertThat("content type", ContentType.of(Response.ok()), nullValue());
     }
 }

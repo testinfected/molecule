@@ -25,9 +25,6 @@ public class FailureMonitorTest {
     @Rule
     public ExpectedException error = ExpectedException.none();
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test
     public void notifiesFailureReporterAndRethrowsExceptionInCaseOfError() throws Exception {
         context.checking(new Expectations() {{
@@ -45,7 +42,7 @@ public class FailureMonitorTest {
             never(failureReporter);
         }});
 
-        Response response = monitor.then(request -> Response.ok().done()).handle(request);
+        Response response = monitor.then(request -> Response.ok().done()).handle(Request.get("/"));
 
         assertNoExecutionError(response);
     }

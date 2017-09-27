@@ -17,13 +17,12 @@ public class FileBodyTest {
 
     File base = onClasspath().locate("assets/images");
     File file = new File(base, "sample.png");
-    Response response = new Response();
 
     @Test public void
     rendersFileContent() throws Exception {
         FileBody body = new FileBody(file);
         assertThat("file", body.file(), sameInstance(file));
-        response.body(body);
+        Response response = Response.ok().body(body);
         assertThat(response).hasBodySize(file.length())
                             .hasBodyContent(contentOf(file));
     }

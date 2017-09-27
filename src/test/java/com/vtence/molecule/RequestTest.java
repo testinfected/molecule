@@ -18,13 +18,12 @@ import static org.hamcrest.Matchers.contains;
 
 public class RequestTest {
 
-    Request request = new Request();
-
     @Test
     public void maintainsAnOrderedListOfParametersWithSameName() {
-        request.addParameter("letters", "a");
-        request.addParameter("letters", "b");
-        request.addParameter("letters", "c");
+        Request request = Request.get("/")
+                                 .addParameter("letters", "a")
+                                 .addParameter("letters", "b")
+                                 .addParameter("letters", "c");
 
         assertThat("has letters?", request.hasParameter("letters"), equalTo(true));
         assertThat("letters", request.parameters("letters"), contains("a", "b", "c"));
@@ -32,28 +31,31 @@ public class RequestTest {
 
     @Test
     public void usesLastSetParameterWhenMultipleParametersWithSameNameExist() {
-        request.addParameter("letter", "a");
-        request.addParameter("letter", "b");
-        request.addParameter("letter", "c");
+        Request request = Request.get("/")
+                                 .addParameter("letter", "a")
+                                 .addParameter("letter", "b")
+                                 .addParameter("letter", "c");
 
         assertThat("authoritative letter", request.parameter("letter"), equalTo("c"));
     }
 
     @Test
     public void maintainsAListOfParameterNames() {
-        request.addParameter("letters", "a, b, c, etc.");
-        request.addParameter("digits", "1, 2, 3, etc.");
-        request.addParameter("symbols", "#, $, %, etc.");
+        Request request = Request.get("/")
+                                 .addParameter("letters", "a, b, c, etc.")
+                                 .addParameter("digits", "1, 2, 3, etc.")
+                                 .addParameter("symbols", "#, $, %, etc.");
 
         assertThat("parameter names", request.parameterNames(), contains("letters", "digits", "symbols"));
     }
 
     @Test
     public void removingAParameterRemovesAllParametersWithSameName() {
-        request.addParameter("letters", "a");
-        request.addParameter("letters", "b");
-        request.addParameter("letters", "c");
-        request.addParameter("digits", "1, 2, 3, etc.");
+        Request request = Request.get("/")
+                                 .addParameter("letters", "a")
+                                 .addParameter("letters", "b")
+                                 .addParameter("letters", "c")
+                                 .addParameter("digits", "1, 2, 3, etc.");
 
         request.removeParameter("letters");
         assertThat("has letters?", request.hasParameter("letters"), equalTo(false));
@@ -62,44 +64,50 @@ public class RequestTest {
 
     @Test
     public void containsABody() throws IOException {
-        request.body("body");
+        Request request = Request.get("/")
+                                 .body("body");
         assertThat("input", request.body(), equalTo("body"));
     }
 
     @Test
     public void maintainsAnOrderedListOfHeaderNames() throws IOException {
-        request.addHeader("Accept", "text/html");
-        request.addHeader("Accept", "application/json");
-        request.header("Accept-Encoding", "gzip");
-        request.header("Accept-Language", "en");
+        Request request = Request.get("/")
+                                 .addHeader("Accept", "text/html")
+                                 .addHeader("Accept", "application/json")
+                                 .header("Accept-Encoding", "gzip")
+                                 .header("Accept-Language", "en");
 
         assertThat("header names", request.headerNames(), contains("Accept", "Accept-Encoding", "Accept-Language"));
     }
 
     @Test
     public void retrievesHeadersByName() throws IOException {
-        request.header("Accept", "text/html; q=0.9, application/json");
+        Request request = Request.get("/")
+                                 .header("Accept", "text/html; q=0.9, application/json");
         assertThat("header", request.header("Accept"), equalTo("text/html; q=0.9, application/json"));
     }
 
     @Test
     public void retrievesListOfHeadersWithSameName() throws IOException {
-        request.addHeader("Accept-Language", "en").
-                addHeader("Accept-Language", "fr");
+        Request request = Request.get("/")
+                                 .addHeader("Accept-Language", "en").
+                                         addHeader("Accept-Language", "fr");
         assertThat("header", request.headers("Accept-Language"), contains("en", "fr"));
     }
 
     @Test
     public void joinsHeadersWithSameName() throws IOException {
-        request.addHeader("Accept", "text/html; q=0.9").
-                addHeader("Accept", "application/json");
+        Request request = Request.get("/")
+                                 .addHeader("Accept", "text/html; q=0.9").
+                                         addHeader("Accept", "application/json");
         assertThat("header", request.header("Accept"), equalTo("text/html; q=0.9, application/json"));
     }
 
     @Test
     public void removesHeaders() throws IOException {
-        request.addHeader("Accept", "text/html");
-        request.addHeader("Accept-Encoding", "gzip");
+        Request request = Request.get("/")
+                                 .addHeader("Accept", "text/html")
+                                 .addHeader("Accept-Encoding", "gzip");
 
         assertThat("header?", request.hasHeader("Accept"), equalTo(true));
         request.removeHeader("Accept");
@@ -110,9 +118,10 @@ public class RequestTest {
 
     @Test
     public void maintainsAMapOfAttributes() throws IOException {
-        request.attribute("name", "Velociraptor");
-        request.attribute("family", "Dromaeosauridae");
-        request.attribute("clade", "Dinosauria");
+        Request request = Request.get("/")
+                                 .attribute("name", "Velociraptor")
+                                 .attribute("family", "Dromaeosauridae")
+                                 .attribute("clade", "Dinosauria");
 
         assertThat("attributes", request.attributes(), allOf(containsEntry("name", "Velociraptor"),
                 containsEntry("family", "Dromaeosauridae"),
@@ -122,32 +131,35 @@ public class RequestTest {
 
     @Test
     public void removesAttributeOnDemand() throws IOException {
-        request.attribute("name", "Velociraptor");
-        request.attribute("family", "Dromaeosauridae");
-        request.attribute("clade", "Dinosauria");
-        request.removeAttribute("family");
+        Request request = Request.get("/")
+                                 .attribute("name", "Velociraptor")
+                                 .attribute("family", "Dromaeosauridae")
+                                 .attribute("clade", "Dinosauria")
+                                 .removeAttribute("family");
 
         assertThat("attribute names", request.attributeKeys(), containsKeys("name", "clade"));
     }
 
     @Test
     public void usesISO8859AsDefaultCharset() {
-        assertThat("default charset", request.charset(), equalTo(StandardCharsets.ISO_8859_1));
+        assertThat("default charset", Request.get("/").charset(), equalTo(StandardCharsets.ISO_8859_1));
     }
 
     @Test
     public void readsCharsetFromContentType() {
-        request.header(CONTENT_TYPE, "text/html; charset=utf-8");
+        Request request = Request.get("/")
+                                 .header(CONTENT_TYPE, "text/html; charset=utf-8");
         assertThat("charset", request.charset(), equalTo(StandardCharsets.UTF_8));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void maintainsAnOrderedListOfBodyParts() {
-        request.addPart(new BodyPart().name("a"));
-        request.addPart(new BodyPart().name("b"));
-        request.addPart(new BodyPart().name("c"));
-        request.addPart(new BodyPart().name("a"));
+        Request request = Request.get("/")
+                                 .addPart(new BodyPart().name("a"))
+                                 .addPart(new BodyPart().name("b"))
+                                 .addPart(new BodyPart().name("c"))
+                                 .addPart(new BodyPart().name("a"));
 
         assertThat("body parts", request.parts(),
                 contains(partWithName("a"), partWithName("b"), partWithName("c"), partWithName("a")));
@@ -156,33 +168,37 @@ public class RequestTest {
     @SuppressWarnings("unchecked")
     @Test
     public void removesBodyPartsByName() {
-        request.addPart(new BodyPart().name("a"));
-        request.addPart(new BodyPart().name("b"));
-        request.addPart(new BodyPart().name("c"));
-        request.addPart(new BodyPart().name("b"));
-        request.removePart("b");
+        Request request = Request.get("/")
+                                 .addPart(new BodyPart().name("a"))
+                                 .addPart(new BodyPart().name("b"))
+                                 .addPart(new BodyPart().name("c"))
+                                 .addPart(new BodyPart().name("b"))
+                                 .removePart("b");
 
         assertThat("body parts", request.parts(), contains(partWithName("a"), partWithName("c")));
     }
 
     @Test
     public void readsHostnameFromHostHeader() {
-        request.serverHost("127.0.0.1");
-        request.header(HOST, "www.example.com");
+        Request request = Request.get("/")
+                                 .serverHost("127.0.0.1")
+                                 .header(HOST, "www.example.com");
 
         assertThat("hostname", request.hostname(), equalTo("www.example.com"));
     }
 
     @Test
     public void fallbacksToServerHostIfHostHeaderMissing() {
-        request.serverHost("www.example.com");
+        Request request = Request.get("/")
+                                 .serverHost("www.example.com");
 
         assertThat("hostname", request.hostname(), equalTo("www.example.com"));
     }
 
     @Test
     public void readsPortFromHostHeader() {
-        request.serverPort(5432);
+        Request request = Request.get("/")
+                                 .serverPort(5432);
         request.header(HOST, "www.example.com:8080");
 
         assertThat("port", request.port(), equalTo(8080));
@@ -190,7 +206,8 @@ public class RequestTest {
 
     @Test
     public void knowsSchemeDefaultPort() {
-        request.header(HOST, "www.example.com");
+        Request request = Request.get("/")
+                                 .header(HOST, "www.example.com");
 
         request.scheme("http");
         assertThat("http port", request.port(), equalTo(80));
@@ -201,14 +218,16 @@ public class RequestTest {
 
     @Test
     public void usesServerPortAsFallback() {
-        request.serverPort(5432);
+        Request request = Request.get("/")
+                                 .serverPort(5432);
 
         assertThat("fallback port", request.port(), equalTo(5432));
     }
 
     @Test
     public void usesUriForUrlIfAbsolute() {
-        request.uri("http://www.example.com/over/there?name=ferret");
+        Request request = Request.get("/")
+                                 .uri("http://www.example.com/over/there?name=ferret");
 
         assertThat("absolute url", request.url(),
                    equalTo("http://www.example.com/over/there?name=ferret"));
@@ -216,8 +235,9 @@ public class RequestTest {
 
     @Test
     public void reconstructsOriginalUrlIfUriIsRelative() {
-        request.uri("/over/there?name=ferret");
-        request.scheme("http");
+        Request request = Request.get("/")
+                                 .uri("/over/there?name=ferret")
+                                 .scheme("http");
 
         request.header(HOST, "www.example.com");
         assertThat("using default port", request.url(),

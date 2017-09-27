@@ -62,6 +62,9 @@ public class Request {
     private boolean secure;
     private long timestamp;
 
+    public Request() {
+    }
+
     /**
      * Creates a get request with the given path
      *
@@ -532,8 +535,9 @@ public class Request {
      *
      * @param part the additional body part
      */
-    public void addPart(BodyPart part) {
+    public Request addPart(BodyPart part) {
         parts.add(part);
+        return this;
     }
 
     /**

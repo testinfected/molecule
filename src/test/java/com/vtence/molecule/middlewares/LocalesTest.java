@@ -24,9 +24,6 @@ public class LocalesTest {
     Locale originalDefault = Locale.getDefault();
     Locale selected;
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Rule
     public ExpectedException error = ExpectedException.none();
 

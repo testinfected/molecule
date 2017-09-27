@@ -22,12 +22,9 @@ public class ForceSSLTest {
 
     ForceSSL ssl = new ForceSSL();
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test
     public void doesNotRedirectRequestsThatAreAlreadySecure() throws Exception {
-        assertIsNotRedirected(secure(request));
+        assertIsNotRedirected(secure(Request.get("/")));
     }
 
     @Test
@@ -56,15 +53,15 @@ public class ForceSSLTest {
 
     @Test
     public void redirectsPermanentlyOnGetAndHead() throws Exception {
-        Request request = new Request();
+        Request request = Request.get("/");
         for (HttpMethod method : asList(HEAD, GET)) {
-            assertIsRedirectPermanently(request.method(method));
+            assertIsRedirectedPermanently(request.method(method));
         }
     }
 
     @Test
     public void redirectsTemporaryOnOtherVerbs() throws Exception {
-        Request request = new Request();
+        Request request = Request.get("/");
         for (HttpMethod method : asList(OPTIONS, POST, PATCH, PUT, DELETE)) {
             assertIsRedirectedTemporary(request.method(method));
         }
@@ -74,14 +71,14 @@ public class ForceSSLTest {
     public void doesNotRedirectProxiedHttps() throws Exception {
         ssl.redirectOn("X-Forwarded-Proto");
 
-        assertIsNotRedirected(request.header("X-Forwarded-Proto", "https"));
-        assertIsRedirectedTemporary(request.header("X-Forwarded-Proto", "http"));
+        assertIsNotRedirected(Request.get("/").header("X-Forwarded-Proto", "https"));
+        assertIsRedirectedPermanently(Request.get("/").header("X-Forwarded-Proto", "http"));
     }
 
     @Test
     public void includesHSTSHeaderByDefaultWithOneYearValidity() throws Exception {
         Response response = ssl.then(ok())
-                               .handle(secure(request));
+                               .handle(secure(Request.get("/")));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=31536000");
     }
@@ -90,7 +87,7 @@ public class ForceSSLTest {
     public void disablingHSTSHeaderClearsBrowserSettings() throws Exception {
         ssl.hsts(false);
         Response response = ssl.then(ok())
-                               .handle(secure(request));
+                               .handle(secure(Request.get("/")));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=0");
     }
@@ -99,7 +96,7 @@ public class ForceSSLTest {
     public void configuresHSTSHeaderExpiry() throws Exception {
         ssl.expires(TimeUnit.DAYS.toSeconds(180));
         Response response = ssl.then(ok())
-                               .handle(secure(request));
+                               .handle(secure(Request.get("/")));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=15552000");
     }
@@ -108,7 +105,7 @@ public class ForceSSLTest {
     public void includesSubdomainsInSecurityHeadersIfRequested() throws Exception {
         ssl.includesSubdomains(true);
         Response response = ssl.then(ok())
-                               .handle(secure(request));
+                               .handle(secure(Request.get("/")));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=31536000; includeSubdomains");
     }
@@ -117,7 +114,7 @@ public class ForceSSLTest {
     public void prefersAppSecurityHeaders() throws Exception {
         Response response = ssl.then(request -> Response.ok()
                                                         .header("Strict-Transport-Security", "provided"))
-                               .handle(secure(request));
+                               .handle(secure(Request.get("/")));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "provided");
     }
@@ -126,7 +123,7 @@ public class ForceSSLTest {
     public void canBeDisabledForDevelopmentMode() throws Exception {
         ssl.enable(false);
 
-        assertIsNotRedirected(request);
+        assertIsNotRedirected(Request.get("/"));
     }
 
     private Application ok() {
@@ -139,7 +136,7 @@ public class ForceSSLTest {
         assertThat(response).hasNoHeader("Location");
     }
 
-    private void assertIsRedirectPermanently(Request request) throws Exception {
+    private void assertIsRedirectedPermanently(Request request) throws Exception {
         Response response = ssl.then(ok())
                                .handle(request);
 
