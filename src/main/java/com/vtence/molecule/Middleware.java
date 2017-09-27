@@ -7,7 +7,7 @@ public interface Middleware {
     /**
      * Compose this middleware with the next in chain.
      */
-    default Middleware compose(Middleware next) {
+    default Middleware andThen(Middleware next) {
         return application -> then(next.then(application));
     }
 
