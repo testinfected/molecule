@@ -22,11 +22,12 @@ Access your application at:
 
 ## About
 
-Molecule is a rack inspired micro web framework for Java, with minimal dependencies. It is fast, small, 
+Molecule is a rack inspired HTTP toolkit for Java, with no dependencies. It is fast, small, 
 easy to use, easy to learn and easy to extend.
 
 Molecule is great for building micro services or regular web applications. It is designed around simplicity,
-testability and freedom of choice. It's more a library than a framework really.
+testability and freedom of choice. Built entirely using TDD it provides super-easy ways to test your 
+application and individual endpoints, both in and out of container.
 
 Molecule is small, it weights less than 150k, and will stay as lean as possible. It is pluggable through the concept
 of rack middlewares and offers some out-of-the box integrations. You're free to use the built-in options 
@@ -45,7 +46,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.11.0</version>
+      <version>0.12.0</version>
 </dependency>
 ```
  
@@ -808,7 +809,7 @@ If you want the latest development version, grab the latest snapshot from [Sonat
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.12.0-SNAPSHOT</version>
+      <version>0.13.0-SNAPSHOT</version>
 </dependency>
 ```
 
