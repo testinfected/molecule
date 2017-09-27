@@ -34,12 +34,25 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
  */
 public class Response {
     private final CompletableFuture<Response> done = new CompletableFuture<>();
-    private final Headers headers = new Headers();
+    private final Headers headers;
 
     private CompletableFuture<Response> postProcessing = done;
-    private int statusCode = HttpStatus.OK.code;
-    private String statusText = HttpStatus.OK.text;
-    private Body body = BinaryBody.empty();
+    private HttpStatus status;
+    private Body body;
+
+    public Response(HttpStatus status) {
+        this(status, BinaryBody.empty());
+    }
+
+    public Response(HttpStatus status, Body body) {
+        this(status, body, new Headers());
+    }
+
+    public Response(HttpStatus status, Body body, Headers headers) {
+        this.status = status;
+        this.body = body;
+        this.headers = headers;
+    }
 
     /**
      * Creates a response with a HTTP status of OK
@@ -54,16 +67,7 @@ public class Response {
      * @param status the HTTP status to set on the response
      */
     public static Response of(HttpStatus status) {
-        return new Response().status(status);
-    }
-
-    /**
-     * Creates a response with the given HTTP status code
-     *
-     * @param statusCode the HTTP status code to set on the response
-     */
-    public static Response of(int statusCode) {
-        return new Response().statusCode(statusCode);
+        return new Response(status);
     }
 
     /**
@@ -88,27 +92,10 @@ public class Response {
     /**
      * Sets the HTTP status for this response. This will set both the status code and the status text.
      *
-     * <p>
-     * The status is set to 200 OK by default.
-     * </p>
-     *
      * @param status the HTTP status to set
      */
     public Response status(HttpStatus status) {
-        statusCode(status.code);
-        statusText(status.text);
-        return this;
-    }
-
-    /**
-     * Sets the status code for this response. It is usually preferable to set the status and text
-     * together with Response#status(com.vtence.molecule.http.HttpStatus).
-     *
-     * @see Response#status(com.vtence.molecule.http.HttpStatus)
-     * @param code the status code to set
-     */
-    public Response statusCode(int code) {
-        statusCode = code;
+        this.status = status;
         return this;
     }
 
@@ -118,39 +105,16 @@ public class Response {
      * @return the response status code
      */
     public int statusCode() {
-        return statusCode;
+        return status.code;
     }
 
     /**
-     * Sets the status text for this response. It is usually preferable to set the status and text
-     * together with Response#status(com.vtence.molecule.http.HttpStatus).
+     * Gets the status description of this response.
      *
-     * @see Response#status(com.vtence.molecule.http.HttpStatus)
-     * @param text the status text to set
+     * @return the status reason pthras
      */
-    public Response statusText(String text) {
-        statusText = text;
-        return this;
-    }
-
-    /**
-     * Gets the status text of this response.
-     *
-     * @return the response status text
-     */
-    public String statusText() {
-        return statusText;
-    }
-
-    /**
-     * Sends a SEE OTHER (303) redirect response to the client using the specified redirect location.
-     *
-     * @param location the url of the other location
-     */
-    public Response redirectTo(String location) {
-        status(SEE_OTHER);
-        header(LOCATION, location);
-        return this;
+    public String statusDescription() {
+        return status.reason;
     }
 
     /**

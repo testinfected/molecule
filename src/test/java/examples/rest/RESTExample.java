@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.vtence.molecule.http.HttpStatus.CREATED;
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
+
 /**
  * <p>
  *     This example demonstrates RESTful routing. It shows how to define routes, map routes to HTTP verbs
@@ -59,7 +62,7 @@ public class RESTExample {
                       int id = sequence.next();
                       Album album = new Album(request.parameter("title"), request.parameter("artist"));
                       albums.put(id, album);
-                      return Response.of(201)
+                      return Response.of(CREATED)
                                      .done(album.info());
                   };
                   post("/albums").to(application3);
@@ -72,7 +75,7 @@ public class RESTExample {
                           return Response.ok()
                                          .done(album.info());
                       } else {
-                          return Response.of(404)
+                          return Response.of(NOT_FOUND)
                                          .done();
                       }
                   };
@@ -91,7 +94,7 @@ public class RESTExample {
                           return Response.ok()
                                          .done(album.info());
                       } else {
-                          return Response.of(404)
+                          return Response.of(NOT_FOUND)
                                          .done();
                       }
                   };
@@ -106,7 +109,7 @@ public class RESTExample {
                           return Response.ok()
                                          .done(album.info());
                       } else {
-                          return Response.of(404)
+                          return Response.of(NOT_FOUND)
                                          .done();
                       }
                   };

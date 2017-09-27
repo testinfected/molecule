@@ -189,7 +189,7 @@ public class SimpleServer implements Server {
 
         private void writeStatusLine(org.simpleframework.http.Response httpResponse, Response response) {
             httpResponse.setCode(response.statusCode());
-            httpResponse.setDescription(response.statusText());
+            httpResponse.setDescription(response.statusDescription());
         }
 
         private void writeHeaders(org.simpleframework.http.Response httpResponse, Response response) {

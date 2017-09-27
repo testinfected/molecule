@@ -40,19 +40,19 @@ public class ResponseAssert {
         return this;
     }
 
-    public ResponseAssert hasStatusText(String text) {
-        hasStatusText(is(text));
+    public ResponseAssert hasStatusDescription(String text) {
+        hasStatusDescription(is(text));
         return this;
     }
 
-    public ResponseAssert hasStatusText(Matcher<? super String> matching) {
-        MatcherAssert.assertThat("response status text", response.statusText(), matching);
+    public ResponseAssert hasStatusDescription(Matcher<? super String> matching) {
+        MatcherAssert.assertThat("response status description", response.statusDescription(), matching);
         return this;
     }
 
     public ResponseAssert hasStatus(HttpStatus expected) {
         hasStatusCode(expected.code);
-        hasStatusText(expected.text);
+        hasStatusDescription(expected.reason);
         return this;
     }
 

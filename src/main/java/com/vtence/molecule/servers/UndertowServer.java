@@ -229,7 +229,7 @@ public class UndertowServer implements Server {
 
         private void setStatusLine(HttpServerExchange exchange, Response response) {
             exchange.setStatusCode(response.statusCode());
-            exchange.setReasonPhrase(response.statusText());
+            exchange.setReasonPhrase(response.statusDescription());
         }
 
         private void setHeaders(HttpServerExchange exchange, Response response) {
