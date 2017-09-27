@@ -1,13 +1,14 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Request;
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 
 import java.time.Clock;
 
 import static com.vtence.molecule.http.HeaderNames.DATE;
 
-public class DateHeader extends AbstractMiddleware {
+public class DateHeader implements Middleware {
 
     private final Clock clock;
 
@@ -19,8 +20,9 @@ public class DateHeader extends AbstractMiddleware {
         this.clock = clock;
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(this::setDateHeaderIfMissing);
+    public Application then(Application next) {
+        return request -> next.handle(request)
+                              .whenSuccessful(this::setDateHeaderIfMissing);
     }
 
     private void setDateHeaderIfMissing(Response response) {

@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
@@ -8,17 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class URLMap extends AbstractMiddleware {
+public class URLMap implements Middleware {
 
     private final List<Mount> mounts = new ArrayList<>();
-
-    public URLMap() {
-        this(new NotFound());
-    }
-
-    public URLMap(Application fallback) {
-        this.connectTo(fallback);
-    }
 
     public URLMap mount(String path, Application app) {
         mounts.add(new Mount(path, app));
@@ -26,22 +19,21 @@ public class URLMap extends AbstractMiddleware {
         return this;
     }
 
+    public Application then(Application next) {
+        return request -> mountFor(request).orElse(new Mount(next)).handle(request);
+    }
+
     private void sortByMostSpecificPaths(List<Mount> mounts) {
         mounts.sort((mount1, mount2) -> mount2.mountPoint.length() - mount1.mountPoint.length());
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        Optional<Mount> mount = mounts.stream().filter(m -> m.matches(request)).findFirst();
-
-        if (mount.isPresent()) {
-            mount.get().handle(request, response);
-        } else {
-            forward(request, response);
-        }
+    private Optional<Mount> mountFor(Request request) {
+        return mounts.stream()
+                     .filter(m -> m.matches(request))
+                     .findFirst();
     }
 
     public interface MountPoint {
-
         String app();
 
         String uri(String path);
@@ -57,6 +49,10 @@ public class URLMap extends AbstractMiddleware {
 
         private final String mountPoint;
         private final Application app;
+
+        public Mount(Application app) {
+            this("/", app);
+        }
 
         public Mount(String mountPoint, Application app) {
             this.mountPoint = mountPoint;
@@ -77,6 +73,12 @@ public class URLMap extends AbstractMiddleware {
             return pathInfo.isEmpty() ? "/" : pathInfo;
         }
 
+        public Response handle(Request request) throws Exception {
+            request.path(pathInfo(request));
+            request.attribute(MountPoint.class, this);
+            return app.handle(request);
+        }
+
         public String uri(String path) {
             if (mountPoint.equals("/")) return path;
             return mountPoint.concat(path.endsWith("/") ? stripTrailingSlash(path) : path);
@@ -84,12 +86,6 @@ public class URLMap extends AbstractMiddleware {
 
         private String stripTrailingSlash(String path) {
             return path.replaceAll("/$", "");
-        }
-
-        public void handle(Request request, Response response) throws Exception {
-            request.path(pathInfo(request));
-            request.attribute(MountPoint.class, this);
-            app.handle(request, response);
         }
     }
 }

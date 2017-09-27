@@ -14,7 +14,7 @@ public class RequestWithMethodTest {
     @SuppressWarnings("unchecked")
     @Test public void
     matchesWhenRequestMethodsAreEqual() {
-        Request request = new Request().method(GET).path("/");
+        Request request = Request.get("/");
 
         assertThat("same case match", withMethod("GET").matches(request), is(true));
         assertThat("different case match", withMethod("get").matches(request), is(true));

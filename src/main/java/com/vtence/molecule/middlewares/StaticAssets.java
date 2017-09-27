@@ -1,6 +1,7 @@
 package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class StaticAssets extends AbstractMiddleware {
+public class StaticAssets implements Middleware {
 
     private final Application fileServer;
     private final List<String> urls = new ArrayList<>();
@@ -31,19 +32,15 @@ public class StaticAssets extends AbstractMiddleware {
         return this;
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        if (canServe(request.path())) {
-            serve(request, response);
-        } else {
-            forward(request, response);
-        }
+    public Application then(Application next) {
+        return request -> canServe(request.path()) ? serve(request) :  next.handle(request);
     }
 
-    private void serve(Request request, Response response) throws Exception {
+    private Response serve(Request request) throws Exception {
         if (targetsDirectory(request)) {
             request.path(request.path() + indexFile);
         }
-        fileServer.handle(request, response);
+        return fileServer.handle(request);
     }
 
     private boolean targetsDirectory(Request request) {

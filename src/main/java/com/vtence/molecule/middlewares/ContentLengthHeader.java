@@ -1,15 +1,17 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.Request;
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.TRANSFER_ENCODING;
 
-public class ContentLengthHeader extends AbstractMiddleware {
+public class ContentLengthHeader implements Middleware {
 
-    public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(this::addContentLengthHeader);
+    public Application then(Application next) {
+        return request -> next.handle(request)
+                              .whenSuccessful(this::addContentLengthHeader);
     }
 
     private void addContentLengthHeader(Response response) {

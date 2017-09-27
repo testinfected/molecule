@@ -1,6 +1,7 @@
 package examples.flash;
 
 
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.lib.FlashHash;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
@@ -32,9 +33,9 @@ public class FlashExample {
               .add(new CookieSessionTracker(SessionPool.secure()))
               // We need the Flash middleware
               .add(new Flash())
-              .start(new DynamicRoutes() {{
+              .route(new DynamicRoutes() {{
                   // a post to /accounts creates a new account if email is not already taken
-                  post("/accounts").to((request, response) -> {
+                  post("/accounts").to(request -> {
                       FlashHash flash = FlashHash.get(request);
 
                       String email = request.parameter("email");
@@ -45,22 +46,22 @@ public class FlashExample {
                           // Add a flash alert if creation failed
                           flash.alert("An email is required");
                       }
-                      response.redirectTo("/account").done();
+                      return Response.redirect("/account").done();
                   });
 
                   // a get /account displays the flash message
-                  get("/account").to((request, response) -> {
+                  get("/account").to(request -> {
                       FlashHash flash = FlashHash.get(request);
 
                       // Display either the notice or alert to the user  ...
                       if (flash.notice() != null) {
-                          response.done(flash.notice());
-                      } else if (flash.alert() != null) {
-                          response.done(flash.alert());
-                      } else {
-                          // ... or nothing
-                          response.done();
+                          return Response.ok().done(flash.notice());
                       }
+                      if (flash.alert() != null) {
+                          return Response.ok().done(flash.alert());
+                      }
+                      // ... or nothing
+                      return Response.ok().done();
                   });
               }});
     }

@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.jmock.Expectations;
@@ -28,9 +29,6 @@ public class ConnectionScopeTest {
     Connection connection = context.mock(Connection.class);
     States connectionStatus = context.states("connection").startsAs("closed");
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Rule
     public ExpectedException error = ExpectedException.none();
 
@@ -50,37 +48,36 @@ public class ConnectionScopeTest {
     @Test
     public void
     opensConnectionAndMakesItAvailableAsRequestAttribute() throws Exception {
-        connectionScope.connectTo((request, response) ->
-                response.body(request.attribute(Connection.class) == connection ? "opened" : "closed"));
-        connectionScope.handle(request, response);
-        response.done();
+        Response response = connectionScope.then(
+                request -> Response.ok()
+                                   .done(request.attribute(Connection.class) == connection ? "opened" : "closed"))
+                                           .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("opened");
     }
 
     @Test
     public void
     removesConnectionFromScopeAfterUse() throws Exception {
-        connectionScope.handle(request, response);
+        Request request = Request.get("/");
+        Response response = connectionScope.then(ok()).handle(request);
         assertThat(request).hasAttribute(Connection.class, notNullValue());
 
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(request).hasNoAttribute(Connection.class);
     }
 
     @Test
     public void
     gracefullyClosesConnectionWhenAnErrorOccurs() throws Exception {
-        connectionScope.connectTo((request, response) -> {
-            throw new Exception("Boom!");
-        });
-
         error.expectMessage("Boom!");
+        Request request = Request.get("/");
+
         try {
-            connectionScope.handle(request, response);
+            connectionScope.then(crash()).handle(request);
         } finally {
             assertThat(request).hasNoAttribute(Connection.class);
         }
@@ -89,14 +86,26 @@ public class ConnectionScopeTest {
     @Test
     public void
     gracefullyClosesConnectionWhenAnErrorOccursLater() throws Throwable {
-        connectionScope.handle(request, response);
+        Request request = Request.get("/");
+        Response response = connectionScope.then(ok()).handle(request);
+
         assertThat(request).hasAttribute(Connection.class, notNullValue());
 
         response.done(new Exception("Boom!"));
         assertThat(request).hasNoAttribute(Connection.class);
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private Application ok() {
+        return request -> Response.ok();
+    }
+
+    private Application crash() {
+        return request -> {
+            throw new Exception("Boom!");
+        };
+    }
+
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 }

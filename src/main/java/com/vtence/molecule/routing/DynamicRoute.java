@@ -1,11 +1,11 @@
 package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
-import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.lib.matchers.Combination;
+import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.lib.matchers.Matchers;
 
 import java.util.Map;
@@ -30,7 +30,7 @@ public class DynamicRoute implements Route {
         return Combination.both(matcher);
     }
 
-    public void handle(Request request, Response response) throws Exception {
+    public Response handle(Request request) throws Exception {
         if (path instanceof WithBoundParameters) {
             WithBoundParameters dynamicPath = (WithBoundParameters) path;
             Map<String, String> dynamicParameters = dynamicPath.parametersBoundTo(request.path());
@@ -38,6 +38,6 @@ public class DynamicRoute implements Route {
                 request.addParameter(name, dynamicParameters.get(name));
             }
         }
-        app.handle(request, response);
+        return app.handle(request);
     }
 }

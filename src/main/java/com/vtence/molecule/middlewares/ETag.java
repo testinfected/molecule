@@ -1,7 +1,8 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Body;
-import com.vtence.molecule.Request;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.helpers.HexEncoder;
 import com.vtence.molecule.http.HeaderNames;
@@ -17,13 +18,13 @@ import static com.vtence.molecule.http.HeaderNames.CACHE_CONTROL;
 import static com.vtence.molecule.http.HeaderNames.ETAG;
 import static com.vtence.molecule.lib.BinaryBody.bytes;
 
-public class ETag extends AbstractMiddleware {
+public class ETag implements Middleware {
 
     private static final String REVALIDATE = "max-age=0; private; no-cache";
     private final HexEncoder encoder = new HexEncoder();
 
-    public void handle(Request request, Response response) throws Exception {
-        forward(request, response).whenSuccessful(this::computeETag);
+    public Application then(Application next) {
+        return request -> next.handle(request).whenSuccessful(this::computeETag);
     }
 
     private void computeETag(Response response) {

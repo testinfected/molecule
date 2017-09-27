@@ -1,5 +1,6 @@
 package com.vtence.molecule.servers;
 
+import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import org.junit.Test;
 
@@ -15,7 +16,7 @@ public class SimpleServerTest extends ServerCompatibilityTests {
 
     @Test public void
     chunksResponseWhenContentLengthUnknown() throws IOException {
-        server.run((request, response) -> response.body("<html>...</html>").done());
+        server.run(request -> Response.ok().done("<html>...</html>"));
 
         response = request.send();
         assertNoError();

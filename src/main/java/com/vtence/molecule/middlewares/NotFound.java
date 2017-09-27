@@ -9,11 +9,9 @@ import static com.vtence.molecule.http.MimeTypes.TEXT;
 
 public class NotFound implements Application {
 
-    public void handle(Request request, Response response) throws Exception {
-        response.status(NOT_FOUND)
+    public Response handle(Request request) throws Exception {
+        return Response.of(NOT_FOUND)
                 .contentType(TEXT)
-                .body("Not found: " + request.path())
-                .done();
-
+                .done("Not found: " + request.path());
     }
 }

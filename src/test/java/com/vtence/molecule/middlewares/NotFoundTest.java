@@ -2,7 +2,6 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import org.junit.Before;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
@@ -12,33 +11,27 @@ public class NotFoundTest {
 
     NotFound notFound = new NotFound();
 
-    Request request = new Request();
-    Response response = new Response();
-
-    String content = "Not found: /resource";
-
-    @Before public void
-    handleRequest() throws Exception {
-        notFound.handle(request.path("/resource"), response);
+    @Test public void
+    setsStatusCodeToNotFound() throws Exception {
+        assertThat(fetchNotFound()).hasStatus(NOT_FOUND);
     }
 
     @Test public void
-    setsStatusCodeToNotFound() {
-        assertThat(response).hasStatus(NOT_FOUND);
+    rendersPageNotFound() throws Exception {
+        assertThat(fetchNotFound()).hasBodyText("Not found: /resource");
     }
 
     @Test public void
-    rendersPageNotFound() {
-        assertThat(response).hasBodyText(content);
+    setsContentTypeToPlainText() throws Exception {
+        assertThat(fetchNotFound()).hasContentType("text/plain");
     }
 
     @Test public void
-    setsContentTypeToPlainText() {
-        assertThat(response).hasContentType("text/plain");
+    completesResponse() throws Exception {
+        assertThat(fetchNotFound()).isDone();
     }
 
-    @Test public void
-    completesResponse() {
-        assertThat(response).isDone();
+    private Response fetchNotFound() throws Exception {
+        return notFound.handle(Request.get("/resource"));
     }
 }

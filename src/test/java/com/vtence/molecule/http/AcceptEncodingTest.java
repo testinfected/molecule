@@ -51,7 +51,7 @@ public class AcceptEncodingTest {
 
     @Test public void
     handlesAbsenceOfAcceptEncodingHeader() {
-        AcceptEncoding accept = AcceptEncoding.of(new Request());
+        AcceptEncoding accept = AcceptEncoding.of(Request.get("/"));
         assertThat("encoding of missing header", accept.selectBestEncoding("gzip", "identity"), equalTo("identity"));
     }
 

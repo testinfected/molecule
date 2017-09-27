@@ -1,10 +1,8 @@
 package examples.filtering;
 
 import com.vtence.molecule.Middleware;
-import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.middlewares.AbstractMiddleware;
 import com.vtence.molecule.routing.DynamicRoutes;
 
 import java.io.IOException;
@@ -37,36 +35,32 @@ public class FilteringExample {
     public void run(WebServer server) throws IOException {
         // We implement a simple authentication middleware that checks against a map of authorized users
         // If credentials match, we allow access to the requested resource. If not, we send a 401 - Unauthorized.
-        Middleware authenticate = new AbstractMiddleware() {
-            public void handle(Request request, Response response) throws Exception {
-                // We read the username and password from the request parameters
-                String user = request.parameter("username");
-                String password = request.parameter("password");
+        Middleware authenticate = next -> request -> {
+                        // We read the username and password from the request parameters
+                        String user = request.parameter("username");
+                        String password = request.parameter("password");
 
-                String token = users.get(user);
-                if (password != null && password.equals(token)) {
-                    // Credentials match, store the current user as a request attribute...
-                    request.attribute("user", user);
-                    // ... then carry on with the processing chain
-                    forward(request, response);
-                } else {
-                    // Halt request processing
-                    response.status(UNAUTHORIZED)
-                            .done("Get away!");
-                }
-            }
-        };
+                        String token = users.get(user);
+                        if (password != null && password.equals(token)) {
+                            // Credentials match, store the current user as a request attribute...
+                            request.attribute("user", user);
+                            // ... then carry on with the processing chain
+                            return next.handle(request);
+                        } else {
+                            // Halt request processing
+                            return Response.of(UNAUTHORIZED)
+                                           .done("Get away!");
+                        }
+                    };
 
         // All requests to /private/... go through the authentication filter
         server.filter("/private", authenticate)
-              .start(new DynamicRoutes() {{
+              .route(new DynamicRoutes() {{
                   // This route is private, thus it requires authentication
-                  get("/private/area").to((request, response) ->
-                          response.done("Hello, " + request.attribute("user") + "!"));
+                  get("/private/area").to(request -> Response.ok().done("Hello, " + request.attribute("user") + "!"));
 
                   // This route is public, anybody can access it
-                  get("/hello").to((request, response) ->
-                          response.done("Welcome, Guest!"));
+                  get("/hello").to(request -> Response.ok().done("Welcome, Guest!"));
               }});
     }
 

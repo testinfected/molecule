@@ -1,5 +1,7 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.FlashHash;
@@ -10,18 +12,22 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class Flash extends AbstractMiddleware {
+public class Flash implements Middleware {
 
-    public void handle(Request request, Response response) throws Exception {
-        FlashHash flash = loadFlash(request);
-        flash.bind(request);
+    public Application then(Application next) {
+        return request -> {
+            FlashHash flash = loadFlash(request);
+            flash.bind(request);
 
-        try {
-            forward(request, response).whenSuccessful(commitFlash(request)).whenComplete(unbindFlashFrom(request));
-        } catch (Throwable error) {
-            FlashHash.unbind(request);
-            throw error;
-        }
+            try {
+                return next.handle(request)
+                           .whenSuccessful(commitFlash(request))
+                           .whenComplete(unbindFlashFrom(request));
+            } catch (Throwable error) {
+                FlashHash.unbind(request);
+                throw error;
+            }
+        };
     }
 
     private BiConsumer<Response, Throwable> unbindFlashFrom(final Request request) {

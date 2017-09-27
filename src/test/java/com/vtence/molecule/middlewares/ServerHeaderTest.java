@@ -13,31 +13,30 @@ public class ServerHeaderTest {
     String serverName = "server/version";
     ServerHeader serverHeader = new ServerHeader(serverName);
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test public void
     setsServerHeaderIfNotPresentOnceDone() throws Exception {
-        serverHeader.handle(request, response);
+        Response response = serverHeader.then(request -> Response.ok())
+                                        .handle(Request.get("/"));
         assertThat(response).hasNoHeader("Server");
 
         response.done();
         assertThat(response).hasHeader("Server", serverName);
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
     }
 
     @Test public void
-    doesNotOverrideExistingServerHeader() throws Exception {
-        serverHeader.handle(request, response);
-
-        response.header("Server", "existing").done();
+    keepsExistingServerHeaderIfAny() throws Exception {
+        Response response = serverHeader.then(request -> Response.ok()
+                                                                 .header("Server", "existing")
+                                                                 .done())
+                                        .handle(Request.get("/"));
 
         assertThat(response).hasHeader("Server", "existing");
-        assertNoExecutionError();
+        assertNoExecutionError(response);
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 }

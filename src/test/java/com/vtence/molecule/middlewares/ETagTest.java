@@ -19,96 +19,107 @@ public class ETagTest {
 
     ETag etag = new ETag();
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test public void
     setsETagByComputingMD5HashOfResponseBody() throws Exception {
-        etag.handle(request, response);
-        response.body("response body").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
         assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
     @Test public void
     willNotSetETagIfBodyIsEmpty() throws Exception {
-        etag.handle(request, response);
-        response.body("").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .done(""))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     willNotSetETagIfStatusIsNotCacheable() throws Exception {
-        etag.handle(request, response);
-        response.status(NOT_FOUND).body("Not found: resource").done();
+        Response response = etag.then(request -> Response.of(NOT_FOUND)
+                                                         .done("Not found: resource"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     willSetETagIfStatusIsCreated() throws Exception {
-        etag.handle(request, response);
-        response.status(CREATED).body("response body").done();
+        Response response = etag.then(request -> Response.of(CREATED)
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeader("ETag", "\"91090ad25c02ffd89cd46ae8b28fcdde\"");
     }
 
     @Test public void
     willNotOverwriteETagIfAlreadySet() throws Exception {
-        etag.handle(request, response);
-        response.header("ETag", "already set").body("response body").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .header("ETag", "already set")
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeader("ETag", "already set");
     }
 
     @Test public void
     willNotSetETagIfLastModifiedHeaderSet() throws Exception {
-        etag.handle(request, response);
-        response.header("Last-Modified", Instant.now()).body("response body").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .header("Last-Modified", Instant.now())
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     willNotSetETagIfCacheControlSetToNoCache() throws Exception {
-        etag.handle(request, response);
-        response.header("Cache-Control", "private; no-cache").body("response body").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .header("Cache-Control", "private; no-cache")
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("ETag");
     }
 
     @Test public void
     setsCacheControlDirectiveToNoCachingIfNoneSet() throws Exception {
-        etag.handle(request, response);
-        response.body("response body").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeader("Cache-Control", "max-age=0; private; no-cache");
     }
 
     @Test public void
     willNoOverwriteCacheControlDirectiveIfAlreadySet() throws Exception {
-        etag.handle(request, response);
-        response.header("Cache-Control", "public").body("response body").done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .header("Cache-Control", "public")
+                                                         .done("response body"))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeader("Cache-Control", "public");
     }
 
     @Test public void
     closesOriginalBodyAfterComputingETag() throws Exception {
-        etag.handle(request, response);
         CloseableBody originalBody = new CloseableBody();
-        response.body(originalBody).done();
+        Response response = etag.then(request -> Response.ok()
+                                                         .done(originalBody))
+                                .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
 
         assertThat("closed?", originalBody.closed, is(true));
     }
@@ -125,7 +136,7 @@ public class ETagTest {
         }
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 }

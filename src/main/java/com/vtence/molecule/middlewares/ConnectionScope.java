@@ -1,13 +1,14 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class ConnectionScope extends AbstractMiddleware {
+public class ConnectionScope implements Middleware {
 
     private final DataSource dataSource;
 
@@ -15,17 +16,19 @@ public class ConnectionScope extends AbstractMiddleware {
         this.dataSource = dataSource;
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        Connection connection = dataSource.getConnection();
-        Reference ref = new Reference(request);
+    public Application then(Application next) {
+        return request -> {
+            Connection connection = dataSource.getConnection();
+            Reference ref = new Reference(request);
 
-        ref.set(connection);
-        try {
-            forward(request, response).whenComplete((result, error) -> dispose(ref));
-        } catch (Throwable e) {
-            dispose(ref);
-            throw e;
-        }
+            ref.set(connection);
+            try {
+                return next.handle(request).whenComplete((result, error) -> dispose(ref));
+            } catch (Throwable e) {
+                dispose(ref);
+                throw e;
+            }
+        };
     }
 
     private void dispose(Reference ref) {

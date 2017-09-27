@@ -1,5 +1,6 @@
 package examples.files;
 
+import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.ApacheCommonLogger;
 import com.vtence.molecule.middlewares.FileServer;
@@ -8,6 +9,7 @@ import com.vtence.molecule.middlewares.StaticAssets;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 
 /**
@@ -47,7 +49,8 @@ public class StaticFilesExample {
               // The apache common logger logs all accesses to the server in apache common log format,
               // so we can see what we're serving.
               .add(new ApacheCommonLogger(logger))
-              .start(assets);
+              .add(assets)
+              .start(request -> Response.of(NOT_FOUND).done("Nothing here!"));
     }
 
     public static void main(String[] args) throws IOException {

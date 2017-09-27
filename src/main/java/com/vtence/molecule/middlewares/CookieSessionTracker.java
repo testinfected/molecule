@@ -1,14 +1,15 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.FailureReporter;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.lib.CookieJar;
 import com.vtence.molecule.session.Session;
 import com.vtence.molecule.session.SessionStore;
 
-public class CookieSessionTracker extends AbstractMiddleware {
+public class CookieSessionTracker implements Middleware {
 
     public static final String STANDARD_SERVLET_SESSION_COOKIE = "JSESSIONID";
 
@@ -36,13 +37,15 @@ public class CookieSessionTracker extends AbstractMiddleware {
         this.failureReporter = failureReporter;
     }
 
-    public void handle(Request request, Response response) throws Exception {
-        CookieJar cookieJar = fetchCookieJar(request);
-        acquireSession(cookieJar).bind(request);
+    public Application then(Application next) {
+        return request -> {
+            CookieJar cookieJar = fetchCookieJar(request);
+            acquireSession(cookieJar).bind(request);
 
-        forward(request, response)
-                .whenSuccessful(result -> commitSession(request))
-                .whenComplete((error, action) -> Session.unbind(request));
+            return next.handle(request)
+                       .whenSuccessful(result -> commitSession(request))
+                       .whenComplete((error, action) -> Session.unbind(request));
+        };
     }
 
     private CookieJar fetchCookieJar(Request request) {

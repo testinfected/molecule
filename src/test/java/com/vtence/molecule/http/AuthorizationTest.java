@@ -11,21 +11,20 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class AuthorizationTest {
-    Request request = new Request();
 
     @Test
     public void needsAuthorizationHeaderToBeProvided() throws Exception {
-        Authorization noAuth = Authorization.of(request);
+        Authorization noAuth = Authorization.of(Request.get("/"));
         assertThat("not provided", noAuth, nullValue());
 
-        Authorization auth = Authorization.of(request.header("Authorization", "..."));
+        Authorization auth = Authorization.of(Request.get("/").header("Authorization", "..."));
         assertThat("provided", auth, notNullValue());
     }
 
     @Test
     public void
     parsesSchemeFromHeader() throws Exception {
-        Authorization auth = Authorization.of(request.header("Authorization", "Basic"));
+        Authorization auth = Authorization.of(Request.get("/").header("Authorization", "Basic"));
 
         assertThat("scheme", auth.scheme(), equalTo("Basic"));
     }
@@ -33,7 +32,7 @@ public class AuthorizationTest {
     @Test
     public void
     considersMissingSchemeAsEmpty() throws Exception {
-        Authorization auth = Authorization.of(request.header("Authorization", ""));
+        Authorization auth = Authorization.of(Request.get("/").header("Authorization", ""));
 
         assertThat("missing scheme", auth.scheme(), is(emptyString()));
     }
@@ -41,7 +40,7 @@ public class AuthorizationTest {
     @Test
     public void
     parsesAuthParamsFromHeader() throws Exception {
-        Authorization auth = Authorization.of(request.header("Authorization", "Basic <credentials>"));
+        Authorization auth = Authorization.of(Request.get("/").header("Authorization", "Basic <credentials>"));
 
         assertThat("params", auth.params(), equalTo("<credentials>"));
     }
@@ -49,7 +48,7 @@ public class AuthorizationTest {
     @Test
     public void
     considersMissingParamsAsEmpty() throws Exception {
-        Authorization auth = Authorization.of(request.header("Authorization", "Basic"));
+        Authorization auth = Authorization.of(Request.get("/").header("Authorization", "Basic"));
 
         assertThat("missing params", auth.params(), is(emptyString()));
     }

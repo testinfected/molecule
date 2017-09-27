@@ -1,6 +1,7 @@
 package com.vtence.molecule;
 
+@FunctionalInterface
 public interface Application {
 
-    void handle(Request request, Response response) throws Exception;
+    Response handle(Request request) throws Exception;
 }

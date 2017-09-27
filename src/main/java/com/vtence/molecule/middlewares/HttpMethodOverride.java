@@ -1,22 +1,25 @@
 package com.vtence.molecule.middlewares;
 
-import com.vtence.molecule.http.HttpMethod;
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
+import com.vtence.molecule.http.HttpMethod;
 
 import java.io.IOException;
 
 import static com.vtence.molecule.http.HttpMethod.POST;
 
-public class HttpMethodOverride extends AbstractMiddleware {
+public class HttpMethodOverride implements Middleware {
 
     public static final String METHOD_OVERRIDE_PARAMETER = "_method";
 
-    public void handle(Request request, Response response) throws Exception {
-        if (overrideDetected(request) && validOverride(request)) {
-            request.method(methodOverride(request).toUpperCase());
-        }
-        forward(request, response);
+    public Application then(Application next) {
+        return request -> {
+            if (overrideDetected(request) && validOverride(request)) {
+                request.method(methodOverride(request).toUpperCase());
+            }
+            return next.handle(request);
+        };
     }
 
     private boolean validOverride(Request request) {

@@ -1,5 +1,6 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.After;
@@ -22,9 +23,6 @@ public class LocalesTest {
     Locale DEFAULT_LOCALE = Locale.US;
     Locale originalDefault = Locale.getDefault();
     Locale selected;
-
-    Request request = new Request();
-    Response response = new Response();
 
     @Rule
     public ExpectedException error = ExpectedException.none();
@@ -67,23 +65,23 @@ public class LocalesTest {
     @Test public void
     unbindsPreferredLocaleOnceDone() throws Exception {
         Locales locales = new Locales();
-        locales.handle(request, response);
+
+        Request request = Request.get("/");
+        Response response = locales.then(ok()).handle(request);
 
         assertThat(request).hasAttribute(Locale.class, notNullValue());
         response.done();
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(request).hasNoAttribute(Locale.class);
-    }
-
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
-        response.await();
     }
 
     @Test public void
     unbindsPreferredLocaleInCaseOfDeferredErrors() throws Exception {
         Locales locales = new Locales();
-        locales.handle(request, response);
+
+        Request request = Request.get("/");
+        Response response = locales.then(ok()).handle(request);
 
         response.done(new Exception("Error!"));
         assertThat(request).hasNoAttribute(Locale.class);
@@ -92,22 +90,37 @@ public class LocalesTest {
     @Test public void
     unbindsPreferredLocaleWhenAnErrorOccurs() throws Exception {
         Locales locales = new Locales();
-        locales.connectTo((request, response) -> {
-            throw new Exception("Error!");
-        });
 
+        Request request = Request.get("/");
         error.expectMessage("Error!");
         try {
-            locales.handle(request, response);
+            locales.then(crash()).handle(request);
         } finally {
             assertThat(request).hasNoAttribute(Locale.class);
         }
     }
 
+    private Application ok() {
+        return request -> Response.ok();
+    }
+
+    private Application crash() {
+        return request -> {
+            throw new Exception("Error!");
+        };
+    }
+
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
+        response.await();
+    }
+
     private Locale selectPreferred(String accepted, String... supported) throws Exception {
         Locales locales = new Locales(supported);
-        locales.connectTo((request, response) -> selected = request.attribute(Locale.class));
-        locales.handle(request.header("Accept-Language", accepted), response);
+        locales.then(request -> {
+            selected = request.attribute(Locale.class);
+            return Response.ok();
+        }).handle(Request.get("/")
+                         .header("Accept-Language", accepted));
 
         return selected;
     }

@@ -14,11 +14,11 @@ public class TemplatesTest {
     Templates templates = new Templates(renderer);
 
     Template<Context> template = templates.named("hello");
-    Response response = new Response();
 
     @Test public void
     rendersTemplateUsingProvidedContext() throws IOException {
-        response.body(template.render(new Context()));
+        Response response = Response.ok()
+                                    .body(template.render(new Context()));
         assertThat(response).hasBodyText(containsString("Hello World"));
     }
 

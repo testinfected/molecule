@@ -17,60 +17,59 @@ public class ContentLengthHeaderTest {
 
     ContentLengthHeader contentLengthHeader = new ContentLengthHeader();
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test public void
     setsContentLengthOnFixedLengthBodiesIfNoneSet() throws Exception {
-        contentLengthHeader.handle(request, response);
-        response.body("This body has a size of 32 bytes")
-                .done();
+        Response response = contentLengthHeader.then(request -> Response.ok()
+                                                                        .done("This body has a size of 32 bytes"))
+                                               .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeader("Content-Length", "32");
     }
 
     @Test public void
     doesNotSetContentLengthOnVariableLengthBodies() throws Exception {
-        contentLengthHeader.handle(request, response);
-        response.body(new VariableLengthBody()).done();
+        Response response = contentLengthHeader.then(request -> Response.ok()
+                                                                        .done(new VariableLengthBody()))
+                                               .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
     doesNotSetContentLengthOnEmptyBodies() throws Exception {
-        contentLengthHeader.handle(request, response);
-        response.done();
+        Response response = contentLengthHeader.then(request -> Response.ok()
+                                                                        .done())
+                                               .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test public void
     doesNotSetContentLengthIfAlreadySet() throws Exception {
-        contentLengthHeader.handle(request, response);
-        response.contentLength(1)
-                .body("This body is definitely larger than 1 byte")
-                .done();
+        Response response = contentLengthHeader.then(request -> Response.ok()
+                                                                        .contentLength(1)
+                                                                        .done("This body is definitely larger than 1 byte"))
+                                               .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasHeader("Content-Length", "1");
     }
 
     @Test public void
     doesNotSetContentLengthForChunkedTransferEncoding() throws Exception {
-        contentLengthHeader.handle(request, response);
-        response.header(TRANSFER_ENCODING, "chunked")
-                .body("This body is chunked encoded")
-                .done();
+        Response response = contentLengthHeader.then(request -> Response.ok()
+                                                                        .header(TRANSFER_ENCODING, "chunked")
+                                                                        .done("This body is chunked encoded"))
+                                               .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("Content-Length");
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 

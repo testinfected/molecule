@@ -1,6 +1,20 @@
 package com.vtence.molecule;
 
-public interface Middleware extends Application {
+public interface Middleware {
 
-    void connectTo(Application successor);
+    Application then(Application next);
+
+    /**
+     * Compose this middleware with the next in chain.
+     */
+    default Middleware andThen(Middleware next) {
+        return application -> then(next.then(application));
+    }
+
+    /**
+     * The identity function.
+     */
+    static Middleware identity() {
+        return application -> application;
+    }
 }

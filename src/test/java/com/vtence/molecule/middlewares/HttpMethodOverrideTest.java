@@ -3,57 +3,46 @@ package com.vtence.molecule.middlewares;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import org.junit.Before;
 import org.junit.Test;
 
-import static com.vtence.molecule.http.HttpMethod.GET;
-import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class HttpMethodOverrideTest {
 
     HttpMethodOverride methodOverride = new HttpMethodOverride();
 
-    Request request = new Request();
-    Response response = new Response();
-
-    @Before public void
-    echoHttpMethod()  {
-        methodOverride.connectTo(echoMethodName());
-    }
-
     @Test public void
     doesNotAffectGetMethods() throws Exception {
-        request.addParameter("_method", "delete");
-        methodOverride.handle(request.method(GET), response);
-        assertMethod("GET");
+        Response response = methodOverride.then(echoMethodName())
+                                          .handle(Request.get("/")
+                                                         .addParameter("_method", "delete"));
+        assertThat(response).hasBodyText("GET");
     }
 
     @Test public void
     leavesMethodUnchangedWhenOverrideParameterAbsent() throws Exception {
-        methodOverride.handle(request.method(POST), response);
-        assertMethod("POST");
+        Response response = methodOverride.then(echoMethodName())
+                                          .handle(Request.post("/"));
+        assertThat(response).hasBodyText("POST");
     }
 
     @Test public void
     changesPostMethodsAccordingToOverrideParameter() throws Exception {
-        request.addParameter("_method", "delete");
-        methodOverride.handle(request.method(POST), response);
-        assertMethod("DELETE");
+        Response response = methodOverride.then(echoMethodName())
+                                          .handle(Request.post("/")
+                                                         .addParameter("_method", "delete"));
+        assertThat(response).hasBodyText("DELETE");
     }
 
     @Test public void
     leavesMethodUnchangedIfMethodIsNotSupported() throws Exception {
-        request.addParameter("_method", "unsupported");
-        methodOverride.handle(request.method(POST), response);
-        assertMethod("POST");
+        Response response = methodOverride.then(echoMethodName())
+                                          .handle(Request.post("/")
+                                                         .addParameter("_method", "unsupported"));
+        assertThat(response).hasBodyText("POST");
     }
 
     private Application echoMethodName() {
-        return (request, response) -> response.body(request.method().name());
-    }
-
-    private void assertMethod(String method) {
-        assertThat(response).hasBodyText(method);
+        return request -> Response.ok().done(request.method().name());
     }
 }

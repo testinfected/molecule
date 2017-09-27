@@ -1,5 +1,7 @@
 package com.vtence.molecule.middlewares;
 
+import com.vtence.molecule.Application;
+import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.http.Cookie;
@@ -13,20 +15,23 @@ import java.util.function.Consumer;
 import static com.vtence.molecule.http.HeaderNames.COOKIE;
 import static com.vtence.molecule.http.HeaderNames.SET_COOKIE;
 
-public class Cookies extends AbstractMiddleware {
+public class Cookies implements Middleware {
 
     private final CookieDecoder cookieDecoder = new CookieDecoder();
 
-    public void handle(Request request, Response response) throws Exception {
-        CookieJar cookieJar = new CookieJar(clientCookiesFrom(request));
-        cookieJar.bind(request);
-        try {
-            forward(request, response).whenSuccessful(commitCookies(cookieJar))
-                                      .whenComplete((result, error) -> cookieJar.unbind(request));
-        } catch (Throwable error) {
-            cookieJar.unbind(request);
-            throw error;
-        }
+    public Application then(Application next) {
+        return request -> {
+            CookieJar cookieJar = new CookieJar(clientCookiesFrom(request));
+            cookieJar.bind(request);
+            try {
+                return next.handle(request)
+                           .whenSuccessful(commitCookies(cookieJar))
+                           .whenComplete((result, error) -> cookieJar.unbind(request));
+            } catch (Throwable error) {
+                cookieJar.unbind(request);
+                throw error;
+            }
+        };
     }
 
     private Consumer<Response> commitCookies(CookieJar cookies) {

@@ -6,7 +6,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.helpers.Joiner;
 import com.vtence.molecule.http.HttpDate;
 import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.http.HttpStatus;
 import com.vtence.molecule.http.MimeTypes;
 import com.vtence.molecule.lib.FileBody;
 
@@ -23,6 +22,7 @@ import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.http.HttpStatus.NOT_MODIFIED;
 import static com.vtence.molecule.http.MimeTypes.TEXT;
 
@@ -48,40 +48,35 @@ public class FileServer implements Application {
         return this;
     }
 
-    public void handle(Request request, Response response) throws Exception {
+    public Response handle(Request request) throws Exception {
         if (!methodAllowed(request)) {
-            response.header(ALLOW, ALLOW_HEADER);
-            response.status(METHOD_NOT_ALLOWED);
-            response.done();
-            return;
+            return Response.of(METHOD_NOT_ALLOWED)
+                           .header(ALLOW, ALLOW_HEADER)
+                           .done();
         }
 
         File file = new File(root, request.path());
         if (!canServe(file)) {
-            response.status(HttpStatus.NOT_FOUND);
-            response.contentType(TEXT);
-            response.body("File not found: " + request.path());
-            response.done();
-            return;
+            return Response.of(NOT_FOUND)
+                           .contentType(TEXT)
+                           .body("File not found: " + request.path())
+                           .done();
         }
 
         if (notModifiedSince(lastTimeSeen(request), file)) {
-            response.status(NOT_MODIFIED);
-            response.done();
-            return;
+            return Response.of(NOT_MODIFIED)
+                           .done();
         }
 
+        Response response = Response.ok();
         addFileHeaders(response, file);
         addCustomHeaders(response);
 
-        response.status(HttpStatus.OK);
         if (head(request)) {
-            response.done();
-            return;
+            return response.done();
         }
 
-        response.body(new FileBody(file));
-        response.done();
+        return response.done(new FileBody(file));
     }
 
     private boolean canServe(File file) {

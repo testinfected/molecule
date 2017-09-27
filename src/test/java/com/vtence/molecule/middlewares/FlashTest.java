@@ -5,7 +5,6 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.FlashHash;
 import com.vtence.molecule.session.Session;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,65 +24,65 @@ import static org.junit.Assert.assertThat;
 public class FlashTest {
 
     Flash flash = new Flash();
-
-    Request request = new Request();
-    Response response = new Response();
-
     Session session = new Session();
 
     @Rule
     public ExpectedException error = ExpectedException.none();
 
-    @Before
-    public void storeEmptyFlash() {
+    public Request withEmptyFlash(Request request) {
         session.put(FlashHash.class, new HashMap<>());
         session.bind(request);
+        return request;
     }
 
     @Test
     public void createsFlashHashFromSessionValues() throws Throwable {
+        Request request = withEmptyFlash(Request.get("/"));
+
         flashes().put("greeting", "Hello");
         flashes().put("farewell", "Goodbye");
 
-        flash.connectTo(this::printFlashContent);
-        flash.handle(request, response);
+        Response response = flash.then(this::printFlashContent)
+                                 .handle(request);
 
-        assertNoError();
+        assertNoError(response);
         assertThat(response).hasBodyText("{greeting=Hello, farewell=Goodbye}");
     }
 
     @Test
     public void complainsIfNoSessionFound() throws Throwable {
-        Session.unbind(request);
-
         error.expect(IllegalStateException.class);
-        flash.handle(request, response);
+        flash.then(this::printFlashContent)
+             .handle(Request.get("/"));
     }
 
     @Test
     public void createsFreshFlashHashWhenNoneExists() throws Throwable {
+        Request request = withEmptyFlash(Request.get("/"));
         session.clear();
 
-        flash.connectTo(this::printFlashContent);
-        flash.handle(request, response);
+        Response response = flash.then(this::printFlashContent)
+                                 .handle(request);
 
-        assertNoError();
+        assertNoError(response);
         assertThat(response).hasBodyText("{}");
     }
 
     @Test
     public void storesFreshFlashEntriesInSessionWhenDoneAndForgetAboutOldEntries() throws Throwable {
+        Request request = withEmptyFlash(Request.get("/"));
         flashes().put("greeting", "Hello");
 
         Map<String, String> freshValues = new HashMap<>();
         freshValues.put("farewell", "Goodbye");
-        flash.connectTo(writeToFlash(freshValues));
 
-        flash.handle(request, response);
+        Response response = flash.then(writeToFlash(freshValues))
+                                 .handle(request);
+
         assertThat("old flashes", flashes(), nullValue());
 
         response.done();
-        assertNoError();
+        assertNoError(response);
 
         assertThat("fresh flashes count", flashes(), aMapWithSize(1));
         assertThat("fresh flashes", flashes(), hasEntry("farewell", "Goodbye"));
@@ -91,29 +90,35 @@ public class FlashTest {
 
     @Test
     public void doesNotWriteEmptyFlashToSession() throws Throwable {
-        flash.connectTo(writeToFlash(emptyMap()));
-        flash.handle(request, response);
+        Request request = withEmptyFlash(Request.get("/"));
+
+        Response response = flash.then(writeToFlash(emptyMap()))
+                                 .handle(request);
 
         response.done();
-        assertNoError();
+        assertNoError(response);
         assertThat("done flashes", flashes(), nullValue());
     }
 
     @Test
     public void unbindsFlashFromRequestOnceDone() throws Throwable {
-        flash.handle(request, response);
-        response.done();
+        Request request = withEmptyFlash(Request.get("/"));
 
-        assertNoError();
+        Response response = flash.then(this::printFlashContent)
+                                 .handle(request);
+
+        assertNoError(response);
         assertThat("flash", FlashHash.get(request), nullValue());
     }
 
     @Test
     public void unbindsFlashFromRequestWhenExceptionOccurs() throws Throwable {
-        flash.connectTo(crashWith(new Exception("Internal error!")));
         error.expectMessage("Internal error!");
+
+        Request request = withEmptyFlash(Request.get("/"));
         try {
-            flash.handle(request, response);
+            flash.then(crashWith(new Exception("Internal error!")))
+                 .handle(request);
         } finally {
             assertThat("flash", FlashHash.get(request), nullValue());
         }
@@ -121,7 +126,10 @@ public class FlashTest {
 
     @Test
     public void unbindsFlashFromRequestInCaseOfDeferredErrorAsWell() throws Throwable {
-        flash.handle(request, response);
+        Request request = withEmptyFlash(Request.get("/"));
+        Response response = flash.then(this::printFlashContent)
+                                 .handle(request);
+
         response.done(new Exception("Internal error!"));
 
         assertThat("flash", FlashHash.get(request), nullValue());
@@ -129,46 +137,48 @@ public class FlashTest {
 
     @Test
     public void complainsIfSessionRemovedDuringProcessing() throws Throwable {
-        flash.connectTo((request, response) -> Session.unbind(request));
-
         error.expect(IllegalStateException.class);
-        response.done();
 
-        flash.handle(request, response);
+        Request request = withEmptyFlash(Request.get("/"));
+        Response response = flash.then(r -> {
+            Session.unbind(request);
+            return Response.ok().done();
+        }).handle(request);
 
-        awaitCompletion();
+        assertNoError(response);
     }
 
     private Application crashWith(Exception error) {
-        return (request, response) -> {
+        return request -> {
             throw error;
         };
     }
 
     private Application writeToFlash(Map<String, String> values) {
-        return (request, response) -> {
+        return request -> {
             FlashHash flash = FlashHash.get(request);
             assertThat("request flash", flash, notNullValue());
 
             flash.putAll(values);
+            return Response.ok();
         };
     }
 
-    private void printFlashContent(Request request, Response response) throws Exception {
+    private Response printFlashContent(Request request) throws Exception {
         FlashHash flash = FlashHash.get(request);
         assertThat("request flash", flash, notNullValue());
-        response.done(flash.toMap().toString());
+        return Response.ok().done(flash.toMap().toString());
     }
 
     private Map<String, String> flashes() {
         return session.get(FlashHash.class);
     }
 
-    private void assertNoError() throws Throwable {
-        awaitCompletion();
+    private void assertNoError(Response response) throws Throwable {
+        awaitCompletion(response);
     }
 
-    private void awaitCompletion() throws Throwable {
+    private void awaitCompletion(Response response) throws Throwable {
         try {
             response.await();
         } catch (ExecutionException e) {

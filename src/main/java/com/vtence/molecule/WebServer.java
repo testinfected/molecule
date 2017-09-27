@@ -135,6 +135,17 @@ public class WebServer {
     }
 
     /**
+     * Mounts the specified middleware stack at the given path. This WebServer will route all incoming requests
+     * which target that path or any sub-path to that stack.
+     *
+     * @param path the mount point
+     * @param stack the middleware stack to attach to the mount point
+     */
+    public WebServer mount(String path, MiddlewareStack stack) {
+        return mount(path, stack.boot());
+    }
+
+    /**
      * Mounts the specified application at the given path. This WebServer will route all incoming requests
      * which target that path or any sub-path to the specified application.
      *
@@ -164,8 +175,20 @@ public class WebServer {
      *
      * @param routes the routes to run at the root mount point (/)
      */
-    public Server start(RouteBuilder routes) throws IOException {
+    public Server route(RouteBuilder routes) throws IOException {
         return start(Router.draw(routes));
+    }
+
+    /**
+     * Boots and starts this WebServer using the previously configured middlewares
+     * and the specified middleware stack at the root the mount point.
+     * <p>
+     * The server will start accepting and processing incoming requests.
+     *
+     * @param stack the middleware stack to run at the root mount point (/)
+     */
+    public Server start(MiddlewareStack stack) throws IOException {
+        return start(stack.boot());
     }
 
     /**
@@ -191,11 +214,10 @@ public class WebServer {
      * @see WebServer#mount(String, Application)
      */
     public Server start() throws IOException {
-        stack.boot();
         if (ssl != null) {
-            server.run(stack, ssl);
+            server.run(stack.boot(), ssl);
         } else {
-            server.run(stack);
+            server.run(stack.boot());
         }
         return server;
     }

@@ -21,6 +21,7 @@ import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_TYPE;
 import static com.vtence.molecule.http.HeaderNames.LOCATION;
 import static com.vtence.molecule.http.HttpDate.httpDate;
+import static com.vtence.molecule.http.HttpStatus.OK;
 import static com.vtence.molecule.http.HttpStatus.SEE_OTHER;
 import static com.vtence.molecule.lib.BinaryBody.bytes;
 import static com.vtence.molecule.lib.TextBody.text;
@@ -40,7 +41,49 @@ public class Response {
     private String statusText = HttpStatus.OK.text;
     private Body body = BinaryBody.empty();
 
-    public Response() {}
+    /**
+     * Creates a response with a HTTP status of OK
+     */
+    public static Response ok() {
+        return of(OK);
+    }
+
+    /**
+     * Creates a response with the given HTTP status
+     *
+     * @param status the HTTP status to set on the response
+     */
+    public static Response of(HttpStatus status) {
+        return new Response().status(status);
+    }
+
+    /**
+     * Creates a response with the given HTTP status code
+     *
+     * @param statusCode the HTTP status code to set on the response
+     */
+    public static Response of(int statusCode) {
+        return new Response().statusCode(statusCode);
+    }
+
+    /**
+     * Sends a SEE OTHER (303) redirect response to the client using the specified redirect location.
+     *
+     * @param location the url of the other location
+     */
+    public static Response redirect(String location) {
+        return Response.redirect(location, SEE_OTHER);
+    }
+
+    /**
+     * Sends a redirect response to the client using the specified redirect location and HTTP status.
+     *
+     * @param location the url of the other location
+     * @param status the status to set on the response
+     */
+    public static Response redirect(String location, HttpStatus status) {
+        return Response.of(status).header(LOCATION, location);
+    }
 
     /**
      * Sets the HTTP status for this response. This will set both the status code and the status text.
@@ -405,8 +448,8 @@ public class Response {
      * </p>
      * @param text the body text to write back to the client
      **/
-    public void done(String text) {
-        done(text(text));
+    public Response done(String text) {
+        return done(text(text));
     }
 
     /**
@@ -418,19 +461,8 @@ public class Response {
      * </p>
      * @param body the body to write back to the client
      **/
-    public void done(Body body) {
-        body(body).done();
-    }
-
-    /**
-     * If not already completed, triggers a normal (i.e successful) completion of this response.
-     * <p>
-     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
-     * abnormally.
-     * </p>
-     **/
-    public void done() {
-        done.complete(this);
+    public Response done(Body body) {
+        return body(body).done();
     }
 
     /**
@@ -442,8 +474,21 @@ public class Response {
      * abnormally.
      * </p>
      **/
-    public void done(Throwable error) {
+    public Response done(Throwable error) {
         done.completeExceptionally(error);
+        return this;
+    }
+
+    /**
+     * If not already completed, triggers a normal (i.e successful) completion of this response.
+     * <p>
+     * A call to <code>done</code> has no effect if this response has already completed, whether normally or
+     * abnormally.
+     * </p>
+     **/
+    public Response done() {
+        done.complete(this);
+        return this;
     }
 
     /**

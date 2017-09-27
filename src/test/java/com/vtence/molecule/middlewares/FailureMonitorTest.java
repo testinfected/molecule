@@ -25,21 +25,15 @@ public class FailureMonitorTest {
     @Rule
     public ExpectedException error = ExpectedException.none();
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Test
     public void notifiesFailureReporterAndRethrowsExceptionInCaseOfError() throws Exception {
-        monitor.connectTo((request, response) -> {
-            throw new Exception("Crash!");
-        });
-
         context.checking(new Expectations() {{
             oneOf(failureReporter).errorOccurred(with(exceptionWithMessage("Crash!")));
         }});
 
         error.expectMessage("Crash!");
-        monitor.handle(request, response);
+        monitor.then(request -> { throw new Exception("Crash!"); })
+               .handle(Request.get("/"));
     }
 
     @Test
@@ -48,10 +42,9 @@ public class FailureMonitorTest {
             never(failureReporter);
         }});
 
-        monitor.handle(request, response);
-        response.done();
+        Response response = monitor.then(request -> Response.ok().done()).handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
     }
 
     @Test
@@ -60,11 +53,11 @@ public class FailureMonitorTest {
             oneOf(failureReporter).errorOccurred(with(exceptionWithMessage("Crash!")));
         }});
 
-        monitor.handle(request, response);
+        Response response = monitor.then(request -> Response.ok()).handle(Request.get("/"));
         response.done(new Exception("Crash!"));
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 

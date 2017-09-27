@@ -31,72 +31,69 @@ public class LayoutTest {
 
     States page = context.states("page").startsAs("selected");
 
-    Request request = new Request();
-    Response response = new Response();
-
     @Before
     public void
     selectPage() throws Exception {
         context.checking(new Expectations() {{
             allowing(selector).selected(with(any(Response.class)));
-            will(returnValue(true));
-            when(page.is("selected"));
+                will(returnValue(true));
+                when(page.is("selected"));
             allowing(selector).selected(with(any(Response.class)));
-            will(returnValue(false));
-            when(page.isNot("selected"));
+                will(returnValue(false));
+                when(page.isNot("selected"));
         }});
     }
 
     @Test
     public void
     runsContentThroughDecoratorWhenPageIsSelected() throws Exception {
-        layout.handle(request, response);
-        response.body("raw content").done();
+        Response response = layout.then(request -> Response.ok()
+                                                           .done("raw content"))
+                                  .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("<decorated>raw content</decorated>");
     }
 
     @Test
     public void
     removesContentLengthHeaderIfDecorating() throws Exception {
-        response.header("Content-Length", 140);
-        layout.handle(request, response);
-        response.done();
+        Response response = layout.then(request -> Response.ok()
+                                                           .header("Content-Length", 140)
+                                                           .done())
+                                  .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasNoHeader("Content-Length");
     }
 
     @Test
     public void
     leavesContentUntouchedIfNoDecorationOccurs() throws Exception {
-        layout.connectTo((request, response) -> response.body("original content"));
-
         page.become("unselected");
-        layout.handle(request, response);
-        response.done();
+        Response response = layout.then(request -> Response.ok()
+                                                           .done("original content"))
+                                  .handle(Request.get("/"));
 
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasBodyText("original content");
     }
 
     @Test
     public void
     preservesOriginalResponseEncodingWhenDecorating() throws Exception {
-        layout.connectTo((request, response) -> response.body("encoded content (éçëœ)"));
+        Response response = layout.then(request -> Response.ok()
+                                                           .contentType("text/html; charset=utf-8")
+                                                           .done("encoded content (éçëœ)"))
+                                  .handle(Request.get("/"));
 
-        response.contentType("text/html; charset=utf-8");
-        layout.handle(request, response);
-        response.done();
-
-        assertNoExecutionError();
+        assertNoExecutionError(response);
         assertThat(response).hasContentType("text/html; charset=utf-8")
                             .hasBodyEncoding(UTF_8)
                             .hasBodyText(containsString("éçëœ"));
     }
 
-    private void assertNoExecutionError() throws ExecutionException, InterruptedException {
+    private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
     }
 
