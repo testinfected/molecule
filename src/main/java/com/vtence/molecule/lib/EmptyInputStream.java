@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class EmptyInputStream extends InputStream {
+    public static final InputStream EMPTY = new EmptyInputStream();
+
     public int read() throws IOException {
         return -1;
     }

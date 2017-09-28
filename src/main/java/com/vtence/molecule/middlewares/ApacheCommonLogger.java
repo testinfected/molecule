@@ -24,7 +24,7 @@ public class ApacheCommonLogger extends ApacheLogger {
     protected Consumer<Response> logAccess(Request request) {
         String remoteIp = request.remoteIp();
         HttpMethod method = request.method();
-        String uri = request.uri();
+        String uri = request.uri().uri();
         String protocol = request.protocol().toUpperCase();
 
         return response -> {

@@ -2,6 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Uri;
 import com.vtence.molecule.support.LoggingSupport.LogRecordingHandler;
 import org.junit.Test;
 
@@ -32,8 +33,7 @@ public class ApacheCommonLoggerTest {
     logsRequestsServedInApacheCommonLogFormat() throws Exception {
         Response response = logger.then(request -> Response.ok()
                                                            .done("a response with a size of 28"))
-                                  .handle(Request.get("/products")
-                                                 .uri("/products?keyword=dogs")
+                                  .handle(Request.get("/products?keyword=dogs")
                                                  .protocol("HTTP/1.1")
                                                  .remoteIp("192.168.0.1"));
 
@@ -60,7 +60,10 @@ public class ApacheCommonLoggerTest {
     public void
     usesOriginalRequestValues() throws Exception {
         logger.then(request -> {
-            request.uri("/changed").method(POST).remoteIp("100.100.100.1").protocol("HTTPS");
+            request.uri(Uri.of("/changed"))
+                   .method(POST)
+                   .remoteIp("100.100.100.1")
+                   .protocol("HTTPS");
             return Response.of(NO_CONTENT).done();
         }).handle(Request.delete("/logout")
                          .protocol("HTTP/1.1")

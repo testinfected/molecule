@@ -2,6 +2,7 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
+import com.vtence.molecule.http.Uri;
 import com.vtence.molecule.support.LoggingSupport.LogRecordingHandler;
 import org.junit.Test;
 
@@ -66,8 +67,7 @@ public class ApacheCombinedLoggerTest {
     logsEmptyStringWhenNoRefererInRequest() throws Exception {
         Response response = logger.then(request -> Response.ok()
                                                            .done("a response with a size of 28"))
-                                  .handle(Request.get("/products")
-                                                 .uri("/products?keyword=dogs")
+                                  .handle(Request.get("/products?keyword=dogs")
                                                  .remoteIp("192.168.0.1")
                                                  .protocol("HTTP/1.1")
                                                  .header(USER_AGENT, "Mozilla/5.0 (compatible; MSIE 9.0; AOL 9.7)"));
@@ -80,8 +80,8 @@ public class ApacheCombinedLoggerTest {
     @Test
     public void
     usesOriginalRequestValues() throws Exception {
-        Response response = logger.then(request -> {
-            request.uri("/changed")
+        logger.then(request -> {
+            request.uri(Uri.of("/changed"))
                    .method(POST)
                    .remoteIp("100.100.100.1")
                    .protocol("HTTPS")

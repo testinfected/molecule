@@ -6,12 +6,12 @@ import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.Host;
 import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.http.Scheme;
-import com.vtence.molecule.lib.EmptyInputStream;
+import com.vtence.molecule.http.Uri;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -22,17 +22,18 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HeaderNames.HOST;
 import static com.vtence.molecule.http.HttpMethod.DELETE;
-import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.HEAD;
 import static com.vtence.molecule.http.HttpMethod.OPTIONS;
 import static com.vtence.molecule.http.HttpMethod.PATCH;
 import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.http.HttpMethod.PUT;
+import static com.vtence.molecule.lib.EmptyInputStream.EMPTY;
 import static java.lang.Long.parseLong;
 
 /**
@@ -42,127 +43,119 @@ import static java.lang.Long.parseLong;
  */
 public class Request {
 
-    private final Headers headers = new Headers();
     private final Map<String, List<String>> parameters = new LinkedHashMap<>();
     private final Map<Object, Object> attributes = new HashMap<>();
     private final List<BodyPart> parts = new ArrayList<>();
 
-    private String uri;
-    private String path;
-    private String query;
-    private String scheme;
-    private String serverHost;
-    private int serverPort;
+    private final Headers headers;
+
+    private Uri uri;
     private String remoteHost;
     private String remoteIp;
     private int remotePort;
     private String protocol;
-    private InputStream input = new EmptyInputStream();
+    private InputStream body;
     private HttpMethod method;
     private boolean secure;
     private long timestamp;
 
-    public Request() {
+    public Request(String method, Uri uri) {
+        this(HttpMethod.valueOf(method), uri);
+    }
+
+    public Request(HttpMethod method, Uri uri) {
+        this(method, uri, new Headers());
+    }
+
+    public Request(HttpMethod method, Uri uri, Headers headers) {
+        this.method = method;
+        this.uri = uri;
+        this.headers = headers;
+        this.secure = Objects.equals(Scheme.from(uri), Scheme.HTTPS);
+        this.protocol = "HTTP/1.1";
+        this.body = EMPTY;
+        this.remotePort = -1;
+        this.timestamp = -1;
     }
 
     /**
-     * Creates a get request with the given path
+     * Creates an HTTP GET request with the given uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request get(String path) {
-        return new Request().scheme("http")
-                            .method(GET)
-                            .uri(path)
-                            .path(path);
+    public static Request get(String uri) {
+        return new Request(HttpMethod.GET, Uri.of(uri));
     }
 
     /**
-     * Creates a HTTP POST request with the given request path.
+     * Creates a HTTP POST request with the given uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request post(String path) {
-        return new Request().scheme("http")
-                            .method(POST)
-                            .uri(path)
-                            .path(path);
+    public static Request post(String uri) {
+        return new Request(POST, Uri.of(uri));
     }
 
     /**
-     * Creates a HTTP PUT request with the given request path.
+     * Creates a HTTP PUT request with the given request uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request put(String path) {
-        return new Request().scheme("http")
-                            .method(PUT)
-                            .uri(path)
-                            .path(path);
+    public static Request put(String uri) {
+        return new Request(PUT, Uri.of(uri));
     }
 
     /**
-     * Creates a HTTP PATCH request with the given request path.
+     * Creates a HTTP PATCH request with the given request uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request patch(String path) {
-        return new Request().scheme("http")
-                            .method(PATCH)
-                            .uri(path)
-                            .path(path);
+    public static Request patch(String uri) {
+        return new Request(PATCH, Uri.of(uri));
     }
 
     /**
-     * Creates a HTTP DELETE request with the given request path.
+     * Creates a HTTP DELETE request with the given request uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request delete(String path) {
-        return new Request().scheme("http")
-                            .method(DELETE)
-                            .uri(path)
-                            .path(path);
+    public static Request delete(String uri) {
+        return new Request(DELETE, Uri.of(uri));
     }
 
     /**
-     * Creates a HTTP HEAD request with the given request path.
+     * Creates a HTTP HEAD request with the given request uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request head(String path) {
-        return new Request().scheme("http")
-                            .method(HEAD)
-                            .uri(path)
-                            .path(path);
+    public static Request head(String uri) {
+        return new Request(HEAD, Uri.of(uri));
     }
 
     /**
-     * Creates a HTTP OPTIONS request with the given request path.
+     * Creates a HTTP OPTIONS request with the given request uri.
      *
-     * @param path the request path
+     * @param uri the request uri
      * @return the new request
      */
-    public static Request options(String path) {
-        return new Request().scheme("http")
-                            .method(OPTIONS)
-                            .uri(path)
-                            .path(path);
+    public static Request options(String uri) {
+        return new Request(OPTIONS, Uri.of(uri));
     }
 
     /**
-     * Reads the URI of this request. It can be a relative URI or the full URL if the client included
-     * the host in the request. The URI will include the query string.
      *
-     * @return the request URI
+     * Reads the URI of this request. It will be the full URL, reconstructed from the status line, server
+     * host and port.
+     *
+     * @return the reconstructed URI
      */
-    public String uri() {
+    public Uri uri() {
         return uri;
     }
 
@@ -171,7 +164,7 @@ public class Request {
      *
      * @param uri the new URI
      */
-    public Request uri(String uri) {
+    public Request uri(Uri uri) {
         this.uri = uri;
         return this;
     }
@@ -179,77 +172,38 @@ public class Request {
     /**
      * Reads the path of this request. This is the normalized path.
      *
-     * @return the request path
+     * @return the normalized path associated with this request's URI
      */
     public String path() {
-        return path;
+        return uri.normalize().path();
     }
 
     /**
-     * Changes the path of this request.
+     * Changes the path of this request. This is a convenience method for changing this request's URI path.
      *
-     * @param path the new path
+     * @param path the new request path
      */
     public Request path(String path) {
-        this.path = path;
+        this.uri = uri.path(path);
         return this;
     }
 
     /**
      * Reads the query part of this request's URI. The query string does not include the leading <code>?</code>.
      *
-     * @return the query associated with this request's URI, which might be an empty string
+     * @return the query associated with this request's URI, which might be null
      */
     public String query() {
-        return query;
+        return uri.query();
     }
 
     /**
-     * Changes the query part of this request. The query string should not include the leading <code>?</code>.
+     * Gets this request URI scheme. It will be one of {@code http} or {@code https}.
      *
-     * @param query the new query part
+     * @return the request URI scheme or null
      */
-    public Request query(String query) {
-        this.query = query;
-        return this;
-    }
-
-    /**
-     * Gets the hostname of the server. It might be the server name or server address.
-     *
-     * @return the server host or ip
-     */
-    public String serverHost() {
-        return serverHost;
-    }
-
-    /**
-     * Changes the hostname of the server.
-     *
-     * @return the new server name or ip
-     */
-    public Request serverHost(String host) {
-        this.serverHost = host;
-        return this;
-    }
-
-    /**
-     * Gets the port of the server.
-     *
-     * @return the server port
-     */
-    public int serverPort() {
-        return serverPort;
-    }
-
-    /**
-     * Changes the port of the server.
-     *
-     * @return the new server port
-     */
-    public Request serverPort(int port) {
-        this.serverPort = port;
-        return this;
+    public String scheme() {
+        return uri.scheme();
     }
 
     /**
@@ -310,66 +264,42 @@ public class Request {
     }
 
     /**
-     * Gets this request URI scheme. It will be one of {@code http} or {@code https}.
-     *
-     * @return the request URI scheme
-     */
-    public String scheme() {
-        return scheme;
-    }
-
-    /**
-     * Changes the scheme of this request URI. It should be one of {@code http} or {@code https}.
-     *
-     * @return the new scheme
-     */
-    public Request scheme(String scheme) {
-        this.scheme = scheme;
-        return this;
-    }
-
-    /**
      * Gets the host name of the server to which this request was sent.
-     * It is taken from the Host header value, if any, otherwise the server hostname is used.
+     * It is taken from the Host header value if any, otherwise the server hostname is used.
      *
      * @return the server host name
      */
     public String hostname() {
-        return hasHeader(HOST) ? Host.parseName(header(HOST)) : serverHost;
+        return hasHeader(HOST) ? Host.parseName(header(HOST)) : uri.host();
     }
 
     /**
      * Reads the port of the server to which this request was sent.
-     * It is taken from the Host header value, if any, otherwise the server port is used.
+     * It is taken from the Host header value if any, otherwise the server port is used.
      *
      * @return the server port
      */
     public int port() {
-        int port = hasHeader(HOST) ? Host.parsePort(header(HOST)) : serverPort;
+        int port = hasHeader(HOST) ? Host.parsePort(header(HOST)) : uri.port();
 
         if (port == -1) {
-            port = Scheme.of(this).defaultPort();
+            port = Scheme.from(uri).defaultPort();
         }
 
         if (port == -1) {
-            port = serverPort;
+            port = uri.port();
         }
 
         return port;
     }
 
     /**
-     * Reconstructs the URL the client used to make this request or reads the URI if it is absolute.
+     * Reconstructs the URL the client made this request to. It will use the HOST header information if present.
      *
-     * @return the absolute URI or the reconstructed URL
+     * @return the reconstructed URL
      */
-    public String url() {
-        if (URI.create(uri).isAbsolute()) {
-            return uri;
-        }
-
-        Host host = new Host(hostname(), port() == Scheme.of(this).defaultPort() ? -1 : port());
-        return scheme + "://" + host + uri;
+    public URL url() {
+        return uri.host(hostname()).port(port() == Scheme.from(uri).defaultPort() ? -1 : port()).toURL();
     }
 
     /**
@@ -483,7 +413,7 @@ public class Request {
      * @return the stream of bytes that make up the body
      */
     public InputStream bodyStream() {
-        return input;
+        return body;
     }
 
     /**
@@ -508,7 +438,7 @@ public class Request {
      * @param content the new body content as an array of bytes
      */
     public Request body(byte[] content) {
-        this.input = new ByteArrayInputStream(content);
+        this.body = new ByteArrayInputStream(content);
         return this;
     }
 
@@ -521,7 +451,7 @@ public class Request {
      * @param input the new body content as a stream of bytes
      */
     public Request body(InputStream input) {
-        this.input = input;
+        this.body = input;
         return this;
     }
 

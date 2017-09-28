@@ -1,7 +1,5 @@
 package com.vtence.molecule.http;
 
-import com.vtence.molecule.Request;
-
 public final class Scheme {
 
     public static final Scheme HTTP = new Scheme("http", 80);
@@ -29,14 +27,14 @@ public final class Scheme {
         return name;
     }
 
-    public static Scheme resolve(String name) {
+    public static Scheme of(String name) {
         for (Scheme scheme : KNOWN) {
             if (scheme.name.equalsIgnoreCase(name)) return scheme;
         }
         return new Scheme(name, -1);
     }
 
-    public static Scheme of(Request request) {
-        return resolve(request.scheme());
+    public static Scheme from(Uri uri) {
+        return of(uri.scheme());
     }
 }

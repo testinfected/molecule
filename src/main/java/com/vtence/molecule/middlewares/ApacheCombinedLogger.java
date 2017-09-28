@@ -25,7 +25,7 @@ public class ApacheCombinedLogger extends ApacheLogger {
     protected Consumer<Response> logAccess(Request request) {
         String remoteIp = request.remoteIp();
         HttpMethod method = request.method();
-        String uri = request.uri();
+        String uri = request.uri().uri();
         String protocol = request.protocol();
         String referer = request.header(HeaderNames.REFERER);
         String userAgent = request.header(HeaderNames.USER_AGENT);

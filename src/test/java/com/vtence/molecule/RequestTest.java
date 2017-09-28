@@ -15,8 +15,23 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class RequestTest {
+
+    @Test
+    public void hasSensibleDefaults() throws IOException {
+        assertThat("default timestamp", Request.get("/").timestamp(), is(-1L));
+        assertThat("default remote ip", Request.get("/").remoteIp(), nullValue());
+        assertThat("default remote host", Request.get("/").remoteHost(), nullValue());
+        assertThat("default remote port", Request.get("/").remotePort(), is(-1));
+        assertThat("default protocol", Request.get("/").protocol(), is("HTTP/1.1"));
+        assertThat("relative uri secure", Request.get("/").secure(), is(false));
+        assertThat("http secure", Request.get("http://localhost").secure(), is(false));
+        assertThat("https secure", Request.get("https://localhost").secure(), is(true));
+        assertThat("default body", Request.get("https://localhost").body(), is(""));
+    }
 
     @Test
     public void maintainsAnOrderedListOfParametersWithSameName() {
@@ -180,8 +195,7 @@ public class RequestTest {
 
     @Test
     public void readsHostnameFromHostHeader() {
-        Request request = Request.get("/")
-                                 .serverHost("127.0.0.1")
+        Request request = Request.get("http://127.0.0.1")
                                  .header(HOST, "www.example.com");
 
         assertThat("hostname", request.hostname(), equalTo("www.example.com"));
@@ -189,63 +203,75 @@ public class RequestTest {
 
     @Test
     public void fallbacksToServerHostIfHostHeaderMissing() {
-        Request request = Request.get("/")
-                                 .serverHost("www.example.com");
+        Request request = Request.get("http://www.example.com");
 
         assertThat("hostname", request.hostname(), equalTo("www.example.com"));
     }
 
     @Test
     public void readsPortFromHostHeader() {
-        Request request = Request.get("/")
-                                 .serverPort(5432);
+        Request request = Request.get("http://localhost:5432/");
         request.header(HOST, "www.example.com:8080");
 
         assertThat("port", request.port(), equalTo(8080));
     }
 
     @Test
-    public void knowsSchemeDefaultPort() {
-        Request request = Request.get("/")
-                                 .header(HOST, "www.example.com");
-
-        request.scheme("http");
-        assertThat("http port", request.port(), equalTo(80));
-
-        request.scheme("https");
-        assertThat("https port", request.port(), equalTo(443));
-    }
-
-    @Test
     public void usesServerPortAsFallback() {
-        Request request = Request.get("/")
-                                 .serverPort(5432);
+        Request request = Request.get("http://localhost:5432/");
 
         assertThat("fallback port", request.port(), equalTo(5432));
     }
 
     @Test
-    public void usesUriForUrlIfAbsolute() {
-        Request request = Request.get("/")
-                                 .uri("http://www.example.com/over/there?name=ferret");
+    public void knowsHttpSchemeDefaultPort() {
+        Request request = Request.get("http://localhost:8080")
+                                 .header(HOST, "www.example.com");
 
-        assertThat("absolute url", request.url(),
-                   equalTo("http://www.example.com/over/there?name=ferret"));
+        assertThat("http port", request.port(), equalTo(80));
     }
 
     @Test
-    public void reconstructsOriginalUrlIfUriIsRelative() {
-        Request request = Request.get("/")
-                                 .uri("/over/there?name=ferret")
-                                 .scheme("http");
+    public void knowsHttpsSchemeDefaultPort() {
+        Request request = Request.get("https://localhost:8443")
+                                 .header(HOST, "www.example.com");
+
+        assertThat("https port", request.port(), equalTo(443));
+    }
+
+    @Test
+    public void reconstructsOriginalUrl() {
+        Request request = Request.get("http://localhost:8080/over/there?name=ferret");
 
         request.header(HOST, "www.example.com");
-        assertThat("using default port", request.url(),
+        assertThat("without port", request.url().toString(),
                    equalTo("http://www.example.com/over/there?name=ferret"));
 
-        request.header(HOST, "www.example.com:8080");
-        assertThat("using custom port", request.url(),
-                   equalTo("http://www.example.com:8080/over/there?name=ferret"));
+        request.header(HOST, "www.example.com:80");
+        assertThat("using default port", request.url().toString(),
+                   equalTo("http://www.example.com/over/there?name=ferret"));
+
+        request.header(HOST, "www.example.com:3000");
+        assertThat("using custom port", request.url().toString(),
+                   equalTo("http://www.example.com:3000/over/there?name=ferret"));
+
+    }
+
+    @Test
+    public void reconstructsOriginalSecureUrl() {
+        Request request = Request.get("https://localhost:8443/over/there?name=ferret");
+
+        request.header(HOST, "www.example.com");
+        assertThat("without port", request.url().toString(),
+                   equalTo("https://www.example.com/over/there?name=ferret"));
+
+        request.header(HOST, "www.example.com:443");
+        assertThat("using default port", request.url().toString(),
+                   equalTo("https://www.example.com/over/there?name=ferret"));
+
+        request.header(HOST, "www.example.com:3333");
+        assertThat("using custom port", request.url().toString(),
+                   equalTo("https://www.example.com:3333/over/there?name=ferret"));
     }
 
     private Matcher<Iterable<?>> containsKeys(Object... keys) {

@@ -95,7 +95,7 @@ public class ForceSSL implements Middleware {
 
     private String httpsLocationFor(Request request) {
         String host = customHost != null ? customHost : request.hostname();
-        return "https://" + host + request.uri();
+        return "https://" + host + request.uri().uri();
     }
 
     private HttpStatus redirectionStatusFor(Request request) {

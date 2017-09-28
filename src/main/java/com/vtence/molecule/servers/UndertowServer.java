@@ -7,6 +7,7 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.http.Uri;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -110,8 +111,7 @@ public class UndertowServer implements Server {
         }
 
         private Request asRequest(HttpServerExchange exchange, List<Closeable> resources) throws IOException {
-            Request request = new Request();
-            setRequestInfo(request, exchange);
+            Request request = read(exchange);
             setHeaders(request, exchange);
             setQueryParameters(request, exchange);
             setFormParameters(request, exchange);
@@ -120,24 +120,23 @@ public class UndertowServer implements Server {
             return request;
         }
 
-        private void setRequestInfo(Request request, HttpServerExchange exchange) {
-            request.serverHost(host);
-            request.serverPort(port);
-            request.uri(exchange.getRequestURI() + queryComponent(exchange));
-            request.path(exchange.getRequestPath());
-            request.query(exchange.getQueryString());
-            request.remoteIp(exchange.getSourceAddress().getAddress().getHostAddress());
-            request.remotePort(exchange.getSourceAddress().getPort());
-            request.remoteHost(exchange.getSourceAddress().getHostName());
-            request.timestamp(exchange.getRequestStartTime());
-            request.scheme(exchange.getRequestScheme());
-            request.protocol(exchange.getProtocol().toString());
-            request.secure(exchange.getConnection().getSslSessionInfo() != null);
-            request.method(exchange.getRequestMethod().toString());
+        private Request read(HttpServerExchange exchange) {
+            return new Request(exchange.getRequestMethod().toString(), reconstructUri(exchange))
+                    .remoteIp(exchange.getSourceAddress().getAddress().getHostAddress())
+                    .remotePort(exchange.getSourceAddress().getPort())
+                    .remoteHost(exchange.getSourceAddress().getHostName())
+                    .timestamp(exchange.getRequestStartTime())
+                    .protocol(exchange.getProtocol().toString())
+                    .secure(exchange.getConnection().getSslSessionInfo() != null);
         }
 
-        private String queryComponent(HttpServerExchange exchange) {
-            return !exchange.getQueryString().isEmpty() ? "?" + exchange.getQueryString() : "";
+        private Uri reconstructUri(HttpServerExchange exchange) {
+            Uri uri = Uri.of(exchange.getRequestURI())
+                         .query(exchange.getQueryString());
+            if (uri.scheme() == null) uri = uri.scheme(exchange.getRequestScheme());
+            if (uri.host() == null) uri = uri.host(host);
+            if (uri.port() == -1) uri = uri.port(port);
+            return uri;
         }
 
         private void setHeaders(Request request, HttpServerExchange exchange) {

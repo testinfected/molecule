@@ -7,6 +7,7 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.http.Uri;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerSocketProcessor;
@@ -23,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
+
+import static com.vtence.molecule.http.Scheme.HTTP;
+import static com.vtence.molecule.http.Scheme.HTTPS;
 
 public class SimpleServer implements Server {
 
@@ -94,8 +98,7 @@ public class SimpleServer implements Server {
 
         private Request asRequest(org.simpleframework.http.Request httpRequest,
                                   Collection<Closeable> resources) throws IOException {
-            Request request = new Request();
-            readInfo(request, httpRequest);
+            Request request = read(httpRequest);
             readHeaders(request, httpRequest);
             readParameters(request, httpRequest);
             readMultiPartData(request, httpRequest, resources);
@@ -103,27 +106,22 @@ public class SimpleServer implements Server {
             return request;
         }
 
-        private void readInfo(Request request, org.simpleframework.http.Request httpRequest) {
-            request.serverHost(host);
-            request.serverPort(port);
-            request.uri(httpRequest.getTarget());
-            request.path(httpRequest.getPath().getPath());
-            request.query(httpRequest.getQuery().toString());
-            request.remoteIp(httpRequest.getClientAddress().getAddress().getHostAddress());
-            request.remotePort(httpRequest.getClientAddress().getPort());
-            request.remoteHost(httpRequest.getClientAddress().getHostName());
-            request.timestamp(httpRequest.getRequestTime());
-            request.scheme(schemeOf(httpRequest));
-            request.protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()));
-            request.secure(httpRequest.isSecure());
-            request.method(httpRequest.getMethod());
+        private Request read(org.simpleframework.http.Request httpRequest) {
+            return new Request(httpRequest.getMethod(), reconstructUri(httpRequest))
+                    .remoteIp(httpRequest.getClientAddress().getAddress().getHostAddress())
+                    .remotePort(httpRequest.getClientAddress().getPort())
+                    .remoteHost(httpRequest.getClientAddress().getHostName())
+                    .timestamp(httpRequest.getRequestTime())
+                    .protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()))
+                    .secure(httpRequest.isSecure());
         }
 
-        private String schemeOf(org.simpleframework.http.Request httpRequest) {
-            // Prefer the scheme specified in the request line if any
-            String scheme = httpRequest.getAddress().getScheme();
-            if (scheme != null) return scheme;
-            return httpRequest.isSecure() ? "https" : "http";
+        private Uri reconstructUri(org.simpleframework.http.Request request) {
+            Uri uri = Uri.of(request.getTarget());
+            if (uri.scheme() == null) uri = uri.scheme(request.isSecure() ? HTTPS.name() : HTTP.name());
+            if (uri.host() == null) uri = uri.host(host);
+            if (uri.port() == -1) uri = uri.port(port);
+            return uri;
         }
 
         private void readHeaders(Request request, org.simpleframework.http.Request httpRequest) {

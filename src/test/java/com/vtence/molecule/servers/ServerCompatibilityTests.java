@@ -146,35 +146,37 @@ public abstract class ServerCompatibilityTests {
     providesGeneralRequestInformation() throws IOException {
         final Map<String, String> info = new HashMap<>();
         server.run(request -> {
-            info.put("uri", request.uri());
+            info.put("url", request.url().toString());
+            info.put("uri", request.uri().uri());
             info.put("path", request.path());
             info.put("query", request.query());
             info.put("scheme", request.scheme());
-            info.put("server-host", request.serverHost());
-            info.put("server-port", valueOf(request.serverPort()));
-            info.put("remote-ip", request.remoteIp());
-            info.put("remote-host", request.remoteHost());
-            info.put("remote-port", valueOf(request.remotePort()));
+            info.put("host", request.hostname());
+            info.put("port", valueOf(request.port()));
+            info.put("remote ip", request.remoteIp());
+            info.put("remote host", request.remoteHost());
+            info.put("remote port", valueOf(request.remotePort()));
             info.put("protocol", request.protocol());
             info.put("secure", valueOf(request.secure()));
             info.put("timestamp", valueOf(request.timestamp()));
             return Response.ok().done();
         });
 
-        request.get("/over/there?name=ferret");
+        request.get("http://localhost:9999/over/there?name=ferret");
         assertNoError();
 
 
         assertThat("request information", info, allOf(
+                hasEntry("url", "http://localhost:9999/over/there?name=ferret"),
                 hasEntry("uri", "/over/there?name=ferret"),
                 hasEntry("path", "/over/there"),
                 hasEntry("query", "name=ferret"),
                 hasEntry("scheme", "http"),
-                hasEntry("server-host", "localhost"),
-                hasEntry("server-port", "9999"),
-                hasEntry("remote-ip", "127.0.0.1"),
-                hasEntry("remote-host", "localhost"),
-                hasEntry(equalTo("remote-port"), not(equalTo("0"))),
+                hasEntry("host", "localhost"),
+                hasEntry("port", "9999"),
+                hasEntry("remote ip", "127.0.0.1"),
+                hasEntry("remote host", "localhost"),
+                hasEntry(equalTo("remote port"), not(equalTo("0"))),
                 hasEntry(equalTo("timestamp"), not(equalTo("0"))),
                 hasEntry("protocol", "HTTP/1.1"),
                 hasEntry("secure", "false")));

@@ -24,15 +24,13 @@ public class ForceSSLTest {
 
     @Test
     public void doesNotRedirectRequestsThatAreAlreadySecure() throws Exception {
-        assertIsNotRedirected(secure(Request.get("/")));
+        assertIsNotRedirected(Request.get("https://example.com"));
     }
 
     @Test
     public void redirectsToHttpsWhenRequestIsInsecure() throws Exception {
         Response response = ssl.then(ok())
-                               .handle(Request.get("/over/there?name=ferret#nose")
-                                              .secure(false)
-                                              .serverHost("example.com"));
+                               .handle(Request.get("http://example.com/over/there?name=ferret#nose"));
 
         assertThat(response).hasStatusCode(301)
                             .isRedirectedTo("https://example.com/over/there?name=ferret#nose")
@@ -44,8 +42,7 @@ public class ForceSSLTest {
         ssl.redirectTo("ssl.example.com:443");
 
         Response response = ssl.then(ok())
-                               .handle(Request.get("/")
-                                              .serverHost("example.com"));
+                               .handle(Request.get("http://example.com"));
 
         assertThat(response).isRedirectedTo("https://ssl.example.com:443/")
                             .isDone();
@@ -78,7 +75,7 @@ public class ForceSSLTest {
     @Test
     public void includesHSTSHeaderByDefaultWithOneYearValidity() throws Exception {
         Response response = ssl.then(ok())
-                               .handle(secure(Request.get("/")));
+                               .handle(Request.get("https://example.com"));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=31536000");
     }
@@ -87,7 +84,7 @@ public class ForceSSLTest {
     public void disablingHSTSHeaderClearsBrowserSettings() throws Exception {
         ssl.hsts(false);
         Response response = ssl.then(ok())
-                               .handle(secure(Request.get("/")));
+                               .handle(Request.get("https://example.com"));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=0");
     }
@@ -96,7 +93,7 @@ public class ForceSSLTest {
     public void configuresHSTSHeaderExpiry() throws Exception {
         ssl.expires(TimeUnit.DAYS.toSeconds(180));
         Response response = ssl.then(ok())
-                               .handle(secure(Request.get("/")));
+                               .handle(Request.get("https://example.com"));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=15552000");
     }
@@ -105,7 +102,7 @@ public class ForceSSLTest {
     public void includesSubdomainsInSecurityHeadersIfRequested() throws Exception {
         ssl.includesSubdomains(true);
         Response response = ssl.then(ok())
-                               .handle(secure(Request.get("/")));
+                               .handle(Request.get("https://example.com"));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "max-age=31536000; includeSubdomains");
     }
@@ -114,7 +111,7 @@ public class ForceSSLTest {
     public void prefersAppSecurityHeaders() throws Exception {
         Response response = ssl.then(request -> Response.ok()
                                                         .header("Strict-Transport-Security", "provided"))
-                               .handle(secure(Request.get("/")));
+                               .handle(Request.get("https://example.com"));
 
         assertThat(response).hasHeader("Strict-Transport-Security", "provided");
     }
@@ -147,9 +144,5 @@ public class ForceSSLTest {
         Response response = ssl.then(ok()).handle(request);
 
         assertThat(response).isDone().hasStatusCode(307);
-    }
-
-    private Request secure(Request request) {
-        return request.secure(true);
     }
 }
