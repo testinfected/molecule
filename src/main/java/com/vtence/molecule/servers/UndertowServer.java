@@ -7,6 +7,7 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.http.Uri;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -15,9 +16,7 @@ import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormEncodedDataDefinition;
 import io.undertow.server.handlers.form.MultiPartParserDefinition;
-import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
-import io.undertow.util.HttpString;
 import org.xnio.IoUtils;
 
 import javax.net.ssl.SSLContext;
@@ -27,11 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import static com.vtence.molecule.http.HttpMethod.valueOf;
+import static io.undertow.util.HttpString.tryFromString;
 
 public class UndertowServer implements Server {
 
@@ -67,7 +70,7 @@ public class UndertowServer implements Server {
     }
 
     private void start(Undertow.Builder builder, Application app) {
-        server = builder.setHandler(new DispatchHandler(new ApplicationHandler(app)))
+        server = builder.setHandler(new DispatchHandler(app))
                         .build();
         server.start();
     }
@@ -76,58 +79,56 @@ public class UndertowServer implements Server {
         if (server != null) server.stop();
     }
 
-    private static class DispatchHandler implements HttpHandler {
-        private final ApplicationHandler handler;
+    private class DispatchHandler implements HttpHandler {
+        private final Application app;
 
-        public DispatchHandler(ApplicationHandler handler) {
-            this.handler = handler;
+        public DispatchHandler(Application app) {
+            this.app = app;
         }
 
         public void handleRequest(HttpServerExchange exchange) throws Exception {
             exchange.startBlocking();
-            exchange.dispatch(() -> handler.handleRequest(exchange));
+            exchange.dispatch(() -> new RequestHandler(app).handleRequest(exchange));
         }
     }
 
-    private class ApplicationHandler implements HttpHandler {
+    private class RequestHandler implements HttpHandler {
+        private final List<Closeable> resources = new ArrayList<>();
         private final Application app;
 
-        public ApplicationHandler(Application app) {
+        public RequestHandler(Application app) {
             this.app = app;
         }
 
         public void handleRequest(HttpServerExchange exchange) {
-            final List<Closeable> resources = new ArrayList<>();
             try {
-                Request request = asRequest(exchange, resources);
-                app.handle(request)
+                app.handle(asRequest(exchange))
                    .whenSuccessful(transferTo(exchange))
                    .whenFailed((result, error) -> failureReporter.errorOccurred(error))
-                   .whenComplete((result, error) -> closeAll(resources, exchange));
+                   .whenComplete((result, error) -> closeAll(exchange));
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
-                closeAll(resources, exchange);
+                closeAll(exchange);
             }
         }
 
-        private Request asRequest(HttpServerExchange exchange, List<Closeable> resources) throws IOException {
-            Request request = read(exchange);
-            setHeaders(request, exchange);
-            setQueryParameters(request, exchange);
-            setFormParameters(request, exchange);
-            setParts(request, exchange, resources);
-            setBody(request, exchange, resources);
-            return request;
-        }
-
-        private Request read(HttpServerExchange exchange) {
-            return new Request(exchange.getRequestMethod().toString(), reconstructUri(exchange))
+        private Request asRequest(HttpServerExchange exchange) throws IOException {
+            return makeRequest(exchange)
                     .remoteIp(exchange.getSourceAddress().getAddress().getHostAddress())
                     .remotePort(exchange.getSourceAddress().getPort())
                     .remoteHost(exchange.getSourceAddress().getHostName())
                     .timestamp(exchange.getRequestStartTime())
                     .protocol(exchange.getProtocol().toString())
-                    .secure(exchange.getConnection().getSslSessionInfo() != null);
+                    .secure(exchange.getConnection().getSslSessionInfo() != null)
+                    .body(readBody(exchange));
+        }
+
+        private Request makeRequest(HttpServerExchange exchange) throws IOException {
+            return new Request(valueOf(exchange.getRequestMethod().toString()),
+                               reconstructUri(exchange),
+                               readHeaders(exchange),
+                               readParameters(exchange),
+                               readParts(exchange));
         }
 
         private Uri reconstructUri(HttpServerExchange exchange) {
@@ -139,63 +140,73 @@ public class UndertowServer implements Server {
             return uri;
         }
 
-        private void setHeaders(Request request, HttpServerExchange exchange) {
-            HeaderMap headers = exchange.getRequestHeaders();
-            for (HeaderValues values : headers) {
+        private Headers readHeaders(HttpServerExchange exchange) {
+            Headers headers = new Headers();
+            for (HeaderValues values : exchange.getRequestHeaders()) {
                 for (String value : values) {
-                    request.addHeader(values.getHeaderName().toString(), value);
+                    headers.add(values.getHeaderName().toString(), value);
                 }
             }
+            return headers;
         }
 
-        private void setQueryParameters(Request request, HttpServerExchange exchange) {
-            Map<String, Deque<String>> parameters = exchange.getQueryParameters();
-            for (String name : parameters.keySet()) {
-                for (String value : parameters.get(name)) {
-                    request.addParameter(name, value);
-                }
-            }
+        private Map<String, List<String>> readParameters(HttpServerExchange exchange) throws IOException {
+            Map<String, List<String>> parameters = new HashMap<>();
+            parameters.putAll(readQueryParameters(exchange));
+            parameters.putAll(readFormParameters(exchange));
+            return parameters;
         }
 
-        private void setFormParameters(Request request, HttpServerExchange exchange) throws IOException {
+        private Map<String, List<String>> readQueryParameters(HttpServerExchange exchange) {
+            return exchange.getQueryParameters().entrySet().stream().collect(Collectors.toMap(
+                    Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
+        }
+
+        private Map<String, List<String>> readFormParameters(HttpServerExchange exchange) throws IOException {
             FormEncodedDataDefinition form = new FormEncodedDataDefinition();
             form.setDefaultEncoding(StandardCharsets.UTF_8.name());
-            FormDataParser parser = form.create(exchange);
-            if (parser == null) return;
 
-            FormData data = parser.parseBlocking();
-            for (String name : data) {
-                for (FormData.FormValue param : data.get(name)) {
-                    request.addParameter(name, param.getValue());
+            try (FormDataParser parser = form.create(exchange)) {
+                Map<String, List<String>> parameters = new HashMap<>();
+                if (parser == null) return parameters;
+
+                FormData data = parser.parseBlocking();
+                for (String name : data) {
+                    for (FormData.FormValue param : data.get(name)) {
+                        parameters.computeIfAbsent(name, key -> new ArrayList<>())
+                                  .add(param.getValue());
+                    }
                 }
+                return parameters;
             }
-            parser.close();
         }
 
-        private void setParts(Request request, HttpServerExchange exchange, List<Closeable> resources)
-                throws IOException {
+        private List<BodyPart> readParts(HttpServerExchange exchange) throws IOException {
             MultiPartParserDefinition multipart = new MultiPartParserDefinition();
             multipart.setDefaultEncoding(StandardCharsets.UTF_8.name());
-            FormDataParser parser = multipart.create(exchange);
-            if (parser == null) return;
 
-            FormData data = parser.parseBlocking();
-            for (String name : data) {
-                for (FormData.FormValue param : data.get(name)) {
-                    BodyPart part = new BodyPart().filename(param.getFileName())
-                                                  .contentType(contentTypeOf(param))
-                                                  .name(name);
-                    if (param.isFile()) {
-                        final FileInputStream content = new FileInputStream(param.getPath().toFile());
-                        resources.add(content);
-                        part.content(content);
-                    } else {
-                        part.content(param.getValue());
+            try(FormDataParser parser = multipart.create(exchange)) {
+                List<BodyPart> parts = new ArrayList<>();
+                if (parser == null) return parts;
+
+                FormData data = parser.parseBlocking();
+                for (String name : data) {
+                    for (FormData.FormValue param : data.get(name)) {
+                        BodyPart part = new BodyPart().filename(param.getFileName())
+                                                      .contentType(contentTypeOf(param))
+                                                      .name(name);
+                        if (param.isFile()) {
+                            final FileInputStream content = new FileInputStream(param.getPath().toFile());
+                            part.content(track(content));
+                        } else {
+                            part.content(param.getValue());
+                        }
+                        parts.add(part);
                     }
-                    request.addPart(part);
                 }
+
+                return parts;
             }
-            parser.close();
         }
 
         private String contentTypeOf(FormData.FormValue param) {
@@ -203,11 +214,8 @@ public class UndertowServer implements Server {
             return contentType != null ? contentType.getFirst() : null;
         }
 
-        private void setBody(Request request, HttpServerExchange exchange, List<Closeable> resources)
-                throws IOException {
-            final InputStream body = exchange.getInputStream();
-            resources.add(body);
-            request.body(body);
+        private InputStream readBody(HttpServerExchange exchange) throws IOException {
+            return track(exchange.getInputStream());
         }
 
         private Consumer<Response> transferTo(HttpServerExchange exchange) {
@@ -232,23 +240,25 @@ public class UndertowServer implements Server {
         }
 
         private void setHeaders(HttpServerExchange exchange, Response response) {
-            for (String name : response.headerNames()) {
-                for (String value : response.headers(name)) {
-                    exchange.getResponseHeaders().add(HttpString.tryFromString(name), value);
-                }
-            }
+            response.headerNames().forEach(name -> {
+                response.headers(name).forEach(
+                        value -> exchange.getResponseHeaders().add(tryFromString(name), value));
+            });
         }
 
         private void writeBody(HttpServerExchange exchange, Response response) throws IOException {
-            Body body = response.body();
-            body.writeTo(exchange.getOutputStream(), response.charset());
-            body.close();
+            try (Body body = response.body()) {
+                body.writeTo(exchange.getOutputStream(), response.charset());
+            }
         }
 
-        private void closeAll(List<Closeable> resources, HttpServerExchange exchange) {
-            for (Closeable resource : resources) {
-                close(resource);
-            }
+        private <T extends Closeable> T track(T resource) {
+            resources.add(resource);
+            return resource;
+        }
+
+        private void closeAll(HttpServerExchange exchange) {
+            resources.forEach(this::close);
             end(exchange);
         }
 
@@ -263,8 +273,8 @@ public class UndertowServer implements Server {
         private void end(HttpServerExchange exchange) {
             try {
                 exchange.endExchange();
-            } catch (Throwable e) {
-                failureReporter.errorOccurred(e);
+            } catch (Throwable t) {
+                failureReporter.errorOccurred(t);
                 IoUtils.safeClose(exchange.getConnection());
             }
         }

@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,8 @@ import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.http.HttpMethod.PUT;
 import static com.vtence.molecule.lib.EmptyInputStream.EMPTY;
 import static java.lang.Long.parseLong;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 /**
  * Holds client HTTP request information and maintains attributes during the request lifecycle.
@@ -59,18 +62,18 @@ public class Request {
     private boolean secure;
     private long timestamp;
 
-    public Request(String method, Uri uri) {
-        this(HttpMethod.valueOf(method), uri);
-    }
-
     public Request(HttpMethod method, Uri uri) {
-        this(method, uri, new Headers());
+        this(method, uri, new Headers(), emptyMap(), emptyList());
     }
 
-    public Request(HttpMethod method, Uri uri, Headers headers) {
+    public Request(HttpMethod method, Uri uri, Headers headers,
+                   Map<String, List<String>> parameters,
+                   Collection<BodyPart> parts) {
         this.method = method;
         this.uri = uri;
         this.headers = headers;
+        this.parameters.putAll(parameters);
+        this.parts.addAll(parts);
         this.secure = Objects.equals(Scheme.from(uri), Scheme.HTTPS);
         this.protocol = "HTTP/1.1";
         this.body = EMPTY;

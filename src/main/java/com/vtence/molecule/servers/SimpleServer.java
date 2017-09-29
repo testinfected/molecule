@@ -7,8 +7,10 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.http.Uri;
 import org.simpleframework.http.Part;
+import org.simpleframework.http.Query;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerSocketProcessor;
 import org.simpleframework.transport.connect.Connection;
@@ -20,11 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 
+import static com.vtence.molecule.http.HttpMethod.valueOf;
 import static com.vtence.molecule.http.Scheme.HTTP;
 import static com.vtence.molecule.http.Scheme.HTTPS;
 
@@ -81,92 +85,100 @@ public class SimpleServer implements Server {
             this.app = app;
         }
 
-        public void handle(org.simpleframework.http.Request httpRequest, org.simpleframework.http.Response httpResponse) {
-            final List<Closeable> resources = new ArrayList<>();
+        public void handle(org.simpleframework.http.Request req, org.simpleframework.http.Response resp) {
+            new RequestHandler(app).handle(req, resp);
+        }
+    }
 
+    private class RequestHandler implements Container {
+        private final List<Closeable> resources = new ArrayList<>();
+        private final Application app;
+
+        public RequestHandler(Application app) {
+            this.app = app;
+        }
+
+        public void handle(org.simpleframework.http.Request req, org.simpleframework.http.Response resp) {
             try {
-                final Request request = asRequest(httpRequest, resources);
-                app.handle(request)
-                   .whenSuccessful(transferTo(httpResponse))
+                app.handle(asRequest(req))
+                   .whenSuccessful(transferTo(resp))
                    .whenFailed((result, error) -> failureReporter.errorOccurred(error))
-                   .whenComplete((result, error) -> closeAll(resources, httpResponse));
+                   .whenComplete((result, error) -> closeAll(resp));
             } catch (Throwable failure) {
                 failureReporter.errorOccurred(failure);
-                closeAll(resources, httpResponse);
+                closeAll(resp);
             }
         }
 
-        private Request asRequest(org.simpleframework.http.Request httpRequest,
-                                  Collection<Closeable> resources) throws IOException {
-            Request request = read(httpRequest);
-            readHeaders(request, httpRequest);
-            readParameters(request, httpRequest);
-            readMultiPartData(request, httpRequest, resources);
-            readBody(request, httpRequest, resources);
-            return request;
+        private Request asRequest(org.simpleframework.http.Request req) throws IOException {
+            return makeRequest(req)
+                    .remoteIp(req.getClientAddress().getAddress().getHostAddress())
+                    .remotePort(req.getClientAddress().getPort())
+                    .remoteHost(req.getClientAddress().getHostName())
+                    .timestamp(req.getRequestTime())
+                    .protocol(String.format("HTTP/%s.%s", req.getMajor(), req.getMinor()))
+                    .secure(req.isSecure())
+                    .body(readBody(req));
         }
 
-        private Request read(org.simpleframework.http.Request httpRequest) {
-            return new Request(httpRequest.getMethod(), reconstructUri(httpRequest))
-                    .remoteIp(httpRequest.getClientAddress().getAddress().getHostAddress())
-                    .remotePort(httpRequest.getClientAddress().getPort())
-                    .remoteHost(httpRequest.getClientAddress().getHostName())
-                    .timestamp(httpRequest.getRequestTime())
-                    .protocol(String.format("HTTP/%s.%s", httpRequest.getMajor(), httpRequest.getMinor()))
-                    .secure(httpRequest.isSecure());
+        private Request makeRequest(org.simpleframework.http.Request req) throws IOException {
+            return new Request(valueOf(req.getMethod()),
+                               reconstructUri(req),
+                               readHeaders(req),
+                               readParameters(req),
+                               readMultiPartData(req));
         }
 
-        private Uri reconstructUri(org.simpleframework.http.Request request) {
-            Uri uri = Uri.of(request.getTarget());
-            if (uri.scheme() == null) uri = uri.scheme(request.isSecure() ? HTTPS.name() : HTTP.name());
+        private Uri reconstructUri(org.simpleframework.http.Request req) {
+            Uri uri = Uri.of(req.getTarget());
+            if (uri.scheme() == null) uri = uri.scheme(req.isSecure() ? HTTPS.name() : HTTP.name());
             if (uri.host() == null) uri = uri.host(host);
             if (uri.port() == -1) uri = uri.port(port);
             return uri;
         }
 
-        private void readHeaders(Request request, org.simpleframework.http.Request httpRequest) {
-            final List<String> names = httpRequest.getNames();
-            for (String header : names) {
+        private Headers readHeaders(org.simpleframework.http.Request req) {
+            Headers headers = new Headers();
+            for (String header : req.getNames()) {
                 // Apparently there's no way to know the number of values for a given name,
                 // so we have to iterate until we reach a null value
                 int index = 0;
-                while (httpRequest.getValue(header, index) != null) {
-                    request.addHeader(header, httpRequest.getValue(header, index));
+                while (req.getValue(header, index) != null) {
+                    headers.add(header, req.getValue(header, index));
                     index++;
                 }
             }
+            return headers;
         }
 
-        private void readParameters(Request request, org.simpleframework.http.Request httpRequest) {
-            for (String name : httpRequest.getQuery().keySet()) {
-                final List<String> values = httpRequest.getQuery().getAll(name);
-                for (String value : values) {
-                    request.addParameter(name, value);
-                }
-            }
+        private Map<String, List<String>> readParameters(org.simpleframework.http.Request req) {
+            Map<String, List<String>> parameters = new HashMap<>();
+            Query query = req.getQuery();
+            query.keySet().forEach(name -> {
+                query.getAll(name).forEach(
+                        value -> parameters.computeIfAbsent(name, k -> new ArrayList<>())
+                                           .add(value));
+            });
+            return parameters;
         }
 
-        private void readMultiPartData(Request request, org.simpleframework.http.Request httpResponse,
-                                       Collection<Closeable> resources) throws IOException {
-            for (Part part : httpResponse.getParts()) {
-                final InputStream input = part.getInputStream();
-                resources.add(input);
-                request.addPart(new BodyPart().content(input)
-                                              .contentType(contentTypeOf(part))
-                                              .name(part.getName())
-                                              .filename(part.getFileName()));
+        private List<BodyPart> readMultiPartData(org.simpleframework.http.Request req) throws IOException {
+            List<BodyPart> parts = new ArrayList<>();
+            for (Part part : req.getParts()) {
+                parts.add(new BodyPart().content(track(part.getInputStream()))
+                                        .contentType(contentTypeOf(part))
+                                        .name(part.getName())
+                                        .filename(part.getFileName()));
             }
+            return parts;
         }
 
         private String contentTypeOf(Part part) {
             return part.getContentType() != null ? part.getContentType().toString() : null;
         }
 
-        private void readBody(Request request, org.simpleframework.http.Request httpResponse,
-                              Collection<Closeable> resources) throws IOException {
-            final InputStream input = httpResponse.getInputStream();
-            resources.add(input);
-            request.body(input);
+        private InputStream readBody(org.simpleframework.http.Request req) throws IOException {
+            return track(req.getInputStream());
         }
 
         private Consumer<Response> transferTo(org.simpleframework.http.Response httpResponse) {
@@ -180,41 +192,41 @@ public class SimpleServer implements Server {
         }
 
         private void commit(org.simpleframework.http.Response httpResponse, Response response) throws IOException {
-            writeStatusLine(httpResponse, response);
-            writeHeaders(httpResponse, response);
+            setStatusLine(httpResponse, response);
+            setHeaders(httpResponse, response);
             writeBody(httpResponse, response);
         }
 
-        private void writeStatusLine(org.simpleframework.http.Response httpResponse, Response response) {
+        private void setStatusLine(org.simpleframework.http.Response httpResponse, Response response) {
             httpResponse.setCode(response.statusCode());
             httpResponse.setDescription(response.statusDescription());
         }
 
-        private void writeHeaders(org.simpleframework.http.Response httpResponse, Response response) {
-            for (String name : response.headerNames()) {
-                for (String value : response.headers(name)) {
-                    httpResponse.addValue(name, value);
-                }
-            }
+        private void setHeaders(org.simpleframework.http.Response httpResponse, Response response) {
+            response.headerNames().forEach(
+                    name -> response.headers(name).forEach(
+                            value -> httpResponse.addValue(name, value)));
         }
 
         private void writeBody(org.simpleframework.http.Response httpResponse, Response response) throws IOException {
-            final Body body = response.body();
-            body.writeTo(httpResponse.getOutputStream(), response.charset());
-            body.close();
-        }
-
-        // too bad Response does not implement Closeable
-        private void closeAll(Iterable<Closeable> resources, org.simpleframework.http.Response httpResponse) {
-            for (Closeable resource : resources) {
-                close(resource);
+            try(Body body = response.body()) {
+                body.writeTo(httpResponse.getOutputStream(), response.charset());
             }
-            close(httpResponse);
         }
 
-        private void close(org.simpleframework.http.Response httpResponse) {
+        private <T extends Closeable> T track(T resource) {
+            resources.add(resource);
+            return resource;
+        }
+
+        private void closeAll(org.simpleframework.http.Response resp) {
+            resources.forEach(this::close);
+            close(resp);
+        }
+
+        private void close(org.simpleframework.http.Response resp) {
             try {
-                httpResponse.close();
+                resp.close();
             } catch (IOException e) {
                 failureReporter.errorOccurred(e);
             }
