@@ -158,8 +158,8 @@ Molecule comes with a routing middleware that let you define your URL routes.
 Routes let you map incoming requests to different applications based on the request verb and path. A route is composed
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
-```java
 {% raw %}
+```java
 server.route(new DynamicRoutes() {{
     get("/posts/:id").to(request -> {
         // retrieve a given post
@@ -177,8 +177,9 @@ server.route(new DynamicRoutes() {{
         // show the home page
     });
 }});
-{% endraw %}
 ```
+{% endraw %}
+
 ### Matching
 
 Routes are matched in the order they are defined. If not defined route matches, the default behaviour is to 
