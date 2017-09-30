@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.13.0] - 2017-09-30
+
+This version introduces a major breaking change in the API. It implements a more functional
+programming style. 
+
+### Added
+- Simplified request URI handling with a new `Uri` class to manipulate and deconstruct URIs. 
+  It is immutable and replaces individual URI components in `Request`. ([#67])
+
+### Changed
+- `Application` are now simple functions of `Request -> Response`. Middlewares become simple functions of 
+  `Application -> Application`. ([#64])
+- Request `uri` is now the full URI, reconstructed from server host and port. ([#67])
+- `HttpStatus` is now a class rather than an enum, which means custom HTTP statuses are supported. ([#66]) 
+
+### Fixed
+- URL Map middleware was failing to dispatch to root mount. `/foo` is now matched if mounted to `/`). ([#62])
+
 ## [0.12.0] - 2017-09-21
 
 ### Added
