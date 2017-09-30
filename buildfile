@@ -2,7 +2,7 @@ require 'buildr/gpg'
 require 'buildr/custom_pom'
 require 'buildr/jacoco'
 
-VERSION_NUMBER = "0.13.0-SNAPSHOT"
+VERSION_NUMBER = "0.13.0"
 
 Release.next_version = '0.14.0-SNAPSHOT'
 Release.commit_message = lambda { |version| "Bump version number to #{version}" }
