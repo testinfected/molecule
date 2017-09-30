@@ -11,7 +11,7 @@
 public class HelloWorld {
     public static void main(String[] args) throws IOException {
         WebServer server = WebServer.create();
-        server.start((request, response) -> response.done("Hello, World"));
+        server.start(request -> Response.ok().done("Hello, World"));
     }
 }
 ```
@@ -22,18 +22,28 @@ Access your application at:
 
 ## About
 
-Molecule is a rack inspired HTTP toolkit for Java, with no dependencies. It is fast, small, 
-easy to use, easy to learn and easy to extend.
+Molecule is an HTTP toolkit for Java, with no dependencies. It is
+- fast and small,
+- easy to use and extend,
+- fully tested.
+
+Molecule is built around the simple concept of Application as a Function:
+- An `Application` is an asynchronous function of `(Request) -> Response`, typically representing some 
+  remote endpoint or service.
+- A `Middleware` is a simple function of `(Application) -> Application` that implements application-independent 
+functionality. A middleware is composed with an application to modify application behavior.
 
 Molecule is great for building micro services or regular web applications. It is designed around simplicity,
 testability and freedom of choice. Built entirely using TDD it provides super-easy ways to test your 
 application and individual endpoints, both in and out of container.
 
-Molecule is small, it weights less than 150k, and will stay as lean as possible. It is pluggable through the concept
-of rack middlewares and offers some out-of-the box integrations. You're free to use the built-in options 
-or provide your own implementations. 
+Molecule is small - it weights less than 150k - and will stay as lean as possible. It is pluggable through the concept
+of middlewares (a.k.a filters). It offers various abstractions for a number of functionalities 
+(such as routing, templating, security, etc.). You're free to use the built-in options or provide 
+your own implementations. 
 
-Molecule requires Java 8. It runs an embedded web-server powered by [Simple](http://simpleframework.org) or [Undertow](http://undertow.io). 
+Molecule requires Java 8. It runs an embedded web-server powered by [Simple](http://simpleframework.org) 
+or [Undertow](http://undertow.io). 
 Both are fully asynchronous and non-blocking, which means they can scale to very high loads.
 
 Have fun!
@@ -46,7 +56,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.12.0</version>
+      <version>0.13.0</version>
 </dependency>
 ```
  
@@ -109,7 +119,7 @@ This will set the web server to run locally on port 8080.
 To start the server, give it an app:
 
 ```java
-server.start((request, response) -> response.done("Hello, World!"));
+server.start(request -> Response.ok().done("Hello, World!"));
 ```
 
 To stop the server, call the _stop_ method:
@@ -149,20 +159,20 @@ Routes let you map incoming requests to different applications based on the requ
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
-server.start(new DynamicRoutes() {{
-    get("/posts/:id").to((request, response) -> {
+server.route(new DynamicRoutes() {{
+    get("/posts/:id").to(request -> {
         // retrieve a given post
     });
-    post("/posts").to((request, response) -> {
+    post("/posts").to(request -> {
         // create a new post
     }); 
-    put("/posts/:id").to((request, response) -> {
+    put("/posts/:id").to(request -> {
         // update an existing post
     });
-    delete("/posts/:id").to((request, response) -> {
+    delete("/posts/:id").to(request -> {
         // delete a post
     }); 
-    map("/").to((request, response) -> {
+    map("/").to(request -> {
         // show the home page
     });
 }});
@@ -176,7 +186,7 @@ By default, a route matches a single verb, specified by the method you use, i.e.
 That can be changed by providing the verbs as arguments to the _via_ method:
 
 ```java
-map("/").via(GET, HEAD).to((request, response) -> {
+map("/").via(GET, HEAD).to(request -> {
     // show the home page
 });
 ```
@@ -191,8 +201,8 @@ Route patterns can be matched exactly - they are said to be static - or can incl
 ```java
 // matches "GET /photos/18" and "GET /photos/25"
 // request.parameter("id") is either '18' or '25'
-get("/photos/:id").to((request, response) -> {
-    response.done("Photo #" + request.parameter("id"));
+get("/photos/:id").to(request -> {
+    Response.ok().done("Photo #" + request.parameter("id"));
 });
 ```
 
@@ -214,12 +224,10 @@ Any middleware can modify the content of the request during processing before pa
 ### Request
 
 ```java
-request.uri();                          // the uri, e.g. /foo?bar
+request.uri();                          // the full uri, e.g. http://localhost:8080/foo?bar
 request.url();                          // the full url, e.g. http://www.example.com/foo?bar
 request.path();                         // the path info, e.g. /foo
 request.query();                        // the query string, e.g. bar
-request.serverHost();                   // the server name or ip
-request.serverPort();                   // the server port
 request.remoteIp();                     // ip of the client
 request.remoteHost();                   // hostname of the client
 request.remotePort();                   // port of the client
@@ -274,9 +282,6 @@ Any middleware can modify the content of the response during processing before r
 
 ```java
 response.status(HttpStatus.OK);         // sets the status
-response.statusCode(400);               // sets the status code
-response.statusText("Bad Request");     // sets the status text
-response.redirect("/url");              // 303 redirect to /url
 response.header("name", "value");       // sets the single value of a named header
 response.addHeader("name", "value");    // adds another value to a named header
 response.contentType("text/html");      // sets the Content-Type header of the response
@@ -336,7 +341,7 @@ This can be useful when you're rendering a small snippet of HTML code. However, 
                        
 #### Rendering JSON
 
-You can send back JSON to the browser by using a text body. Here's an example using google Gson library:
+You can send back JSON to the browser by using a text body. Here's an example using google `Gson` library:
  
 ```java
 Gson gson = new Gson();
@@ -380,17 +385,16 @@ You can use a <code>FileBody</code> to stream the content of a file:
 
 #### Redirection
 
-You can trigger a browser redirect using a See Other (303) status code 
-using the <code>redirectTo</code> method on the <code>Response</code>:
+You can trigger a browser redirect using a See Other (303) status code :
 
 ```java
-response.redirectTo("/url").done();
+Response.redirect("/url").done();
 ```
 
 If you need to use a different status code, simply change the status: 
 
 ```java
-response.redirectTo("/url").statusCode(301).done(); // moved permanently
+Response.redirect("/url", 301).done(); // moved permanently
 ```
 
 ## Cookies
@@ -552,7 +556,7 @@ Template<Map<String, String>> mainLayout = layouts.named("main");
 
 // Apply the main site layout to requests under the / path, in other words to all rendered pages
 server.filter("/", Layout.html(mainLayout))
-      .start(new DynamicRoutes() {{
+      .route(new DynamicRoutes() {{
           // Your routes definitions here
           // ...
       }});
@@ -615,14 +619,10 @@ wants to send back. They are not wrappers around the actual HTTP request and res
  them:
  
 ```java
-Request request = new Request();
-Response response = new Response();
-
-request.header("Authorization", "Basic " + mime.encode("joe:bad secret"));
-
 // Call your application endpoint
-authentication.handle(request, response);
-
+Response response = application.handle(Request.get("/")
+                                              .header("Authorization", "Basic " + mime.encode("joe:bad secret")));
+ 
 // Make assertions on the response
 // ...
 
@@ -681,7 +681,8 @@ assertThat(response).hasStatusCode(303)
 
 ## Middlewares
 
-Middlewares are a way to enhance your application with optional building blocks, using a pipeline design. A middleware component sits between the client and the server, processing inbound requests and outbound responses.
+Middlewares are a way to enhance your application with optional building blocks, using a pipeline design. 
+A middleware component sits between the client and the server, processing inbound requests and outbound responses.
 
 Middlewares implement functionality you tend to need across all your applications,
 but you don't want to build everytime. Things like **access logging**, **authentication**, 
@@ -724,7 +725,7 @@ server.add(new ContentLengthHeader())
       .add(new ConditionalGet())
       .add(new ETag())
       .add(new Compressor())
-      .start(new DynamicRoutes() {{
+      .route(new DynamicRoutes() {{
           // ...
       }});
 ```
@@ -809,7 +810,7 @@ If you want the latest development version, grab the latest snapshot from [Sonat
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.13.0-SNAPSHOT</version>
+      <version>0.14.0-SNAPSHOT</version>
 </dependency>
 ```
 

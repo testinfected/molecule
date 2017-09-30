@@ -34,9 +34,9 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
  */
 public class Response {
     private final CompletableFuture<Response> done = new CompletableFuture<>();
-    private final Headers headers;
-
     private CompletableFuture<Response> postProcessing = done;
+
+    private final Headers headers;
     private HttpStatus status;
     private Body body;
 
