@@ -111,12 +111,16 @@ Sessions are considered stale when they have been inactive for longer than the c
 - `ApacheCommonLogger` now correctly logs request parameters as they were received, in case they are modified down the middleware chain
 
 
+[0.13.0]: https://github.com/testinfected/molecule/compare/v0.12.0...master
 [0.12.0]: https://github.com/testinfected/molecule/compare/v0.11.0...master
 [0.11.0]: https://github.com/testinfected/molecule/compare/v0.10...v0.11.1
 [0.10]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.10
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9...v0.9.1
 [0.9]: https://github.com/testinfected/molecule/compare/v0.8.2...v0.9
 
+[#67]: https://github.com/testinfected/molecule/issues/67
+[#66]: https://github.com/testinfected/molecule/issues/66
+[#64]: https://github.com/testinfected/molecule/issues/64
 [#62]: https://github.com/testinfected/molecule/issues/62
 [#61]: https://github.com/testinfected/molecule/issues/61
 [#60]: https://github.com/testinfected/molecule/issues/60
