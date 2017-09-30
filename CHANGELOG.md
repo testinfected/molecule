@@ -17,9 +17,6 @@ programming style.
 - Request `uri` is now the full URI, reconstructed from server host and port. ([#67])
 - `HttpStatus` is now a class rather than an enum, which means custom HTTP statuses are supported. ([#66]) 
 
-### Fixed
-- URL Map middleware was failing to dispatch to root mount. `/foo` is now matched if mounted to `/`). ([#62])
-
 ## [0.12.0] - 2017-09-21
 
 ### Added
