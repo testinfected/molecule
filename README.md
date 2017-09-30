@@ -440,9 +440,9 @@ To use sessions you need to start your server with session support:
 ```java
 server.add(new Cookies())
       .add(new CookieSessionTracker(CookieSessionStore.secure("your secret");))
-      .start(new DynamicRoutes() {{
+      .route(new DynamicRoutes() {{
       // your routing here
-}}
+      }});
 ```
 
 Since HTTP is a stateless protocol and Molecule uses a minimalist approach, sessions are not part of the request. 
@@ -541,11 +541,11 @@ Here's a contrived example of a mustache layout template that simply recreates t
 ```html
 <html>
 <head>
-&#123;&#123;head&#125;&#125;
-<title>{{"{{"}}title{{"}}"}}</title>
+{{head}}
+<title>{{title}}</title>
 </head>
 <body>
-{{"{{"}}body{{"}}"}}
+{{body}}
 </body>
 </html>
 ```
