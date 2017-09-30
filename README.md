@@ -159,6 +159,7 @@ Routes let you map incoming requests to different applications based on the requ
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
+{% raw %}
 server.route(new DynamicRoutes() {{
     get("/posts/:id").to(request -> {
         // retrieve a given post
@@ -176,6 +177,7 @@ server.route(new DynamicRoutes() {{
         // show the home page
     });
 }});
+{% endraw %}
 ```
 ### Matching
 
