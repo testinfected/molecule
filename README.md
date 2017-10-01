@@ -159,25 +159,27 @@ Routes let you map incoming requests to different applications based on the requ
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
-get("/posts/:id").to(request -> {
-    // retrieve a given post
-});
-
-post("/posts").to(request -> {
-    // create a new post
-}); 
-
-put("/posts/:id").to(request -> {
-    // update an existing post
-});
-
-delete("/posts/:id").to(request -> {
-    // delete a post
-}); 
-
-map("/").to(request -> {
-    // show the home page
-});
+server.route(new DynamicRoutes() {{
+    get("/posts/:id").to(request -> {
+        // retrieve a given post
+    });
+    
+    post("/posts").to(request -> {
+        // create a new post
+    }); 
+    
+    put("/posts/:id").to(request -> {
+        // update an existing post
+    });
+    
+    delete("/posts/:id").to(request -> {
+        // delete a post
+    }); 
+    
+    map("/").to(request -> {
+        // show the home page
+    })
+}});
 ```
 
 To start the server with the router use `Server#route`. For an example have a look at [Dynamic Routes](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java).
