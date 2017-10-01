@@ -541,11 +541,11 @@ Here's a contrived example of a mustache layout template that simply recreates t
 ```html
 <html>
 <head>
-{{head}}
-<title>{{title}}</title>
+{{ "{{head" }}}}
+<title>{{ "{{title" }}}}</title>
 </head>
 <body>
-{{body}}
+{{ "{{body" }}}}
 </body>
 </html>
 ```
