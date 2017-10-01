@@ -159,25 +159,26 @@ Routes let you map incoming requests to different applications based on the requ
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
-get("/posts/:id").to(request -> {
-    // retrieve a given post
-});
+server.start(new DynamicRoutes() {{ "{{" }}
+    get("/posts/:id").to(request -> {
+        // retrieve a given post
+    });
 
-post("/posts").to(request -> {
-    // create a new post
-}); 
+    post("/posts").to(request -> {
+        // create a new post
+    }); 
 
-put("/posts/:id").to(request -> {
-    // update an existing post
-});
+    put("/posts/:id").to(request -> {
+        // update an existing post
+    });
 
-delete("/posts/:id").to(request -> {
-    // delete a post
-}); 
+    delete("/posts/:id").to(request -> {
+        // delete a post
+    }); 
 
-map("/").to(request -> {
-    // show the home page
-});
+    map("/").to(request -> {
+        // show the home page
+}}); 
 ```
 
 To start the server with the router use `Server#route`. For an example have a look at [Dynamic Routes](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/routing/RoutingExample.java).
@@ -440,7 +441,7 @@ To use sessions you need to start your server with session support:
 ```java
 server.add(new Cookies())
       .add(new CookieSessionTracker(CookieSessionStore.secure("your secret");))
-      .route(new DynamicRoutes() {{
+      .route(new DynamicRoutes() {{ "{{" }}
       // your routing here
       }});
 ```
@@ -561,7 +562,7 @@ Template<Map<String, String>> mainLayout = layouts.named("main");
 
 // Apply the main site layout to requests under the / path, in other words to all rendered pages
 server.filter("/", Layout.html(mainLayout))
-      .route(new DynamicRoutes() {{
+      .route(new DynamicRoutes() {{ "{{" }}
           // Your routes definitions here
           // ...
       }});
@@ -730,7 +731,7 @@ server.add(new ContentLengthHeader())
       .add(new ConditionalGet())
       .add(new ETag())
       .add(new Compressor())
-      .route(new DynamicRoutes() {{
+      .route(new DynamicRoutes() {{ "{{" }}
           // ...
       }});
 ```
@@ -744,7 +745,7 @@ server.failureReporter(failureReporter)
       // a custom middleware to redirect non secure requests to HTTPS 
       .add(new ForceSSL())
       .add(new ContentLengthHeader())
-      .mount("/api", new MiddlewareStack() {{
+      .mount("/api", new MiddlewareStack() {{ "{{" }}
           use(new Failsafe());
           use(new FailureMonitor(failureReporter));
           use(new ConnectionScope(database));
