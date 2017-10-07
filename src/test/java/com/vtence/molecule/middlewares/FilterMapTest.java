@@ -4,10 +4,10 @@ import com.vtence.molecule.Application;
 import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.lib.matchers.Matcher;
-import com.vtence.molecule.lib.matchers.Matchers;
 import org.junit.Test;
 
+import static com.vtence.molecule.lib.predicates.Predicates.all;
+import static com.vtence.molecule.lib.predicates.Predicates.none;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.lang.String.format;
 
@@ -61,14 +61,6 @@ public class FilterMapTest {
 
     private void assertFilteredContent(Response response, String content) {
         assertThat(response).hasHeader("content", content);
-    }
-
-    private Matcher<Request> all() {
-        return Matchers.anything();
-    }
-
-    private Matcher<Request> none() {
-        return Matchers.nothing();
     }
 
     private Middleware filter(final String name) {

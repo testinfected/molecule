@@ -1,11 +1,11 @@
-package com.vtence.molecule.lib.matchers;
+package com.vtence.molecule.lib.predicates;
 
 import com.vtence.molecule.Request;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.POST;
-import static com.vtence.molecule.lib.matchers.Matchers.withMethod;
+import static com.vtence.molecule.lib.predicates.Predicates.withMethod;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -16,9 +16,9 @@ public class RequestWithMethodTest {
     matchesWhenRequestMethodsAreEqual() {
         Request request = Request.get("/");
 
-        assertThat("same case match", withMethod("GET").matches(request), is(true));
-        assertThat("different case match", withMethod("get").matches(request), is(true));
-        assertThat("method match", withMethod(GET).matches(request), is(true));
-        assertThat("method mismatch", withMethod(POST).matches(request), is(false));
+        assertThat("same case match", withMethod("GET").test(request), is(true));
+        assertThat("different case match", withMethod("get").test(request), is(true));
+        assertThat("method match", withMethod(GET).test(request), is(true));
+        assertThat("method mismatch", withMethod(POST).test(request), is(false));
     }
 }

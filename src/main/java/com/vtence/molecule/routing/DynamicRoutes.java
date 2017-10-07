@@ -1,24 +1,23 @@
 package com.vtence.molecule.routing;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.matchers.Matcher;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.function.Predicate;
 
-import static com.vtence.molecule.http.HttpMethod.*;
-import static com.vtence.molecule.lib.matchers.Matchers.anyOf;
-import static com.vtence.molecule.lib.matchers.Matchers.anything;
-import static com.vtence.molecule.lib.matchers.Matchers.equalTo;
+import static com.vtence.molecule.http.HttpMethod.DELETE;
+import static com.vtence.molecule.http.HttpMethod.GET;
+import static com.vtence.molecule.http.HttpMethod.HEAD;
+import static com.vtence.molecule.http.HttpMethod.OPTIONS;
+import static com.vtence.molecule.http.HttpMethod.PATCH;
+import static com.vtence.molecule.http.HttpMethod.POST;
+import static com.vtence.molecule.http.HttpMethod.PUT;
 
 public class DynamicRoutes implements RouteBuilder {
 
-    private final Collection<Definition> routes = new ArrayList<>();
+    private final Collection<RouteDefinition> routes = new ArrayList<>();
 
     public void build(RouteSet routeSet) {
-        for (Definition definition : this.routes) {
+        for (RouteDefinition definition : this.routes) {
             routeSet.add(definition.toRoute());
         }
     }
@@ -27,7 +26,7 @@ public class DynamicRoutes implements RouteBuilder {
         return openRoute(new DynamicPath(path));
     }
 
-    public ViaClause map(Matcher<? super String> path) {
+    public ViaClause map(Predicate<? super String> path) {
         return openRoute(path);
     }
 
@@ -35,7 +34,7 @@ public class DynamicRoutes implements RouteBuilder {
         return get(new DynamicPath(path));
     }
 
-    public ToClause get(Matcher<? super String> path) {
+    public ToClause get(Predicate<? super String> path) {
         return map(path).via(GET);
     }
 
@@ -43,7 +42,7 @@ public class DynamicRoutes implements RouteBuilder {
         return post(new DynamicPath(path));
     }
 
-    public ToClause post(Matcher<? super String> path) {
+    public ToClause post(Predicate<? super String> path) {
         return map(path).via(POST);
     }
 
@@ -51,7 +50,7 @@ public class DynamicRoutes implements RouteBuilder {
         return put(new DynamicPath(path));
     }
 
-    public ToClause put(Matcher<? super String> path) {
+    public ToClause put(Predicate<? super String> path) {
         return map(path).via(PUT);
     }
 
@@ -59,7 +58,7 @@ public class DynamicRoutes implements RouteBuilder {
         return delete(new DynamicPath(path));
     }
 
-    public ToClause delete(Matcher<? super String> path) {
+    public ToClause delete(Predicate<? super String> path) {
         return map(path).via(DELETE);
     }
 
@@ -67,7 +66,7 @@ public class DynamicRoutes implements RouteBuilder {
         return patch(new DynamicPath(path));
     }
 
-    public ToClause patch(Matcher<? super String> path) {
+    public ToClause patch(Predicate<? super String> path) {
         return map(path).via(PATCH);
     }
 
@@ -75,7 +74,7 @@ public class DynamicRoutes implements RouteBuilder {
         return head(new DynamicPath(path));
     }
 
-    public ToClause head(Matcher<? super String> path) {
+    public ToClause head(Predicate<? super String> path) {
         return map(path).via(HEAD);
     }
 
@@ -83,51 +82,13 @@ public class DynamicRoutes implements RouteBuilder {
         return options(new DynamicPath(path));
     }
 
-    public ToClause options(Matcher<? super String> path) {
+    public ToClause options(Predicate<? super String> path) {
         return map(path).via(OPTIONS);
     }
 
-    private Definition openRoute(Matcher<? super String> path) {
-        Definition definition = new Definition(path);
+    private RouteDefinition openRoute(Predicate<? super String> path) {
+        RouteDefinition definition = RouteDefinition.map(path);
         routes.add(definition);
         return definition;
-    }
-
-    private static class Definition implements ViaClause {
-
-        private final Matcher<? super String> path;
-
-        private Matcher<? super HttpMethod> method = anything();
-        private Application app;
-
-        public Definition(Matcher<? super String> path) {
-            this.path = path;
-        }
-
-        public Definition via(HttpMethod... methods) {
-            return via(oneOf(methods));
-        }
-
-        public Definition via(Matcher<? super HttpMethod> method) {
-            this.method = method;
-            return this;
-        }
-
-        public Definition to(Application application) {
-            this.app = application;
-            return this;
-        }
-
-        public DynamicRoute toRoute() {
-            return new DynamicRoute(path, method, app);
-        }
-
-        private Matcher<? super HttpMethod> oneOf(HttpMethod... methods) {
-            List<Matcher<? super HttpMethod>> matchMethods = new ArrayList<>();
-            for (HttpMethod httpMethod : methods) {
-                matchMethods.add(equalTo(httpMethod));
-            }
-            return anyOf(matchMethods);
-        }
     }
 }

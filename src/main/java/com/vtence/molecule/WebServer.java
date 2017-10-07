@@ -1,6 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.lib.matchers.Matcher;
 import com.vtence.molecule.middlewares.FilterMap;
 import com.vtence.molecule.middlewares.Router;
 import com.vtence.molecule.routing.RouteBuilder;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static com.vtence.molecule.ssl.KeyStoreType.DEFAULT;
 import static com.vtence.molecule.ssl.SecureProtocol.TLS;
@@ -124,13 +124,13 @@ public class WebServer {
 
     /**
      * Adds a middleware filter to this WebServer's stack of configured middlewares. The server will apply the given
-     * filter to all requests matched by the specified matcher.
+     * filter to all requests that satisfy the specified condition.
      *
-     * @param requestMatcher the matcher to trigger filtering
-     * @param filter         the filter to apply to incoming requests that are matched
+     * @param condition the condition to trigger filtering
+     * @param filter    the filter to apply to incoming requests that are matched
      */
-    public WebServer filter(Matcher<? super Request> requestMatcher, Middleware filter) {
-        stack.use(new FilterMap().map(requestMatcher, filter));
+    public WebServer filter(Predicate<? super Request> condition, Middleware filter) {
+        stack.use(new FilterMap().map(condition, filter));
         return this;
     }
 

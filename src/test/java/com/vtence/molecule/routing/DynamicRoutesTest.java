@@ -8,7 +8,7 @@ import com.vtence.molecule.middlewares.Router;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpMethod.GET;
-import static com.vtence.molecule.lib.matchers.Matchers.anything;
+import static com.vtence.molecule.lib.predicates.Predicates.all;
 import static com.vtence.molecule.routing.DynamicRoutesTest.Echo.echo;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
@@ -20,7 +20,7 @@ public class DynamicRoutesTest {
             map("/uri").via(HttpMethod.POST).to(echo("post to /uri"));
             map("/other/uri").via(GET).to(echo("get to /other/uri"));
 
-            map(anything()).to(echo("not matched"));
+            map(all()).to(echo("not matched"));
         }});
 
         assertThat(dispatch(router, Request.post("/uri"))).hasBodyText("post to /uri");

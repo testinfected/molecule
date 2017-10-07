@@ -6,32 +6,34 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
 
 public class DynamicPathTest {
 
     @Test public void
     matchesIdenticalStaticPaths() {
         DynamicPath dynamicPath = new DynamicPath("/products");
-        assertThat("no match", dynamicPath.matches("/products"));
+        assertThat("no match", dynamicPath.test("/products"));
     }
 
     @Test public void
     rejectsDifferentStaticPaths() {
         DynamicPath dynamicPath = new DynamicPath("/products");
-        assertThat("match", !dynamicPath.matches("/items"));
+        assertThat("match", !dynamicPath.test("/items"));
     }
 
     @Test public void
     ignoresDynamicSegmentsWhenMatching() {
         DynamicPath dynamicPath = new DynamicPath("/products/:number/items/:id");
-        assertThat("no match", dynamicPath.matches("/products/LAB-1234/items/12345678"));
+        assertThat("no match", dynamicPath.test("/products/LAB-1234/items/12345678"));
     }
 
     @Test public void
     expectsPathsWithSameNumberOfSegments() {
         DynamicPath dynamicPath = new DynamicPath("/products/:number/items/:id");
-        assertThat("match", !dynamicPath.matches("/products/LAB-1234"));
+        assertThat("match", !dynamicPath.test("/products/LAB-1234"));
     }
 
     @Test public void

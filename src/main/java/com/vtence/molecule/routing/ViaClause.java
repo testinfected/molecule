@@ -1,11 +1,12 @@
 package com.vtence.molecule.routing;
 
 import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.matchers.Matcher;
+
+import java.util.function.Predicate;
 
 public interface ViaClause extends ToClause {
 
     ToClause via(HttpMethod... methods);
 
-    ToClause via(Matcher<? super HttpMethod> method);
+    ToClause via(Predicate<? super HttpMethod> method);
 }

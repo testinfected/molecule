@@ -1,13 +1,12 @@
 package com.vtence.molecule.routing;
 
-import com.vtence.molecule.lib.matchers.Matcher;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
-public class DynamicPath implements Matcher<String>, WithBoundParameters {
+public class DynamicPath implements WithBoundParameters, Predicate<String> {
 
     private final Path pattern;
 
@@ -15,7 +14,7 @@ public class DynamicPath implements Matcher<String>, WithBoundParameters {
         this.pattern = new Path(pattern);
     }
 
-    public boolean matches(String actual) {
+    public boolean test(String actual) {
         Path path = new Path(actual);
         if (!pattern.sameLengthAs(path)) return false;
 

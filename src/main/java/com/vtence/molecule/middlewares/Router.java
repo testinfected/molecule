@@ -9,6 +9,7 @@ import com.vtence.molecule.routing.RouteSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Router implements Application, RouteSet {
 
@@ -29,33 +30,21 @@ public class Router implements Application, RouteSet {
         this.fallback = fallback;
     }
 
-    public void add(Route route) {
+    public Router add(Route route) {
         routingTable.add(route);
+        return this;
     }
 
     public Response handle(Request request) throws Exception {
         return routeFor(request).handle(request);
     }
 
-    private Route routeFor(Request request) {
-        return routingTable.stream().filter(route -> route.matches(request))
+    private Application routeFor(Request request) {
+        return routingTable.stream()
+                           .map(route -> route.route(request))
+                           .filter(Optional::isPresent)
+                           .map(Optional::get)
                            .findFirst()
-                           .orElse(new FallbackRoute(fallback));
-    }
-
-    private class FallbackRoute implements Route {
-        private final Application fallback;
-
-        public FallbackRoute(Application fallback) {
-            this.fallback = fallback;
-        }
-
-        public Response handle(Request request) throws Exception {
-            return fallback.handle(request);
-        }
-
-        public boolean matches(Request actual) {
-            return true;
-        }
+                           .orElse(fallback);
     }
 }
