@@ -214,9 +214,10 @@ get("/photos/:id").to(request -> {
 
 ### Custom Matching
 
-You are not limited to the provided match patterns. You can easily implement your own matcher and decide exactly how to match an incoming url to an application.
+You are not limited to the provided match patterns. You can provide your own predicate and decide exactly how to match 
+an incoming url to an application.
 
-To do this, use the route definition methods that accept a _Matcher_ rather than a _String_.
+To do this, use the route definition methods that accept a _Predicate_ rather than a _String_.
 
 
 ## Working with the Request
