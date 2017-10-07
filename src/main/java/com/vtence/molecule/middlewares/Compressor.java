@@ -149,12 +149,16 @@ public class Compressor implements Middleware {
     }
 
     private boolean compressible(Response response) {
-        return compressibleTypes.isEmpty() || compressible(ContentType.of(response).mediaType());
+        return compressibleTypes.isEmpty() || compressible(ContentType.of(response));
     }
 
-    private boolean compressible(String contentType) {
+    private boolean compressible(ContentType contentType) {
+        return contentType != null && compressible(contentType.mediaType());
+    }
+
+    private boolean compressible(String mediaType) {
         for (String compressible : compressibleTypes) {
-            if (MimeTypes.matches(contentType, compressible)) return true;
+            if (MimeTypes.matches(mediaType, compressible)) return true;
         }
         return false;
     }

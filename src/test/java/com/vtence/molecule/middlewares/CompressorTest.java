@@ -174,6 +174,20 @@ public class CompressorTest {
     }
 
     @Test public void
+    ignoresResponseWithoutContentType() throws Exception {
+        compressor.compressibleTypes("*/*");
+
+        Response response = compressor.then(request -> Response.ok()
+                                                               .done("uncompressed body"))
+                                      .handle(Request.get("/")
+                                                     .header("Accept-Encoding", "gzip"));
+
+        assertNoExecutionError(response);
+        assertThat(response).hasNoHeader("Content-Encoding")
+                            .hasBodyText("uncompressed body");
+    }
+
+    @Test public void
     ignoresContentTypeCharsetToDecideIfContentShouldBeCompressed() throws Exception {
         compressor.compressibleTypes("text/html");
 
