@@ -2,7 +2,7 @@ package examples.routing;
 
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class RoutingExample {
     public void run(WebServer server) throws IOException {
         // We start the server by providing a set of routes, which creates a router to dispatch
         // requests to different endpoints.
-        server.route(new DynamicRoutes() {{
+        server.route(new Routes() {{
             // Routes are matched in the order they are defined. The first one that matches the request will be
             // invoked.
 

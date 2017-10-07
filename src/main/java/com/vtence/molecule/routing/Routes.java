@@ -12,13 +12,13 @@ import static com.vtence.molecule.http.HttpMethod.PATCH;
 import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.http.HttpMethod.PUT;
 
-public class DynamicRoutes implements RouteBuilder {
+public class Routes implements RouteBuilder {
 
     private final Collection<RouteDefinition> routes = new ArrayList<>();
 
     public void build(RouteSet routeSet) {
         for (RouteDefinition definition : this.routes) {
-            routeSet.add(definition.toRoute());
+            routeSet.route(definition.toRoute());
         }
     }
 

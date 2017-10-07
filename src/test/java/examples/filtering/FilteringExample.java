@@ -3,7 +3,7 @@ package examples.filtering;
 import com.vtence.molecule.Middleware;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,7 +55,7 @@ public class FilteringExample {
 
         // All requests to /private/... go through the authentication filter
         server.filter("/private", authenticate)
-              .route(new DynamicRoutes() {{
+              .route(new Routes() {{
                   // This route is private, thus it requires authentication
                   get("/private/area").to(request -> Response.ok().done("Hello, " + request.attribute("user") + "!"));
 

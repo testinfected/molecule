@@ -4,7 +4,7 @@ import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.lib.TextBody;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 
 import java.io.IOException;
 
@@ -24,7 +24,7 @@ public class MultipartExample {
 
     public void run(WebServer server) throws IOException {
         // Start the server with a set of routes
-        server.route(new DynamicRoutes() {{
+        server.route(new Routes() {{
 
             // A GET request to /profile renders an HTML profile form. It will be submitted as
             // multipart/form-data. In this form the user can enter an email address, upload a text biography

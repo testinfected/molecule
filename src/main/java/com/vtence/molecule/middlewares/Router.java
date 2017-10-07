@@ -10,6 +10,7 @@ import com.vtence.molecule.routing.RouteSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class Router implements Application, RouteSet {
 
@@ -30,7 +31,11 @@ public class Router implements Application, RouteSet {
         this.fallback = fallback;
     }
 
-    public Router add(Route route) {
+    public Router route(Predicate<Request> condition, Application app) {
+        return route(new StaticRoute(condition, app));
+    }
+
+    public Router route(Route route) {
         routingTable.add(route);
         return this;
     }

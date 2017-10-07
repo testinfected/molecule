@@ -4,7 +4,7 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.middlewares.Cookies;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 import com.vtence.molecule.session.CookieSessionStore;
 import com.vtence.molecule.session.Session;
 
@@ -59,7 +59,7 @@ public class SessionExample {
               // Track sessions using transient - a.k.a session - cookies by default
               // You can change of the name of the cookie used to track sessions
               .add(new CookieSessionTracker(sessions).usingCookieName("molecule.session"))
-              .route(new DynamicRoutes() {{
+              .route(new Routes() {{
                   // The default route greets the signed in user
                   map("/").to(request -> {
                       // There's always a session bound to the request, although it may be empty and fresh

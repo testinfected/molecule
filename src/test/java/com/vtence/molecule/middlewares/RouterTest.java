@@ -15,15 +15,15 @@ public class RouterTest {
 
     @Test public void
     rendersNotFoundWhenNoRouteMatch() throws Exception {
-        router.add(new StaticRoute(none(), echo("other")));
+        router.route(new StaticRoute(none(), echo("other")));
         Response response = router.handle(Request.get("/"));
         assertThat(response).hasStatus(NOT_FOUND);
     }
 
     @Test public void
     dispatchesToFirstRouteThatMatches() throws Exception {
-        router.add(new StaticRoute(all(), echo("preferred")));
-        router.add(new StaticRoute(all(), echo("alternate")));
+        router.route(new StaticRoute(all(), echo("preferred")));
+        router.route(new StaticRoute(all(), echo("alternate")));
         Response response = router.handle(Request.get("/"));
         assertThat(response).hasBodyText("preferred");
     }

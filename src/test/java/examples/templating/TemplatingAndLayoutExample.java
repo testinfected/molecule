@@ -3,7 +3,7 @@ package examples.templating;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.middlewares.Layout;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 import com.vtence.molecule.templating.JMustacheRenderer;
 import com.vtence.molecule.templating.Template;
 import com.vtence.molecule.templating.Templates;
@@ -36,7 +36,7 @@ public class TemplatingAndLayoutExample {
 
         // Apply a common site layout to requests under the / path, i.e. to all rendered pages
         server.filter("/", Layout.html(layout))
-              .route(new DynamicRoutes() {{
+              .route(new Routes() {{
                   get("/hello").to(request -> {
                       Response response = Response.ok()
                                                   .contentType("text/html; charset=utf-8");

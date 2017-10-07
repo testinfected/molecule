@@ -7,7 +7,7 @@ import com.vtence.molecule.lib.FlashHash;
 import com.vtence.molecule.middlewares.CookieSessionTracker;
 import com.vtence.molecule.middlewares.Cookies;
 import com.vtence.molecule.middlewares.Flash;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 import com.vtence.molecule.session.SessionPool;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class FlashExample {
               .add(new CookieSessionTracker(SessionPool.secure()))
               // We need the Flash middleware
               .add(new Flash())
-              .route(new DynamicRoutes() {{
+              .route(new Routes() {{
                   // a post to /accounts creates a new account if email is not already taken
                   post("/accounts").to(request -> {
                       FlashHash flash = FlashHash.get(request);

@@ -5,7 +5,7 @@ import com.vtence.molecule.WebServer;
 import com.vtence.molecule.http.Cookie;
 import com.vtence.molecule.lib.CookieJar;
 import com.vtence.molecule.middlewares.Cookies;
-import com.vtence.molecule.routing.DynamicRoutes;
+import com.vtence.molecule.routing.Routes;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ public class CookiesExample {
         // and makes it available a request attribute.
         server.add(new Cookies())
               // We create a simple set of routes to demonstrate various operations on cookies.
-              .route(new DynamicRoutes() {{
+              .route(new Routes() {{
 
                   // A GET to / will read the 'customer' client cookie
                   // This will not write any cookie back to client, since we're only reading from the jar
