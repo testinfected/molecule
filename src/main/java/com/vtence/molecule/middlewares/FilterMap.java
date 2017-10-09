@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static com.vtence.molecule.Middleware.identity;
-import static com.vtence.molecule.lib.predicates.Predicates.startingWith;
-import static com.vtence.molecule.lib.predicates.Predicates.withPath;
+import static com.vtence.molecule.lib.predicates.Predicates.withPathPrefix;
 
 public class FilterMap implements Middleware {
 
@@ -24,11 +23,11 @@ public class FilterMap implements Middleware {
     }
 
     public FilterMap map(String pathPrefix, Middleware filter) {
-        return map(withPath(startingWith(pathPrefix)), filter);
+        return map(withPathPrefix(pathPrefix), filter);
     }
 
-    public FilterMap map(Predicate<? super Request> requestMatcher, Middleware filter) {
-        filters.put(requestMatcher, filter);
+    public FilterMap map(Predicate<? super Request> request, Middleware filter) {
+        filters.put(request, filter);
         return this;
     }
 

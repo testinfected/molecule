@@ -2,6 +2,7 @@ package com.vtence.molecule.http;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public final class MimeTypes {
 
@@ -33,7 +34,12 @@ public final class MimeTypes {
     }
 
     public static boolean matches(String mediaType, String pattern) {
-        return MediaType.parse(pattern).isGeneralizationOf(MediaType.parse(mediaType));
+        return isSpecializationOf(pattern).test(mediaType);
+    }
+
+    public static Predicate<String> isSpecializationOf(String pattern) {
+        final MediaType type = MediaType.parse(pattern);
+        return m -> type.isGeneralizationOf(MediaType.parse(m));
     }
 
     public void register(String extension, String mimeType) {
@@ -48,7 +54,7 @@ public final class MimeTypes {
     }
 
     private static class MediaType {
-        public static final String WILCARD = "*";
+        public static final String WILDCARD = "*";
 
         public final String type;
         public final String subtype;
@@ -60,12 +66,12 @@ public final class MimeTypes {
 
         public static MediaType parse(String mediaType) {
             String[] parts = mediaType.split("/");
-            return parts.length > 1 ? new MediaType(parts[0], parts[1]) : new MediaType(parts[0], WILCARD);
+            return parts.length > 1 ? new MediaType(parts[0], parts[1]) : new MediaType(parts[0], WILDCARD);
         }
 
         public boolean isGeneralizationOf(MediaType mime) {
-            return (type.equals(mime.type) || type.equals(WILCARD)) &&
-                    (subtype.equals(WILCARD) || subtype.equals(mime.subtype));
+            return (type.equals(mime.type) || type.equals(WILDCARD)) &&
+                   (subtype.equals(WILDCARD) || subtype.equals(mime.subtype));
         }
     }
 }

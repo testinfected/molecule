@@ -2,26 +2,24 @@ package com.vtence.molecule.routing;
 
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
-import com.vtence.molecule.http.HttpMethod;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.vtence.molecule.lib.predicates.Predicates.withMethod;
 import static com.vtence.molecule.lib.predicates.Predicates.withPath;
 
 public class DynamicRoute implements Route {
 
     private final Predicate<? super String> path;
-    private final Predicate<? super HttpMethod> method;
+    private final Predicate<? super Request> otherConditions;
     private final Application app;
 
     public DynamicRoute(Predicate<? super String> path,
-                        Predicate<? super HttpMethod> method,
+                        Predicate<? super Request> otherConditions,
                         Application app) {
         this.path = path;
-        this.method = method;
+        this.otherConditions = otherConditions;
         this.app = app;
     }
 
@@ -30,7 +28,7 @@ public class DynamicRoute implements Route {
     }
 
     private boolean matches(Request request) {
-        return withMethod(method).and(withPath(path)).test(request);
+        return withPath(path).and(otherConditions).test(request);
     }
 
     private Application extractPathParameters(Application app) {

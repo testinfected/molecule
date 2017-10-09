@@ -30,59 +30,59 @@ public class Routes implements RouteBuilder {
         return openRoute(path);
     }
 
-    public ToClause get(String path) {
+    public AcceptClause get(String path) {
         return get(new DynamicPath(path));
     }
 
-    public ToClause get(Predicate<? super String> path) {
+    public AcceptClause get(Predicate<? super String> path) {
         return map(path).via(GET);
     }
 
-    public ToClause post(String path) {
+    public AcceptClause post(String path) {
         return post(new DynamicPath(path));
     }
 
-    public ToClause post(Predicate<? super String> path) {
+    public AcceptClause post(Predicate<? super String> path) {
         return map(path).via(POST);
     }
 
-    public ToClause put(String path) {
+    public AcceptClause put(String path) {
         return put(new DynamicPath(path));
     }
 
-    public ToClause put(Predicate<? super String> path) {
+    public AcceptClause put(Predicate<? super String> path) {
         return map(path).via(PUT);
     }
 
-    public ToClause delete(String path) {
+    public AcceptClause delete(String path) {
         return delete(new DynamicPath(path));
     }
 
-    public ToClause delete(Predicate<? super String> path) {
+    public AcceptClause delete(Predicate<? super String> path) {
         return map(path).via(DELETE);
     }
 
-    public ToClause patch(String path) {
+    public AcceptClause patch(String path) {
         return patch(new DynamicPath(path));
     }
 
-    public ToClause patch(Predicate<? super String> path) {
+    public AcceptClause patch(Predicate<? super String> path) {
         return map(path).via(PATCH);
     }
 
-    public ToClause head(String path) {
+    public AcceptClause head(String path) {
         return head(new DynamicPath(path));
     }
 
-    public ToClause head(Predicate<? super String> path) {
+    public AcceptClause head(Predicate<? super String> path) {
         return map(path).via(HEAD);
     }
 
-    public ToClause options(String path) {
+    public AcceptClause options(String path) {
         return options(new DynamicPath(path));
     }
 
-    public ToClause options(Predicate<? super String> path) {
+    public AcceptClause options(Predicate<? super String> path) {
         return map(path).via(OPTIONS);
     }
 

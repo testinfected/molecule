@@ -6,8 +6,8 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
 
-import static com.vtence.molecule.lib.predicates.Predicates.all;
-import static com.vtence.molecule.lib.predicates.Predicates.none;
+import static com.vtence.molecule.lib.predicates.Predicates.anything;
+import static com.vtence.molecule.lib.predicates.Predicates.nothing;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.lang.String.format;
 
@@ -24,8 +24,8 @@ public class FilterMapTest {
 
     @Test public void
     runsRequestThroughMatchingFilter() throws Exception {
-        filters.map(none(), filter("none"));
-        filters.map(all(), filter("filter"));
+        filters.map(nothing(), filter("none"));
+        filters.map(anything(), filter("filter"));
 
         Response response = filters.then(stubResponse("content"))
                                    .handle(Request.get("/"));
@@ -34,7 +34,7 @@ public class FilterMapTest {
 
     @Test public void
     forwardsRequestIfNoFilterMatch() throws Exception {
-        filters.map(none(), filter("no"));
+        filters.map(nothing(), filter("no"));
         Response response = filters.then(stubResponse("content"))
                                    .handle(Request.get("/"));
         assertFilteredContent(response, "content");
@@ -51,8 +51,8 @@ public class FilterMapTest {
 
     @Test public void
     appliesLastRegisteredOfMatchingFilters() throws Exception {
-        filters.map(all(), filter("filter"));
-        filters.map(all(), filter("replacement"));
+        filters.map(anything(), filter("filter"));
+        filters.map(anything(), filter("replacement"));
 
         Response response = filters.then(stubResponse("content"))
                                    .handle(Request.get("/"));

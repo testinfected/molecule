@@ -4,9 +4,9 @@ import com.vtence.molecule.http.HttpMethod;
 
 import java.util.function.Predicate;
 
-public interface ViaClause extends ToClause {
+public interface ViaClause extends AcceptClause {
 
-    ToClause via(HttpMethod... methods);
+    AcceptClause via(HttpMethod... methods);
 
-    ToClause via(Predicate<? super HttpMethod> method);
+    AcceptClause via(Predicate<? super HttpMethod> method);
 }

@@ -7,8 +7,10 @@ import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.middlewares.Router;
 import org.junit.Test;
 
+import static com.vtence.molecule.http.HeaderNames.ACCEPT;
 import static com.vtence.molecule.http.HttpMethod.GET;
-import static com.vtence.molecule.lib.predicates.Predicates.all;
+import static com.vtence.molecule.http.HttpMethod.POST;
+import static com.vtence.molecule.lib.predicates.Predicates.anything;
 import static com.vtence.molecule.routing.DynamicRoutingTest.Echo.echo;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
@@ -17,10 +19,10 @@ public class DynamicRoutingTest {
     @Test public void
     matchingRequestPathAndVerb() throws Exception {
         Router router = Router.draw(new Routes() {{
-            map("/uri").via(HttpMethod.POST).to(echo("post to /uri"));
+            map("/uri").via(POST).to(echo("post to /uri"));
             map("/other/uri").via(GET).to(echo("get to /other/uri"));
 
-            map(all()).to(echo("not matched"));
+            map(anything()).to(echo("not matched"));
         }});
 
         assertThat(router.handle(Request.post("/uri"))).hasBodyText("post to /uri");
@@ -63,11 +65,25 @@ public class DynamicRoutingTest {
     public void
     matchingAnyOfTheVerbsSpecifiedInViaClause() throws Exception {
         Router router = Router.draw(new Routes() {{
-            map("/").via(HttpMethod.POST, HttpMethod.PUT).to(echo("found"));
+            map("/").via(POST, HttpMethod.PUT).to(echo("found"));
         }});
 
         assertThat(router.handle(Request.post("/"))).hasBodyText("found");
         assertThat(router.handle(Request.put("/"))).hasBodyText("found");
+    }
+
+    @Test
+    public void
+    matchingOnAcceptHeader() throws Exception {
+        Router router = Router.draw(new Routes() {{
+            get("/").accept("application/json").to(echo("json"));
+            get("/").accept("image/*").to(echo("image"));
+            get("/").to(echo("html"));
+        }});
+
+        assertThat(router.handle(Request.get("/").header(ACCEPT, "application/json"))).hasBodyText("json");
+        assertThat(router.handle(Request.get("/").header(ACCEPT, "image/png"))).hasBodyText("image");
+        assertThat(router.handle(Request.get("/").header(ACCEPT, "text/html"))).hasBodyText("html");
     }
 
     @Test public void
