@@ -23,6 +23,7 @@ import static com.vtence.molecule.http.HeaderNames.LAST_MODIFIED;
 import static com.vtence.molecule.http.MimeTypes.CSS;
 import static com.vtence.molecule.http.MimeTypes.HTML;
 import static com.vtence.molecule.http.MimeTypes.JAVASCRIPT;
+import static com.vtence.molecule.templating.JMustacheRenderer.FileTemplateLoader.dir;
 
 /**
  * <p>
@@ -61,7 +62,7 @@ public class CachingAndCompressionExample {
 
         // For other requests, we'll serve web pages.
         // Our web pages are Mustache templates with an .html extension
-        Templates templates = new Templates(new JMustacheRenderer().fromDir(content).extension("html"));
+        Templates templates = new Templates(JMustacheRenderer.from(dir(content).usingExtension("html")));
         // This is our index.html template
         final Template<Void> index = templates.named("index");
 

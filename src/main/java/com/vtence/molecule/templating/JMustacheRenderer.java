@@ -5,36 +5,44 @@ import com.samskivert.mustache.Template;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import static com.vtence.molecule.templating.JMustacheRenderer.ClasspathTemplateLoader.classpath;
+import static com.vtence.molecule.templating.JMustacheRenderer.FileTemplateLoader.dir;
 
 public class JMustacheRenderer implements RenderingEngine {
 
     private Mustache.Compiler mustache;
-    private File path = new File(".");
-    private Charset encoding = StandardCharsets.UTF_8;
-    private String extension = "mustache";
 
-    public JMustacheRenderer() {
-        this(Mustache.compiler());
+    public static JMustacheRenderer from(Mustache.TemplateLoader loader) {
+        return new JMustacheRenderer(Mustache.compiler().withLoader(loader));
     }
 
     public JMustacheRenderer(Mustache.Compiler compiler) {
-        this.mustache = compiler.withLoader(this::loadTemplate);
+        this.mustache = compiler;
     }
 
-    public JMustacheRenderer fromDir(File dir) {
-        this.path = dir;
-        return this;
+    public static JMustacheRenderer fromClasspath() {
+        return from(classpath());
     }
 
-    public JMustacheRenderer extension(String ext) {
-        this.extension = ext;
-        return this;
+    public static JMustacheRenderer fromClasspath(String root) {
+        return from(classpath(root));
+    }
+
+    public static JMustacheRenderer fromDir(String root) {
+        return fromDir(new File(root));
+    }
+
+    public static JMustacheRenderer fromDir(File root) {
+        return from(dir(root));
     }
 
     public JMustacheRenderer defaultValue(String defaultValue) {
@@ -47,28 +55,83 @@ public class JMustacheRenderer implements RenderingEngine {
         return this;
     }
 
-    public JMustacheRenderer encoding(String charsetName) {
-        encoding(Charset.forName(charsetName));
-        return this;
-    }
-
-    public JMustacheRenderer encoding(Charset charset) {
-        this.encoding = charset;
-        return this;
-    }
-
     public void render(Writer out, String templateName, Object context) throws IOException {
-        try (Reader source = loadTemplate(templateName)) {
+        try (Reader source = mustache.loader.getTemplate(templateName)) {
             Template template = mustache.compile(source);
             template.execute(context, out);
+        } catch (Exception e) {
+            throw new IOException("Unable to load template " + templateName, e);
         }
     }
 
-    private Reader loadTemplate(String name) throws IOException {
-        return new InputStreamReader(new FileInputStream(templateFile(name)), encoding);
+    public static abstract class AbstractTemplateLoader implements Mustache.TemplateLoader {
+
+        protected Charset encoding = StandardCharsets.UTF_8;
+        protected String extension = "mustache";
+
+        public AbstractTemplateLoader usingEncoding(String charsetName) {
+            return usingEncoding(Charset.forName(charsetName));
+        }
+
+        public AbstractTemplateLoader usingEncoding(Charset charset) {
+            this.encoding = charset;
+            return this;
+        }
+
+        public AbstractTemplateLoader usingExtension(String ext) {
+            this.extension = ext;
+            return this;
+        }
     }
 
-    private File templateFile(String name) {
-        return new File(path, name + "." + extension);
+    public static class ClasspathTemplateLoader extends AbstractTemplateLoader {
+
+        private final String root;
+        private ClassLoader classLoader;
+
+        public ClasspathTemplateLoader(String root) {
+            this.root = root;
+            this.classLoader = Thread.currentThread().getContextClassLoader();
+        }
+
+        public static ClasspathTemplateLoader classpath() {
+            return classpath(".");
+        }
+
+        public static ClasspathTemplateLoader classpath(String root) {
+            return new ClasspathTemplateLoader(root);
+        }
+
+        public ClasspathTemplateLoader usingClassLoader(ClassLoader classLoader) {
+            this.classLoader = classLoader;
+            return this;
+        }
+
+        public Reader getTemplate(String name) throws IOException {
+            String resource = root + "/" + name + "." + extension;
+            URL location = classLoader.getResource(resource);
+            if (location == null) throw new FileNotFoundException("Cannot find resource: " + resource);
+            return new InputStreamReader(location.openStream(), encoding);
+        }
+    }
+
+    public static class FileTemplateLoader extends AbstractTemplateLoader {
+        private final File root;
+
+        public FileTemplateLoader(File root) {
+            this.root = root;
+        }
+
+        public static FileTemplateLoader dir(File root) {
+            return new FileTemplateLoader(root);
+        }
+
+        public Reader getTemplate(String name) throws IOException {
+            return new InputStreamReader(new FileInputStream(templateFile(name)), encoding);
+        }
+
+        private File templateFile(String name) {
+            return new File(root, name + "." + extension);
+        }
     }
 }

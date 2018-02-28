@@ -5,12 +5,12 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class TemplatesTest {
-    RenderingEngine renderer = new JMustacheRenderer().fromDir(locateOnClasspath("views"));
+    RenderingEngine renderer = JMustacheRenderer.fromClasspath("views");
+
     Templates templates = new Templates(renderer);
 
     Template<Context> template = templates.named("hello");
