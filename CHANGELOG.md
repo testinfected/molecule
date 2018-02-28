@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.13.1] - Unreleased
+
+### Added
+- Mustache view templates can now be loaded from the classpath, in situations where they're bundled in a jar. ([#72])
+
 ## [0.13.0] - 2017-09-30
 
 This version introduces a major breaking change in the API. It implements a more functional
@@ -27,7 +32,7 @@ programming style.
 - Session cookies are now encoded in RFC4648 base64. ([#61])
 
 ### Fixed
-- URL Map middleware was failing to dispatch to root mount. `/foo` is now matched if mounted to `/`). ([#62])
+- URL Map middleware was failing to dispatch to root mount. `/foo` is now matched if mounted to `/`. ([#62])
 
 ## [0.11.0] - 2016-11-17
 
