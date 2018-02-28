@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.14.0] - Unreleased
+## [0.14.0] - 2018-02-27
 
 ### Added
 - The ability to load mustache view templates from the classpath, in situations where they're bundled in a jar. ([#72])
@@ -123,9 +123,10 @@ Sessions are considered stale when they have been inactive for longer than the c
 - `ApacheCommonLogger` now correctly logs request parameters as they were received, in case they are modified down the middleware chain
 
 
-[0.13.0]: https://github.com/testinfected/molecule/compare/v0.12.0...master
-[0.12.0]: https://github.com/testinfected/molecule/compare/v0.11.0...master
-[0.11.0]: https://github.com/testinfected/molecule/compare/v0.10...v0.11.1
+[0.14.0]: https://github.com/testinfected/molecule/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/testinfected/molecule/compare/v0.12.0...v0.13.0
+[0.12.0]: https://github.com/testinfected/molecule/compare/v0.11.0...v0.12.0
+[0.11.0]: https://github.com/testinfected/molecule/compare/v0.10...v0.11.0
 [0.10]: https://github.com/testinfected/molecule/compare/v0.9.1...v0.10
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9...v0.9.1
 [0.9]: https://github.com/testinfected/molecule/compare/v0.8.2...v0.9
