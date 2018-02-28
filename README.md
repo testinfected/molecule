@@ -509,7 +509,7 @@ Rendering a template takes a view model and returns a body object to use with th
   
 ```java
 // Declare the template engine
-Templates templates = new Templates(new JMustacheRenderer().fromDir(new File("/path/to/template/files")));
+Templates templates = new Templates(JMustacheRenderer.fromDir(new File("/path/to/template/files")));
 // Load the 'profile.mustache' template
 Template<Employee> profile = templates.named("profile");
 // Render the template using an Employee instance 
@@ -558,7 +558,7 @@ to build the final result:
 
 ```java
 // Declare the template engine
-Templates layouts = new Templates(new JMustacheRenderer().fromDir(new File("/path/to/layout/templates")));
+Templates layouts = new Templates(JMustacheRenderer.fromClasspath("/path/to/layout/templates"));
 // Load the main layout template
 Template<Map<String, String>> mainLayout = layouts.named("main");
 
