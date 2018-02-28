@@ -2,10 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.13.1] - Unreleased
+## [0.14.0] - Unreleased
 
 ### Added
-- Mustache view templates can now be loaded from the classpath, in situations where they're bundled in a jar. ([#72])
+- The ability to load mustache view templates from the classpath, in situations where they're bundled in a jar. ([#72])
+- An additional clause to route definitions for routing requests based on the HTTP `Accept` header. (#[70])
+- A way to do simple static routing based on HTTP verbs using `Predicate`s. A set of basic predicates is
+  provided out-of-the-box. (#[70])
+
+### Changed
+- Drop `Matcher` interface in favor of Java 8 `Predicate`. ([#69])
+- As a consequence to introduction of static routing, `DynamicRoutes` has been renamed to `Routes`. ([#70])
+
+### Fixed
+- An error occurring when compressing responses without a content type. ([#71]) 
 
 ## [0.13.0] - 2017-09-30
 
@@ -120,6 +130,10 @@ Sessions are considered stale when they have been inactive for longer than the c
 [0.9.1]: https://github.com/testinfected/molecule/compare/v0.9...v0.9.1
 [0.9]: https://github.com/testinfected/molecule/compare/v0.8.2...v0.9
 
+[#72]: https://github.com/testinfected/molecule/issues/72
+[#71]: https://github.com/testinfected/molecule/issues/71
+[#70]: https://github.com/testinfected/molecule/issues/70
+[#69]: https://github.com/testinfected/molecule/issues/69
 [#67]: https://github.com/testinfected/molecule/issues/67
 [#66]: https://github.com/testinfected/molecule/issues/66
 [#64]: https://github.com/testinfected/molecule/issues/64
