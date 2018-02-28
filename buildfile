@@ -1,6 +1,4 @@
 require 'buildr/gpg'
-require 'buildr/custom_pom'
-require 'buildr/jacoco'
 
 VERSION_NUMBER = "0.14.0-SNAPSHOT"
 
