@@ -41,6 +41,13 @@ repositories {
   mavenCentral()
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
 dependencies {
   compile libs.simple, optional
   compile libs.undertow, optional
