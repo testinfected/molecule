@@ -43,7 +43,7 @@ repositories {
 
 test {
     testLogging {
-        events "passed", "skipped", "failed"
+        events "skipped", "failed"
         exceptionFormat "full"
     }
 }
