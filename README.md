@@ -159,7 +159,7 @@ Routes let you map incoming requests to different applications based on the requ
 of a path pattern, an optional set of verbs to match, and an application endpoint: 
 
 ```java
-server.route(new DynamicRoutes() {{
+server.route(new Routes() {{
     get("/posts/:id").to(request -> {
         // retrieve a given post
     });
@@ -199,6 +199,12 @@ map("/").via(GET, HEAD).to(request -> {
 ```
 
 If you don't provide any verbs, _map_ will match on all verbs.
+
+You can also match based on the HTTP `Accept` header, such as:
+
+```java
+get("/api/posts").accept("application/json").to(request -> {...});
+```
 
 ### Dynamic Parameters
 
@@ -443,7 +449,7 @@ To use sessions you need to start your server with session support:
 ```java
 server.add(new Cookies())
       .add(new CookieSessionTracker(CookieSessionStore.secure("your secret");))
-      .route(new DynamicRoutes() {{
+      .route(new Routes() {{
       // your routing here
       }});
 ```
@@ -564,7 +570,7 @@ Template<Map<String, String>> mainLayout = layouts.named("main");
 
 // Apply the main site layout to requests under the / path, in other words to all rendered pages
 server.filter("/", Layout.html(mainLayout))
-      .route(new DynamicRoutes() {{
+      .route(new Routes() {{
           // Your routes definitions here
           // ...
       }});
@@ -733,7 +739,7 @@ server.add(new ContentLengthHeader())
       .add(new ConditionalGet())
       .add(new ETag())
       .add(new Compressor())
-      .route(new DynamicRoutes() {{
+      .route(new Routes() {{
           // ...
       }});
 ```
