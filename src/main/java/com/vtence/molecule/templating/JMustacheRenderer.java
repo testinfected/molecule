@@ -56,11 +56,17 @@ public class JMustacheRenderer implements RenderingEngine {
     }
 
     public void render(Writer out, String templateName, Object context) throws IOException {
-        try (Reader source = mustache.loader.getTemplate(templateName)) {
+        try (Reader source = load(templateName)) {
             Template template = mustache.compile(source);
             template.execute(context, out);
+        }
+    }
+
+    private Reader load(String templateName) throws IOException {
+        try {
+            return mustache.loader.getTemplate(templateName);
         } catch (Exception e) {
-            throw new IOException("Unable to load template " + templateName, e);
+            throw new IOException("loading template `" + templateName + "`", e);
         }
     }
 
@@ -95,7 +101,7 @@ public class JMustacheRenderer implements RenderingEngine {
         }
 
         public static ClasspathTemplateLoader classpath() {
-            return classpath(".");
+            return classpath("");
         }
 
         public static ClasspathTemplateLoader classpath(String root) {
@@ -108,9 +114,9 @@ public class JMustacheRenderer implements RenderingEngine {
         }
 
         public Reader getTemplate(String name) throws IOException {
-            String resource = root + "/" + name + "." + extension;
+            String resource = (root.equals("") ? "" : root + "/") + name + "." + extension;
             URL location = classLoader.getResource(resource);
-            if (location == null) throw new FileNotFoundException("Cannot find resource: " + resource);
+            if (location == null) throw new FileNotFoundException("classpath:" + resource);
             return new InputStreamReader(location.openStream(), encoding);
         }
     }
