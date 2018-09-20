@@ -36,7 +36,4 @@ public class TextBody implements Body {
     public void writeTo(OutputStream out, Charset charset) throws IOException {
         out.write(content(charset));
     }
-
-    public void close() throws IOException {
-    }
 }

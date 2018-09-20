@@ -146,8 +146,7 @@ public class MultipartForm extends Form {
 
         private Charset fileCharset() {
             ContentType contentType = ContentType.parse(this.contentType);
-            if (contentType == null || contentType.charset() == null) return StandardCharsets.UTF_8;
-            return contentType.charset();
+            return contentType.charset() != null ? contentType.charset() : StandardCharsets.UTF_8;
         }
     }
 }

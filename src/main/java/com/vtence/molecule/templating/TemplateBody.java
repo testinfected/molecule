@@ -25,7 +25,4 @@ public class TemplateBody extends ChunkedBody {
         renderer.render(writer, template, context);
         writer.flush();
     }
-
-    public void close() throws IOException {
-    }
 }

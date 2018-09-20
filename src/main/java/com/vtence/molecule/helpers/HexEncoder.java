@@ -1,7 +1,8 @@
 package com.vtence.molecule.helpers;
 
 /**
- * Code taken from <a href="https://stackoverflow.com/a/9855338">Stack Overflow</a>. Attribution goes to <a href="http://stackoverflow.com/users/1284661/maybewecouldstealavan">maybeWeCouldStealAVan</a>.
+ * Code taken from <a href="https://stackoverflow.com/a/9855338">Stack Overflow</a>.
+ * Attribution goes to <a href="http://stackoverflow.com/users/1284661/maybewecouldstealavan">maybeWeCouldStealAVan</a>.
  */
 public final class HexEncoder {
 

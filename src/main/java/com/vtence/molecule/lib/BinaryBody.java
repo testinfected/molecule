@@ -31,7 +31,4 @@ public class BinaryBody implements Body {
     public void writeTo(OutputStream out, Charset charset) throws IOException {
         out.write(content);
     }
-
-    public void close() throws IOException {
-    }
 }

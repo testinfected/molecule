@@ -5,7 +5,6 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.lib.TextBody;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 
@@ -131,7 +130,7 @@ public class ETagTest {
             append("Close me!");
         }
 
-        public void close() throws IOException {
+        public void close() {
             closed = true;
         }
     }

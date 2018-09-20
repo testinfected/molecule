@@ -77,8 +77,5 @@ public class ContentLengthHeaderTest {
         public void writeTo(OutputStream out, Charset charset) throws IOException {
             out.write("A variable length body".getBytes(charset));
         }
-
-        public void close() throws IOException {
-        }
     }
 }

@@ -39,7 +39,4 @@ public class FileBody implements Body {
             Streams.copy(in, out, chunkSize);
         }
     }
-
-    public void close() throws IOException {
-    }
 }
