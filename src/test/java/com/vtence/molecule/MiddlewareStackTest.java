@@ -1,12 +1,13 @@
 package com.vtence.molecule;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.junit.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MiddlewareStackTest {
 

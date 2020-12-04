@@ -30,7 +30,6 @@ def libs = [
         undertow          : 'io.undertow:undertow-core:2.2.2.Final',
         jmustache         : 'com.samskivert:jmustache:1.15',
         hamcrest          : 'org.hamcrest:hamcrest:2.2',
-        hamcrest_junit    : 'org.hamcrest:hamcrest-junit:2.0.0.0',
         junit             : 'junit:junit:4.13.1@jar',
         jmock             : ['org.jmock:jmock:2.12.0@jar',
                             'org.jmock:jmock-junit4:2.12.0@jar'],
@@ -57,7 +56,6 @@ dependencies {
   compile libs.hamcrest, optional
   compile libs.juniversal_chardet, optional
 
-  testCompile libs.hamcrest_junit
   testCompile libs.junit
   testCompile libs.jmock
   testCompile libs.juniversal_chardet

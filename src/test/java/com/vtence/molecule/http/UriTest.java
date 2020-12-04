@@ -6,10 +6,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 public class UriTest {
 

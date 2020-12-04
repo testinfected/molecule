@@ -3,9 +3,9 @@ package com.vtence.molecule.http;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.Host.parse;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasToString;
-import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 public class HostTest {
 

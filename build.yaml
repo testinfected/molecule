@@ -18,7 +18,6 @@ artifacts:
   # -- test dependencies
   jmock: org.jmock:jmock:jar:2.12.0
   jmock_junit: org.jmock:jmock-junit4:jar:2.12.0
-  hamcrest_junit: org.hamcrest:hamcrest-junit:jar:2.0.0.0
 
 jmock: 2.12.0
 junit: 4.13.1
