@@ -3,8 +3,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.vtence.molecule/molecule.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.vtence.molecule/molecule)
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat)](http://vtence.mit-license.org)
 
-[![Issues In Progress](https://badge.waffle.io/testinfected/molecule.svg?label=In%20Progress&title=Started)](https://waffle.io/testinfected/molecule)
-
 ## Quick Start
 
 ```java
@@ -56,7 +54,7 @@ You can get the latest release version from Maven Central:
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.13.0</version>
+      <version>0.14.0</version>
 </dependency>
 ```
  
@@ -823,7 +821,7 @@ If you want the latest development version, grab the latest snapshot from [Sonat
 <dependency>
       <groupId>com.vtence.molecule</groupId>
       <artifactId>molecule</artifactId>
-      <version>0.14.0-SNAPSHOT</version>
+      <version>0.15.0-SNAPSHOT</version>
 </dependency>
 ```
 
