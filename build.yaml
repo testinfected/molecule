@@ -2,24 +2,23 @@ gems:
 
 repositories:
   remote:
-    - http://repo1.maven.org/maven2
+    - https://repo1.maven.org/maven2
 
 artifacts:
   simple_common: org.simpleframework:simple-common:jar:6.0.1
   simple_transport: org.simpleframework:simple-transport:jar:6.0.1
   simple_http: org.simpleframework:simple-http:jar:6.0.1
-  undertow: io.undertow:undertow-core:jar:1.4.4.Final
-  xnio_api: org.jboss.xnio:xnio-api:jar:3.3.6.Final
-  xnio: org.jboss.xnio:xnio-nio:jar:3.3.6.Final
-  jboss_logging: org.jboss.logging:jboss-logging:jar:3.2.1.Final
-  mustache: com.samskivert:jmustache:jar:1.9
+  undertow: io.undertow:undertow-core:jar:2.2.2.Final
+  mustache: com.samskivert:jmustache:jar:1.15
 
   # -- testing dependencies
-  hamcrest: org.hamcrest:java-hamcrest:jar:2.0.0.0
+  hamcrest: org.hamcrest:hamcrest:jar:2.2
   juniversalchardet: com.googlecode.juniversalchardet:juniversalchardet:jar:1.0.3
 
   # -- test dependencies
-  jmock: org.jmock:jmock:jar:2.6.0
+  jmock: org.jmock:jmock:jar:2.12.0
+  jmock_junit: org.jmock:jmock-junit4:jar:2.12.0
   hamcrest_junit: org.hamcrest:hamcrest-junit:jar:2.0.0.0
 
-jmock: 2.6.0
+jmock: 2.12.0
+junit: 4.13.1

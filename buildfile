@@ -7,14 +7,15 @@ Release.commit_message = lambda { |version| "Bump version number to #{version}" 
 Release.tag_name = lambda { |version| "v#{version}" }
 
 SIMPLE = [:simple_common, :simple_transport, :simple_http]
-UNDERTOW = [:jboss_logging, :xnio_api, :xnio, :undertow]
+UNDERTOW = transitive(artifact(:undertow))
+JMOCK = [:jmock, :jmock_junit]
 
 define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER do
   compile.options.source = '1.8'
   compile.options.target = '1.8'
 
   compile.with SIMPLE, UNDERTOW, :mustache, :hamcrest, :juniversalchardet
-  test.with :hamcrest_junit, :jmock
+  test.with JMOCK, :hamcrest_junit
 
   package :jar
   package :javadoc

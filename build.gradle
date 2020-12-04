@@ -27,13 +27,13 @@ targetCompatibility = 1.8
 
 def libs = [
         simple            : 'org.simpleframework:simple-http:6.0.1',
-        undertow          : 'io.undertow:undertow-core:1.4.4.Final',
-        jmustache         : 'com.samskivert:jmustache:1.9',
-        hamcrest          : 'org.hamcrest:java-hamcrest:2.0.0.0',
+        undertow          : 'io.undertow:undertow-core:2.2.2.Final',
+        jmustache         : 'com.samskivert:jmustache:1.15',
+        hamcrest          : 'org.hamcrest:hamcrest:2.2',
         hamcrest_junit    : 'org.hamcrest:hamcrest-junit:2.0.0.0',
-        junit             : 'junit:junit:4.11@jar',
-        jmock             : 'org.jmock:jmock:2.6.0@jar',
-        jmock_junit4      : 'org.jmock:jmock-junit4:2.6.0@jar',
+        junit             : 'junit:junit:4.13.1@jar',
+        jmock             : ['org.jmock:jmock:2.12.0@jar',
+                            'org.jmock:jmock-junit4:2.12.0@jar'],
         juniversal_chardet: 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3',
 ]
 
@@ -60,14 +60,15 @@ dependencies {
   testCompile libs.hamcrest_junit
   testCompile libs.junit
   testCompile libs.jmock
-  testCompile libs.jmock_junit4
   testCompile libs.juniversal_chardet
 }
 
 compileJava.options.encoding = 'UTF-8'
 
-task 'version' << {
-  println version
+task 'version' {
+  doLast {
+     println version
+  }
 }
 
 jacocoTestReport {
@@ -78,7 +79,7 @@ jacocoTestReport {
 
     // Exclude testing package from the report
     afterEvaluate {
-        classDirectories =  files(classDirectories.files.collect {
+        getClassDirectories().setFrom(classDirectories.files.collect {
             fileTree(dir: it, exclude: '**/testing/**')
         })
     }

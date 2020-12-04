@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Drop `Matcher` interface in favor of Java 8 `Predicate`. ([#69])
-- As a consequence to introduction of static routing, `DynamicRoutes` has been renamed to `Routes`. ([#70])
+- Following introduction of static routing, `DynamicRoutes` has been renamed to `Routes`. ([#70])
 
 ### Fixed
 - An error occurring when compressing responses without a content type. ([#71]) 

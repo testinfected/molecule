@@ -75,7 +75,7 @@ public class UndertowServer implements Server {
         server.start();
     }
 
-    public void shutdown() throws IOException {
+    public void shutdown()  {
         if (server != null) server.stop();
     }
 
@@ -86,7 +86,7 @@ public class UndertowServer implements Server {
             this.app = app;
         }
 
-        public void handleRequest(HttpServerExchange exchange) throws Exception {
+        public void handleRequest(HttpServerExchange exchange) {
             exchange.startBlocking();
             exchange.dispatch(() -> new RequestHandler(app).handleRequest(exchange));
         }
@@ -195,8 +195,8 @@ public class UndertowServer implements Server {
                         BodyPart part = new BodyPart().filename(param.getFileName())
                                                       .contentType(contentTypeOf(param))
                                                       .name(name);
-                        if (param.isFile()) {
-                            final FileInputStream content = new FileInputStream(param.getPath().toFile());
+                        if (param.isFileItem()) {
+                            final FileInputStream content = new FileInputStream(param.getFileItem().getFile().toFile());
                             part.content(track(content));
                         } else {
                             part.content(param.getValue());
