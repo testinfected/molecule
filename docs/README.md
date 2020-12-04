@@ -605,8 +605,8 @@ The test helpers are located in the `com.vtence.molecule.testing` package. To us
 ```xml
 <dependency>
     <groupId>org.hamcrest</groupId>
-    <artifactId>java-hamcrest</artifactId>
-    <version>2.0.0.0</version>
+    <artifactId>hamcrest</artifactId>
+    <version>2.2</version>
     <scope>test</scope>
 </dependency>
 ```
