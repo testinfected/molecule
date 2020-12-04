@@ -182,7 +182,6 @@ public abstract class ServerCompatibilityTests {
                 hasEntry("secure", "false")));
     }
 
-    @SuppressWarnings("unchecked")
     @Test public void
     readsRequestHeaders() throws IOException {
         final Map<String, Iterable<String>> headers = new HashMap<>();
@@ -215,7 +214,6 @@ public abstract class ServerCompatibilityTests {
         assertThat("response headers", response.headers("Cache-Control"), hasItems("no-cache", "no-store"));
     }
 
-    @SuppressWarnings("unchecked")
     @Test public void
     readsRequestContent() throws IOException {
         final Map<String, String> content = new HashMap<>();
@@ -265,7 +263,6 @@ public abstract class ServerCompatibilityTests {
         assertThat(response).hasBodyText("[Alice, Bob, Charles]");
     }
 
-    @SuppressWarnings("unchecked")
     @Test public void
     readsFormEncodedParameters() throws IOException {
         final Map<String, String> parameters = new HashMap<>();

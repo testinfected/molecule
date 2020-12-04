@@ -7,8 +7,8 @@ import org.junit.rules.ExpectedException;
 import java.util.Base64;
 
 import static com.vtence.molecule.session.SessionMatchers.sameSessionDataAs;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 public class SecureSessionEncoderTest {
 

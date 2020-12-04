@@ -1,7 +1,6 @@
 package com.vtence.molecule;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;

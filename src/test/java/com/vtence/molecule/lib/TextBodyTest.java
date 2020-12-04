@@ -3,8 +3,6 @@ package com.vtence.molecule.lib;
 import com.vtence.molecule.Response;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -12,7 +10,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class TextBodyTest {
 
     @Test public void
-    appendsAndRendersText() throws IOException {
+    appendsAndRendersText() {
         TextBody body = new TextBody();
         body.append("The entire");
         body.append(" text");
@@ -24,7 +22,7 @@ public class TextBodyTest {
     }
 
     @Test public void
-    usesSpecifiedTextEncoding() throws IOException {
+    usesSpecifiedTextEncoding() {
         TextBody body = new TextBody();
         body.append("De drôles d'œufs abîmés");
         Response response = Response.ok()

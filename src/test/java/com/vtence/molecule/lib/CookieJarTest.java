@@ -24,7 +24,7 @@ public class CookieJarTest {
         assertThat("total cookies in jar", jar.size(), is(2));
     }
 
-    @Test @SuppressWarnings("unchecked")
+    @Test
     public void addsNewCookiesInOrder() {
         jar.add("delicious", "chocolat au lait");
 

@@ -16,7 +16,7 @@ public class JMustacheRendererTest {
     rendersFromTemplatesFolder() throws IOException {
         JMustacheRenderer mustache = JMustacheRenderer.fromDir(locateOnClasspath("views"));
 
-        String view = render("hello").with(new Object() { String name = "World"; })
+        String view = render("hello").with(new Object() { final String name = "World"; })
                 .asString(mustache);
         assertThat("view", view, containsString("Hello World"));
     }
@@ -25,7 +25,7 @@ public class JMustacheRendererTest {
     rendersFromClasspath() throws IOException {
         JMustacheRenderer mustache = JMustacheRenderer.fromClasspath("views");
 
-        String view = render("hello").with(new Object() { String name = "World"; })
+        String view = render("hello").with(new Object() { final String name = "World"; })
                 .asString(mustache);
         assertThat("view", view, containsString("Hello World"));
     }
@@ -42,7 +42,7 @@ public class JMustacheRendererTest {
     makesNullValueConfigurable() throws IOException {
         JMustacheRenderer mustache = JMustacheRenderer.fromClasspath().nullValue("World");
 
-        String view = render("views/hello").with(new Object() { String name = null; }).asString(mustache);
+        String view = render("views/hello").with(new Object() { final String name = null; }).asString(mustache);
         assertThat("view", view, containsString("Hello World"));
     }
 
@@ -73,7 +73,7 @@ public class JMustacheRendererTest {
     supportsPartialTemplates() throws IOException {
         JMustacheRenderer mustache = JMustacheRenderer.fromClasspath("views");
 
-        String view = render("full").with(new Object() { String name = "World"; })
+        String view = render("full").with(new Object() { final String name = "World"; })
                 .asString(mustache);
         assertThat("view", view, containsString("Hello World"));
     }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.vtence.molecule.support.HasMethodWithValue.hasMethod;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.equalTo;
 
 public class SessionMatchers {
@@ -21,7 +22,7 @@ public class SessionMatchers {
         matchers.add(sessionUpdatedAt(data.updatedAt()));
         matchers.add(sessionWithMaxAge(data.maxAge()));
 
-        matchers.addAll(data.keys().stream().map(key -> sessionWithSameAttributeAs(data, key)).collect(Collectors.toList()));
+        matchers.addAll(data.keys().stream().map(key -> sessionWithSameAttributeAs(data, key)).collect(toList()));
 
         return new AllOf<>(matchers);
     }

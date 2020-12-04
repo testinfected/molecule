@@ -55,7 +55,7 @@ public class PeriodicSessionHouseKeepingTest {
         assertThat("housekeeping chores", count.chores, equalTo(operand));
     }
 
-    private class CountChores implements SessionHouse {
+    private static class CountChores implements SessionHouse {
         private int chores;
 
         public void houseKeeping() {

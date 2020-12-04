@@ -3,9 +3,9 @@ package com.vtence.molecule.http;
 import com.vtence.molecule.lib.MimeEncoder;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 public class BasicCredentialsTest {
 

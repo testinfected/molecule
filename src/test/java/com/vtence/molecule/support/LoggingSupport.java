@@ -9,7 +9,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LoggingSupport {
 
