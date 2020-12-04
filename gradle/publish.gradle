@@ -1,4 +1,4 @@
-apply plugin: 'nexus'
+apply plugin: 'com.bmuschko.nexus'
 
 def optionalDeps = []
 ext {
