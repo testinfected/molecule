@@ -75,7 +75,7 @@ To choose Undertow as your web server, add [Undertow](http://undertow.io) instea
 <dependency>
       <groupId>io.undertow</groupId>
       <artifactId>undertow-core</artifactId>
-      <version>1.4.4.Final</version>
+      <version>2.2.2.Final</version>
       <scope>runtime</scope>
 </dependency>
 ```
