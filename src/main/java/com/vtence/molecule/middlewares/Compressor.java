@@ -62,7 +62,7 @@ public class Compressor implements Middleware {
             for (Codings coding : values()) {
                 all.add(coding.name());
             }
-            return all.toArray(new String[all.size()]);
+            return all.toArray(new String[0]);
         }
 
         private static class GZipStream extends ChunkedBody {

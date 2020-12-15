@@ -26,7 +26,7 @@ public class HttpMethodOverride implements Middleware {
         return HttpMethod.valid(methodOverride(request));
     }
 
-    private boolean overrideDetected(Request request) throws IOException {
+    private boolean overrideDetected(Request request) {
         return methodOverride(request) != null && request.method() == POST;
     }
 

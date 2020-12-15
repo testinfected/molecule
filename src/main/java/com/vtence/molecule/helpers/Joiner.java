@@ -1,10 +1,9 @@
 package com.vtence.molecule.helpers;
 
-import java.util.Iterator;
+import java.util.StringJoiner;
 
 public class Joiner {
 
-    private static final String EMPTY = "";
     private final String separator;
 
     public static Joiner on(String separator) {
@@ -16,25 +15,10 @@ public class Joiner {
     }
 
     public String join(Iterable<?> parts) {
-        return join(parts.iterator());
-    }
-
-    private String join(Iterator<?> parts) {
-        if (!parts.hasNext()) {
-            return EMPTY;
+        StringJoiner joiner = new StringJoiner(separator);
+        for (Object part: parts) {
+            joiner.add(String.valueOf(part));
         }
-
-        Object first = parts.next();
-        if (!parts.hasNext()) {
-            return String.valueOf(first);
-        }
-
-        StringBuilder builder = new StringBuilder(256);
-        builder.append(first);
-        while (parts.hasNext()) {
-            builder.append(separator);
-            builder.append(parts.next());
-        }
-        return builder.toString();
+        return joiner.toString();
     }
 }

@@ -13,10 +13,6 @@ import java.util.logging.Logger;
 public class ApacheCombinedLogger extends ApacheLogger {
     private static final String COMBINED_LOG_FORMAT = "%s - - [%s] \"%s %s %s\" %s %s \"%s\" \"%s\"";
 
-    public ApacheCombinedLogger(Logger logger) {
-        super(logger);
-    }
-
     public ApacheCombinedLogger(Logger logger, Clock clock, Locale locale) {
         super(logger, clock, locale);
     }

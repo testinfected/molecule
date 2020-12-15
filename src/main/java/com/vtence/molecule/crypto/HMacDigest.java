@@ -30,7 +30,7 @@ public class HMacDigest implements DigestAlgorithm {
 
     private final String algorithm;
 
-    private byte[] encode(String key) throws UnsupportedEncodingException {
+    private byte[] encode(String key) {
         return key.getBytes(UTF_8);
     }
 

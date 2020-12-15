@@ -37,10 +37,6 @@ public class JMustacheRenderer implements RenderingEngine {
         return from(classpath(root));
     }
 
-    public static JMustacheRenderer fromDir(String root) {
-        return fromDir(new File(root));
-    }
-
     public static JMustacheRenderer fromDir(File root) {
         return from(dir(root));
     }
@@ -97,7 +93,7 @@ public class JMustacheRenderer implements RenderingEngine {
 
         public ClasspathTemplateLoader(String root) {
             this.root = root;
-            this.classLoader = Thread.currentThread().getContextClassLoader();
+            usingClassLoader(Thread.currentThread().getContextClassLoader());
         }
 
         public static ClasspathTemplateLoader classpath() {

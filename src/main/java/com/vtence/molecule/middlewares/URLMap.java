@@ -24,7 +24,7 @@ public class URLMap implements Middleware {
     }
 
     private void sortByMostSpecificPaths(List<Mount> mounts) {
-        mounts.sort((mount1, mount2) -> mount2.mountPoint.length() - mount1.mountPoint.length());
+        mounts.sort((left, right) -> right.mountPoint.length() - left.mountPoint.length());
     }
 
     private Optional<Mount> mountFor(Request request) {

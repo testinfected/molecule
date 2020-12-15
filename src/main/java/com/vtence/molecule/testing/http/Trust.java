@@ -3,7 +3,6 @@ package com.vtence.molecule.testing.http;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 class Trust {
@@ -11,11 +10,11 @@ class Trust {
     public static TrustManager allCertificates() {
         return new X509TrustManager() {
             @Override
-            public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
             }
 
             @Override
-            public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
             }
 
             @Override

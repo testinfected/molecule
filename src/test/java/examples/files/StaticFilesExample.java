@@ -7,6 +7,8 @@ import com.vtence.molecule.middlewares.FileServer;
 import com.vtence.molecule.middlewares.StaticAssets;
 
 import java.io.IOException;
+import java.time.Clock;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
@@ -48,7 +50,7 @@ public class StaticFilesExample {
         server.warmup(app -> logger.info("Ready to serve files"))
               // The apache common logger logs all accesses to the server in apache common log format,
               // so we can see what we're serving.
-              .add(new ApacheCommonLogger(logger))
+              .add(new ApacheCommonLogger(logger, Clock.systemDefaultZone(), Locale.ENGLISH))
               .add(assets)
               .start(request -> Response.of(NOT_FOUND).done("Nothing here!"));
     }

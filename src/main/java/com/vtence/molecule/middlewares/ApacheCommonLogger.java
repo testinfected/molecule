@@ -12,10 +12,6 @@ import java.util.logging.Logger;
 public class ApacheCommonLogger extends ApacheLogger {
     private static final String COMMON_LOG_FORMAT = "%s - %s [%s] \"%s %s %s\" %s %s";
 
-    public ApacheCommonLogger(Logger logger) {
-        super(logger);
-    }
-
     public ApacheCommonLogger(Logger logger, Clock clock, Locale locale) {
         super(logger, clock, locale);
     }

@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class JoinerTest {
 
     @Test
-    public void ignoresEmptySequences() throws Exception {
+    public void ignoresEmptySequences() {
         assertThat("joined", Joiner.on(", ").join(emptyList()), equalTo(""));
     }
 }

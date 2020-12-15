@@ -12,10 +12,6 @@ public class DateHeader implements Middleware {
 
     private final Clock clock;
 
-    public DateHeader() {
-        this(Clock.systemDefaultZone());
-    }
-
     public DateHeader(Clock clock) {
         this.clock = clock;
     }

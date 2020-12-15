@@ -2,9 +2,9 @@ package com.vtence.molecule.http;
 
 public class Cookie {
     private final String name;
+    private final String value;
 
     private int version = 1;
-    private String value;
     private int maxAge = -1;
     private String domain;
     private String path = "/";

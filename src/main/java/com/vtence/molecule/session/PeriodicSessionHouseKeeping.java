@@ -14,8 +14,8 @@ public class PeriodicSessionHouseKeeping {
 
     private final ScheduledExecutorService scheduler;
     private final SessionHouse sessions;
+    private final long choresInterval;
 
-    private long choresInterval;
     private ScheduledFuture<?> chores;
 
     public PeriodicSessionHouseKeeping(ScheduledExecutorService scheduler, SessionHouse sessions) {

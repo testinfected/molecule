@@ -11,9 +11,9 @@ import static java.util.stream.Collectors.toList;
 
 public final class Servers {
 
-    private static final List<String> supported = asList("Simple", "Undertow");
+    private static final List<String> SUPPORTED = asList("Simple", "Undertow");
 
-    private static final List<? extends Class<? extends Server>> available = supported.stream()
+    private static final List<? extends Class<? extends Server>> AVAILABLE = SUPPORTED.stream()
                                                                                       .map(Servers::loadClass)
                                                                                       .filter(Objects::nonNull)
                                                                                       .collect(toList());
@@ -40,7 +40,7 @@ public final class Servers {
     private Servers() {}
 
     public static Server create(String host, int port) {
-        return available.stream()
+        return AVAILABLE.stream()
                         .map(server -> instantiate(server, host, port))
                         .findFirst()
                         .orElseThrow(NoneAvailableException::new);

@@ -62,7 +62,7 @@ public class DynamicPath implements WithBoundParameters, Predicate<String> {
             for (String part : parts) {
                 if (!part.isEmpty()) segments.add(part);
             }
-            return segments.toArray(new String[segments.size()]);
+            return segments.toArray(new String[0]);
         }
 
         public boolean sameLengthAs(Path other) {

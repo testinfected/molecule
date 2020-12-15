@@ -19,10 +19,6 @@ public abstract class ApacheLogger implements Middleware {
     private final Clock clock;
     private final DateTimeFormatter formatter;
 
-    protected ApacheLogger(Logger logger) {
-        this(logger, Clock.systemDefaultZone(), Locale.getDefault());
-    }
-
     protected ApacheLogger(Logger logger, Clock clock, Locale locale) {
         this.logger = logger;
         this.clock = clock;

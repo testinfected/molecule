@@ -170,7 +170,7 @@ public class HttpRequest {
         HttpsURLConnection connection = (HttpsURLConnection) new URL("https", host, port, path).openConnection();
         SSLContext sslContext;
         try {
-            sslContext = TLS.initialize(null, new TrustManager[] { Trust.allCertificates() });
+            sslContext = TLS.initialize(null, new TrustManager[]{Trust.allCertificates()});
         } catch (GeneralSecurityException e) {
             throw new AssertionError("Failed to setup  SSL", e);
         }
@@ -190,7 +190,7 @@ public class HttpRequest {
 
     private void setRequestHeaders(HttpURLConnection connection) {
         for (String name : headers.names()) {
-            for (String value: headers.list(name)) {
+            for (String value : headers.list(name)) {
                 connection.addRequestProperty(name, value);
             }
         }

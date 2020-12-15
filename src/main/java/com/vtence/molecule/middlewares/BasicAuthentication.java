@@ -36,8 +36,7 @@ public class BasicAuthentication implements Middleware {
             }
 
             if (!auth.hasScheme(BASIC_AUTHENTICATION)) {
-                return Response.of(BAD_REQUEST)
-                               .done();
+                return Response.of(BAD_REQUEST).done();
             }
 
             BasicCredentials credentials = BasicCredentials.decode(auth.params());
