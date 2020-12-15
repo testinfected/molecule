@@ -85,4 +85,10 @@ jacocoTestReport {
     }
 }
 
+
+coveralls {
+    saveAsFile = true
+    sendToCoveralls = false
+}
+
 task coverage(dependsOn: ['test', 'jacocoTestReport'])
