@@ -1,6 +1,5 @@
 package com.vtence.molecule.testing.http;
 
-import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 
 import java.io.File;
@@ -140,7 +139,7 @@ public class MultipartForm extends Form {
 
         private void writeFileContent(OutputStream output) throws IOException {
             try (FileInputStream input = new FileInputStream(file)) {
-                Streams.copy(input, output);
+                input.transferTo(output);
             }
         }
 

@@ -1,7 +1,6 @@
 package com.vtence.molecule;
 
 import com.vtence.molecule.helpers.Headers;
-import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 import com.vtence.molecule.http.Host;
 import com.vtence.molecule.http.HttpMethod;
@@ -406,7 +405,7 @@ public class Request {
      * @return the bytes content of the body
      */
     public byte[] bodyContent() throws IOException {
-        return Streams.consume(bodyStream());
+        return bodyStream().readAllBytes();
     }
 
     /**

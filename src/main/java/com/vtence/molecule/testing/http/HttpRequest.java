@@ -2,7 +2,6 @@ package com.vtence.molecule.testing.http;
 
 import com.vtence.molecule.helpers.Headers;
 import com.vtence.molecule.helpers.Joiner;
-import com.vtence.molecule.helpers.Streams;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -181,7 +180,7 @@ public class HttpRequest {
 
     private byte[] readResponseBody(HttpURLConnection connection) throws IOException {
         InputStream bodyStream = successful(connection) ? connection.getInputStream() : connection.getErrorStream();
-        return bodyStream != null ? Streams.consume(bodyStream) : new byte[0];
+        return bodyStream != null ? bodyStream.readAllBytes() : new byte[0];
     }
 
     private boolean successful(HttpURLConnection connection) throws IOException {

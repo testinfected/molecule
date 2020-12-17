@@ -1,7 +1,6 @@
 package com.vtence.molecule.lib;
 
 import com.vtence.molecule.Body;
-import com.vtence.molecule.helpers.Streams;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -12,18 +11,10 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public class FileBody implements Body {
-    private static final int SIZE_8K = 8 * 1024;
-
     private final File file;
-    private final int chunkSize;
 
     public FileBody(File file) {
-        this(file, SIZE_8K);
-    }
-
-    public FileBody(File file, int chunkSize) {
         this.file = file;
-        this.chunkSize = chunkSize;
     }
 
     public File file() {
@@ -36,7 +27,7 @@ public class FileBody implements Body {
 
     public void writeTo(OutputStream out, Charset charset) throws IOException {
         try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
-            Streams.copy(in, out, chunkSize);
+            in.transferTo(out);
         }
     }
 }

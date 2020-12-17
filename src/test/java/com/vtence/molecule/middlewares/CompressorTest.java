@@ -2,10 +2,11 @@ package com.vtence.molecule.middlewares;
 
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
-import com.vtence.molecule.helpers.Streams;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
@@ -202,14 +203,18 @@ public class CompressorTest {
     }
 
     private String inflate(Response response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new InflaterInputStream(asStream(response), new Inflater(true)));
+        return response.empty() ? "" : toString(new InflaterInputStream(asStream(response), new Inflater(true)));
     }
 
     private String unzip(Response response) throws IOException {
-        return response.empty() ? "" : Streams.toString(new GZIPInputStream(asStream(response)));
+        return response.empty() ? "" : toString(new GZIPInputStream(asStream(response)));
     }
 
     private void assertNoExecutionError(Response response) throws ExecutionException, InterruptedException {
         response.await();
+    }
+
+    private String toString(InputStream in) throws IOException {
+        return new String(in.readAllBytes(), Charset.defaultCharset());
     }
 }

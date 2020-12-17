@@ -1,6 +1,5 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
 
 import java.io.ByteArrayInputStream;
@@ -99,7 +98,7 @@ public class BodyPart {
      * @throws IOException thrown if the content can not be accessed
      */
     public byte[] content() throws IOException {
-        return Streams.consume(stream());
+        return stream().readAllBytes();
     }
 
     /**
