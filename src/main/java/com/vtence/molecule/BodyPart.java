@@ -2,7 +2,6 @@ package com.vtence.molecule;
 
 import com.vtence.molecule.helpers.Streams;
 import com.vtence.molecule.http.ContentType;
-import com.vtence.molecule.lib.EmptyInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class BodyPart {
     private String name;
     private String filename;
     private String contentType;
-    private InputStream input = new EmptyInputStream();
+    private InputStream input = InputStream.nullInputStream();
 
     /**
      * Sets the name of this part.

@@ -34,7 +34,6 @@ import static com.vtence.molecule.http.HttpMethod.OPTIONS;
 import static com.vtence.molecule.http.HttpMethod.PATCH;
 import static com.vtence.molecule.http.HttpMethod.POST;
 import static com.vtence.molecule.http.HttpMethod.PUT;
-import static com.vtence.molecule.lib.EmptyInputStream.EMPTY;
 import static java.lang.Long.parseLong;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -76,7 +75,7 @@ public class Request {
         this.parts.addAll(parts);
         this.secure = Objects.equals(Scheme.from(uri), Scheme.HTTPS);
         this.protocol = "HTTP/1.1";
-        this.body = EMPTY;
+        this.body = InputStream.nullInputStream();
         this.remotePort = -1;
         this.timestamp = -1;
     }
