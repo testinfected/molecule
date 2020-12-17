@@ -24,8 +24,8 @@ defaultTasks 'build'
 group = 'com.vtence.molecule'
 version = '0.15.0-SNAPSHOT'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 
 def libs = [
         simple            : 'org.simpleframework:simple-http:6.0.1',
