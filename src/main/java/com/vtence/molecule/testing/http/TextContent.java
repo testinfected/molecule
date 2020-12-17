@@ -36,8 +36,10 @@ public class TextContent implements HttpContent {
     }
 
     private Charset charset() {
+        if (contentType() == null) return StandardCharsets.ISO_8859_1;
+
         ContentType contentType = ContentType.parse(contentType());
-        if (contentType == null || contentType.charset() == null) return StandardCharsets.ISO_8859_1;
+        if (contentType.charset() == null) return StandardCharsets.ISO_8859_1;
 
         return contentType.charset();
     }
