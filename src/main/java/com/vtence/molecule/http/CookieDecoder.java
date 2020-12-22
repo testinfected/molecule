@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class CookieDecoder {
 
-    private static final Pattern NAME_VALUE_PAIR = Pattern.compile("(?:\\s|[;,])*([^;=]+)(?:=([\"]((?:\\\\\"|[^\"])*)[\"]|[^;,]*))?");
+    private static final Pattern NAME_VALUE_PAIR = Pattern.compile("(?:\\s|[;,])*+([^;=]++)(?:=([\"]((?:\\\\\"|[^\"])++)[\"]|[^;,]*+))?+");
 
     private static final int NAME = 1;
     private static final int VALUE = 2;

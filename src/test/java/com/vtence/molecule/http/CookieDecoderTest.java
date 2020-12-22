@@ -1,5 +1,6 @@
 package com.vtence.molecule.http;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.util.List;
@@ -130,6 +131,12 @@ public class CookieDecoderTest {
         assertThat("cookie version", launcher.version(), is(1));
         assertThat("cookie name", launcher.name(), equalTo("Part_Number"));
         assertThat("cookie value", launcher.value(), equalTo("Rocket_Launcher_0001"));
+    }
+
+    @Test
+    public void handlesVeryLongCookieValue() {
+        Cookie cookie = decodeSingle("$Version=\"1\"; molecule.session=\"rO0ABXNyACNjb20udnRlbmNlLm1vbGVjdWxlLnNlc3Npb24uU2Vzc2lvbvJqkJ0nBioiAgAGWgAHaW52YWxpZEkABm1heEFnZUwACmF0dHJpYnV0ZXN0AA9MamF2YS91dGlsL01hcDtMAAljcmVhdGVkQXR0ABNMamF2YS90aW1lL0luc3RhbnQ7TAACaWR0ABJMamF2YS9sYW5nL1N0cmluZztMAAl1cGRhdGVkQXRxAH4AAnhwAP////9zcgAmamF2YS51dGlsLmNvbmN1cnJlbnQuQ29uY3VycmVudEhhc2hNYXBkmd4SnYcpPQMAA0kAC3NlZ21lbnRNYXNrSQAMc2VnbWVudFNoaWZ0WwAIc2VnbWVudHN0ADFbTGphdmEvdXRpbC9jb25jdXJyZW50L0NvbmN1cnJlbnRIYXNoTWFwJFNlZ21lbnQ7eHAAAAAPAAAAHHVyADFbTGphdmEudXRpbC5jb25jdXJyZW50LkNvbmN1cnJlbnRIYXNoTWFwJFNlZ21lbnQ7Unc/QTKbOXQCAAB4cAAAABBzcgAuamF2YS51dGlsLmNvbmN1cnJlbnQuQ29uY3VycmVudEhhc2hNYXAkU2VnbWVudB82TJBYkyk9AgABRgAKbG9hZEZhY3RvcnhyAChqYXZhLnV0aWwuY29uY3VycmVudC5sb2Nrcy5SZWVudHJhbnRMb2NrZlWoLCzIausCAAFMAARzeW5jdAAvTGphdmEvdXRpbC9jb25jdXJyZW50L2xvY2tzL1JlZW50cmFudExvY2skU3luYzt4cHNyADRqYXZhLnV0aWwuY29uY3VycmVudC5sb2Nrcy5SZWVudHJhbnRMb2NrJE5vbmZhaXJTeW5jZYgy51N7vwsCAAB4cgAtamF2YS51dGlsLmNvbmN1cnJlbnQubG9ja3MuUmVlbnRyYW50TG9jayRTeW5juB6ilKpEWnwCAAB4cgA1amF2YS51dGlsLmNvbmN1cnJlbnQubG9ja3MuQWJzdHJhY3RRdWV1ZWRTeW5jaHJvbml6ZXJmVahDdT9S4wIAAUkABXN0YXRleHIANmphdmEudXRpbC5jb25jdXJyZW50LmxvY2tzLkFic3RyYWN0T3duYWJsZVN5bmNocm9uaXplcjPfr7mtbW+pAgAAeHAAAAAAP0AAAHNxAH4ACnNxAH4ADgAAAAA/QAAAc3EAfgAKc3EAfgAOAAAAAD9AAABzcQB+AApzcQB+AA4AAAAAP0AAAHNxAH4ACnNxAH4ADgAAAAA/QAAAc3EAfgAKc3EAfgAOAAAAAD9AAABzcQB+AApzcQB+AA4AAAAAP0AAAHNxAH4ACnNxAH4ADgAAAAA/QAAAc3EAfgAKc3EAfgAOAAAAAD9AAABzcQB+AApzcQB+AA4AAAAAP0AAAHNxAH4ACnNxAH4ADgAAAAA/QAAAc3EAfgAKc3EAfgAOAAAAAD9AAABzcQB+AApzcQB+AA4AAAAAP0AAAHNxAH4ACnNxAH4ADgAAAAA/QAAAc3EAfgAKc3EAfgAOAAAAAD9AAABzcQB+AApzcQB+AA4AAAAAP0AAAHQACHVzZXJuYW1ldAAHVmluY2VudHBweHNyAA1qYXZhLnRpbWUuU2VylV2EuhsiSLIMAAB4cHcNAgAAAABf4YaaJOx4CHh0ACRjNGIxMDNlMC0zYzAzLTQxZDYtOWEzNC1lZTczOWE3ODc0YzBxAH4ANA==--r3q1yut2aSCAjMF03DMV2z5A79aeWP744I2pMVoO7qk=\";$Path=\"/\";$Domain=\"0.0.0.0\"");
+        assertThat(cookie.value(), Matchers.endsWith("MVoO7qk="));
     }
 
     private Cookie decodeSingle(String cookieHeader) {
