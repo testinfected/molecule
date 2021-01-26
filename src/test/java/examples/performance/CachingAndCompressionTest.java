@@ -1,26 +1,31 @@
 package examples.performance;
 
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.helpers.HexEncoder;
 import com.vtence.molecule.support.Delorean;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
+import org.hamcrest.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.util.Arrays;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
-import static org.hamcrest.core.StringStartsWith.startsWith;
+import static examples.performance.CachingAndCompressionTest.StartsWithBytes.startsWithBytes;
+import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class CachingAndCompressionTest {
-    String GZIP_HEADER = new String(new char[]{0x1f, 0x8b, 0x08});
     Delorean delorean = new Delorean();
     CachingAndCompressionExample caching = new CachingAndCompressionExample(delorean);
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
+    String GZIP_HEADER = "1f8b08";
 
     @Before
     public void startServer() throws IOException {
@@ -33,18 +38,19 @@ public class CachingAndCompressionTest {
     }
 
     @Test
-    public void compressingResponses() throws IOException {
-        response = request.header("Accept-Encoding", "deflate; q=0.9, gzip").get("/");
+    public void compressingResponses() throws Exception {
+        request.header("Accept-Encoding", "deflate; q=0.9, gzip");
+        var response = client.send(request.build(), ofByteArray());
 
         assertThat(response).isOK()
                 // We expect gzip compression, which is preferred by the client
                 .hasHeader("Content-Encoding", "gzip")
-                .hasBodyText(startsWith(GZIP_HEADER));
+                .hasBody(startsWithBytes(GZIP_HEADER));
     }
 
     @Test
-    public void addingETagValidatorAndCacheDirectivesToDynamicContent() throws IOException {
-        response = request.get("/");
+    public void addingETagValidatorAndCacheDirectivesToDynamicContent() throws Exception {
+        var response = client.send(request.build(), ofString());
 
         assertThat(response).isOK()
                             .hasContentType("text/html")
@@ -55,21 +61,22 @@ public class CachingAndCompressionTest {
     }
 
     @Test public void
-    notGeneratingTheResponseBodyWhenETagHasNotChanged() throws IOException {
-        response = request.get("/");
+    notGeneratingTheResponseBodyWhenETagHasNotChanged() throws Exception {
+        var response = client.send(request.build(), ofString());
 
         assertThat(response).isOK()
                             .hasHeader("ETag");
 
         // Play the same request with freshness information...
-        response = request.header("If-None-Match", response.header("ETag")).get("/");
+        request.header("If-None-Match", response.headers().firstValue("ETag").orElse(null));
+        var notModified = client.send(request.GET().build(), ofString());
         // ... and expect a not modified
-        assertThat(response).hasStatusCode(304);
+        assertThat(notModified).hasStatusCode(304);
     }
 
     @Test
-    public void addingLastModifiedValidatorAndCacheDirectivesToStaticFiles() throws IOException {
-        response = request.get("/js/fox.js");
+    public void addingLastModifiedValidatorAndCacheDirectivesToStaticFiles() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/js/fox.js")).build(), ofString());
 
         assertThat(response).isOK()
                             .hasContentType("application/javascript")
@@ -82,19 +89,47 @@ public class CachingAndCompressionTest {
     }
 
     @Test public void
-    notGeneratingTheResponseBodyWhenResourceHasNotBeenModified() throws IOException {
+    notGeneratingTheResponseBodyWhenResourceHasNotBeenModified() throws Exception {
         // Freeze time to get the same validation information for the resource on subsequent calls
         delorean.freeze();
         // Request freshness information with the response
-        response = request.get("/?conditional");
+        var response = client.send(request.uri(server.uri().resolve("/?conditional")).build(), ofString());
 
         assertThat(response).isOK()
                             // We expect a Last-Modified header with freshness information
                             .hasHeader("Last-Modified");
 
+        request.header("If-Modified-Since", response.headers().firstValue("Last-Modified").orElse(null));
         // Play the same request with freshness information...
-        response = request.header("If-Modified-Since", response.header("Last-Modified")).get("/?conditional");
+        var notModified = client.send(request.uri(server.uri().resolve("/?conditional")).build(), ofString());
         // ... and expect a not modified
-        assertThat(response).hasStatusCode(304);
+        assertThat(notModified).hasStatusCode(304);
+    }
+
+    static class StartsWithBytes extends TypeSafeMatcher<byte[]> {
+        private final byte[] start;
+
+        public StartsWithBytes(byte[] start) {
+            super(byte[].class);
+            this.start = start;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("gzipped content");
+        }
+
+        @Override
+        protected boolean matchesSafely(byte[] actual) {
+            return Arrays.mismatch(actual, start) >= start.length;
+        }
+
+        public static Matcher<byte[]> startsWithBytes(byte[] bytes) {
+            return new StartsWithBytes(bytes);
+        }
+
+        public static Matcher<byte[]> startsWithBytes(String hex) {
+            return startsWithBytes(new HexEncoder().fromHex(hex));
+        }
     }
 }

@@ -2,15 +2,13 @@ package com.vtence.molecule.testing.http;
 
 import com.vtence.molecule.http.ContentType;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.URLConnection;
+import java.io.*;
+import java.net.http.HttpRequest;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.concurrent.Flow;
 
 public class MultipartForm extends Form {
 
@@ -21,9 +19,25 @@ public class MultipartForm extends Form {
     private Charset charset = StandardCharsets.UTF_8;
 
     @Override
-    public long contentLength() throws IOException {
+    public void subscribe(Flow.Subscriber<? super ByteBuffer> subscriber) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            writeTo(buffer);
+            HttpRequest.BodyPublisher delegate = HttpRequest.BodyPublishers.ofByteArray(buffer.toByteArray());
+            delegate.subscribe(subscriber);
+        } catch (IOException e) {
+            subscriber.onError(e);
+        }
+    }
+
+    @Override
+    public long contentLength() {
         ByteCountingOutputStream out = new ByteCountingOutputStream();
-        writeTo(out);
+        try {
+            writeTo(out);
+        } catch (IOException ignored) {
+            return -1;
+        }
         return out.byteCount();
     }
 
@@ -40,52 +54,50 @@ public class MultipartForm extends Form {
         return this;
     }
 
-    public MultipartForm addField(Field field) {
-        super.addField(field);
+    public MultipartForm addField(String name, String value) {
+        addPart(new Field(name, value));
         return this;
     }
 
-    public MultipartForm addField(String name, String value) {
-        return addField(new TextField(name, value));
-    }
-
-    public MultipartForm addTextFile(String name, File file) {
+    public MultipartForm addTextFile(String name, File file) throws IOException {
         return addTextFile(name, file, guessMimeType(file));
     }
 
     public MultipartForm addTextFile(String name, File file, String contentType) {
-        return addField(new FileUpload(name, file, contentType, false));
+        addPart(new FilePart(name, file, contentType, false));
+        return this;
     }
 
-    public MultipartForm addBinaryFile(String name, File toUpload) {
-        return addBinaryFile(name, toUpload, guessMimeType(toUpload));
+    public MultipartForm addBinaryFile(String name, File file) throws IOException {
+        return addBinaryFile(name, file, guessMimeType(file));
     }
 
-    public MultipartForm addBinaryFile(String name, File toUpload, String contentType) {
-        return addField(new FileUpload(name, toUpload, contentType, true));
+    public MultipartForm addBinaryFile(String name, File file, String contentType) {
+        addPart(new FilePart(name, file, contentType, true));
+        return this;
     }
 
     public void writeTo(OutputStream out) throws IOException {
         Writer writer = new OutputStreamWriter(out, charset);
-        for (Field field : fields) {
+        for (Part part : parts) {
             writer.append("--").append(boundary).append(CRLF);
             writer.flush();
-            field.encode(out, charset);
+            part.encode(out, charset);
         }
         writer.append("--").append(boundary).append("--").append(CRLF);
         writer.flush();
     }
 
-    private String guessMimeType(File file) {
-        return URLConnection.guessContentTypeFromName(file.getName());
+    private String guessMimeType(File file) throws IOException {
+        return Files.probeContentType(file.toPath());
     }
 
-    static class TextField implements Field {
+    static class Field implements Part {
 
         public final String name;
         public final String value;
 
-        public TextField(String name, String value) {
+        public Field(String name, String value) {
             this.name = name;
             this.value = value;
         }
@@ -101,14 +113,14 @@ public class MultipartForm extends Form {
         }
     }
 
-    static class FileUpload implements Field {
+    static class FilePart implements Part {
 
         private final String name;
         private final File file;
         private final String contentType;
         private final boolean binary;
 
-        public FileUpload(String name, File file, String contentType, boolean binary) {
+        public FilePart(String name, File file, String contentType, boolean binary) {
             this.name = name;
             this.file = file;
             this.contentType = contentType;

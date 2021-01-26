@@ -1,15 +1,16 @@
 package examples.templating;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.hamcrest.Matchers.containsString;
 
 public class TemplatingAndLayoutTest {
@@ -17,8 +18,8 @@ public class TemplatingAndLayoutTest {
     TemplatingAndLayoutExample templating = new TemplatingAndLayoutExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder();
 
     @Before
     public void startServer() throws IOException {
@@ -31,27 +32,33 @@ public class TemplatingAndLayoutTest {
     }
 
     @Test
-    public void renderingAnHtmlTemplateUsingMustache() throws IOException {
-        response = request.get("/hello?name=Frodo");
+    public void renderingAnHtmlTemplateUsingMustache() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/hello?name=Frodo"))
+                                          .GET().build(),
+                                   ofString());
         assertThat(response).isOK()
                             .hasContentType("text/html; charset=utf-8")
-                            .hasBodyText(containsString("<p>Hello, Frodo!</p>"));
+                            .hasBody(containsString("<p>Hello, Frodo!</p>"));
     }
 
     @Test
-    public void applyingACommonLayoutToASetOfPages() throws IOException {
-        response = request.get("/hello");
+    public void applyingACommonLayoutToASetOfPages() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/hello"))
+                                          .GET().build(),
+                                   ofString());
         assertThat(response).isOK()
-                            .hasBodyText(containsString("<title>Layout - Hello World"))
-                            .hasBodyText(containsString("<h1>A simple page</h1>"))
-                            .hasBodyText(containsString("<meta name=\"description\" content=\"Hello World\">"))
-                            .hasBodyText(containsString("<p>Hello, World!</p>"));
+                            .hasBody(containsString("<title>Layout - Hello World"))
+                            .hasBody(containsString("<h1>A simple page</h1>"))
+                            .hasBody(containsString("<meta name=\"description\" content=\"Hello World\">"))
+                            .hasBody(containsString("<p>Hello, World!</p>"));
     }
 
     @Test
-    public void skippingDecorationWhenResponseStatusIsNotOk() throws IOException {
-        response = request.get("/not-found");
+    public void skippingDecorationWhenResponseStatusIsNotOk() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/nothing"))
+                                          .GET().build(),
+                                   ofString());
         assertThat(response).hasStatusCode(404)
-                            .hasBodyText("Not found: /not-found");
+                            .hasBody("Not found: /nothing");
     }
 }

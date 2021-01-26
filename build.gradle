@@ -47,6 +47,8 @@ test {
         events "skipped", "failed"
         exceptionFormat "full"
     }
+
+    systemProperty "jdk.internal.httpclient.disableHostnameVerification", "true"
 }
 
 dependencies {

@@ -15,7 +15,7 @@ define 'molecule', :group => 'com.vtence.molecule', :version => VERSION_NUMBER d
   compile.options.target = '1.8'
 
   compile.with SIMPLE, UNDERTOW, :mustache, :hamcrest, :juniversalchardet
-  test.with JMOCK
+  test.with JMOCK, :properties => { 'jdk.internal.httpclient.disableHostnameVerification' => 'true' }
 
   package :jar
   package :javadoc

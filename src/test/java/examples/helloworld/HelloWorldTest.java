@@ -1,23 +1,24 @@
 package examples.helloworld;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class HelloWorldTest {
 
     HelloWorldExample helloWorld = new HelloWorldExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
 
     @Before
     public void startServer() throws IOException {
@@ -30,8 +31,8 @@ public class HelloWorldTest {
     }
 
     @Test
-    public void respondingWithHelloWorld() throws IOException {
-        response = request.get("/");
-        assertThat(response).hasBodyText("Hello, World!");
+    public void respondingWithHelloWorld() throws Exception {
+        var response = client.send(request.GET().build(), ofString());
+        assertThat(response).hasBody("Hello, World!");
     }
 }

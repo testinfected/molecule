@@ -32,7 +32,7 @@ public class MultipartExample {
             get("/profile").to(
                     request -> Response.ok()
                                        // Set the content type of the response to text/html
-                                       .contentType("text/html")
+                                       .contentType("text/html; charset=utf-8")
                                        // Render the profile form
                                        .done("<html>" +
                                              "<body>" +
@@ -78,7 +78,7 @@ public class MultipartExample {
                         // We also read the content of the image as a raw stream of bytes to calculate its length
                         .append(" - ").append(String.valueOf(avatar.content().length)).append(" bytes");
                 return Response.ok()
-                               .contentType("text/plain")
+                               .contentType("text/plain; charset=utf-8")
                                .done(echo);
             });
         }});

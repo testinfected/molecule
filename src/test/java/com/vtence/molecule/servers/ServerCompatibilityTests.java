@@ -1,20 +1,21 @@
 package com.vtence.molecule.servers;
 
-import com.vtence.molecule.Application;
 import com.vtence.molecule.BodyPart;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.StackTrace;
 import com.vtence.molecule.testing.ResourceLocator;
 import com.vtence.molecule.testing.http.Form;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
+import com.vtence.molecule.testing.http.Trust;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
-import java.io.IOException;
+import javax.net.ssl.TrustManager;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,128 +25,124 @@ import static com.vtence.molecule.ssl.KeyStoreType.DEFAULT;
 import static com.vtence.molecule.ssl.SecureProtocol.TLS;
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.http.HttpResponseThat.contentEncodedWithCharset;
 import static java.lang.String.valueOf;
+import static java.net.http.HttpRequest.BodyPublishers.ofString;
+import static java.net.http.HttpResponse.BodyHandlers.discarding;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 
 public abstract class ServerCompatibilityTests {
 
     int port = 9999;
 
-    Server server;
+    WebServer server;
     ResourceLocator resources = ResourceLocator.onClasspath();
-    HttpRequest request = new HttpRequest(port);
-    HttpResponse response;
+    HttpClient client = HttpClient.newBuilder().sslContext(setupSSL()).build();
+    HttpRequest.Builder request = HttpRequest.newBuilder();
 
     Throwable error;
 
     @Before public void
     configureServer() {
-        server = createServer("localhost", port);
-        server.reportErrorsTo(error -> ServerCompatibilityTests.this.error = error);
+        server = new WebServer(createServer("localhost", port));
+        server.failureReporter(error -> ServerCompatibilityTests.this.error = error);
     }
 
     protected abstract Server createServer(String host, int port);
 
     @After public void
     stopServer() throws Exception {
-        server.shutdown();
+        server.stop();
     }
 
     @Test public void
-    knowsItsHost() throws IOException {
-        assertThat("host", server.host(), equalTo("localhost"));
+    knowsItsHost() {
+        assertThat("host", server.uri().getHost(), equalTo("localhost"));
     }
 
     @Test public void
-    knowsItsPort() throws IOException {
-        assertThat("port", server.port(), equalTo(9999));
+    knowsItsPort() {
+        assertThat("port", server.uri().getPort(), equalTo(9999));
     }
 
     @Test public void
-    notifiesReportersOfFailures() throws IOException {
-        server.run(request -> {
+    notifiesReportersOfFailures() throws Exception {
+        server.start(request -> {
             throw new Exception("Crash!");
         });
 
-        request.send();
+        client.send(request.uri(server.uri()).build(), discarding());
         assertThat("error", error, notNullValue());
         assertThat("error message", error.getMessage(), equalTo("Crash!"));
     }
 
     @Test public void
-    notifiesReportersOfErrorsOccurringAsync() throws IOException {
-        server.run(request -> Response.ok().done(new Exception("Crash!")));
+    notifiesReportersOfErrorsOccurringAsync() throws Exception {
+        server.start(request -> Response.ok().done(new Exception("Crash!")));
 
-        request.send();
+        client.send(request.uri(server.uri()).build(), discarding());
         assertThat("error", error, notNullValue());
         assertThat("error message", error.getMessage(), equalTo("Crash!"));
     }
 
     @Test public void
-    respondsToRequests() throws IOException {
-        server.run(request -> Response.of(CREATED).done());
+    respondsToRequests() throws Exception {
+        server.start(request -> Response.of(CREATED).done());
 
-        response = request.send();
+        var response = client.send(request.uri(server.uri()).build(), discarding());
         assertNoError();
-        assertThat(response).hasStatusCode(201)
-                            .hasStatusMessage("Created");
+        assertThat(response).hasStatusCode(201);
     }
 
     @Test public void
-    respondsToRequestsAsynchronously() throws IOException {
-        server.run(request -> {
+    respondsToRequestsAsynchronously() throws Exception {
+        server.start(request -> {
             Response response = Response.of(CREATED);
             runAsync(response::done);
             return response;
         });
 
-        response = request.send();
+        var response = client.send(request.uri(server.uri()).build(), discarding());
         assertNoError();
-        assertThat(response).hasStatusCode(201)
-                            .hasStatusMessage("Created");
+        assertThat(response).hasStatusCode(201);
     }
 
     @Test public void
-    doesNotChunkResponsesWithContentLengthHeader() throws IOException {
-        server.run(request -> Response.ok()
+    doesNotChunkResponsesWithContentLengthHeader() throws Exception {
+        server.start(request -> Response.ok()
                                        .contentLength(16)
                                        .body("<html>...</html>")
                                        .done());
 
-        response = request.send();
+        var response = client.send(request.uri(server.uri()).build(), ofString());
         assertNoError();
-        assertThat(response).hasBodyText("<html>...</html>")
+        assertThat(response).hasBody("<html>...</html>")
                             .hasHeader("Content-Length", "16")
                             .isNotChunked();
     }
 
     @Test public void
-    encodesResponsesAccordingToContentType() throws IOException {
-        server.run(request -> Response.ok()
+    encodesResponsesAccordingToContentType() throws Exception {
+        server.start(request -> Response.ok()
                                       .contentType("text/plain; charset=utf-16")
                                       .done("This content requires encoding &âçüè!"));
 
-        response = request.send();
+        var response = client.send(request.uri(server.uri()).build(), ofString());
         assertNoError();
         assertThat(response).isOK()
-                            .hasContentEncodedAs(containsString("UTF-16"));
+                            .has(contentEncodedWithCharset(hasToString(startsWith("UTF-16"))));
     }
 
-    @SuppressWarnings("unchecked")
     @Test public void
-    providesGeneralRequestInformation() throws IOException {
+    providesGeneralRequestInformation() throws Exception {
         final Map<String, String> info = new HashMap<>();
-        server.run(request -> {
+        server.start(request -> {
             info.put("url", request.url().toString());
             info.put("uri", request.uri().uri());
             info.put("path", request.path());
@@ -162,9 +159,8 @@ public abstract class ServerCompatibilityTests {
             return Response.ok().done();
         });
 
-        request.get("http://localhost:9999/over/there?name=ferret");
+        client.send(request.uri(server.uri().resolve("/over/there?name=ferret")).build(), discarding());
         assertNoError();
-
 
         assertThat("request information", info, allOf(
                 hasEntry("url", "http://localhost:9999/over/there?name=ferret"),
@@ -183,17 +179,22 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    readsRequestHeaders() throws IOException {
-        final Map<String, Iterable<String>> headers = new HashMap<>();
-        server.run(request -> {
+    readsRequestHeaders() throws Exception {
+        var headers = new HashMap<String, Iterable<String>>();
+        server.start(request -> {
             headers.put("names", request.headerNames());
             headers.put("encoding", request.headers("Accept-Encoding"));
             return Response.ok().done();
         });
 
-        request.header("Accept", "text/html")
-               .header("Accept-Encoding", "gzip", "identity; q=0.5", "deflate;q=1.0", "*;q=0")
-               .send();
+        client.send(request.uri(server.uri())
+                           .headers("Accept", "text/html",
+                                    "Accept-Encoding", "gzip",
+                                    "Accept-Encoding", "identity; q=0.5",
+                                    "Accept-Encoding", "deflate;q=1.0",
+                                    "Accept-Encoding", "*;q=0")
+                           .build(),
+                    discarding());
         assertNoError();
 
         assertThat("header names", headers.get("names"), hasItems("Accept", "Accept-Encoding"));
@@ -202,31 +203,33 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    writesHeadersWithMultipleValues() throws IOException {
-        server.run(request -> Response.ok()
+    writesHeadersWithMultipleValues() throws Exception {
+        server.start(request -> Response.ok()
                                        .addHeader("Cache-Control", "no-cache")
                                        .addHeader("Cache-Control", "no-store")
                                        .done());
 
-        response = request.send();
+        var response = client.send(request.uri(server.uri()).build(), discarding());
 
         assertNoError();
-        assertThat("response headers", response.headers("Cache-Control"), hasItems("no-cache", "no-store"));
+        assertThat(response).hasHeaders("Cache-Control", hasItems("no-cache", "no-store"));
     }
 
     @Test public void
-    readsRequestContent() throws IOException {
+    readsRequestContent() throws Exception {
         final Map<String, String> content = new HashMap<>();
-        server.run(request -> {
+        server.start(request -> {
             content.put("contentType", valueOf(request.contentType()));
             content.put("contentLength", valueOf(request.contentLength()));
             content.put("body", request.body());
             return Response.ok().done();
         });
 
-        request.contentType("application/json")
-               .body("{\"name\": \"value\"}")
-               .post("/uri");
+        client.send(request.uri(server.uri().resolve("/uri"))
+                           .header("Content-Type", "application/json")
+                           .POST(ofString("{\"name\": \"value\"}"))
+                           .build(),
+               discarding());
         assertNoError();
 
         assertThat("request content", content, allOf(
@@ -236,16 +239,16 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    readsQueryParameters() throws IOException {
-        final Map<String, String> parameters = new HashMap<>();
-        server.run(request -> {
+    readsQueryParameters() throws Exception {
+        var parameters = new HashMap<String, String>();
+        server.start(request -> {
             for (String name : request.parameterNames()) {
                 parameters.put(name, request.parameter(name));
             }
             return Response.ok().done();
         });
 
-        request.get("/?param1=value1&param2=value2");
+        client.send(request.uri(server.uri().resolve("/?param1=value1&param2=value2")).build(), discarding());
 
         assertNoError();
         assertThat("query parameters", parameters, allOf(
@@ -254,30 +257,34 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    supportsMultipleQueryParametersWithSameName() throws IOException {
-        server.run(request -> Response.ok().done(request.parameters("names").toString()));
+    supportsMultipleQueryParametersWithSameName() throws Exception {
+        server.start(request -> Response.ok().done(request.parameters("names").toString()));
 
-        response = request.get("/?names=Alice&names=Bob&names=Charles");
+        var response = client.send(request.uri(server.uri().resolve("/?names=Alice&names=Bob&names=Charles"))
+                                          .build(),
+                                   ofString());
 
         assertNoError();
-        assertThat(response).hasBodyText("[Alice, Bob, Charles]");
+        assertThat(response).hasBody("[Alice, Bob, Charles]");
     }
 
     @Test public void
-    readsFormEncodedParameters() throws IOException {
-        final Map<String, String> parameters = new HashMap<>();
-        Application application = request -> {
+    readsFormEncodedParameters() throws Exception {
+        var parameters = new HashMap<String, String>();
+        server.start(request -> {
             for (String name : request.parameterNames()) {
                 parameters.put(name, request.parameter(name));
             }
             return Response.ok().done();
-        };
-        server.run(application);
+        });
 
-        response = request.content(Form.urlEncoded()
-                                       .addField("param1", "value1")
-                                       .addField("param2", "value2"))
-                          .post("/");
+        client.send(request.uri(server.uri())
+                           .header("Content-Type", Form.urlEncoded().contentType())
+                           .POST(Form.urlEncoded()
+                                     .addField("param1", "value1")
+                                     .addField("param2", "value2"))
+                           .build(),
+                    discarding());
 
         assertNoError();
         assertThat("form parameters", parameters, allOf(
@@ -286,24 +293,27 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    supportsMultipleFormEncodedParametersWithSameName() throws IOException {
-        server.run(request -> Response.ok()
+    supportsMultipleFormEncodedParametersWithSameName() throws Exception {
+        server.start(request -> Response.ok()
                                        .done(request.parameters("name").toString()));
 
-        response = request.content(Form.urlEncoded()
-                                       .addField("name", "Alice")
-                                       .addField("name", "Bob")
-                                       .addField("name", "Charles"))
-                          .post("/");
+        var response = client.send(request.uri(server.uri())
+                                          .header("Content-Type", Form.urlEncoded().contentType())
+                                          .POST(Form.urlEncoded()
+                                                    .addField("name", "Alice")
+                                                    .addField("name", "Bob")
+                                                    .addField("name", "Charles"))
+                                          .build(),
+                                   ofString());
 
         assertNoError();
-        assertThat(response).hasBodyText("[Alice, Bob, Charles]");
+        assertThat(response).hasBody("[Alice, Bob, Charles]");
     }
 
     @Test public void
-    readsMultiPartFormParameters() throws IOException {
-        final Map<String, String> parameters = new HashMap<>();
-        server.run(request -> {
+    readsMultiPartFormParameters() throws Exception {
+        var parameters = new HashMap<String, String>();
+        server.start(request -> {
             List<BodyPart> parts = request.parts();
             for (BodyPart part : parts) {
                 parameters.put(part.name(), part.value());
@@ -311,10 +321,14 @@ public abstract class ServerCompatibilityTests {
             return Response.ok().done();
         });
 
-        response = request.content(Form.multipart()
-                                       .addField("param1", "value1")
-                                       .addField("param2", "value2"))
-                          .post("/");
+        var form = Form.multipart()
+                       .addField("param1", "value1")
+                       .addField("param2", "value2");
+        client.send(request.uri(server.uri())
+                           .header("Content-Type", form.contentType())
+                           .POST(form)
+                           .build(),
+                    discarding());
 
         assertNoError();
         assertThat("form data parameters", parameters, allOf(
@@ -323,10 +337,10 @@ public abstract class ServerCompatibilityTests {
     }
 
     @Test public void
-    downloadsUploadedFiles() throws IOException {
-        final Map<String, Integer> files = new HashMap<>();
-        final Map<String, String> mimeTypes = new HashMap<>();
-        server.run(request -> {
+    downloadsUploadedFiles() throws Exception {
+        var files = new HashMap<String, Integer>();
+        var mimeTypes = new HashMap<String, String>();
+        server.start(request -> {
             List<BodyPart> parts = request.parts();
             for (BodyPart part : parts) {
                 files.put(part.filename(), part.content().length);
@@ -336,9 +350,12 @@ public abstract class ServerCompatibilityTests {
         });
 
 
-        response = request.content(Form.multipart()
-                                       .addBinaryFile("file", resources.locate("assets/images/minion.png")))
-                          .post("/");
+        var form = Form.multipart()
+                       .addBinaryFile("file", resources.locate("assets/images/minion.png"));
+        client.send(request.uri(server.uri())
+                           .header("Content-Type", form.contentType())
+                           .POST(form)
+                           .build(), discarding());
 
         assertNoError();
         assertThat("filenames", files, hasEntry("minion.png", 21134));
@@ -347,22 +364,31 @@ public abstract class ServerCompatibilityTests {
 
     @Test public void
     supportsHttps() throws Exception {
-        SSLContext sslContext =
-                TLS.initialize(DEFAULT.loadKeys(locateOnClasspath("ssl/keystore"), "password", "password"));
-
-        final Map<String, String> info = new HashMap<>();
-        server.run(request -> {
+        var info = new HashMap<String, String>();
+        server.enableSSL(setupSSL())
+              .start(request -> {
             info.put("scheme", request.scheme());
             info.put("secure", valueOf(request.secure()));
             return Response.ok().done();
-        }, sslContext);
+        });
 
-        response = request.secure(true).get("/");
+        client.send(request.uri(server.uri()).build(), discarding());
         assertNoError();
 
         assertThat("request information", info, allOf(
                 hasEntry("scheme", "https"),
                 hasEntry("secure", "true")));
+    }
+
+    private SSLContext setupSSL() {
+        System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
+        try {
+            return TLS.initialize(
+                    DEFAULT.loadKeys(locateOnClasspath("ssl/keystore"), "password", "password"),
+                    new TrustManager[] {Trust.allCertificates()});
+        } catch (Exception e) {
+            throw new AssertionError("Unable to setup SSL", e);
+        }
     }
 
     protected void assertNoError() {

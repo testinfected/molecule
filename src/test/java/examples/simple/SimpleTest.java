@@ -1,15 +1,18 @@
 package examples.simple;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static com.vtence.molecule.testing.http.HttpResponseThat.contentEncodedAs;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.hamcrest.Matchers.containsString;
 
 public class SimpleTest {
@@ -17,8 +20,8 @@ public class SimpleTest {
     SimpleExample example = new SimpleExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder();
 
     @Before
     public void startServer() throws IOException {
@@ -31,16 +34,22 @@ public class SimpleTest {
     }
 
     @Test
-    public void specifyingResponseOutputEncoding() throws IOException {
-        response = request.get("/?encoding=utf-8");
-        assertThat(response).hasContentEncodedAs("utf-8")
-                            .hasBodyText(containsString("Les naïfs ægithales hâtifs"));
+    public void specifyingResponseOutputEncoding() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("?encoding=utf-8"))
+                                          .GET().build(),
+                                   ofString());
+
+        assertThat(response)
+                .has(contentEncodedAs(StandardCharsets.UTF_8))
+                .hasBody(containsString("Les naïfs ægithales hâtifs"));
     }
 
     @Test
-    public void causingTheApplicationToCrashAndRenderA500Page() throws IOException {
-        response = request.get("/?encoding=not-supported");
+    public void causingTheApplicationToCrashAndRenderA500Page() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("?encoding=not-supported"))
+                                          .GET().build(),
+                                   ofString());
         assertThat(response).hasStatusCode(500)
-                            .hasBodyText(containsString("java.nio.charset.UnsupportedCharsetException"));
+                            .hasBody(containsString("java.nio.charset.UnsupportedCharsetException"));
     }
 }

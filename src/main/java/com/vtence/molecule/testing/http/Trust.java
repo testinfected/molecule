@@ -5,7 +5,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
-class Trust {
+public final class Trust {
 
     public static TrustManager allCertificates() {
         return new X509TrustManager() {
@@ -27,4 +27,6 @@ class Trust {
     public static HostnameVerifier allHostNames() {
         return (hostname, sslSession) -> true;
     }
+
+    private Trust() {}
 }

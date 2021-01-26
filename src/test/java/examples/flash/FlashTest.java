@@ -2,24 +2,28 @@ package examples.flash;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.testing.http.Form;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpRequest.BodyPublishers.noBody;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static org.hamcrest.Matchers.emptyString;
 
 public class FlashTest {
 
     FlashExample flash = new FlashExample();
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
-
     WebServer server = WebServer.create(9999);
+
+    HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
 
     @Before
     public void startServer() throws IOException {
@@ -32,54 +36,52 @@ public class FlashTest {
     }
 
     @Test
-    public void retrievingAFlashNoticeInTheNextRequest() throws IOException {
-        response = request.but()
-                          .content(Form.urlEncoded().addField("email", "james@gmail.com"))
-                          .post("/accounts");
+    public void retrievingAFlashNoticeInTheNextRequest() throws Exception {
+        var form = Form.urlEncoded().addField("email", "james@gmail.com");
+        var initial = client.send(request.copy()
+                                         .uri(server.uri().resolve("/accounts"))
+                                         .header("Content-Type", form.contentType())
+                                         .POST(form)
+                                         .build(), ofString());
 
-        String redirection = response.header("Location");
-        String sessionId = response.cookie("molecule.session").getValue();
-        response = request.but()
-                          .cookie("molecule.session", sessionId)
-                          .get(redirection);
+        String redirection = initial.headers().firstValue("Location").orElseThrow();
+        var next = client.send(request.copy().uri(server.uri().resolve(redirection))
+                                      .build(), ofString());
 
-        assertThat(response).hasBodyText("Account 'james@gmail.com' successfully created");
+        assertThat(next).hasBody("Account 'james@gmail.com' successfully created");
     }
 
     @Test
-    public void flashEntriesDoNotSurviveTheNextRequest() throws IOException {
-        response = request.but()
-                          .content(Form.urlEncoded().addField("email", "james@gmail.com"))
-                          .post("/accounts");
+    public void flashEntriesDoNotSurviveTheNextRequest() throws Exception {
+        var form = Form.urlEncoded().addField("email", "james@gmail.com");
+        var initial = client.send(request.copy()
+                                         .uri(server.uri().resolve("/accounts"))
+                                         .header("Content-Type", form.contentType())
+                                         .POST(form)
+                                         .build(), ofString());
 
-        String redirection = response.header("Location");
-        String sessionId = response.cookie("molecule.session").getValue();
-        response = request.but()
-                          .cookie("molecule.session", sessionId)
-                          .get(redirection);
+        String redirection = initial.headers().firstValue("Location").orElseThrow();
+        client.send(request.copy().uri(server.uri().resolve(redirection))
+                           .build(), ofString());
 
-        // Session id might have been updated
-        sessionId = response.cookie("molecule.session") != null ? response.cookie("molecule.session").getValue() :
-                sessionId;
         // play again
-        response = request.but()
-                          .cookie("molecule.session", sessionId)
-                          .get(redirection);
+        var again = client.send(request.copy().uri(server.uri().resolve(redirection))
+                                       .build(), ofString());
 
-        assertThat(response).hasBodyText("");
+        assertThat(again).hasBody(emptyString());
     }
 
     @Test
-    public void usingTheFlashToRedirectWithErrors() throws IOException {
-        response = request.but()
-                          .post("/accounts");
+    public void usingTheFlashToRedirectWithErrors() throws Exception {
+        var initial = client.send(request.copy()
+                                         .uri(server.uri().resolve("/accounts"))
+                                         .POST(noBody())
+                                         .build(), ofString());
 
-        String redirection = response.header("Location");
-        String sessionId = response.cookie("molecule.session").getValue();
-        response = request.but()
-                          .cookie("molecule.session", sessionId)
-                          .get(redirection);
+        String redirection = initial.headers().firstValue("Location").orElseThrow();
+        var next = client.send(request.copy().uri(server.uri().resolve(redirection))
+                                      .build(), ofString());
 
-        assertThat(response).hasBodyText("An email is required");
+        assertThat(next).hasBody("An email is required");
     }
 }

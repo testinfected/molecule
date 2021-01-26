@@ -1,29 +1,29 @@
 package com.vtence.molecule;
 
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.URI;
-import java.security.GeneralSecurityException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.util.logging.LogManager;
 
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class WebServerTest {
 
-    WebServer server;
-    HttpRequest request = new HttpRequest(8080);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder();
 
-    @BeforeClass public static void
-    silenceLogging() {
+    WebServer server;
+
+    @BeforeClass
+    public static void silenceLogging() {
         LogManager.getLogManager().reset();
     }
 
@@ -33,16 +33,16 @@ public class WebServerTest {
     }
 
     @Test
-    public void runsServerOnPort8080ByDefault() throws IOException, GeneralSecurityException {
+    public void byDefaultRunsServerOnPort8080() throws Exception {
         server = WebServer.create();
         server.start(request -> Response.ok().done("It works!"));
 
-        response = request.get("/");
-        assertThat(response).hasBodyText("It works!");
+        var response = client.send(request.uri(server.uri()).GET().build(), ofString());
+        assertThat(response).hasBody("It works!");
     }
 
     @Test
-    public void knowsServerUri() throws IOException {
+    public void knowsServerUri() {
         server = WebServer.create("0.0.0.0", 9000);
         assertThat("server uri", server.uri(), equalTo(URI.create("http://0.0.0.0:9000")));
     }

@@ -1,16 +1,17 @@
 package examples.locale;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.util.Locale;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.hamcrest.Matchers.containsString;
 
 public class LocaleNegotiationTest {
@@ -18,8 +19,8 @@ public class LocaleNegotiationTest {
     LocaleNegotiationExample example = new LocaleNegotiationExample("en", "en-US", "fr", "da-DK");
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
 
     Locale originalDefault = Locale.getDefault();
 
@@ -36,26 +37,30 @@ public class LocaleNegotiationTest {
     }
 
     @Test
-    public void selectingTheBestSupportedLanguage() throws IOException {
-        response = request.header("Accept-Language", "en; q=0.8, fr").send();
-        assertThat(response).hasBodyText(containsString("The best match is: fr\n"));
+    public void selectingTheBestSupportedLanguage() throws Exception {
+        request.header("Accept-Language", "en; q=0.8, fr");
+        var response = client.send(request.GET().build(), ofString());
+        assertThat(response).hasBody(containsString("The best match is: fr\n"));
     }
 
     @Test
-    public void fallingBackToTheDefaultLanguage() throws IOException {
-        response = request.header("Accept-Language", "es-ES").send();
-        assertThat(response).hasBodyText(containsString("The best match is: en-US\n"));
+    public void fallingBackToTheDefaultLanguage() throws Exception {
+        request.header("Accept-Language", "es-ES");
+        var response = client.send(request.GET().build(), ofString());
+        assertThat(response).hasBody(containsString("The best match is: en-US\n"));
     }
 
     @Test
-    public void fallingBackToAMoreGeneralLanguage() throws IOException {
-        response = request.header("Accept-Language", "en-GB").send();
-        assertThat(response).hasBodyText(containsString("The best match is: en\n"));
+    public void fallingBackToAMoreGeneralLanguage() throws Exception {
+        request.header("Accept-Language", "en-GB");
+        var response = client.send(request.GET().build(), ofString());
+        assertThat(response).hasBody(containsString("The best match is: en\n"));
     }
 
     @Test
-    public void usingACountrySpecificLanguageWhenTheGeneralOneIsNotSupported() throws IOException {
-        response = request.header("Accept-Language", "da").send();
-        assertThat(response).hasBodyText(containsString("The best match is: da-DK\n"));
+    public void usingACountrySpecificLanguageWhenTheGeneralOneIsNotSupported() throws Exception {
+        request.header("Accept-Language", "da");
+        var response = client.send(request.GET().build(), ofString());
+        assertThat(response).hasBody(containsString("The best match is: da-DK\n"));
     }
 }

@@ -2,11 +2,12 @@ package com.vtence.molecule.testing.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.http.HttpRequest;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Form implements HttpContent {
+public abstract class Form implements HttpRequest.BodyPublisher {
 
     public static UrlEncodedForm urlEncoded() {
         return new UrlEncodedForm();
@@ -16,16 +17,15 @@ public abstract class Form implements HttpContent {
         return new MultipartForm();
     }
 
-    protected final List<Field> fields = new ArrayList<>();
+    protected final List<Part> parts = new ArrayList<>();
 
-    public abstract Form addField(String name, String value);
+    public abstract String contentType();
 
-    public Form addField(Field field) {
-        this.fields.add(field);
-        return this;
+    protected void addPart(Part part) {
+        this.parts.add(part);
     }
 
-    public interface Field {
+    public interface Part {
         void encode(OutputStream out, Charset charset) throws IOException;
     }
 }

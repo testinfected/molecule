@@ -4,9 +4,9 @@ import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpClient.Version.HTTP_1_1;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class SimpleServerTest extends ServerCompatibilityTests {
 
@@ -15,12 +15,12 @@ public class SimpleServerTest extends ServerCompatibilityTests {
     }
 
     @Test public void
-    chunksResponseWhenContentLengthUnknown() throws IOException {
-        server.run(request -> Response.ok().done("<html>...</html>"));
+    chunksResponseWhenContentLengthUnknown() throws Exception {
+        server.start(request -> Response.ok().done("<html>...</html>"));
 
-        response = request.send();
+        var response = client.send(request.version(HTTP_1_1).uri(server.uri()).build(), ofString());
         assertNoError();
-        assertThat(response).hasBodyText("<html>...</html>")
+        assertThat(response).hasBody("<html>...</html>")
                             .isChunked();
     }
 }

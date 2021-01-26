@@ -1,23 +1,24 @@
 package examples.multiapps;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class MultiAppsTest {
 
     MultiAppsExample multiApps = new MultiAppsExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
 
     @Before
     public void startServer() throws IOException {
@@ -30,21 +31,21 @@ public class MultiAppsTest {
     }
 
     @Test
-    public void dispatchingRequestsToMultipleApplicationsDependingOnThePath() throws IOException {
-        response = request.get("/foo/quux");
-        assertThat(response).isOK().hasBodyText("/foo at /quux (/foo/quux)");
+    public void dispatchingRequestsToMultipleApplicationsDependingOnThePath() throws Exception {
+        var foo = client.send(request.uri(server.uri().resolve("/foo/quux")).GET().build(), ofString());
+        assertThat(foo).isOK().hasBody("/foo at /quux (/foo/quux)");
 
-        response = request.get("/foo/bar/quux");
-        assertThat(response).isOK().hasBodyText("/foo/bar at /quux (/foo/bar/quux)");
+        var bar = client.send(request.uri(server.uri().resolve("/foo/bar/quux")).GET().build(), ofString());
+        assertThat(bar).isOK().hasBody("/foo/bar at /quux (/foo/bar/quux)");
 
-        response = request.get("/baz");
-        assertThat(response).isOK().hasBodyText("/baz at / (/baz)");
+        var baz = client.send(request.uri(server.uri().resolve("/baz")).GET().build(), ofString());
+        assertThat(baz).isOK().hasBody("/baz at / (/baz)");
     }
 
     @Test
-    public void gettingA404OnRequestToUnmappedPath() throws IOException {
-        response = request.get("/quux");
-        assertThat(response).hasStatusCode(404)
-                            .hasBodyText("Not found: /quux");
+    public void gettingA404OnRequestToUnmappedPath() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/quux")).build(), ofString());
+
+        assertThat(response).hasStatusCode(404).hasBody("Not found: /quux");
     }
 }

@@ -2,23 +2,25 @@ package examples.routing;
 
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.testing.http.Form;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class RoutingTest {
 
     RoutingExample routing = new RoutingExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
+
 
     @Before
     public void startServer() throws IOException {
@@ -31,29 +33,39 @@ public class RoutingTest {
     }
 
     @Test
-    public void mappingRoutesToUrls() throws IOException {
-        response = request.get("/");
+    public void mappingRoutesToUrls() throws Exception {
+        var response = client.send(request.GET().build(), ofString());
+
         assertThat(response).isOK()
-                            .hasBodyText("Welcome!");
+                            .hasBody("Welcome!");
     }
 
     @Test
-    public void restrictingARouteToASpecificVerb() throws IOException {
-        response = request.content(Form.urlEncoded().addField("username", "Vincent")).post("/login");
+    public void restrictingARouteToASpecificVerb() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/login"))
+                                          .header("Content-Type", Form.urlEncoded().contentType())
+                                          .POST(Form.urlEncoded().addField("username", "Vincent"))
+                                          .build(), ofString());
+
         assertThat(response).hasStatusCode(303);
     }
 
     @Test
-    public void bindingDynamicRequestParametersToPath() throws IOException {
-        response = request.get("/hello/Vincent");
+    public void bindingDynamicRequestParametersToPath() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/hello/Vincent"))
+                                          .GET()
+                                          .build(), ofString());
+
         assertThat(response).isOK()
                             .hasContentType("text/html")
-                            .hasBodyText("<html><body><h3>Hello, Vincent</h3></body></html>");
+                            .hasBody("<html><body><h3>Hello, Vincent</h3></body></html>");
     }
 
     @Test
-    public void requestingAnUndefinedRoute() throws IOException {
-        response = request.get("/nowhere");
+    public void requestingAnUndefinedRoute() throws Exception {
+        var response = client.send(request.uri(server.uri().resolve("/nowhere"))
+                                          .GET()
+                                          .build(), ofString());
         assertThat(response).hasStatusCode(404);
     }
 }

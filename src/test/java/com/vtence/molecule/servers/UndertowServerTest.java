@@ -5,10 +5,10 @@ import com.vtence.molecule.Server;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.logging.LogManager;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class UndertowServerTest extends ServerCompatibilityTests {
 
@@ -22,12 +22,12 @@ public class UndertowServerTest extends ServerCompatibilityTests {
     }
 
     @Test public void
-    setsContentLengthAutomaticallyForSmallResponses() throws IOException {
-        server.run(request -> Response.ok().done("<html>...</html>"));
+    setsContentLengthAutomaticallyForSmallResponses() throws Exception {
+        server.start(request -> Response.ok().done("<html>...</html>"));
 
-        response = request.send();
+        var response = client.send(request.uri(server.uri()).build(), ofString());
         assertNoError();
-        assertThat(response).hasBodyText("<html>...</html>")
+        assertThat(response).hasBody("<html>...</html>")
                             .hasHeader("Content-Length", "16")
                             .isNotChunked();
     }

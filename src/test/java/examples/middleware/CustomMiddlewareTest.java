@@ -1,24 +1,25 @@
 package examples.middleware;
 
 import com.vtence.molecule.WebServer;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static java.lang.String.valueOf;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 
 public class CustomMiddlewareTest {
 
     CustomMiddlewareExample middlewares = new CustomMiddlewareExample();
     WebServer server = WebServer.create(9999);
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
 
     @Before
     public void startServer() throws IOException {
@@ -31,19 +32,21 @@ public class CustomMiddlewareTest {
     }
 
     @Test
-    public void shortCircuitingRequestProcessing() throws IOException {
-        response = request.header("User-Agent", "MSIE").get("/");
+    public void shortCircuitingRequestProcessing() throws Exception {
+        request.header("User-Agent", "MSIE");
+        var response = client.send(request.GET().build(), ofString());
         assertThat(response).hasStatusCode(303);
     }
 
     @Test
-    public void alteringResponseAfterProcessing() throws IOException {
-        response = request.header("User-Agent", "Chrome").get("/");
+    public void alteringResponseAfterProcessing() throws Exception {
+        request.header("User-Agent", "Chrome");
+        var response = client.send(request.GET().build(), ofString());
 
         String expected = "<html><body>Hello, World</body></html>";
 
         assertThat(response).hasContentType("text/html")
-                            .hasBodyText(expected)
+                            .hasBody(expected)
                             .hasHeader("Content-Length", valueOf(expected.length()));
     }
 }

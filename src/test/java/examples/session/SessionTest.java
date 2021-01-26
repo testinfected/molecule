@@ -3,21 +3,22 @@ package examples.session;
 import com.vtence.molecule.WebServer;
 import com.vtence.molecule.support.Delorean;
 import com.vtence.molecule.support.StackTrace;
-import com.vtence.molecule.testing.http.HttpRequest;
-import com.vtence.molecule.testing.http.HttpResponse;
-import com.vtence.molecule.testing.http.UrlEncodedForm;
+import com.vtence.molecule.testing.http.Form;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.HttpCookie;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class SessionTest {
 
@@ -30,8 +31,9 @@ public class SessionTest {
     String SESSION_COOKIE = "molecule.session";
     int FIVE_MIN = 300;
 
-    HttpRequest request = new HttpRequest(9999);
-    HttpResponse response;
+    CookieManager cookies = new CookieManager();
+    HttpClient client = HttpClient.newBuilder().cookieHandler(cookies).build();
+    HttpRequest.Builder request = HttpRequest.newBuilder(server.uri());
 
     @Before
     public void startServer() throws IOException {
@@ -46,103 +48,133 @@ public class SessionTest {
     }
 
     @Test
-    public void accessingTheSessionWithoutCreatingANewSession() throws IOException {
-        response = request.get("/");
+    public void accessingTheSessionWithoutCreatingANewSession() throws Exception {
+        var response = client.send(request.GET().build(), ofString());
         assertNoError();
         assertThat(response).hasNoCookie(SESSION_COOKIE)
-                            .hasBodyText("Hello, Guest");
+                            .hasBody("Hello, Guest");
     }
 
     @Test
-    public void trackingASessionAcrossRequests() throws IOException {
-        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
-        assertNoError();
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
+    public void trackingASessionAcrossRequests() throws Exception {
+        var ok = client.send(request.copy().uri(server.uri().resolve("/login"))
+                                       .header("Content-Type", Form.urlEncoded().contentType())
+                                       .POST(Form.urlEncoded().addField("username", "Vincent"))
+                                       .build(), ofString());
 
-        response = request.but().cookie(SESSION_COOKIE, sessionId).get("/");
         assertNoError();
-        assertThat(response).hasBodyText("Hello, Vincent");
+
+        var response = client.send(request.copy().GET().build(), ofString());
+        assertNoError();
+        assertThat(response).hasBody("Hello, Vincent");
     }
 
     @Test
-    public void creatingATransientSessionCookie() throws IOException {
-        response = request.content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
+    public void creatingATransientSessionCookie() throws Exception {
+        var response = client.send(request.copy().uri(server.uri().resolve("/login"))
+                                          .header("Content-Type", Form.urlEncoded().contentType())
+                                          .POST(Form.urlEncoded().addField("username", "Vincent"))
+                                          .build(), ofString());
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(-1);
     }
 
     @Test
-    public void creatingAPersistentSessionCookieWhichExpiresAfterFiveMinutes() throws IOException {
-        response = request.content(new UrlEncodedForm().addField("username", "Vincent")
-                                                       .addField("remember_me", "true"))
-                          .post("/login");
+    public void creatingAPersistentSessionCookieWhichExpiresAfterFiveMinutes() throws Exception {
+        var response = client.send(request.copy().uri(server.uri().resolve("/login"))
+                                          .header("Content-Type", Form.urlEncoded().contentType())
+                                          .POST(Form.urlEncoded()
+                                                    .addField("username", "Vincent")
+                                                    .addField("remember_me", "true"))
+                                          .build(), ofString());
+
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(FIVE_MIN);
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
         // Play the same request again and include the cookie
-        response = request.cookie(SESSION_COOKIE, sessionId).send();
+        var again = client.send(request.copy().build(), ofString());
         assertNoError();
         // ... the cookie will have been refreshed
-        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(FIVE_MIN);
+        assertThat(again).hasCookie(SESSION_COOKIE).hasMaxAge(FIVE_MIN);
     }
 
     @Test
-    public void deletingASession() throws IOException {
-        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")).post("/login");
+    public void deletingASession() throws Exception {
+        var response = client.send(request.copy().uri(server.uri().resolve("/login"))
+                                          .header("Content-Type", Form.urlEncoded().contentType())
+                                          .POST(Form.urlEncoded()
+                                                    .addField("username", "Vincent")
+                                                    .addField("remember_me", "true"))
+                                          .build(), ofString());
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE);
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
-        response = request.but().cookie(SESSION_COOKIE, sessionId).delete("/logout");
+        var delete = client.send(request.copy().uri(server.uri().resolve("/logout")).DELETE().build(), ofString());
         assertNoError();
         // Session cookie should be expired
-        assertThat(response).hasCookie(SESSION_COOKIE).hasMaxAge(0);
+        assertThat(delete).hasCookie(SESSION_COOKIE).hasMaxAge(0);
 
-        response = request.but().get("/");
+        var get = client.send(request.copy().build(), ofString());
         assertNoError();
         // Back to being a guest
-        assertThat(response).hasBodyText("Hello, Guest");
+        assertThat(get).hasBody("Hello, Guest");
     }
 
     @Test
     public void
     attemptingToUseAnExpiredSession() throws Exception {
-        response = request.but().content(new UrlEncodedForm().addField("username", "Vincent")
-                                                             .addField("remember_me", "true"))
-                          .post("/login");
+        client.send(request.copy().uri(server.uri().resolve("/login"))
+                           .header("Content-Type", Form.urlEncoded().contentType())
+                           .POST(Form.urlEncoded()
+                                     .addField("username", "Vincent")
+                                     .addField("remember_me", "true"))
+                           .build(), ofString());
         assertNoError();
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
 
         delorean.travelInTime(SECONDS.toMillis(FIVE_MIN));
 
-        response = request.but().cookie(SESSION_COOKIE, sessionId).get("/");
+        var response = client.send(request.copy().build(), ofString());
         assertNoError();
+        // Back to being a guest
         assertThat(response).hasNoCookie(SESSION_COOKIE)
-                            .hasBodyText("Hello, Guest");
+                       .hasBody("Hello, Guest");
     }
 
     @Test
     public void
     renewingASessionToAvoidSessionFixation() throws Exception {
-        response = request.but().content(new UrlEncodedForm().addField("username", "attacker")).post("/login");
+        var attack = client.send(request.copy().uri(server.uri().resolve("/login"))
+                           .header("Content-Type", Form.urlEncoded().contentType())
+                           .POST(Form.urlEncoded()
+                                     .addField("username", "attacker"))
+                           .build(), ofString());
         assertNoError();
-        String fixatedSession = response.cookie(SESSION_COOKIE).getValue();
+        String fixatedSession = readSessionCookie();
 
-        response = request.but().cookie(SESSION_COOKIE, fixatedSession)
-                          .content(new UrlEncodedForm().addField("username", "Vincent")
-                                                       .addField("remember_me", "true")
-                                                       .addField("renew", "true"))
-                          .post("/login");
+        var response = client.send(request.copy().uri(server.uri().resolve("/login"))
+                                          .header("Content-Type", Form.urlEncoded().contentType())
+                                          .POST(Form.urlEncoded()
+                                                    .addField("username", "Vincent")
+                                                    .addField("remember_me", "true"))
+                                          .build(), ofString());
         assertNoError();
         assertThat(response).hasCookie(SESSION_COOKIE);
 
-        String sessionId = response.cookie(SESSION_COOKIE).getValue();
-
+        String sessionId = readSessionCookie();
         assertThat("new session id", sessionId, not(equalTo(fixatedSession)));
     }
 
+    private String readSessionCookie() {
+        var sessionId = cookies.getCookieStore().get(server.uri()).stream()
+                       .filter(it -> it.getName().equals(SESSION_COOKIE))
+                       .map(HttpCookie::getValue)
+                       .findFirst()
+                       .orElse(null);
+        assertThat("session cookie", sessionId, notNullValue());
+        return sessionId;
+    }
+
     private void assertNoError() {
-        if (error != null) fail(StackTrace.of(error));
+        if (error != null) throw new AssertionError(StackTrace.of(error));
     }
 }
