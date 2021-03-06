@@ -3,21 +3,21 @@ package com.vtence.molecule.routing;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.http.HttpMethod;
-import com.vtence.molecule.lib.predicates.Predicates;
+import com.vtence.molecule.lib.predicates.Requests;
 
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.vtence.molecule.http.MimeTypes.isSpecializationOf;
-import static com.vtence.molecule.lib.predicates.Predicates.accepting;
-import static com.vtence.molecule.lib.predicates.Predicates.nothing;
-import static com.vtence.molecule.lib.predicates.Predicates.withMethod;
+import static com.vtence.molecule.lib.predicates.Requests.accepting;
+import static com.vtence.molecule.lib.predicates.Requests.nothing;
+import static com.vtence.molecule.lib.predicates.Requests.withMethod;
 
 public class RouteDefinition implements ViaClause {
 
     private final Predicate<? super String> path;
 
-    private Predicate<Request> conditions = Predicates.anything();
+    private Predicate<Request> conditions = Requests.anything();
     private Application app;
 
     private RouteDefinition(Predicate<? super String> path) {

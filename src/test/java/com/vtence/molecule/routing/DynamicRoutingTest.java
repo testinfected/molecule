@@ -10,7 +10,7 @@ import org.junit.Test;
 import static com.vtence.molecule.http.HeaderNames.ACCEPT;
 import static com.vtence.molecule.http.HttpMethod.GET;
 import static com.vtence.molecule.http.HttpMethod.POST;
-import static com.vtence.molecule.lib.predicates.Predicates.anything;
+import static com.vtence.molecule.lib.predicates.Requests.anything;
 import static com.vtence.molecule.routing.DynamicRoutingTest.Echo.echo;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 

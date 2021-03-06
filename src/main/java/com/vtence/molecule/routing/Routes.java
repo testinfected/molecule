@@ -23,7 +23,7 @@ public class Routes implements RouteBuilder {
     }
 
     public ViaClause map(String path) {
-        return openRoute(new DynamicPath(path));
+        return openRoute(DynamicPath.equalTo(path));
     }
 
     public ViaClause map(Predicate<? super String> path) {
@@ -31,7 +31,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause get(String path) {
-        return get(new DynamicPath(path));
+        return get(DynamicPath.equalTo(path));
     }
 
     public AcceptClause get(Predicate<? super String> path) {
@@ -39,7 +39,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause post(String path) {
-        return post(new DynamicPath(path));
+        return post(DynamicPath.equalTo(path));
     }
 
     public AcceptClause post(Predicate<? super String> path) {
@@ -47,7 +47,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause put(String path) {
-        return put(new DynamicPath(path));
+        return put(DynamicPath.equalTo(path));
     }
 
     public AcceptClause put(Predicate<? super String> path) {
@@ -55,7 +55,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause delete(String path) {
-        return delete(new DynamicPath(path));
+        return delete(DynamicPath.equalTo(path));
     }
 
     public AcceptClause delete(Predicate<? super String> path) {
@@ -63,7 +63,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause patch(String path) {
-        return patch(new DynamicPath(path));
+        return patch(DynamicPath.equalTo(path));
     }
 
     public AcceptClause patch(Predicate<? super String> path) {
@@ -71,7 +71,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause head(String path) {
-        return head(new DynamicPath(path));
+        return head(DynamicPath.equalTo(path));
     }
 
     public AcceptClause head(Predicate<? super String> path) {
@@ -79,7 +79,7 @@ public class Routes implements RouteBuilder {
     }
 
     public AcceptClause options(String path) {
-        return options(new DynamicPath(path));
+        return options(DynamicPath.equalTo(path));
     }
 
     public AcceptClause options(Predicate<? super String> path) {

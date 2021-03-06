@@ -14,38 +14,45 @@ public class DynamicPathTest {
 
     @Test public void
     matchesIdenticalStaticPaths() {
-        DynamicPath dynamicPath = new DynamicPath("/products");
+        DynamicPath dynamicPath = DynamicPath.equalTo("/products");
         assertThat("no match", dynamicPath.test("/products"));
     }
 
     @Test public void
     rejectsDifferentStaticPaths() {
-        DynamicPath dynamicPath = new DynamicPath("/products");
+        DynamicPath dynamicPath = DynamicPath.equalTo("/products");
         assertThat("match", !dynamicPath.test("/items"));
     }
 
     @Test public void
     ignoresDynamicSegmentsWhenMatching() {
-        DynamicPath dynamicPath = new DynamicPath("/products/:number/items/:id");
+        DynamicPath dynamicPath = DynamicPath.equalTo("/products/:number/items/:id");
         assertThat("no match", dynamicPath.test("/products/LAB-1234/items/12345678"));
     }
 
     @Test public void
-    expectsPathsWithSameNumberOfSegments() {
-        DynamicPath dynamicPath = new DynamicPath("/products/:number/items/:id");
-        assertThat("match", !dynamicPath.test("/products/LAB-1234"));
+    expectsPathsWithExactlySameNumberOfSegments() {
+        DynamicPath dynamicPath = DynamicPath.equalTo("/products/:number");
+        assertThat("match", !dynamicPath.test("/products/LAB-1234/items/1234"));
+    }
+
+    @Test public void
+    expectsPathsWithAtLeastSameNumberOfSegments() {
+        DynamicPath dynamicPath = DynamicPath.startingWith("/products/:number");
+        assertThat("match prefix", dynamicPath.test("/products/LAB-1234"));
+        assertThat("match longer path", dynamicPath.test("/products/LAB-1234/items/1234"));
     }
 
     @Test public void
     staticPathsHaveNoBoundParameters() {
-        DynamicPath dynamicPath = new DynamicPath("/products");
+        DynamicPath dynamicPath = DynamicPath.equalTo("/products");
         Map<String, String> boundParameters = dynamicPath.parametersBoundTo("/products");
         assertThat("bound parameters values", boundParameters.values(), Matchers.<String>empty());
     }
 
     @Test public void
     extractBoundParametersFromDynamicSegments() {
-        DynamicPath dynamicPath = new DynamicPath("/products/:number/items/:id");
+        DynamicPath dynamicPath = DynamicPath.equalTo("/products/:number/items/:id");
         Map<String, String> boundParameters = dynamicPath.parametersBoundTo("/products/LAB-1234/items/12345678");
         assertThat("bound parameters values", boundParameters.values(), hasSize(2));
         assertThat("bound parameters", boundParameters, allOf(hasEntry("number", "LAB-1234"), hasEntry("id", "12345678")));

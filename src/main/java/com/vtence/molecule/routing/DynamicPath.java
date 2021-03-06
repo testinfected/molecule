@@ -9,14 +9,29 @@ import java.util.function.Predicate;
 public class DynamicPath implements WithBoundParameters, Predicate<String> {
 
     private final Path pattern;
+    private final boolean fullMatch;
 
     public DynamicPath(String pattern) {
+        this(pattern, false);
+    }
+
+    public DynamicPath(String pattern, boolean fullMatch) {
         this.pattern = new Path(pattern);
+        this.fullMatch = fullMatch;
+    }
+
+    public static DynamicPath equalTo(String pattern) {
+        return new DynamicPath(pattern, true);
+    }
+
+    public static DynamicPath startingWith(String pattern) {
+        return new DynamicPath(pattern, false);
     }
 
     public boolean test(String actual) {
         Path path = new Path(actual);
-        if (!pattern.sameLengthAs(path)) return false;
+        if (pattern.longerThan(path)) return false;
+        if (fullMatch && path.longerThan(pattern)) return false;
 
         for (int i = 0; i < pattern.segmentCount(); i++) {
             if (!isDynamic(pattern.segment(i)) && !pattern.segment(i).equals(path.segment(i)))
@@ -65,8 +80,8 @@ public class DynamicPath implements WithBoundParameters, Predicate<String> {
             return segments.toArray(new String[0]);
         }
 
-        public boolean sameLengthAs(Path other) {
-            return other.segments().length == segments().length;
+        public boolean longerThan(Path other) {
+            return segments().length > other.segments().length;
         }
 
         public String segment(int index) {

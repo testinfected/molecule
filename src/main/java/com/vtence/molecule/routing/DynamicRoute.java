@@ -3,11 +3,10 @@ package com.vtence.molecule.routing;
 import com.vtence.molecule.Application;
 import com.vtence.molecule.Request;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.vtence.molecule.lib.predicates.Predicates.withPath;
+import static com.vtence.molecule.lib.predicates.Requests.withPath;
 
 public class DynamicRoute implements Route {
 
@@ -35,10 +34,7 @@ public class DynamicRoute implements Route {
         return request -> {
             if (path instanceof WithBoundParameters) {
                 WithBoundParameters dynamicPath = (WithBoundParameters) path;
-                Map<String, String> dynamicParameters = dynamicPath.parametersBoundTo(request.path());
-                for (String name : dynamicParameters.keySet()) {
-                    request.addParameter(name, dynamicParameters.get(name));
-                }
+                dynamicPath.addParametersTo(request);
             }
             return app.handle(request);
         };

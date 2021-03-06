@@ -6,8 +6,11 @@ import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import org.junit.Test;
 
-import static com.vtence.molecule.lib.predicates.Predicates.anything;
-import static com.vtence.molecule.lib.predicates.Predicates.nothing;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.vtence.molecule.Middleware.identity;
+import static com.vtence.molecule.lib.predicates.Requests.*;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 import static java.lang.String.format;
 
@@ -50,7 +53,16 @@ public class FilterMapTest {
     }
 
     @Test public void
-    appliesLastRegisteredOfMatchingFilters() throws Exception {
+    addPathBoundParametersToRequest() throws Exception {
+        Response response = filters.map("/products/:number", identity())
+                                   .then(reportParameters("number"))
+                                   .handle(Request.get("/products/ABCDEF/items/12345678"));
+
+        assertThat(response).hasBodyText("number: ABCDEF");
+    }
+
+    @Test public void
+    appliesLastRegisteredMatchingFilter() throws Exception {
         filters.map(anything(), filter("filter"));
         filters.map(anything(), filter("replacement"));
 
@@ -63,7 +75,7 @@ public class FilterMapTest {
         assertThat(response).hasHeader("content", content);
     }
 
-    private Middleware filter(final String name) {
+    private Middleware filter(String name) {
         return next -> request -> {
             Response response = next.handle(request);
             return response.header("content", format("%s(%s)", name, response.header("content")));
@@ -72,5 +84,9 @@ public class FilterMapTest {
 
     private Application stubResponse(String content) {
         return request -> Response.ok().header("content", content).done();
+    }
+
+    private Application reportParameters(String... names) {
+        return request -> Response.ok().done(Stream.of(names).map(it -> it + ": " + request.parameter(it)).collect(Collectors.joining("; ")));
     }
 };

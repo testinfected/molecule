@@ -6,8 +6,8 @@ import com.vtence.molecule.Response;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
-import static com.vtence.molecule.lib.predicates.Predicates.anything;
-import static com.vtence.molecule.lib.predicates.Predicates.nothing;
+import static com.vtence.molecule.lib.predicates.Requests.anything;
+import static com.vtence.molecule.lib.predicates.Requests.nothing;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
 public class RouterTest {

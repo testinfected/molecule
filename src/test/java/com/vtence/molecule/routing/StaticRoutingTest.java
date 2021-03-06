@@ -7,14 +7,14 @@ import com.vtence.molecule.middlewares.Router;
 import org.junit.Test;
 
 import static com.vtence.molecule.http.HeaderNames.ACCEPT;
-import static com.vtence.molecule.lib.predicates.Predicates.DELETE;
-import static com.vtence.molecule.lib.predicates.Predicates.GET;
-import static com.vtence.molecule.lib.predicates.Predicates.HEAD;
-import static com.vtence.molecule.lib.predicates.Predicates.OPTIONS;
-import static com.vtence.molecule.lib.predicates.Predicates.PATCH;
-import static com.vtence.molecule.lib.predicates.Predicates.POST;
-import static com.vtence.molecule.lib.predicates.Predicates.PUT;
-import static com.vtence.molecule.lib.predicates.Predicates.accepting;
+import static com.vtence.molecule.lib.predicates.Requests.DELETE;
+import static com.vtence.molecule.lib.predicates.Requests.GET;
+import static com.vtence.molecule.lib.predicates.Requests.HEAD;
+import static com.vtence.molecule.lib.predicates.Requests.OPTIONS;
+import static com.vtence.molecule.lib.predicates.Requests.PATCH;
+import static com.vtence.molecule.lib.predicates.Requests.POST;
+import static com.vtence.molecule.lib.predicates.Requests.PUT;
+import static com.vtence.molecule.lib.predicates.Requests.accepting;
 import static com.vtence.molecule.routing.StaticRoutingTest.Echo.echo;
 import static com.vtence.molecule.testing.ResponseAssert.assertThat;
 
