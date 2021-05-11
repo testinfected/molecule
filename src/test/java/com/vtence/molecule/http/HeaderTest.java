@@ -2,9 +2,13 @@ package com.vtence.molecule.http;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 public class HeaderTest {
 
@@ -52,5 +56,19 @@ public class HeaderTest {
     ignoresQualityIfNotFirstParameterOrNotANumber() {
         Header header = new Header("foo; bar; q=0, baz; q=0.8, qux; q=_");
         assertThat("acceptable values", header.values(), contains("foo", "qux", "baz"));
+    }
+
+    @Test public void
+    recognizesParametersWithoutAnyValue() {
+        Header header = new Header("for=192.0.2.60;proto=http;by=203.0.113.43");
+        assertThat("is a single value", header.all(), hasSize(1));
+        assertThat("without value", header.first().value(), emptyString());
+        assertThat("made of 3 parameters", header.first().parameters(), hasSize(3));
+    }
+
+    @Test public void
+    ignoresParameterNameCasing() {
+        Header header = new Header("For=192.0.2.60");
+        assertThat(header.first().parameter("for"), equalTo("192.0.2.60"));
     }
 }

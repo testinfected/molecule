@@ -3,6 +3,7 @@ package com.vtence.molecule.http;
 import com.vtence.molecule.helpers.Joiner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -39,23 +40,27 @@ public class Header {
         return values.stream().filter(Value::acceptable).map(Value::value).collect(toList());
     }
 
-    private List<Value> parseValues(String header) {
+    private static List<Value> parseValues(String header) {
         List<Value> values = new ArrayList<>();
         for (String value : VALUES_DELIMITER.split(header)) {
             String[] tokens = TOKENS_DELIMITER.split(value);
-            values.add(new Value(value(tokens), parameters(tokens)));
+
+            if (isParameter(tokens[0])) {
+                values.add(new Value("", parameters(tokens)));
+            } else {
+                values.add(new Value(tokens[0], parameters(Arrays.copyOfRange(tokens, 1, tokens.length))));
+            }
         }
         return values;
     }
 
-    private String value(String[] tokens) {
-        return tokens[0];
+    private static boolean isParameter(String first) {
+        return NAME_VALUE_DELIMITER.split(first).length > 1;
     }
 
-    private List<Parameter> parameters(String[] tokens) {
+    private static List<Parameter> parameters(String[] tokens) {
         List<Parameter> pairs = new ArrayList<>();
-        for (int i = 1; i < tokens.length; i++) {
-            String token = tokens[i];
+        for (String token : tokens) {
             String[] parts = NAME_VALUE_DELIMITER.split(token);
             String attribute = parts[0];
             String value = parts.length > 1 ? parts[1] : null;
@@ -149,7 +154,7 @@ public class Header {
         }
 
         public boolean is(String name) {
-            return this.name().equals(name);
+            return this.name().equalsIgnoreCase(name);
         }
 
         public String value() {
