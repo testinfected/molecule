@@ -1,13 +1,8 @@
 package com.vtence.molecule.servers;
 
-import com.vtence.molecule.Application;
-import com.vtence.molecule.Body;
-import com.vtence.molecule.BodyPart;
-import com.vtence.molecule.FailureReporter;
-import com.vtence.molecule.Request;
-import com.vtence.molecule.Response;
-import com.vtence.molecule.Server;
+import com.vtence.molecule.*;
 import com.vtence.molecule.helpers.Headers;
+import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.http.Uri;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -25,15 +20,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.vtence.molecule.http.HttpMethod.valueOf;
+import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.util.HttpString.tryFromString;
 
 public class UndertowServer implements Server {
@@ -61,16 +54,17 @@ public class UndertowServer implements Server {
         return host;
     }
 
-    public void run(final Application app) throws IOException {
-        start(Undertow.builder().addHttpListener(port, host), app);
+    public void run(final Application app, ServerOption... options) throws IOException {
+        start(Undertow.builder().addHttpListener(port, host), app, options);
     }
 
-    public void run(final Application app, SSLContext context) throws IOException {
-        start(Undertow.builder().addHttpsListener(port, host, context), app);
+    public void run(final Application app, SSLContext context, ServerOption... options) throws IOException {
+        start(Undertow.builder().addHttpsListener(port, host, context), app, options);
     }
 
-    private void start(Undertow.Builder builder, Application app) {
+    private void start(Undertow.Builder builder, Application app, ServerOption... options) {
         server = builder.setHandler(new DispatchHandler(app))
+                        .setServerOption(ENABLE_HTTP2, Set.of(options).contains(ServerOption.HTTP_2))
                         .build();
         server.start();
     }
@@ -124,11 +118,18 @@ public class UndertowServer implements Server {
         }
 
         private Request makeRequest(HttpServerExchange exchange) throws IOException {
-            return new Request(valueOf(exchange.getRequestMethod().toString()),
-                               reconstructUri(exchange),
+            return new Request(getMethod(exchange), reconstructUri(exchange), getProtocol(exchange),
                                readHeaders(exchange),
                                readParameters(exchange),
                                readParts(exchange));
+        }
+
+        private String getProtocol(HttpServerExchange exchange) {
+            return exchange.getProtocol().toString();
+        }
+
+        private HttpMethod getMethod(HttpServerExchange exchange) {
+            return valueOf(exchange.getRequestMethod().toString());
         }
 
         private Uri reconstructUri(HttpServerExchange exchange) {

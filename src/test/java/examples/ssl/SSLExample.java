@@ -2,11 +2,15 @@ package examples.ssl;
 
 import com.vtence.molecule.Response;
 import com.vtence.molecule.WebServer;
+import com.vtence.molecule.middlewares.ApacheCommonLogger;
 import com.vtence.molecule.middlewares.ForceSSL;
+import examples.files.Logging;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.Clock;
+import java.util.Locale;
 
 import static com.vtence.molecule.http.HttpStatus.NOT_FOUND;
 import static com.vtence.molecule.testing.ResourceLocator.locateOnClasspath;
@@ -45,6 +49,7 @@ public class SSLExample {
         server.enableSSL(keyStore, keyStorePassword, keyPassword)
               // Add HSTS security headers
               .add(new ForceSSL())
+              .add(new ApacheCommonLogger(Logging.toConsole(), Clock.systemDefaultZone(), Locale.getDefault()))
               // We a render a simple text to let our user know she is on a secure channel
               .start(request -> Response.ok().done("You are on a secure channel"));
     }

@@ -31,4 +31,13 @@ public class UndertowServerTest extends ServerCompatibilityTests {
                             .hasHeader("Content-Length", "16")
                             .isNotChunked();
     }
+
+    @Test public void
+    supportsHttp2() throws Exception {
+        server.enableHTTP2().start(request -> Response.ok().done(request.protocol()));
+
+        var response = client.send(request.uri(server.uri().resolve("/")).build(), ofString());
+        assertNoError();
+        assertThat(response).hasBody("HTTP/2.0");
+    }
 }

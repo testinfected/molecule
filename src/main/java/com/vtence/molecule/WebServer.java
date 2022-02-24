@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -23,6 +25,7 @@ public class WebServer {
 
     private final Server server;
     private final MiddlewareStack stack;
+    private final Set<ServerOption> options = new HashSet<>();
 
     private SSLContext ssl;
 
@@ -87,6 +90,14 @@ public class WebServer {
      */
     public WebServer enableSSL(SSLContext context) {
         this.ssl = context;
+        return this;
+    }
+
+    /**
+     * Prefers to use HTTP/2 over HTTP/1.1 if the underlying server supports it.
+     */
+    public WebServer enableHTTP2() {
+        this.options.add(ServerOption.HTTP_2);
         return this;
     }
 
@@ -215,9 +226,9 @@ public class WebServer {
      */
     public Server start() throws IOException {
         if (ssl != null) {
-            server.run(stack.boot(), ssl);
+            server.run(stack.boot(), ssl, options.toArray(new ServerOption[0]));
         } else {
-            server.run(stack.boot());
+            server.run(stack.boot(), options.toArray(new ServerOption[0]));
         }
         return server;
     }

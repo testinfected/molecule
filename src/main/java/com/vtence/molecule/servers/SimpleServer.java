@@ -7,7 +7,9 @@ import com.vtence.molecule.FailureReporter;
 import com.vtence.molecule.Request;
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import com.vtence.molecule.ServerOption;
 import com.vtence.molecule.helpers.Headers;
+import com.vtence.molecule.http.HttpMethod;
 import com.vtence.molecule.http.Uri;
 import org.simpleframework.http.Part;
 import org.simpleframework.http.Query;
@@ -65,11 +67,11 @@ public class SimpleServer implements Server {
         return host;
     }
 
-    public void run(final Application app) throws IOException {
-        run(app, null);
+    public void run(final Application app, ServerOption... options) throws IOException {
+        run(app, null, options);
     }
 
-    public void run(final Application app, SSLContext context) throws IOException {
+    public void run(final Application app, SSLContext context, ServerOption... options) throws IOException {
         connection = new SocketConnection(new ContainerSocketProcessor(new ApplicationContainer(app), numberOfThreads));
         connection.connect(new InetSocketAddress(host, port), context);
     }
@@ -122,11 +124,20 @@ public class SimpleServer implements Server {
         }
 
         private Request makeRequest(org.simpleframework.http.Request req) throws IOException {
-            return new Request(valueOf(req.getMethod()),
+            return new Request(getMethod(req),
                                reconstructUri(req),
+                               getProtocol(req),
                                readHeaders(req),
                                readParameters(req),
                                readMultiPartData(req));
+        }
+
+        private String getProtocol(org.simpleframework.http.Request req) {
+            return String.format("HTTP/%d.%d", req.getMajor(), req.getMinor());
+        }
+
+        private HttpMethod getMethod(org.simpleframework.http.Request req) {
+            return valueOf(req.getMethod());
         }
 
         private Uri reconstructUri(org.simpleframework.http.Request req) {

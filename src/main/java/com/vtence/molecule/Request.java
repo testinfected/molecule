@@ -61,10 +61,13 @@ public class Request {
     private long timestamp;
 
     public Request(HttpMethod method, Uri uri) {
-        this(method, uri, new Headers(), emptyMap(), emptyList());
+        this(method, uri, "HTTP/1.1", new Headers(), emptyMap(), emptyList());
     }
 
-    public Request(HttpMethod method, Uri uri, Headers headers,
+    public Request(HttpMethod method,
+                   Uri uri,
+                   String protocol,
+                   Headers headers,
                    Map<String, List<String>> parameters,
                    Collection<BodyPart> parts) {
         this.method = method;
@@ -73,7 +76,7 @@ public class Request {
         this.parameters.putAll(parameters);
         this.parts.addAll(parts);
         this.secure = Objects.equals(Scheme.from(uri), Scheme.HTTPS);
-        this.protocol = "HTTP/1.1";
+        this.protocol = protocol;
         this.body = InputStream.nullInputStream();
         this.remotePort = -1;
         this.timestamp = -1;
