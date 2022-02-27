@@ -66,7 +66,13 @@ public class UriTest {
     public void handlesAbsenceOfQueryComponent() {
         Uri uri = new Uri(null, null, null, -1, "/path", null, null);
 
-        assertThat("uri", uri.uri(), is("/path"));
+        assertThat("query component", uri.queryComponent(), is(""));
+    }
+
+    @Test
+    public void ignoresEmptyQueryString() {
+        Uri uri = new Uri(null, null, null, -1, "/path", "", null);
+
         assertThat("query component", uri.queryComponent(), is(""));
         assertThat("fragment component", uri.fragmentComponent(), is(""));
     }

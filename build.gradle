@@ -29,7 +29,7 @@ targetCompatibility = 1.11
 
 def libs = [
         simple            : 'org.simpleframework:simple-http:6.0.1',
-        undertow          : 'io.undertow:undertow-core:2.2.2.Final',
+        undertow          : 'io.undertow:undertow-core:2.2.16.Final',
         jmustache         : 'com.samskivert:jmustache:1.15',
         hamcrest          : 'org.hamcrest:hamcrest:2.2',
         junit             : 'junit:junit:4.13.1@jar',

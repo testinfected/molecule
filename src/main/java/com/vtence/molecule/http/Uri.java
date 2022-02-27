@@ -97,7 +97,7 @@ public class Uri {
     }
 
     public String queryComponent() {
-        return query == null ? "" : "?" + query;
+        return query == null || query.isEmpty()? "" : "?" + query;
     }
 
     public String fragmentComponent() {

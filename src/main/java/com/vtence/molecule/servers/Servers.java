@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.toList;
 
 public final class Servers {
 
-    private static final List<String> SUPPORTED = asList("Simple", "Undertow");
+    private static final List<String> SUPPORTED = asList("Undertow", "Simple");
 
     private static final List<? extends Class<? extends Server>> AVAILABLE = SUPPORTED.stream()
                                                                                       .map(Servers::loadClass)

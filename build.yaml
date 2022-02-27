@@ -8,7 +8,7 @@ artifacts:
   simple_common: org.simpleframework:simple-common:jar:6.0.1
   simple_transport: org.simpleframework:simple-transport:jar:6.0.1
   simple_http: org.simpleframework:simple-http:jar:6.0.1
-  undertow: io.undertow:undertow-core:jar:2.2.2.Final
+  undertow: io.undertow:undertow-core:jar:2.2.16.Final
   mustache: com.samskivert:jmustache:jar:1.15
 
   # -- testing dependencies
