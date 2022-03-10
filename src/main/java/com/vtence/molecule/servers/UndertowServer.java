@@ -23,11 +23,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.vtence.molecule.http.HttpMethod.valueOf;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static io.undertow.util.HttpString.tryFromString;
+import static java.util.logging.Level.OFF;
 
 public class UndertowServer implements Server {
 
@@ -55,18 +57,27 @@ public class UndertowServer implements Server {
     }
 
     public void run(final Application app, ServerOption... options) throws IOException {
-        start(Undertow.builder().addHttpListener(port, host), app, options);
+        start(Undertow.builder().addHttpListener(port, host), app, Set.of(options));
     }
 
     public void run(final Application app, SSLContext context, ServerOption... options) throws IOException {
-        start(Undertow.builder().addHttpsListener(port, host, context), app, options);
+        start(Undertow.builder().addHttpsListener(port, host, context), app, Set.of(options));
     }
 
-    private void start(Undertow.Builder builder, Application app, ServerOption... options) {
+    private void start(Undertow.Builder builder, Application app, Set<ServerOption> options) {
+        if (!options.contains(ServerOption.LOGGING))
+            silenceLogging();
+
         server = builder.setHandler(new DispatchHandler(app))
-                        .setServerOption(ENABLE_HTTP2, Set.of(options).contains(ServerOption.HTTP_2))
+                        .setServerOption(ENABLE_HTTP2, options.contains(ServerOption.HTTP_2))
                         .build();
         server.start();
+    }
+
+    private void silenceLogging() {
+        Logger.getLogger("org.xnio").setLevel(OFF);
+        Logger.getLogger("io.undertow").setLevel(OFF);
+        Logger.getLogger("org.jboss.threads").setLevel(OFF);
     }
 
     public void shutdown()  {

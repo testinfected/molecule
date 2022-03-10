@@ -1,18 +1,16 @@
 package examples.files;
 
 import java.io.OutputStream;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.StreamHandler;
+import java.util.logging.*;
+
+import static java.util.logging.Level.OFF;
 
 public class Logging {
 
     public static Logger off() {
         Logger logger = Logger.getAnonymousLogger();
         logger.setUseParentHandlers(false);
-        logger.setLevel(Level.OFF);
+        logger.setLevel(OFF);
         return logger;
     }
 

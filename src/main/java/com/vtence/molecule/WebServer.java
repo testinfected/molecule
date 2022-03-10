@@ -102,6 +102,14 @@ public class WebServer {
     }
 
     /**
+     * Activate the underlying server internal logging mechanism, if any exists.
+     */
+    public WebServer activateLogging() {
+        this.options.add(ServerOption.LOGGING);
+        return this;
+    }
+
+    /**
      * Notifies the given error consumer when an uncaught exceptions occurs.
      *
      * @param reporter the failure reporter to notify in case of uncaught exceptions
