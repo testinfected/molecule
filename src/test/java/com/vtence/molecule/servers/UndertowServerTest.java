@@ -2,10 +2,15 @@ package com.vtence.molecule.servers;
 
 import com.vtence.molecule.Response;
 import com.vtence.molecule.Server;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
+
+import java.net.http.HttpClient;
+import java.util.regex.Matcher;
 
 import static com.vtence.molecule.testing.http.HttpResponseAssert.assertThat;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
+import static org.hamcrest.Matchers.equalTo;
 
 public class UndertowServerTest extends ServerCompatibilityTests {
 
@@ -31,5 +36,6 @@ public class UndertowServerTest extends ServerCompatibilityTests {
         var response = client.send(request.uri(server.uri().resolve("/")).build(), ofString());
         assertNoError();
         assertThat(response).hasBody("HTTP/2.0");
+        MatcherAssert.assertThat("protocol version", response.version(), equalTo(HttpClient.Version.HTTP_2));
     }
 }
