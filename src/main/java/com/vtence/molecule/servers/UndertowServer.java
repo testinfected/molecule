@@ -75,9 +75,15 @@ public class UndertowServer implements Server {
     }
 
     private void silenceLogging() {
-        Logger.getLogger("org.xnio").setLevel(OFF);
-        Logger.getLogger("io.undertow").setLevel(OFF);
-        Logger.getLogger("org.jboss.threads").setLevel(OFF);
+        silenceLogger("org.xnio");
+        silenceLogger("io.undertow");
+        silenceLogger("org.jboss.threads");
+    }
+
+    private void silenceLogger(String name) {
+        var logger = Logger.getLogger(name);
+        logger.setLevel(OFF);
+        logger.setUseParentHandlers(false);
     }
 
     public void shutdown()  {
