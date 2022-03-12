@@ -31,7 +31,7 @@ Molecule is built around the simple concept of Application as a Function:
 - A `Middleware` is a simple function of `(Application) -> Application` that implements application-independent 
 functionality. A middleware is composed with an application to modify application behavior.
 
-Molecule is great for building micro services or regular web applications. It is designed around simplicity,
+Molecule is great for building microservices or regular web applications. It is designed around simplicity,
 testability and freedom of choice. Built entirely using TDD it provides super-easy ways to test your 
 application and individual endpoints, both in and out of container.
 
@@ -40,9 +40,8 @@ of middlewares (a.k.a filters). It offers various abstractions for a number of f
 (such as routing, templating, security, etc.). You're free to use the built-in options or provide 
 your own implementations. 
 
-Molecule requires Java 8. It runs an embedded web-server powered by [Simple](http://simpleframework.org) 
-or [Undertow](http://undertow.io). 
-Both are fully asynchronous and non-blocking, which means they can scale to very high loads.
+Molecule requires Java 8. It runs an embedded web-server powered by your choice of [Undertow](http://undertow.io)
+or [Simple](http://simpleframework.org). Both are fully asynchronous and non-blocking, which means they can scale to very high loads.
 
 Have fun!
 
@@ -57,7 +56,18 @@ You can get the latest release version from Maven Central:
       <version>0.14.0</version>
 </dependency>
 ```
- 
+
+To choose Undertow as your web server, add [Undertow](http://undertow.io) instead to your dependencies:
+
+```xml
+<dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-core</artifactId>
+      <version>2.2.16.Final</version>
+      <scope>runtime</scope>
+</dependency>
+```
+
 To use Simple as your web server, add [Simple](http://www.simpleframework.org) as a dependency:
 
 ```xml
@@ -67,18 +77,8 @@ To use Simple as your web server, add [Simple](http://www.simpleframework.org) a
       <version>6.0.1</version>
       <scope>runtime</scope>
 </dependency>
-
 ```
-To choose Undertow as your web server, add [Undertow](http://undertow.io) instead to your dependencies:
 
-```xml
-<dependency>
-      <groupId>io.undertow</groupId>
-      <artifactId>undertow-core</artifactId>
-      <version>1.4.4.Final</version>
-      <scope>runtime</scope>
-</dependency>
-```
 
 ## Want to start with some code?
 
