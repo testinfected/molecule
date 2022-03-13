@@ -57,7 +57,7 @@ You can get the latest release version from Maven Central:
 </dependency>
 ```
 
-To choose Undertow as your web server, add [Undertow](http://undertow.io) instead to your dependencies:
+To choose Undertow as your web server, add [Undertow](http://undertow.io) to your dependencies:
 
 ```xml
 <dependency>
@@ -68,7 +68,7 @@ To choose Undertow as your web server, add [Undertow](http://undertow.io) instea
 </dependency>
 ```
 
-To use Simple as your web server, add [Simple](http://www.simpleframework.org) as a dependency:
+To use Simple as your web server, add [Simple](http://www.simpleframework.org) instead as a dependency:
 
 ```xml
 <dependency>
@@ -96,13 +96,14 @@ Try out the following examples:
 * [Multipart Forms](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/multipart/MultipartExample.java)
 * [View Templates and Layout](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/templating/TemplatingAndLayoutExample.java)
 * [HTTP Sessions](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/SessionExample.java)
+* [HTTP/2](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/session/Http2Example.java)
 * [Multiple Applications](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/multiapps/MultiAppsExample.java)
 * [Filters](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/filtering/FilteringExample.java)
 * [Creating a Custom Middleware](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/middleware/CustomMiddlewareExample.java)
 * [Caching and Compression](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/performance/CachingAndCompressionExample.java)
 * [SSL](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/ssl/SSLExample.java)
 * [Basic Authentication](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/auth/BasicAuthExample.java)
-* [A Sample Application](https://github.com/testinfected/simple-petstore/blob/master/webapp/src/main/java/org/testinfected/petstore/PetStore.java)
+
 
 ## Getting Started
 
@@ -135,7 +136,8 @@ WebServer server = WebServer.create("0.0.0.0", 8088);
 
 ## Asynchronous Processing
 
-Molecule uses [Simple](http://www.simpleframework.org) as a default web server. You have the choice to run using [Undertow](http://undertow.io) instead. Both are fully asynchronous and non-blocking. This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending on a high latency external resource.
+Molecule uses [Undertow](http://undertow.io) as a default web server. You have the choice to run using [Simple](http://www.simpleframework.org) instead. 
+Both are fully asynchronous and non-blocking. This allows the server to scale to very high loads and handle as many concurrent connections as possible, even when depending on a high latency external resource.
          
 What this means is you can serve your response content from a thread separate to the original servicing thread. For instance your application 
 might need to wait for some remote process that takes some time to complete, such as an HTTP or SOAP request to an external server. You can simply 
@@ -145,6 +147,18 @@ To tell the server that you're ready to serve the response, call the <code>done<
 
 Look at the [Asynchronous example](https://github.com/testinfected/molecule/blob/master/src/test/java/examples/async/AsyncExample.java)
 to see how to serve content from a separate thread.
+
+
+## HTTP/2
+
+[Undertow](http://undertow.io) supports HTTP/2 (unfortunately [Simple](http://www.simpleframework.org) does not support it). 
+Enabling HTTP/2 must be done before starting
+the `WebServer` :
+
+```java
+WebServer server = WebServer.create();
+server.enableHTTP2();
+```
 
 
 ## Routing
