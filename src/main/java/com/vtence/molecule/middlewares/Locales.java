@@ -18,7 +18,7 @@ public class Locales implements Middleware {
     }
 
     private static List<Locale> fromLanguageTags(String... languageTags) {
-        List<Locale> locales = new ArrayList<>();
+        var locales = new ArrayList<Locale>();
         for (String tag : languageTags) {
             locales.add(Locale.forLanguageTag(tag));
         }
@@ -27,7 +27,7 @@ public class Locales implements Middleware {
 
     public Application then(Application next) {
         return request -> {
-            AcceptLanguage acceptedLanguages = AcceptLanguage.of(request);
+            var acceptedLanguages = AcceptLanguage.of(request);
             Locale best = acceptedLanguages.selectBest(supported);
             request.attribute(Locale.class, best != null ? best : Locale.getDefault());
 

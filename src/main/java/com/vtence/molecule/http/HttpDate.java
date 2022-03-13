@@ -30,7 +30,7 @@ public final class HttpDate {
     private static final ZoneId GMT = ZoneId.of("GMT");
 
     public static Instant parse(String httpDate) {
-        for (DateTimeFormatter format : POSSIBLE_FORMATS) {
+        for (var format : POSSIBLE_FORMATS) {
             try {
                 // Ignore timezone component as all HTTP dates should be represented in UTC
                 return LocalDateTime.parse(httpDate, format).atZone(GMT).toInstant();

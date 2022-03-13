@@ -15,8 +15,8 @@ public class Serializer<T> implements Marshaller<T> {
     }
 
     public byte[] marshall(T data) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ObjectOutputStream output = new ObjectOutputStream(buffer);
+        var buffer = new ByteArrayOutputStream();
+        var output = new ObjectOutputStream(buffer);
         output.writeObject(data);
         output.flush();
         output.close();
@@ -24,7 +24,7 @@ public class Serializer<T> implements Marshaller<T> {
     }
 
     public T unmarshall(byte[] data) throws Exception {
-        ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(data));
+        var input = new ObjectInputStream(new ByteArrayInputStream(data));
         return type.cast(input.readObject());
     }
 }

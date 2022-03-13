@@ -23,7 +23,7 @@ public class AcceptEncoding {
     }
 
     public static AcceptEncoding from(Header header) {
-        AcceptEncoding accept = new AcceptEncoding();
+        var accept = new AcceptEncoding();
         accept.values.addAll(header.all());
         return accept;
     }
@@ -42,7 +42,7 @@ public class AcceptEncoding {
     }
 
     private List<Header.Value> explicitContentCodings(Collection<String> availableEncodings) {
-        List<Header.Value> codings = new ArrayList<>();
+        var codings = new ArrayList<Header.Value>();
 
         for (Header.Value accept: values) {
             if (accept.is("*")) {
@@ -63,7 +63,7 @@ public class AcceptEncoding {
         List<String> candidates = listValues(encodings);
         if (!candidates.contains("identity")) candidates.add("identity");
 
-        for (Header.Value encoding : encodings) {
+        for (var encoding : encodings) {
             if (!encoding.acceptable()) candidates.remove(encoding.value());
         }
         return candidates;

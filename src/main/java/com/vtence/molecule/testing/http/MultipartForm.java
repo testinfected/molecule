@@ -20,10 +20,10 @@ public class MultipartForm extends Form {
 
     @Override
     public void subscribe(Flow.Subscriber<? super ByteBuffer> subscriber) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        var buffer = new ByteArrayOutputStream();
         try {
             writeTo(buffer);
-            HttpRequest.BodyPublisher delegate = HttpRequest.BodyPublishers.ofByteArray(buffer.toByteArray());
+            var delegate = HttpRequest.BodyPublishers.ofByteArray(buffer.toByteArray());
             delegate.subscribe(subscriber);
         } catch (IOException e) {
             subscriber.onError(e);
@@ -32,7 +32,7 @@ public class MultipartForm extends Form {
 
     @Override
     public long contentLength() {
-        ByteCountingOutputStream out = new ByteCountingOutputStream();
+        var out = new ByteCountingOutputStream();
         try {
             writeTo(out);
         } catch (IOException ignored) {
@@ -78,7 +78,7 @@ public class MultipartForm extends Form {
     }
 
     public void writeTo(OutputStream out) throws IOException {
-        Writer writer = new OutputStreamWriter(out, charset);
+        var writer = new OutputStreamWriter(out, charset);
         for (Part part : parts) {
             writer.append("--").append(boundary).append(CRLF);
             writer.flush();
@@ -104,8 +104,8 @@ public class MultipartForm extends Form {
 
         @Override
         public void encode(OutputStream out, Charset charset) throws IOException {
-            Writer writer = new OutputStreamWriter(out, charset);
-            URLEscaper escaper = URLEscaper.to(charset);
+            var writer = new OutputStreamWriter(out, charset);
+            var escaper = URLEscaper.to(charset);
             writer.append("Content-Disposition: form-data; name=\"").append(escaper.escape(name)).append("\"").append(CRLF);
             writer.append(CRLF);
             writer.append(value).append(CRLF);
@@ -128,8 +128,8 @@ public class MultipartForm extends Form {
         }
 
         public void encode(OutputStream out, Charset charset) throws IOException {
-            Writer writer = new OutputStreamWriter(out, charset);
-            URLEscaper escaper = URLEscaper.to(charset);
+            var writer = new OutputStreamWriter(out, charset);
+            var escaper = URLEscaper.to(charset);
             writer.append("Content-Disposition: form-data");
             if (name != null) {
                 writer.append("; name=\"").append(escaper.escape(name)).append("\"");
@@ -156,7 +156,7 @@ public class MultipartForm extends Form {
         }
 
         private Charset fileCharset() {
-            ContentType contentType = ContentType.parse(this.contentType);
+            var contentType = ContentType.parse(this.contentType);
             return contentType.charset() != null ? contentType.charset() : StandardCharsets.UTF_8;
         }
     }

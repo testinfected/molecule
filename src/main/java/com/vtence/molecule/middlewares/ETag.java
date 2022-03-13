@@ -45,7 +45,7 @@ public class ETag implements Middleware {
     }
 
     private byte[] render(Response response) throws IOException {
-        try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try(var out = new ByteArrayOutputStream()) {
             try(Body body = response.body()) {
                 body.writeTo(out, response.charset());
             }
@@ -92,7 +92,7 @@ public class ETag implements Middleware {
     }
 
     private byte[] computeHash(byte[] output) throws NoSuchAlgorithmException {
-        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        var md5 = MessageDigest.getInstance("MD5");
         return md5.digest(output);
     }
 }

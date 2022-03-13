@@ -21,7 +21,7 @@ public class TemplateBody extends ChunkedBody {
     }
 
     public void writeTo(OutputStream out, Charset charset) throws IOException {
-        Writer writer = new BufferedWriter(new OutputStreamWriter(out, charset));
+        var writer = new BufferedWriter(new OutputStreamWriter(out, charset));
         renderer.render(writer, template, context);
         writer.flush();
     }

@@ -16,7 +16,7 @@ public class HMacDigest implements DigestAlgorithm {
     }
 
     public byte[] compute(String secret, byte[] content) throws Exception {
-        SecretKeySpec keySpec = new SecretKeySpec(encode(secret), algorithm);
+        var keySpec = new SecretKeySpec(encode(secret), algorithm);
         Mac mac = Mac.getInstance(algorithm);
         mac.init(keySpec);
 

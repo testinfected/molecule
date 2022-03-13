@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 public class Router implements Application, RouteSet {
 
     public static Router draw(RouteBuilder routeBuilder) {
-        Router router = new Router();
+        var router = new Router();
         routeBuilder.build(router);
         return router;
     }

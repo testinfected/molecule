@@ -55,7 +55,7 @@ public class FileServer implements Application {
                            .done();
         }
 
-        File file = new File(root, request.path());
+        var file = new File(root, request.path());
         if (!canServe(file)) {
             return Response.of(NOT_FOUND)
                            .contentType(TEXT)
@@ -68,7 +68,7 @@ public class FileServer implements Application {
                            .done();
         }
 
-        Response response = Response.ok();
+        var response = Response.ok();
         addFileHeaders(response, file);
         addCustomHeaders(response);
 

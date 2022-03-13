@@ -14,7 +14,7 @@ public class CookieSessionStore implements SessionStore {
     private int timeToLive;
 
     public static CookieSessionStore secure(String key, String... oldKeys) {
-        SecureSessionEncoder secureEncoder = new SecureSessionEncoder(key);
+        var secureEncoder = new SecureSessionEncoder(key);
         secureEncoder.acceptAlternateKeys(oldKeys);
         return new CookieSessionStore(new SecureIdentifierPolicy(), secureEncoder);
     }
@@ -99,7 +99,7 @@ public class CookieSessionStore implements SessionStore {
     }
 
     private Session makeSession(Session data, String sid) {
-        Session session = new Session(sid);
+        var session = new Session(sid);
         session.merge(data);
         session.maxAge(data.maxAge());
         session.updatedAt(data.updatedAt());

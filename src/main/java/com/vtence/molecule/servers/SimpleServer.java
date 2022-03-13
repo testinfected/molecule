@@ -141,7 +141,7 @@ public class SimpleServer implements Server {
         }
 
         private Uri reconstructUri(org.simpleframework.http.Request req) {
-            Uri uri = Uri.of(req.getTarget());
+            var uri = Uri.of(req.getTarget());
             if (uri.scheme() == null) uri = uri.scheme(req.isSecure() ? HTTPS.name() : HTTP.name());
             if (uri.host() == null) uri = uri.host(host);
             if (uri.port() == -1) uri = uri.port(port);
@@ -149,7 +149,7 @@ public class SimpleServer implements Server {
         }
 
         private Headers readHeaders(org.simpleframework.http.Request req) {
-            Headers headers = new Headers();
+            var headers = new Headers();
             for (String header : req.getNames()) {
                 // Apparently there's no way to know the number of values for a given name,
                 // so we have to iterate until we reach a null value
@@ -163,7 +163,7 @@ public class SimpleServer implements Server {
         }
 
         private Map<String, List<String>> readParameters(org.simpleframework.http.Request req) {
-            Map<String, List<String>> parameters = new HashMap<>();
+            var parameters = new HashMap<String, List<String>>();
             Query query = req.getQuery();
             query.keySet().forEach(name -> {
                 query.getAll(name).forEach(
@@ -174,7 +174,7 @@ public class SimpleServer implements Server {
         }
 
         private List<BodyPart> readMultiPartData(org.simpleframework.http.Request req) throws IOException {
-            List<BodyPart> parts = new ArrayList<>();
+            var parts = new ArrayList<BodyPart>();
             for (Part part : req.getParts()) {
                 parts.add(new BodyPart().content(track(part.getInputStream()))
                                         .contentType(contentTypeOf(part))

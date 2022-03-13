@@ -26,31 +26,30 @@ import static com.vtence.molecule.http.HeaderNames.CONTENT_ENCODING;
 import static com.vtence.molecule.http.HeaderNames.CONTENT_LENGTH;
 import static com.vtence.molecule.http.HttpStatus.NOT_ACCEPTABLE;
 import static com.vtence.molecule.http.MimeTypes.TEXT;
-import static com.vtence.molecule.middlewares.Compressor.Codings.identity;
+import static com.vtence.molecule.middlewares.Compressor.Codings.IDENTITY;
 
 public class Compressor implements Middleware {
 
     private final Collection<String> compressibleTypes = new ArrayList<>();
 
     enum Codings {
-
-        gzip {
+        GZIP {
             public void encode(Response response) {
                 response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, name());
+                response.header(CONTENT_ENCODING, name().toLowerCase());
                 response.body(new GZipStream(response.body()));
             }
         },
 
-        deflate {
+        DEFLATE {
             public void encode(Response response) {
                 response.removeHeader(CONTENT_LENGTH);
-                response.header(CONTENT_ENCODING, name());
+                response.header(CONTENT_ENCODING, name().toLowerCase());
                 response.body(new DeflateStream(response.body()));
             }
         },
 
-        identity {
+        IDENTITY {
             public void encode(Response response) {
             }
         };
@@ -58,9 +57,9 @@ public class Compressor implements Middleware {
         public abstract void encode(Response response);
 
         public static String[] all() {
-            List<String> all = new ArrayList<>();
+            var all = new ArrayList<String>();
             for (Codings coding : values()) {
-                all.add(coding.name());
+                all.add(coding.name().toLowerCase());
             }
             return all.toArray(new String[0]);
         }
@@ -73,7 +72,7 @@ public class Compressor implements Middleware {
             }
 
             public void writeTo(OutputStream out, Charset charset) throws IOException {
-                GZIPOutputStream zip = new GZIPOutputStream(out);
+                var zip = new GZIPOutputStream(out);
                 try {
                     body.writeTo(zip, charset);
                 } finally {
@@ -94,8 +93,8 @@ public class Compressor implements Middleware {
             }
 
             public void writeTo(OutputStream out, Charset charset) throws IOException {
-                Deflater zlib = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-                DeflaterOutputStream deflate = new DeflaterOutputStream(out, zlib);
+                var zlib = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+                var deflate = new DeflaterOutputStream(out, zlib);
                 try {
                     body.writeTo(deflate, charset);
                 } finally {
@@ -127,7 +126,7 @@ public class Compressor implements Middleware {
             }
 
             if (bestEncoding != null) {
-                Codings coding = Codings.valueOf(bestEncoding);
+                Codings coding = Codings.valueOf(bestEncoding.toUpperCase());
                 coding.encode(response);
             } else {
                 notAcceptable(response);
@@ -164,7 +163,7 @@ public class Compressor implements Middleware {
     }
 
     private boolean isIdentity(String contentEncoding) {
-        return contentEncoding.matches(atWordBoundaries(identity.name()));
+        return contentEncoding.matches(atWordBoundaries(IDENTITY.name().toLowerCase()));
     }
 
     private String atWordBoundaries(String text) {
@@ -172,7 +171,7 @@ public class Compressor implements Middleware {
     }
 
     private String selectBestAvailableEncodingFor(Request request) {
-        AcceptEncoding acceptEncoding = AcceptEncoding.of(request);
+        var acceptEncoding = AcceptEncoding.of(request);
         return acceptEncoding.selectBestEncoding(Codings.all());
     }
 

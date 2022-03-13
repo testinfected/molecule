@@ -15,7 +15,7 @@ public class Joiner {
     }
 
     public String join(Iterable<?> parts) {
-        StringJoiner joiner = new StringJoiner(separator);
+        var joiner = new StringJoiner(separator);
         for (Object part: parts) {
             joiner.add(String.valueOf(part));
         }

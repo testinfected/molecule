@@ -41,7 +41,7 @@ public class Header {
     }
 
     private static List<Value> parseValues(String header) {
-        List<Value> values = new ArrayList<>();
+        var values = new ArrayList<Value>();
         for (String value : VALUES_DELIMITER.split(header)) {
             String[] tokens = TOKENS_DELIMITER.split(value);
 
@@ -59,7 +59,7 @@ public class Header {
     }
 
     private static List<Parameter> parameters(String[] tokens) {
-        List<Parameter> pairs = new ArrayList<>();
+        var pairs = new ArrayList<Parameter>();
         for (String token : tokens) {
             String[] parts = NAME_VALUE_DELIMITER.split(token);
             String attribute = parts[0];

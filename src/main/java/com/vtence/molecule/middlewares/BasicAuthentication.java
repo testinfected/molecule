@@ -39,7 +39,7 @@ public class BasicAuthentication implements Middleware {
                 return Response.of(BAD_REQUEST).done();
             }
 
-            BasicCredentials credentials = BasicCredentials.decode(auth.params());
+            var credentials = BasicCredentials.decode(auth.params());
             Optional<String> user = authenticator.authenticate(credentials.username(), credentials.password());
 
             if (user.isPresent()) {

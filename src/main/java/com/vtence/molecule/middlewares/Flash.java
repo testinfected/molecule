@@ -44,7 +44,7 @@ public class Flash implements Middleware {
     private Consumer<Response> commitFlash(Request request) {
         return response -> {
             Session session = fetchSession(request);
-            FlashHash flash = FlashHash.get(request);
+            var flash = FlashHash.get(request);
             flash.sweep();
             if (!session.invalid() && !flash.empty()) {
                 session.put(FlashHash.class, flash.toMap());
@@ -53,7 +53,7 @@ public class Flash implements Middleware {
     }
 
     private Session fetchSession(Request request) {
-        Session session = Session.get(request);
+        var session = Session.get(request);
         if (session == null) throw new IllegalStateException("No session bound to request");
         return session;
     }

@@ -17,9 +17,9 @@ public class CookieDecoder {
     private static final String DOMAIN = "$Domain";
 
     public List<Cookie> decode(String header) {
-        List<Cookie> cookies = new ArrayList<>();
+        var cookies = new ArrayList<Cookie>();
 
-        Matcher pair = NAME_VALUE_PAIR.matcher(header);
+        var pair = NAME_VALUE_PAIR.matcher(header);
 
         int pos = 0;
         int version = 1;
@@ -34,7 +34,7 @@ public class CookieDecoder {
         while (pair.find(pos)) {
             pos = pair.end();
 
-            Cookie cookie = new Cookie(name(pair), value(pair));
+            var cookie = new Cookie(name(pair), value(pair));
             cookie.version(version);
 
             if (pair.find(pos)) {

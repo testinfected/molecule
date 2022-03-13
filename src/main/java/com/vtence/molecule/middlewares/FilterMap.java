@@ -42,7 +42,7 @@ public class FilterMap implements Middleware {
     private Function<Predicate<? super Request>, Predicate<? super Request>> addDynamicParametersTo(Request request) {
         return path -> {
             if (path instanceof WithBoundParameters) {
-                WithBoundParameters dynamicPath = (WithBoundParameters) path;
+                var dynamicPath = (WithBoundParameters) path;
                 dynamicPath.addParametersTo(request);
             }
             return path;
@@ -50,7 +50,7 @@ public class FilterMap implements Middleware {
     }
 
     private List<Predicate<? super Request>> possibleMatches() {
-        List<Predicate<? super Request>> matchers = new ArrayList<>(filters.keySet());
+        var matchers = new ArrayList<>(filters.keySet());
         Collections.reverse(matchers);
         return matchers;
     }

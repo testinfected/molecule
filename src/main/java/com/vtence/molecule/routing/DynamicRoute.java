@@ -33,7 +33,7 @@ public class DynamicRoute implements Route {
     private Application extractPathParameters(Application app) {
         return request -> {
             if (path instanceof WithBoundParameters) {
-                WithBoundParameters dynamicPath = (WithBoundParameters) path;
+                var dynamicPath = (WithBoundParameters) path;
                 dynamicPath.addParametersTo(request);
             }
             return app.handle(request);

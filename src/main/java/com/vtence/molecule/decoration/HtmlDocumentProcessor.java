@@ -17,7 +17,7 @@ public class HtmlDocumentProcessor implements ContentProcessor {
     private static final Pattern META = Pattern.compile("<meta name=\"([^\"]*)\" content=\"([^\"]*)\"", Pattern.DOTALL);
 
     public Map<String, String> process(String html) {
-        final Map<String, String> chunks = new HashMap<>();
+        var chunks = new HashMap<String, String>();
         addHead(chunks, html);
         addTitle(chunks, html);
         addBody(chunks, html);
@@ -56,7 +56,7 @@ public class HtmlDocumentProcessor implements ContentProcessor {
     }
 
     private void addMetaData(Map<String, String> chunks, String head) {
-        Matcher matcher = META.matcher(head);
+        var matcher = META.matcher(head);
         while (matcher.find()) {
             chunks.put(matcher.group(NAME), matcher.group(CONTENT));
         }

@@ -49,7 +49,7 @@ public class CookieSessionTracker implements Middleware {
     }
 
     private CookieJar fetchCookieJar(Request request) {
-        CookieJar cookieJar = CookieJar.get(request);
+        var cookieJar = CookieJar.get(request);
         if (cookieJar == null) throw new IllegalStateException("No cookie jar bound to request");
         return cookieJar;
     }

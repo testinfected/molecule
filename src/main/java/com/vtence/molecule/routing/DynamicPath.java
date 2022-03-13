@@ -29,7 +29,7 @@ public class DynamicPath implements WithBoundParameters, Predicate<String> {
     }
 
     public boolean test(String actual) {
-        Path path = new Path(actual);
+        var path = new Path(actual);
         if (pattern.longerThan(path)) return false;
         if (fullMatch && path.longerThan(pattern)) return false;
 
@@ -45,8 +45,8 @@ public class DynamicPath implements WithBoundParameters, Predicate<String> {
     }
 
     public Map<String, String> parametersBoundTo(String path) {
-        Path p = new Path(path);
-        Map<String, String> boundParameters = new HashMap<>();
+        var p = new Path(path);
+        var boundParameters = new HashMap<String, String>();
 
         for (int i = 0; i < pattern.segmentCount(); i++) {
             String segment = pattern.segment(i);
@@ -73,7 +73,7 @@ public class DynamicPath implements WithBoundParameters, Predicate<String> {
         }
 
         private static String[] removeEmptyParts(String[] parts) {
-            List<String> segments = new ArrayList<>();
+            var segments = new ArrayList<String>();
             for (String part : parts) {
                 if (!part.isEmpty()) segments.add(part);
             }

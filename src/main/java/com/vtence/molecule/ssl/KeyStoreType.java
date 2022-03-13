@@ -23,19 +23,19 @@ public enum KeyStoreType {
     }
 
     public KeyStore open(InputStream keyStore, String password) throws GeneralSecurityException, IOException {
-        KeyStore store = KeyStore.getInstance(type);
+        var store = KeyStore.getInstance(type);
         store.load(keyStore, password.toCharArray());
         return store;
     }
 
     public KeyStore open(File keyStore, String password) throws GeneralSecurityException, IOException {
-        try (InputStream source = new FileInputStream(keyStore)) {
+        try (var source = new FileInputStream(keyStore)) {
             return open(source, password);
         }
     }
 
     public KeyManager[] loadKeys(KeyStore keyStore, String keyPassword) throws GeneralSecurityException {
-        KeyManagerFactory keys = KeyManagerFactory.getInstance(algorithm);
+        var keys = KeyManagerFactory.getInstance(algorithm);
         keys.init(keyStore, keyPassword.toCharArray());
         return keys.getKeyManagers();
     }

@@ -48,7 +48,7 @@ public final class Servers {
 
     private static Server instantiate(Class<? extends Server> clazz, String host, int port) {
         try {
-            Constructor<? extends Server> constructor = clazz.getDeclaredConstructor(String.class, Integer.TYPE);
+            var constructor = clazz.getDeclaredConstructor(String.class, Integer.TYPE);
             return constructor.newInstance(host, port);
         } catch (Exception e) {
             throw new CreationFailed(clazz, e);

@@ -100,7 +100,7 @@ public class SessionPool implements SessionStore, SessionHouse {
     }
 
     private Session makeSession(String sid, Session data) {
-        Session session = new Session(sid);
+        var session = new Session(sid);
         session.merge(data);
         session.maxAge(data.maxAge());
         session.updatedAt(data.updatedAt());

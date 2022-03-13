@@ -150,7 +150,7 @@ public class UndertowServer implements Server {
         }
 
         private Uri reconstructUri(HttpServerExchange exchange) {
-            Uri uri = Uri.of(exchange.getRequestURI())
+            var uri = Uri.of(exchange.getRequestURI())
                          .query(exchange.getQueryString());
             if (uri.scheme() == null) uri = uri.scheme(exchange.getRequestScheme());
             if (uri.host() == null) uri = uri.host(host);
@@ -159,7 +159,7 @@ public class UndertowServer implements Server {
         }
 
         private Headers readHeaders(HttpServerExchange exchange) {
-            Headers headers = new Headers();
+            var headers = new Headers();
             for (HeaderValues values : exchange.getRequestHeaders()) {
                 for (String value : values) {
                     headers.add(values.getHeaderName().toString(), value);
@@ -169,7 +169,7 @@ public class UndertowServer implements Server {
         }
 
         private Map<String, List<String>> readParameters(HttpServerExchange exchange) throws IOException {
-            Map<String, List<String>> parameters = new HashMap<>();
+            var parameters = new HashMap<String, List<String>>();
             parameters.putAll(readQueryParameters(exchange));
             parameters.putAll(readFormParameters(exchange));
             return parameters;
@@ -177,15 +177,15 @@ public class UndertowServer implements Server {
 
         private Map<String, List<String>> readQueryParameters(HttpServerExchange exchange) {
             return exchange.getQueryParameters().entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
+                    Map.Entry::getKey, it -> new ArrayList<>(it.getValue())));
         }
 
         private Map<String, List<String>> readFormParameters(HttpServerExchange exchange) throws IOException {
-            FormEncodedDataDefinition form = new FormEncodedDataDefinition();
+            var form = new FormEncodedDataDefinition();
             form.setDefaultEncoding(StandardCharsets.UTF_8.name());
 
             try (FormDataParser parser = form.create(exchange)) {
-                Map<String, List<String>> parameters = new HashMap<>();
+                var parameters = new HashMap<String, List<String>>();
                 if (parser == null) return parameters;
 
                 FormData data = parser.parseBlocking();
@@ -200,7 +200,7 @@ public class UndertowServer implements Server {
         }
 
         private List<BodyPart> readParts(HttpServerExchange exchange) throws IOException {
-            MultiPartParserDefinition multipart = new MultiPartParserDefinition();
+            var multipart = new MultiPartParserDefinition();
             multipart.setDefaultEncoding(StandardCharsets.UTF_8.name());
 
             try(FormDataParser parser = multipart.create(exchange)) {
@@ -210,11 +210,11 @@ public class UndertowServer implements Server {
                 FormData data = parser.parseBlocking();
                 for (String name : data) {
                     for (FormData.FormValue param : data.get(name)) {
-                        BodyPart part = new BodyPart().filename(param.getFileName())
-                                                      .contentType(contentTypeOf(param))
-                                                      .name(name);
+                        var part = new BodyPart().filename(param.getFileName())
+                                                 .contentType(contentTypeOf(param))
+                                                 .name(name);
                         if (param.isFileItem()) {
-                            final FileInputStream content = new FileInputStream(param.getFileItem().getFile().toFile());
+                            var content = new FileInputStream(param.getFileItem().getFile().toFile());
                             part.content(track(content));
                         } else {
                             part.content(param.getValue());

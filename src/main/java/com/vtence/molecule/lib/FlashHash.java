@@ -87,7 +87,7 @@ public class FlashHash {
     }
 
     public void sweep() {
-        Map<String, Object> fresh = new HashMap<>();
+        var fresh = new HashMap<String, Object>();
         entries.keySet().stream().filter(this.keep::contains).forEach(key -> fresh.put(key, entries.get(key)));
         entries.clear();
         entries.putAll(fresh);

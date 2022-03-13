@@ -16,7 +16,7 @@ public class UrlEncodedForm extends Form {
 
     @Override
     public long contentLength() {
-        ByteCountingOutputStream out = new ByteCountingOutputStream();
+        var out = new ByteCountingOutputStream();
         try {
             writeTo(out);
         } catch (IOException ignored) {
@@ -27,10 +27,10 @@ public class UrlEncodedForm extends Form {
 
     @Override
     public void subscribe(Flow.Subscriber<? super ByteBuffer> subscriber) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        var buffer = new ByteArrayOutputStream();
         try {
             writeTo(buffer);
-            BodyPublisher delegate = BodyPublishers.ofByteArray(buffer.toByteArray());
+            var delegate = BodyPublishers.ofByteArray(buffer.toByteArray());
             delegate.subscribe(subscriber);
         } catch (IOException e) {
             subscriber.onError(e);
@@ -80,8 +80,8 @@ public class UrlEncodedForm extends Form {
         }
 
         public void encode(OutputStream out, Charset charset) throws IOException {
-            URLEscaper escaper = URLEscaper.to(charset);
-            Writer writer = new OutputStreamWriter(out, charset);
+            var escaper = URLEscaper.to(charset);
+            var writer = new OutputStreamWriter(out, charset);
             writer.append(escaper.escape(name)).append("=").append(escaper.escape(value));
             writer.flush();
         }

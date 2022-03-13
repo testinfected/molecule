@@ -36,8 +36,8 @@ public class Failsafe implements Middleware {
     }
 
     private String formatAsHtml(Throwable error) {
-        StringWriter html = new StringWriter();
-        PrintWriter buffer = new PrintWriter(html);
+        var html = new StringWriter();
+        var buffer = new PrintWriter(html);
         buffer.println("<html>");
         buffer.println("<body>");
         buffer.println("<h1>Oups!</h1>");

@@ -19,7 +19,7 @@ public class ConnectionScope implements Middleware {
     public Application then(Application next) {
         return request -> {
             Connection connection = dataSource.getConnection();
-            Reference ref = new Reference(request);
+            var ref = new Reference(request);
 
             ref.set(connection);
             try {

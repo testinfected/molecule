@@ -38,7 +38,7 @@ public final class MimeTypes {
     }
 
     public static Predicate<String> isSpecializationOf(String pattern) {
-        final MediaType type = MediaType.parse(pattern);
+        var type = MediaType.parse(pattern);
         return m -> type.isGeneralizationOf(MediaType.parse(m));
     }
 

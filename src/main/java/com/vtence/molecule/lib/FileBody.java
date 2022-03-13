@@ -26,7 +26,7 @@ public class FileBody implements Body {
     }
 
     public void writeTo(OutputStream out, Charset charset) throws IOException {
-        try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
+        try (var in = new BufferedInputStream(new FileInputStream(file))) {
             in.transferTo(out);
         }
     }

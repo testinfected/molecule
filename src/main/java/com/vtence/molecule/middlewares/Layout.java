@@ -70,7 +70,7 @@ public class Layout implements Middleware {
     }
 
     private String render(Body body, Charset charset) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        var buffer = new ByteArrayOutputStream();
         body.writeTo(buffer, charset);
         return buffer.toString(charset.name());
     }

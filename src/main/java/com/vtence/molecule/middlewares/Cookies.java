@@ -21,7 +21,7 @@ public class Cookies implements Middleware {
 
     public Application then(Application next) {
         return request -> {
-            CookieJar cookieJar = new CookieJar(clientCookiesFrom(request));
+            var cookieJar = new CookieJar(clientCookiesFrom(request));
             cookieJar.bind(request);
             try {
                 return next.handle(request)
@@ -36,11 +36,11 @@ public class Cookies implements Middleware {
 
     private Consumer<Response> commitCookies(CookieJar cookies) {
         return response -> {
-            for (Cookie cookie : cookies.fresh()) {
+            for (var cookie : cookies.fresh()) {
                 response.addHeader(SET_COOKIE, cookie.toString());
             }
 
-            for (Cookie cookie : cookies.discarded()) {
+            for (var cookie : cookies.discarded()) {
                 response.addHeader(SET_COOKIE, cookie.maxAge(0).toString());
             }
         };

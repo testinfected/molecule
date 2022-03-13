@@ -35,7 +35,7 @@ public class Headers {
     }
 
     public Map<String, String> all() {
-        Map<String, String> headers = new LinkedHashMap<>();
+        var headers = new LinkedHashMap<String, String>();
         for (String name : names()) {
             headers.put(name, get(name));
         }

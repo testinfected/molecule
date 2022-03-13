@@ -24,7 +24,7 @@ public class ContentLanguage {
     }
 
     public static ContentLanguage from(Header header) {
-        ContentLanguage languages = new ContentLanguage();
+        var languages = new ContentLanguage();
         header.values().stream().filter(locale -> !locale.equals(""))
               .forEach(locale -> languages.add(Locale.forLanguageTag(locale)));
         return languages;

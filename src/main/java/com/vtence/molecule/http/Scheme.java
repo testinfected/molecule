@@ -5,7 +5,7 @@ public final class Scheme {
     public static final Scheme HTTP = new Scheme("http", 80);
     public static final Scheme HTTPS = new Scheme("https", 443);
 
-    private static final Scheme[] KNOWN = new Scheme[] { HTTP, HTTPS };
+    private static final Scheme[] KNOWN_SCHEMES = new Scheme[] { HTTP, HTTPS };
 
     private final String name;
     private final int defaultPort;
@@ -28,7 +28,7 @@ public final class Scheme {
     }
 
     public static Scheme of(String name) {
-        for (Scheme scheme : KNOWN) {
+        for (var scheme : KNOWN_SCHEMES) {
             if (scheme.name.equalsIgnoreCase(name)) return scheme;
         }
         return new Scheme(name, -1);

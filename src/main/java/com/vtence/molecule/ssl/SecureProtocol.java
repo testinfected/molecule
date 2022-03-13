@@ -20,7 +20,7 @@ public enum SecureProtocol {
     }
 
     public SSLContext initialize(KeyManager[] keys, TrustManager[] trusts) throws GeneralSecurityException {
-        SSLContext context = SSLContext.getInstance(protocol);
+        var context = SSLContext.getInstance(protocol);
         context.init(keys, trusts, null);
         return context;
     }

@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class BodyContent {
 
     public static byte[] asBytes(Response response) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        var out = new ByteArrayOutputStream();
         try {
             response.body().writeTo(out, response.charset());
         } catch (IOException e) {
