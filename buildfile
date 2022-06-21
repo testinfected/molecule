@@ -1,8 +1,8 @@
 require 'buildr/gpg'
 
-VERSION_NUMBER = "0.15.0-SNAPSHOT"
+VERSION_NUMBER = "0.15.0"
 
-Release.next_version = '0.15.0-SNAPSHOT'
+Release.next_version = '0.16.0-SNAPSHOT'
 Release.commit_message = lambda { |version| "Bump version number to #{version}" }
 Release.tag_name = lambda { |version| "v#{version}" }
 
