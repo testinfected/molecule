@@ -12,6 +12,4 @@ env:
     - TERM=dumb
 
 after_success:
-  - gradle coverage coveralls
-  - curl -F 'json_file=@build/coveralls/report.json' 'https://coveralls.io/api/v1/jobs'
-  - .scripts/publish-to-sonatype.sh
+  - ./gradlew test jacocoTestReport coveralls
