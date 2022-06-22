@@ -53,6 +53,12 @@ tasks.jacocoTestReport {
     }
 }
 
+coveralls {
+    saveAsFile = true
+    sendToCoveralls = false
+}
+
+
 publishing {
     publications {
         create<MavenPublication>("molecule") {
