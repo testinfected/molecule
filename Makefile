@@ -18,4 +18,4 @@ build:
 
 publish:
 	@echo "Publishing version ${VERSION} to Sonatype OSS repository..."
-	@./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+	@./gradlew --no-configuration-cache publishToSonatype closeAndReleaseSonatypeStagingRepository
